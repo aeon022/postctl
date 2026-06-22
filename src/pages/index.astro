@@ -1445,10 +1445,30 @@ Campaign successfully posted!
 	});
 
 	backToTopBtn?.addEventListener("click", () => {
-		window.scrollTo({
-			top: 0,
-			behavior: "smooth"
-		});
+		const start = window.scrollY || document.documentElement.scrollTop;
+		const duration = 500; // ms
+		let startTime = null;
+
+		function animation(currentTime) {
+			if (startTime === null) startTime = currentTime;
+			const timeElapsed = currentTime - startTime;
+			const run = easeInOutQuad(timeElapsed, start, -start, duration);
+			window.scrollTo(0, run);
+			if (timeElapsed < duration) {
+				requestAnimationFrame(animation);
+			} else {
+				window.scrollTo(0, 0); // ensure it lands exactly at 0
+			}
+		}
+
+		function easeInOutQuad(t, b, c, d) {
+			t /= d / 2;
+			if (t < 1) return c / 2 * t * t + b;
+			t--;
+			return -c / 2 * (t * (t - 2) - 1) + b;
+		}
+
+		requestAnimationFrame(animation);
 	});
 
 	// Smooth scroll for anchor links with header offset
