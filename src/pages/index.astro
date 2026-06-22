@@ -463,6 +463,11 @@ Campaign successfully posted!
 			</div>
 		</div>
 	</footer>
+
+	<!-- Back to Top Button -->
+	<button id="back-to-top" class="back-to-top" aria-label="Back to Top">
+		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+	</button>
 </Layout>
 
 <style>
@@ -1319,6 +1324,41 @@ Campaign successfully posted!
 	.footer-link:hover {
 		color: var(--text-primary);
 	}
+
+	/* Back to Top Button */
+	.back-to-top {
+		position: fixed;
+		bottom: 2rem;
+		right: 2rem;
+		z-index: 99;
+		background: rgba(13, 14, 18, 0.8);
+		backdrop-filter: blur(8px);
+		border: 1px solid var(--border);
+		color: var(--text-secondary);
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(10px);
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		box-shadow: var(--shadow-md);
+	}
+	.back-to-top.visible {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+	}
+	.back-to-top:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+		box-shadow: 0 0 15px var(--accent-glow);
+		transform: translateY(-2px);
+	}
 </style>
 
 <script>
@@ -1380,6 +1420,23 @@ Campaign successfully posted!
 			if (targetContent) {
 				targetContent.classList.add("active");
 			}
+		});
+	});
+
+	// Back to Top button scroll check
+	const backToTopBtn = document.getElementById("back-to-top");
+	window.addEventListener("scroll", () => {
+		if (window.scrollY > 300) {
+			backToTopBtn?.classList.add("visible");
+		} else {
+			backToTopBtn?.classList.remove("visible");
+		}
+	});
+
+	backToTopBtn?.addEventListener("click", () => {
+		window.scrollTo({
+			top: 0,
+			behavior: "smooth"
 		});
 	});
 
