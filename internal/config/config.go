@@ -35,11 +35,34 @@ type Config struct {
 		Model    string `mapstructure:"model" yaml:"model"`
 		BaseURL  string `mapstructure:"base_url" yaml:"base_url"`
 	} `mapstructure:"ai" yaml:"ai"`
-	DBPath string `mapstructure:"db_path" yaml:"db_path"`
+	DBPath     string `mapstructure:"db_path" yaml:"db_path"`
+	LicenseKey string `mapstructure:"license_key" yaml:"license_key"`
 }
 
 // ActiveConfig stellt die geladene Konfiguration global zur Verfügung
 var ActiveConfig Config
+
+// IsPro prüft, ob eine gültige Pro-Lizenz aktiv ist
+func IsPro() bool {
+	return ValidateLicenseKey(ActiveConfig.LicenseKey)
+}
+
+// ValidateLicenseKey prüft das Format und die Gültigkeit des Lizenzschlüssels.
+// Für Demo-/Entwicklungszwecke ist jeder Schlüssel gültig, der mit "PCTL-PRO-" beginnt
+// und mindestens 16 Zeichen lang ist, oder exakt "postctl-pro-dev" lautet.
+func ValidateLicenseKey(key string) bool {
+	key = strings.TrimSpace(key)
+	if key == "" {
+		return false
+	}
+	if key == "postctl-pro-dev" {
+		return true
+	}
+	if strings.HasPrefix(key, "PCTL-PRO-") && len(key) >= 16 {
+		return true
+	}
+	return false
+}
 
 // LoadConfig lädt die Konfiguration aus ~/.config/postctl/config.yaml oder setzt Defaultwerte
 func LoadConfig() error {
@@ -57,6 +80,7 @@ func LoadConfig() error {
 	viper.SetDefault("defaults.image_dir", "./screenshots")
 	viper.SetDefault("ai.provider", "openai")
 	viper.SetDefault("ai.model", "gpt-4o-mini")
+	viper.SetDefault("license_key", "")
 
 	viper.AddConfigPath(configDir)
 	viper.SetConfigName("config")
@@ -71,6 +95,9 @@ func LoadConfig() error {
 		
 		dummyContent := `# postctl configuration file
 db_path: "~/.config/postctl/postctl.db"
+
+# License Key for Pro Features
+license_key: ""
 
 defaults:
   timezone: "Europe/Vienna"
@@ -160,6 +187,7 @@ func SaveConfig() error {
 	viper.Set("linkedin.client_secret", ActiveConfig.LinkedIn.ClientSecret)
 	viper.Set("threads.app_id", ActiveConfig.Threads.AppID)
 	viper.Set("threads.app_secret", ActiveConfig.Threads.AppSecret)
+	viper.Set("license_key", ActiveConfig.LicenseKey)
 
 	return nil
 }

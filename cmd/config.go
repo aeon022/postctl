@@ -92,6 +92,8 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Threads.AppID = value
 	case "threads.app_secret":
 		config.ActiveConfig.Threads.AppSecret = value
+	case "license_key", "licensekey":
+		config.ActiveConfig.LicenseKey = value
 	default:
 		return fmt.Errorf("unknown config key: %s", key)
 	}
@@ -101,6 +103,7 @@ func setConfigValue(key, value string) error {
 type configShowJSON struct {
 	OK     bool          `json:"ok"`
 	Config config.Config `json:"config"`
+	IsPro  bool          `json:"is_pro"`
 }
 
 type configSuccessJSON struct {
@@ -122,6 +125,7 @@ func reportConfigShow(cmd *cobra.Command) {
 	masked.Twitter.ClientSecret = maskSecret(masked.Twitter.ClientSecret)
 	masked.LinkedIn.ClientSecret = maskSecret(masked.LinkedIn.ClientSecret)
 	masked.Threads.AppSecret = maskSecret(masked.Threads.AppSecret)
+	masked.LicenseKey = maskSecret(masked.LicenseKey)
 
 	out := cmd.OutOrStdout()
 
@@ -129,6 +133,7 @@ func reportConfigShow(cmd *cobra.Command) {
 		outJSON := configShowJSON{
 			OK:     true,
 			Config: masked,
+			IsPro:  config.IsPro(),
 		}
 		jsonBytes, _ := json.MarshalIndent(outJSON, "", "  ")
 		fmt.Fprintln(out, string(jsonBytes))
@@ -152,7 +157,13 @@ func reportConfigShow(cmd *cobra.Command) {
 		fmt.Fprintf(out, "    client_secret:   %s\n\n", masked.LinkedIn.ClientSecret)
 		fmt.Fprintln(out, "  threads:")
 		fmt.Fprintf(out, "    app_id:          %s\n", masked.Threads.AppID)
-		fmt.Fprintf(out, "    app_secret:      %s\n", masked.Threads.AppSecret)
+		fmt.Fprintf(out, "    app_secret:      %s\n\n", masked.Threads.AppSecret)
+		
+		statusStr := "CORE"
+		if config.IsPro() {
+			statusStr = "PRO ACTIVE"
+		}
+		fmt.Fprintf(out, "  license_key:       %s [%s]\n", masked.LicenseKey, statusStr)
 	}
 }
 

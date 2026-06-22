@@ -14,6 +14,11 @@ func (m Model) renderSettings() string {
 
 	builder.WriteString(StyleHeader.Render("EINSTELLUNGEN / CONFIGURATION") + "\n\n")
 
+	licenseStatus := "Core (Gratis)"
+	if config.IsPro() {
+		licenseStatus = "Pro (Aktiv ✅)"
+	}
+
 	options := []struct {
 		label string
 		value string
@@ -21,21 +26,29 @@ func (m Model) renderSettings() string {
 		{"AI Provider", config.ActiveConfig.AI.Provider},
 		{"AI Model   ", config.ActiveConfig.AI.Model},
 		{"Dry Run    ", fmt.Sprintf("%t", config.ActiveConfig.Defaults.DryRun)},
+		{"Lizenztyp  ", licenseStatus},
 	}
 
 	for i, opt := range options {
 		cursorStr := "  "
-		if i == m.cursor {
+		// Lizenztyp ist nicht auswählbar, daher Cursor unterdrücken, falls er darauf zeigen würde
+		if i == m.cursor && i < 3 {
 			cursorStr = "> "
 		}
 
 		labelStyle := lipgloss.NewStyle().Foreground(ColorText)
-		if i == m.cursor {
+		if i == m.cursor && i < 3 {
 			labelStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 		}
 
 		valStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
-		if opt.value == "true" {
+		if opt.label == "Lizenztyp  " {
+			if config.IsPro() {
+				valStyle = lipgloss.NewStyle().Foreground(ColorPosted).Bold(true)
+			} else {
+				valStyle = lipgloss.NewStyle().Foreground(ColorLightGray)
+			}
+		} else if opt.value == "true" {
 			valStyle = lipgloss.NewStyle().Foreground(ColorPosted).Bold(true)
 		} else if opt.value == "false" {
 			valStyle = lipgloss.NewStyle().Foreground(ColorFailed).Bold(true)
@@ -47,7 +60,7 @@ func (m Model) renderSettings() string {
 	}
 
 	builder.WriteString("\n")
-	builder.WriteString(StyleHelp.Render("←/→ / enter: Werte ändern  ·  Änderungen werden sofort in config.yaml gespeichert."))
+	builder.WriteString(StyleHelp.Render("←/→ / enter: Werte ändern  ·  Änderungen werden sofort gespeichert.\nPro-Lizenz über CLI aktivieren:\n  postctl config set license_key <key>"))
 
 	return StyleBox.Width(78).Height(14).Render(builder.String())
 }

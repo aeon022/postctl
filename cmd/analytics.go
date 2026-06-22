@@ -31,7 +31,18 @@ var analyticsCmd = &cobra.Command{
 		}
 		defer s.Close()
 
-		// 1. Alle geposteten Artikel abfragen
+		// 1. Feature Gate check
+		if !config.IsPro() {
+			if analyticsDays > 3 {
+				if FormatFlag != "json" {
+					fmt.Fprintln(os.Stderr, "💡 Pro Tip: Mit postctl Pro kannst du unbegrenzt Historie analysieren! Trage einen Lizenzschlüssel mit 'postctl config set license_key <key>' ein.")
+					fmt.Fprint(os.Stderr, "Limitiere Analyse auf die letzten 3 Tage (Core-Lizenz).\n\n")
+				}
+				analyticsDays = 3
+			}
+		}
+
+		// 2. Alle geposteten Artikel abfragen
 		posts, err := s.ListPosts(ctx, "all", "posted", "")
 		if err != nil {
 			reportAnalyticsError(fmt.Errorf("fetch posts: %w", err), 2)
