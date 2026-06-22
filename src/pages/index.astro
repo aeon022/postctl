@@ -3,6 +3,11 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
+	<!-- Decorative Grid & Glow Background -->
+	<div class="bg-glow bg-glow-1"></div>
+	<div class="bg-glow bg-glow-2"></div>
+	<div class="grid-overlay"></div>
+
 	<!-- Navigation Header -->
 	<header class="header">
 		<div class="container header-container">
@@ -12,10 +17,12 @@ import Layout from '../layouts/Layout.astro';
 			</div>
 			<nav class="nav">
 				<a href="#features" class="nav-link">Features</a>
-				<a href="#tui-demo" class="nav-link">TUI-Demo</a>
-				<a href="#pricing" class="nav-link">Preise & Pro</a>
+				<a href="#how-it-works" class="nav-link">How it Works</a>
+				<a href="#tui-demo" class="nav-link">TUI Demo</a>
+				<a href="#ai-operator" class="nav-link">AI-Ready</a>
+				<a href="#pricing" class="nav-link">Pricing</a>
 				<a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="nav-link github-link">
-					<svg height="20" viewBox="0 0 16 16" width="20" class="github-icon"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+					<svg height="18" viewBox="0 0 16 16" width="18" class="github-icon"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
 					GitHub
 				</a>
 			</nav>
@@ -28,15 +35,15 @@ import Layout from '../layouts/Layout.astro';
 			<div class="container hero-container">
 				<div class="hero-content">
 					<div class="badge">Astro v6 Powered</div>
-					<h1 class="hero-title">Social Media Management direkt aus dem <span class="text-gradient">Terminal</span></h1>
+					<h1 class="hero-title">Social Media Management from your <span class="text-gradient">Terminal</span></h1>
 					<p class="hero-subtitle">
-						Markdown-First, Terminal-Native und AI-Ready. Verwalte und veröffentliche deine Posts für Twitter/X, LinkedIn und Threads, ohne deine Entwicklungsumgebung zu verlassen.
+						A Markdown-first, terminal-native post scheduler and publisher. Manage Twitter, LinkedIn, and Threads directly from the CLI or TUI. Zero dependencies, CGO-free, and AI-ready.
 					</p>
 					<div class="hero-ctas">
-						<a href="#tui-demo" class="btn btn-primary">TUI-Demo ansehen</a>
-						<a href="#pricing" class="btn btn-secondary">Pro freischalten</a>
+						<a href="#tui-demo" class="btn btn-primary">Try Interactive TUI</a>
+						<a href="#pricing" class="btn btn-secondary">Get Pro License</a>
 						<a href="https://polar.sh/aeon022/donate" target="_blank" rel="noopener noreferrer" class="btn btn-tertiary">
-							<span class="heart-icon">♥</span> Spenden via Polar.sh
+							<span class="heart-icon">♥</span> Fund on Polar.sh
 						</a>
 					</div>
 				</div>
@@ -63,8 +70,8 @@ import Layout from '../layouts/Layout.astro';
 		<section id="features" class="features-section">
 			<div class="container">
 				<div class="section-header">
-					<h2 class="section-title">Entwickelt für effiziente Workflows</h2>
-					<p class="section-subtitle">postctl verbindet das Beste aus Git-Versionierung, Terminal-Effizienz und KI-Automatisierung.</p>
+					<h2 class="section-title">Built for Developer Workflows</h2>
+					<p class="section-subtitle">Why switch to bloated web UIs when you can distribute your content alongside your code?</p>
 				</div>
 
 				<div class="features-grid">
@@ -72,36 +79,114 @@ import Layout from '../layouts/Layout.astro';
 					<div class="feature-card">
 						<div class="feature-icon">📝</div>
 						<h3 class="feature-title">Markdown-First</h3>
-						<p class="feature-desc">Deine Posts leben als einfache Markdown-Dateien mit YAML-Frontmatter direkt in deinem Git-Repository. Versioniert, diffbar und per Pull Request reviewbar.</p>
+						<p class="feature-desc">Write your posts inside your favorite editor. Frontmatter fields handle platform targets, scheduling, and image paths. Perfectly Git-versionable and reviewable in PRs.</p>
 					</div>
 					<!-- Feature 2 -->
 					<div class="feature-card">
 						<div class="feature-icon">🖥️</div>
-						<h3 class="feature-title">Terminal-Native</h3>
-						<p class="feature-desc">Vollständige TUI (Terminal User Interface) basierend auf Bubbletea. Plane Beiträge, prüfe den Verlauf und editiere Einstellungen, ohne jemals den Browser zu öffnen.</p>
+						<h3 class="feature-title">TUI & CLI Modes</h3>
+						<p class="feature-desc">Use CLI commands for instant scriptability or open the full Bubbletea-based TUI to view, edit, filter, and schedule posts interactively without context-switching.</p>
 					</div>
 					<!-- Feature 3 -->
 					<div class="feature-card">
 						<div class="feature-icon">🤖</div>
 						<h3 class="feature-title">AI-as-Operator</h3>
-						<p class="feature-desc">Entwickelt für KI-Agenten (wie Claude oder GPT). CLI-Befehle unterstützen strukturiertes JSON-Output (`--format json`) und simulationssichere Testläufe (`--dry-run`).</p>
+						<p class="feature-desc">Engineered for AI assistants. Claude/GPT can generate Markdown draft files, test publication flows with `--dry-run`, and receive machine-readable outcomes using `--format json`.</p>
 					</div>
 					<!-- Feature 4 -->
 					<div class="feature-card">
 						<div class="feature-icon">⚡</div>
-						<h3 class="feature-title">Single Binary</h3>
-						<p class="feature-desc">Geschrieben in purem Go mit SQLite als integrierter lokaler Datenbank. Keine Node-Runtimes, Docker-Container oder Cloud-Zwang. Ein Binary, läuft überall offline.</p>
+						<h3 class="feature-title">Zero Infrastructure</h3>
+						<p class="feature-desc">Built in Go with a CGO-free SQLite storage engine. Packaged as a single offline-first binary. Copy the database file to backup all your posts and schedules.</p>
 					</div>
 				</div>
 			</div>
 		</section>
 
-		<!-- Interactive TUI Simulator Section -->
+		<!-- How it Works Section (NEW) -->
+		<section id="how-it-works" class="how-section">
+			<div class="container">
+				<div class="section-header">
+					<h2 class="section-title">How It Works</h2>
+					<p class="section-subtitle">Three steps from draft file to multi-platform publication.</p>
+				</div>
+
+				<div class="how-grid">
+					<!-- Step 1 -->
+					<div class="how-step-card">
+						<div class="step-num">01</div>
+						<div class="step-text-col">
+							<h3 class="step-title">Write Markdown Posts</h3>
+							<p class="step-desc">Structure your post as Markdown. Frontmatter defines platforms, campaigns, schedule times, and tags. Separate thread elements using headers.</p>
+						</div>
+						<div class="step-visual">
+							<pre class="code-block"><code>---
+platform: twitter
+type: thread
+campaign: launch-v1
+schedule: 2026-06-25T09:00
+images:
+  - img/dashboard.png
+---
+
+## Tweet 1
+Your CMS is a single file...
+
+## Tweet 2
+Calendar grid screenshots attached...
+</code></pre>
+						</div>
+					</div>
+
+					<!-- Step 2 -->
+					<div class="how-step-card reverse">
+						<div class="step-num">02</div>
+						<div class="step-text-col">
+							<h3 class="step-title">Import & Preview</h3>
+							<p class="step-desc">Import the Markdown directory to populate the local SQLite database. Open the TUI to visually inspect thread limits, character lengths, and schedules.</p>
+						</div>
+						<div class="step-visual">
+							<pre class="code-block"><code>$ postctl import ./posts/
+Importing...
+✔ post-1.md -> Import successful
+✔ post-2.md -> Import successful
+
+$ postctl list
+ID                  Platform  Type    Status
+launch-v1-twitter   twitter   thread  draft
+launch-v1-linkedin  linkedin  single  draft
+</code></pre>
+						</div>
+					</div>
+
+					<!-- Step 3 -->
+					<div class="how-step-card">
+						<div class="step-num">03</div>
+						<div class="step-text-col">
+							<h3 class="step-title">Post or Run Daemon</h3>
+							<p class="step-desc">Publish campaigns instantly with `--dry-run` safety gates, or start `postctl daemon` in the background to automatically trigger scheduled items.</p>
+						</div>
+						<div class="step-visual">
+							<pre class="code-block"><code># Start background scheduler
+$ postctl daemon --interval 30 --background
+
+# Or post immediately (simulate first)
+$ postctl campaign post launch-v1 --dry-run
+$ postctl campaign post launch-v1
+Campaign successfully posted!
+</code></pre>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- TUI Interactive Simulator Section -->
 		<section id="tui-demo" class="tui-section">
 			<div class="container">
 				<div class="section-header">
-					<h2 class="section-title">Erlebe die TUI im Browser</h2>
-					<p class="section-subtitle">Klicke durch die Tabs der interaktiven Terminal-Simulation, um postctl in Aktion zu sehen.</p>
+					<h2 class="section-title">Explore the Terminal UI</h2>
+					<p class="section-subtitle">Click the tabs on the interactive terminal mockup below to preview the actual app dashboards.</p>
 				</div>
 
 				<!-- TUI Mockup Container -->
@@ -163,7 +248,7 @@ import Layout from '../layouts/Layout.astro';
 							
 							<!-- Tab 1: Posts -->
 							<div class="tui-tab-content" id="tui-tab-1">
-								<div class="tui-sub-header">IMPORTIERTE BEITRÄGE (FILTER: ALL)</div>
+								<div class="tui-sub-header">IMPORTED POSTS (FILTER: ALL)</div>
 								<div class="posts-list">
 									<div class="post-item selected">
 										<div class="post-header">
@@ -194,7 +279,7 @@ import Layout from '../layouts/Layout.astro';
 							
 							<!-- Tab 2: Schedule -->
 							<div class="tui-tab-content" id="tui-tab-2">
-								<div class="tui-sub-header">VERÖFFENTLICHUNGS-ZEITPLAN (NEXT UP)</div>
+								<div class="tui-sub-header">PUBLICATION TIMELINE (NEXT UP)</div>
 								<div class="schedule-timeline">
 									<div class="timeline-event">
 										<div class="time-badge">Mon 09:00</div>
@@ -222,7 +307,7 @@ import Layout from '../layouts/Layout.astro';
 							
 							<!-- Tab 3: Settings -->
 							<div class="tui-tab-content" id="tui-tab-3">
-								<div class="tui-sub-header">EINSTELLUNGEN / CONFIGURATION</div>
+								<div class="tui-sub-header">SYSTEM CONFIGURATION</div>
 								<div class="settings-list">
 									<div class="setting-row cursor-pointing">
 										<span class="setting-label">AI Provider:</span>
@@ -237,12 +322,12 @@ import Layout from '../layouts/Layout.astro';
 										<span class="setting-value color-failed">false</span>
 									</div>
 									<div class="setting-row">
-										<span class="setting-label">Lizenztyp:</span>
-										<span class="setting-value color-posted">Pro (Aktiv ✅)</span>
+										<span class="setting-label">License Type:</span>
+										<span class="setting-value color-posted">Pro (Active ✅)</span>
 									</div>
 								</div>
 								<div class="tui-footer-tip" style="margin-top: 1.5rem;">
-									<span class="tui-muted">Tipp: Aktiviere deine Pro-Lizenz direkt über das Terminal via:</span><br/>
+									<span class="tui-muted">Tip: Activate your Pro key via command line anytime:</span><br/>
 									<code>postctl config set license_key PCTL-PRO-XXXX...</code>
 								</div>
 							</div>
@@ -250,8 +335,49 @@ import Layout from '../layouts/Layout.astro';
 						
 						<!-- Help Bar -->
 						<div class="tui-help-bar">
-							<span>Klicke die Tabs oben zum Navigieren</span>
-							<span class="align-right">q Beenden</span>
+							<span>Click tabs above to navigate</span>
+							<span class="align-right">q Quit</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- AI Operator workflow section (NEW) -->
+		<section id="ai-operator" class="ai-operator-section">
+			<div class="container">
+				<div class="section-header">
+					<h2 class="section-title">Designed for AI Operators</h2>
+					<p class="section-subtitle">Let your AI assistant handle social media distribution while you retain total approval control.</p>
+				</div>
+
+				<div class="ai-workflow-grid">
+					<div class="ai-workflow-card">
+						<div class="workflow-step">
+							<span class="w-icon">🤖</span>
+							<h4>1. AI Generates Drafts</h4>
+							<p>Your coding agent reads web contents or release files and generates formatted Markdown draft files into a directory.</p>
+						</div>
+					</div>
+					<div class="ai-workflow-card">
+						<div class="workflow-step">
+							<span class="w-icon">💾</span>
+							<h4>2. AI Imports & Checks</h4>
+							<p>AI runs `postctl import` and checks results using `postctl list --format json`. Validation catches lengths and files.</p>
+						</div>
+					</div>
+					<div class="ai-workflow-card">
+						<div class="workflow-step">
+							<span class="w-icon">🛡️</span>
+							<h4>3. Dry-Run Validation</h4>
+							<p>AI executes `postctl campaign post launch-v1 --dry-run` to query APIs and verify integrity without causing live posts.</p>
+						</div>
+					</div>
+					<div class="ai-workflow-card">
+						<div class="workflow-step">
+							<span class="w-icon">👤</span>
+							<h4>4. Human Approves & Posts</h4>
+							<p>You review the simulated outcome in chat. Give the agent approval, and it triggers the final publish command.</p>
 						</div>
 					</div>
 				</div>
@@ -262,8 +388,8 @@ import Layout from '../layouts/Layout.astro';
 		<section id="pricing" class="pricing-section">
 			<div class="container">
 				<div class="section-header">
-					<h2 class="section-title">Finde das passende Lizenzmodell</h2>
-					<p class="section-subtitle">postctl ist Open Source. Unterstütze die Entwicklung oder schalte Premium-Features frei.</p>
+					<h2 class="section-title">Transparent Gating Structure</h2>
+					<p class="section-subtitle">postctl is open-source. Help fund development or upgrade to support advanced analytics.</p>
 				</div>
 
 				<div class="pricing-grid">
@@ -271,38 +397,38 @@ import Layout from '../layouts/Layout.astro';
 					<div class="pricing-card">
 						<div class="plan-header">
 							<h3 class="plan-name">Core (OSS)</h3>
-							<div class="plan-price">0€<span class="price-period">/ dauerhaft</span></div>
-							<p class="plan-desc">Perfekt für Entwickler, die ihre Posts direkt versionieren und posten möchten.</p>
+							<div class="plan-price">$0<span class="price-period">/ forever</span></div>
+							<p class="plan-desc">For developers looking to version and post files directly from the CLI or TUI.</p>
 						</div>
 						<ul class="plan-features">
-							<li><span class="check-icon">✓</span> Unbegrenzt importieren & posten</li>
-							<li><span class="check-icon">✓</span> Multi-Plattform (Twitter, LinkedIn, Threads)</li>
-							<li><span class="check-icon">✓</span> Vollständige Terminal UI & CLI</li>
-							<li><span class="check-icon">✓</span> Lokaler Scheduler-Daemon</li>
-							<li><span class="check-icon">✓</span> 100% Open Source (MIT Lizenz)</li>
+							<li><span class="check-icon">✓</span> Unlimited drafts & publication</li>
+							<li><span class="check-icon">✓</span> Multi-platform (Twitter, LinkedIn, Threads)</li>
+							<li><span class="check-icon">✓</span> Full Bubbletea TUI & Cobra CLI</li>
+							<li><span class="check-icon">✓</span> In-process daemon background scheduler</li>
+							<li><span class="check-icon">✓</span> 100% Open Source (MIT Licensed)</li>
 						</ul>
 						<div class="plan-cta">
-							<a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-full">Auf GitHub ansehen</a>
+							<a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-full">View Repository on GitHub</a>
 						</div>
 					</div>
 
 					<!-- Pro Plan (Polar.sh Subscriptions) -->
 					<div class="pricing-card featured">
-						<div class="pricing-badge">Empfohlen</div>
+						<div class="pricing-badge">Recommended</div>
 						<div class="plan-header">
 							<h3 class="plan-name">Pro (Polar.sh)</h3>
-							<div class="plan-price">9€<span class="price-period">/ Monat</span></div>
-							<p class="plan-desc">Schalte Profi-Analysen frei und unterstütze direkt die kontinuierliche Entwicklung.</p>
+							<div class="plan-price">$9<span class="price-period">/ month</span></div>
+							<p class="plan-desc">Unlock stats dashboard, support development, and generate secure license keys.</p>
 						</div>
 						<ul class="plan-features">
-							<li><span class="check-icon">✓</span> <strong>Analytics Dashboard</strong>: Auswertungen direkt im Terminal</li>
-							<li><span class="check-icon">✓</span> <strong>Unbegrenzte Historie</strong> statt 3 Tage</li>
-							<li><span class="check-icon">✓</span> <strong>Interaktive ASCII-Barcharts</strong> für Engagement Shares</li>
-							<li><span class="check-icon">✓</span> <strong>Pro-Support</strong> bei GitHub-Issues</li>
-							<li><span class="check-icon">✓</span> Generierung von Lizenzschlüsseln via Polar.sh</li>
+							<li><span class="check-icon">✓</span> <strong>Analytics Dashboard</strong>: Live engagement tracking</li>
+							<li><span class="check-icon">✓</span> <strong>Unlimited analytics history</strong> (Core limits to 3 days)</li>
+							<li><span class="check-icon">✓</span> <strong>Interactive ASCII Barcharts</strong> directly in terminal</li>
+							<li><span class="check-icon">✓</span> <strong>Priority GitHub Support</strong> SLA</li>
+							<li><span class="check-icon">✓</span> Automatic key generation and verification via Polar.sh</li>
 						</ul>
 						<div class="plan-cta">
-							<a href="https://polar.sh/aeon022/subscriptions" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full">Pro abonnieren via Polar.sh</a>
+							<a href="https://polar.sh/aeon022/subscriptions" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full">Subscribe Pro via Polar.sh</a>
 						</div>
 					</div>
 				</div>
@@ -310,12 +436,12 @@ import Layout from '../layouts/Layout.astro';
 				<!-- Donate Card -->
 				<div class="donate-banner">
 					<div class="donate-content">
-						<h3>Möchtest du uns einfach so unterstützen?</h3>
-						<p>Wir lieben Open Source. Du kannst ein einmaliges Trinkgeld spenden oder Sponsor werden.</p>
+						<h3>Want to support without a subscription?</h3>
+						<p>Fund individual issues, buy us coffee, or become a one-time sponsor on Polar.sh.</p>
 					</div>
 					<div class="donate-actions">
 						<a href="https://polar.sh/aeon022/donate" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-							<span class="heart-icon">♥</span> Spenden auf Polar.sh
+							<span class="heart-icon">♥</span> Fund on Polar.sh
 						</a>
 					</div>
 				</div>
@@ -330,8 +456,8 @@ import Layout from '../layouts/Layout.astro';
 				<span class="logo-icon">&gt;_</span> postctl Social Manager
 			</div>
 			<div class="footer-right">
-				<span>Lizenziert unter MIT &copy; 2026 aeon022.</span>
-				<a href="https://polar.sh/aeon022" target="_blank" rel="noopener noreferrer" class="footer-link">Polar.sh Profil</a>
+				<span>Licensed under MIT &copy; 2026 aeon022.</span>
+				<a href="https://polar.sh/aeon022" target="_blank" rel="noopener noreferrer" class="footer-link">Polar Profile</a>
 				<a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a>
 			</div>
 		</div>
@@ -339,13 +465,46 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <style>
+	/* Background Glows */
+	.bg-glow {
+		position: absolute;
+		width: 600px;
+		height: 600px;
+		background: radial-gradient(circle, var(--accent-glow) 0%, rgba(8,9,11,0) 70%);
+		z-index: -2;
+		pointer-events: none;
+		border-radius: 50%;
+	}
+	.bg-glow-1 {
+		top: -150px;
+		left: calc(50% - 300px);
+	}
+	.bg-glow-2 {
+		top: 800px;
+		right: -200px;
+	}
+	.grid-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-image: 
+			linear-gradient(var(--border) 1px, transparent 1px),
+			linear-gradient(90deg, var(--border) 1px, transparent 1px);
+		background-size: 80px 80px;
+		z-index: -1;
+		pointer-events: none;
+		opacity: 0.35;
+	}
+
 	/* Header Navigation */
 	.header {
 		position: sticky;
 		top: 0;
 		z-index: 100;
-		background: rgba(8, 9, 11, 0.8);
-		backdrop-filter: blur(12px);
+		background: rgba(8, 9, 11, 0.85);
+		backdrop-filter: blur(16px);
 		border-bottom: 1px solid var(--border);
 	}
 	.header-container {
@@ -371,10 +530,15 @@ import Layout from '../layouts/Layout.astro';
 		align-items: center;
 		gap: 2rem;
 	}
+	@media (max-width: 640px) {
+		.nav {
+			display: none;
+		}
+	}
 	.nav-link {
 		color: var(--text-secondary);
 		font-weight: 500;
-		font-size: 0.95rem;
+		font-size: 0.9rem;
 	}
 	.nav-link:hover {
 		color: var(--text-primary);
@@ -382,12 +546,13 @@ import Layout from '../layouts/Layout.astro';
 	.github-link {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		padding: 0.5rem 1rem;
+		gap: 0.4rem;
+		padding: 0.5rem 0.9rem;
 		border-radius: 8px;
 		background: var(--bg-tertiary);
 		border: 1px solid var(--border);
 		color: var(--text-primary);
+		font-size: 0.85rem;
 	}
 	.github-link:hover {
 		border-color: var(--accent);
@@ -396,19 +561,18 @@ import Layout from '../layouts/Layout.astro';
 
 	/* Hero Section */
 	.hero-section {
-		padding: 7rem 0 4rem 0;
-		position: relative;
+		padding: 7rem 0 5rem 0;
 	}
 	.hero-container {
 		display: grid;
-		grid-template-columns: 1.2fr 1fr;
+		grid-template-columns: 1.1fr 1fr;
 		gap: 4rem;
 		align-items: center;
 	}
 	@media (max-width: 968px) {
 		.hero-container {
 			grid-template-columns: 1fr;
-			gap: 3rem;
+			gap: 3.5rem;
 		}
 	}
 	.hero-content {
@@ -419,30 +583,31 @@ import Layout from '../layouts/Layout.astro';
 	.badge {
 		background: var(--accent-glow);
 		color: var(--accent);
-		border: 1px solid rgba(139, 124, 248, 0.3);
+		border: 1px solid rgba(139, 124, 248, 0.35);
 		padding: 0.35rem 0.85rem;
 		border-radius: 100px;
-		font-size: 0.8rem;
-		font-weight: 600;
-		letter-spacing: 0.05em;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
 		margin-bottom: 1.5rem;
 		text-transform: uppercase;
 	}
 	.hero-title {
-		font-size: 3.5rem;
-		line-height: 1.15;
+		font-size: 3.8rem;
+		line-height: 1.1;
 		margin-bottom: 1.5rem;
 	}
 	@media (max-width: 640px) {
 		.hero-title {
-			font-size: 2.5rem;
+			font-size: 2.8rem;
 		}
 	}
 	.hero-subtitle {
-		font-size: 1.2rem;
+		font-size: 1.15rem;
 		color: var(--text-secondary);
 		margin-bottom: 2.5rem;
 		max-width: 550px;
+		line-height: 1.7;
 	}
 	.hero-ctas {
 		display: flex;
@@ -460,7 +625,7 @@ import Layout from '../layouts/Layout.astro';
 		padding: 0.75rem 1.5rem;
 		border-radius: 8px;
 		font-weight: 600;
-		font-size: 0.95rem;
+		font-size: 0.9rem;
 		cursor: pointer;
 		border: 1px solid transparent;
 		transition: var(--transition);
@@ -490,7 +655,7 @@ import Layout from '../layouts/Layout.astro';
 		color: #f87171;
 	}
 	.btn-tertiary:hover {
-		background: rgba(239, 68, 68, 0.1);
+		background: rgba(239, 68, 68, 0.08);
 		border-color: #ef4444;
 		transform: translateY(-2px);
 	}
@@ -508,7 +673,7 @@ import Layout from '../layouts/Layout.astro';
 		border-radius: 12px;
 		box-shadow: var(--shadow-lg);
 		overflow: hidden;
-		min-height: 380px;
+		min-height: 400px;
 		display: flex;
 		flex-direction: column;
 	}
@@ -541,10 +706,10 @@ import Layout from '../layouts/Layout.astro';
 	.terminal-body {
 		padding: 1.5rem;
 		font-family: var(--font-mono);
-		font-size: 0.9rem;
+		font-size: 0.85rem;
 		color: #e5e7eb;
 		flex-grow: 1;
-		line-height: 1.5;
+		line-height: 1.6;
 		overflow-y: auto;
 	}
 	.cursor-blink {
@@ -568,23 +733,24 @@ import Layout from '../layouts/Layout.astro';
 	.section-header {
 		text-align: center;
 		max-width: 700px;
-		margin: 0 auto 4rem auto;
+		margin: 0 auto 4.5rem auto;
 	}
 	.section-title {
-		font-size: 2.5rem;
+		font-size: 2.6rem;
 		margin-bottom: 1rem;
 		letter-spacing: -0.01em;
 	}
 	.section-subtitle {
 		color: var(--text-secondary);
 		font-size: 1.1rem;
+		line-height: 1.6;
 	}
 
 	/* Features Section */
 	.features-section {
-		padding: 6rem 0;
+		padding: 6.5rem 0;
 		border-top: 1px solid var(--border);
-		background: rgba(17, 19, 24, 0.4);
+		background: rgba(17, 19, 24, 0.45);
 	}
 	.features-grid {
 		display: grid;
@@ -600,8 +766,8 @@ import Layout from '../layouts/Layout.astro';
 	}
 	.feature-card:hover {
 		border-color: var(--accent);
-		transform: translateY(-5px);
-		box-shadow: var(--shadow-md);
+		transform: translateY(-4px);
+		box-shadow: 0 0 30px rgba(139, 124, 248, 0.05);
 	}
 	.feature-icon {
 		font-size: 2.5rem;
@@ -617,16 +783,80 @@ import Layout from '../layouts/Layout.astro';
 		line-height: 1.6;
 	}
 
+	/* How It Works Section (NEW) */
+	.how-section {
+		padding: 6.5rem 0;
+		border-top: 1px solid var(--border);
+	}
+	.how-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 5rem;
+		max-width: 950px;
+		margin: 0 auto;
+	}
+	.how-step-card {
+		display: flex;
+		align-items: center;
+		gap: 4rem;
+	}
+	.how-step-card.reverse {
+		flex-direction: row-reverse;
+	}
+	@media (max-width: 768px) {
+		.how-step-card, .how-step-card.reverse {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 2rem;
+		}
+	}
+	.step-num {
+		font-family: var(--font-heading);
+		font-size: 4rem;
+		font-weight: 800;
+		color: var(--accent);
+		opacity: 0.15;
+		line-height: 1;
+	}
+	.step-text-col {
+		flex: 1;
+	}
+	.step-title {
+		font-size: 1.6rem;
+		margin-bottom: 0.75rem;
+	}
+	.step-desc {
+		color: var(--text-secondary);
+		line-height: 1.6;
+	}
+	.step-visual {
+		flex: 1.2;
+		background: #0d0e12;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		padding: 1.25rem;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		color: #e5e7eb;
+		width: 100%;
+		max-height: 250px;
+		overflow-y: auto;
+	}
+	.code-block {
+		margin: 0;
+	}
+
 	/* TUI Emulator Section */
 	.tui-section {
-		padding: 6rem 0;
+		padding: 6.5rem 0;
 		border-top: 1px solid var(--border);
+		background: rgba(17, 19, 24, 0.45);
 	}
 	.tui-emulator {
 		max-width: 900px;
 		margin: 0 auto;
 		background: #08090b;
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 12px;
 		overflow: hidden;
 		box-shadow: var(--shadow-lg);
@@ -644,7 +874,7 @@ import Layout from '../layouts/Layout.astro';
 	.tui-app {
 		background: #1c1d22;
 		font-family: var(--font-mono);
-		font-size: 0.9rem;
+		font-size: 0.85rem;
 		color: #e5e7eb;
 		display: flex;
 		flex-direction: column;
@@ -699,7 +929,7 @@ import Layout from '../layouts/Layout.astro';
 		border-bottom: 1px solid rgba(139, 124, 248, 0.3);
 		padding-bottom: 0.25rem;
 		margin-bottom: 1rem;
-		font-size: 0.8rem;
+		font-size: 0.75rem;
 		letter-spacing: 0.05em;
 	}
 	.tui-list {
@@ -769,12 +999,12 @@ import Layout from '../layouts/Layout.astro';
 		font-weight: bold;
 	}
 	.post-snippet {
-		font-size: 0.85rem;
+		font-size: 0.8rem;
 		color: var(--text-primary);
 		margin-bottom: 0.25rem;
 	}
 	.post-meta {
-		font-size: 0.8rem;
+		font-size: 0.75rem;
 	}
 
 	/* Schedule Mock TUI */
@@ -792,7 +1022,7 @@ import Layout from '../layouts/Layout.astro';
 		background: #272930;
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
-		font-size: 0.8rem;
+		font-size: 0.75rem;
 		min-width: 90px;
 		text-align: center;
 	}
@@ -820,18 +1050,55 @@ import Layout from '../layouts/Layout.astro';
 	.tui-help-bar {
 		background: #111318;
 		padding: 0.25rem 1rem;
-		font-size: 0.8rem;
+		font-size: 0.75rem;
 		color: var(--text-secondary);
 		display: flex;
 		justify-content: space-between;
 		border-top: 1px solid rgba(255, 255, 255, 0.05);
 	}
 
+	/* AI Operator workflow section (NEW) */
+	.ai-operator-section {
+		padding: 6.5rem 0;
+		border-top: 1px solid var(--border);
+	}
+	.ai-workflow-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: 2rem;
+		margin-top: 2rem;
+	}
+	.ai-workflow-card {
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		padding: 2.25rem;
+		text-align: center;
+		transition: var(--transition);
+	}
+	.ai-workflow-card:hover {
+		border-color: rgba(255,255,255,0.12);
+	}
+	.w-icon {
+		font-size: 2.5rem;
+		display: inline-block;
+		margin-bottom: 1rem;
+	}
+	.workflow-step h4 {
+		font-size: 1.15rem;
+		margin-bottom: 0.75rem;
+	}
+	.workflow-step p {
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+		line-height: 1.5;
+	}
+
 	/* Pricing Section */
 	.pricing-section {
-		padding: 6rem 0;
+		padding: 6.5rem 0;
 		border-top: 1px solid var(--border);
-		background: rgba(17, 19, 24, 0.4);
+		background: rgba(17, 19, 24, 0.45);
 	}
 	.pricing-grid {
 		display: grid;
@@ -858,7 +1125,7 @@ import Layout from '../layouts/Layout.astro';
 	.pricing-card.featured {
 		border-color: var(--accent);
 		background: linear-gradient(180deg, rgba(139, 124, 248, 0.05) 0%, rgba(8, 9, 11, 0) 100%), var(--bg-secondary);
-		box-shadow: 0 10px 40px rgba(139, 124, 248, 0.1);
+		box-shadow: 0 10px 40px rgba(139, 124, 248, 0.15);
 	}
 	.pricing-badge {
 		position: absolute;
@@ -866,7 +1133,7 @@ import Layout from '../layouts/Layout.astro';
 		right: 1.5rem;
 		background: var(--accent);
 		color: var(--bg-primary);
-		font-size: 0.75rem;
+		font-size: 0.7rem;
 		font-weight: 700;
 		padding: 0.25rem 0.75rem;
 		border-radius: 100px;
@@ -906,7 +1173,7 @@ import Layout from '../layouts/Layout.astro';
 		display: flex;
 		gap: 0.75rem;
 		margin-bottom: 0.85rem;
-		font-size: 0.95rem;
+		font-size: 0.9rem;
 		color: var(--text-secondary);
 	}
 	.check-icon {
@@ -923,7 +1190,7 @@ import Layout from '../layouts/Layout.astro';
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-top: 4rem;
+		margin-top: 4.5rem;
 		flex-wrap: wrap;
 		gap: 2rem;
 	}
@@ -947,7 +1214,7 @@ import Layout from '../layouts/Layout.astro';
 		border-top: 1px solid var(--border);
 		background: var(--bg-primary);
 		color: var(--text-secondary);
-		font-size: 0.9rem;
+		font-size: 0.85rem;
 	}
 	.footer-container {
 		display: flex;
@@ -985,13 +1252,13 @@ import Layout from '../layouts/Layout.astro';
 <script>
 	// Terminal typing simulation
 	const commands = [
-		{ text: "postctl import ./posts", output: "Importiere Beiträge aus ./posts...\n✔  Beitrag 'launch-v1-twitter' geladen (5 Tweets, 2 Bilder)\n✔  Beitrag 'launch-v1-linkedin' geladen (Single Post)\n✔  Beitrag 'feature-threads' geladen (Single Post)\n\nErfolgreich 3 Beiträge als Entwurf in SQLite importiert." },
-		{ text: "postctl campaign post launch-v1 --dry-run", output: "[DRY RUN] Validiere Kampagne 'launch-v1'...\n✔  Zeichenanzahl-Check bestanden (Tweets < 280 Chars)\n✔  Bildpfade existieren lokal\n\n[DRY RUN] Sende 'launch-v1-twitter' an Twitter API... Erfolg (ID: MockTweet1)\n[DRY RUN] Sende 'launch-v1-linkedin' an LinkedIn API... Erfolg (ID: MockLinkedIn2)\n\nSimulationslauf beendet. Keine API-Schreibaktionen ausgeführt." }
+		{ text: "postctl import ./posts", output: "Importing posts from ./posts...\n✔ post-1.md -> Loaded successfully (5 tweets, 2 images)\n✔ post-2.md -> Loaded successfully (Single post)\n✔ post-3.md -> Loaded successfully (Single post)\n\nImport complete. 3 draft posts saved to SQLite store." },
+		{ text: "postctl campaign post launch-v1 --dry-run", output: "[DRY RUN] Validating campaign 'launch-v1'...\n✔ Character validation passed (all segments < 280 chars)\n✔ Local image paths exist\n\n[DRY RUN] Posting 'launch-v1-twitter' to Twitter... Success (ID: MockTweetId)\n[DRY RUN] Posting 'launch-v1-linkedin' to LinkedIn... Success (ID: MockLinkedInId)\n\nSimulated run complete. No write actions performed." }
 	];
 
 	let commandIndex = 0;
 	let charIndex = 0;
-	const typingSpeed = 70;
+	const typingSpeed = 60;
 	const delayBetweenCommands = 5000;
 
 	const typedTextEl = document.querySelector("#typing-terminal .typed-text");
