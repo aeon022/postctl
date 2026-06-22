@@ -1359,6 +1359,17 @@ Campaign successfully posted!
 		box-shadow: 0 0 15px var(--accent-glow);
 		transform: translateY(-2px);
 	}
+
+	/* Scroll Reveal Animations */
+	.reveal {
+		opacity: 0;
+		transform: translateY(30px);
+		transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	.reveal.active {
+		opacity: 1;
+		transform: translateY(0);
+	}
 </style>
 
 <script>
@@ -1438,6 +1449,46 @@ Campaign successfully posted!
 			top: 0,
 			behavior: "smooth"
 		});
+	});
+
+	// Smooth scroll for anchor links with header offset
+	document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+		anchor.addEventListener('click', function (e) {
+			e.preventDefault();
+			const targetId = this.getAttribute('href');
+			if (targetId === '#') return;
+			const targetElement = document.querySelector(targetId);
+			if (targetElement) {
+				const headerOffset = 90; // offset for the floating header
+				const elementPosition = targetElement.getBoundingClientRect().top;
+				const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+				
+				window.scrollTo({
+					top: offsetPosition,
+					behavior: 'smooth'
+				});
+			}
+		});
+	});
+
+	// Intersection Observer for scroll reveal animations
+	const revealElements = document.querySelectorAll(".feature-card, .how-step-card, .ai-workflow-card, .pricing-card, .section-header, .tui-emulator, .donate-banner");
+	
+	const revealObserver = new IntersectionObserver((entries, observer) => {
+		entries.forEach(entry => {
+			if (entry.isIntersecting) {
+				entry.target.classList.add("active");
+				observer.unobserve(entry.target);
+			}
+		});
+	}, {
+		threshold: 0.1,
+		rootMargin: "0px 0px -50px 0px"
+	});
+
+	revealElements.forEach(el => {
+		el.classList.add("reveal");
+		revealObserver.observe(el);
 	});
 
 	// Start typing simulator on load
