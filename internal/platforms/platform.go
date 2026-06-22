@@ -1,0 +1,38 @@
+package platforms
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/aeon022/postctl/internal/config"
+	"github.com/aeon022/postctl/internal/models"
+	"github.com/aeon022/postctl/internal/store"
+)
+
+// Platform definiert die Schnittstelle für alle Social Media Kanäle
+type Platform interface {
+	Name() string
+	Auth(ctx context.Context) error
+	Post(ctx context.Context, post *models.Post) (string, error)  // Gibt die Plattform-Post-ID zurück
+	UploadImage(ctx context.Context, path string) (string, error) // Gibt die URN / Media-ID zurück
+	IsAuthenticated(ctx context.Context) bool
+	FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error)
+}
+
+// GetPlatform liefert die passende Platform-Instanz. Im Simulationsmodus (dryRun) wird ein Mock zurückgegeben.
+func GetPlatform(name string, s store.Store, dryRun bool) (Platform, error) {
+	if dryRun {
+		return NewDryRunPlatform(name), nil
+	}
+
+	switch name {
+	case models.PlatformTwitter:
+		return NewTwitterPlatform(s, config.ActiveConfig.Twitter.ClientID, config.ActiveConfig.Twitter.ClientSecret), nil
+	case models.PlatformLinkedIn:
+		return NewLinkedInPlatform(s, config.ActiveConfig.LinkedIn.ClientID, config.ActiveConfig.LinkedIn.ClientSecret), nil
+	case models.PlatformThreads:
+		return NewThreadsPlatform(s, config.ActiveConfig.Threads.AppID, config.ActiveConfig.Threads.AppSecret), nil
+	default:
+		return nil, fmt.Errorf("unknown platform %q", name)
+	}
+}

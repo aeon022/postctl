@@ -1,0 +1,28 @@
+# Binaries
+postctl
+postctl.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# SQLite databases
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Configuration and user-specific files
+/content/
+/screenshots/
+
+# System files
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
