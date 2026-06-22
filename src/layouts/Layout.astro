@@ -1,0 +1,130 @@
+---
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const { 
+	title = "postctl — Social Media Management from your Terminal", 
+	description = "A terminal-native, Markdown-first social media scheduler and publisher. Manage Twitter, LinkedIn, and Threads directly from the CLI or TUI." 
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		
+		<!-- SEO Best Practices -->
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		
+		<!-- Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		--bg-primary: #08090b;
+		--bg-secondary: #111318;
+		--bg-tertiary: #1b1e26;
+		
+		--text-primary: #f3f4f6;
+		--text-secondary: #9ca3af;
+		--text-muted: #6b7280;
+		
+		--accent: #8b7cf8;
+		--accent-glow: rgba(139, 124, 248, 0.15);
+		--accent-hover: #a195f9;
+		
+		--success: #10b981;
+		--error: #ef4444;
+		--border: rgba(255, 255, 255, 0.08);
+		--border-hover: rgba(255, 255, 255, 0.15);
+		
+		--font-heading: 'Space Grotesk', sans-serif;
+		--font-body: 'Inter', sans-serif;
+		--font-mono: 'Fira Code', monospace;
+		
+		--transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+		--shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+		--shadow-md: 0 8px 30px rgba(0, 0, 0, 0.7);
+		--shadow-lg: 0 12px 50px rgba(0, 0, 0, 0.9);
+	}
+
+	* {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+	}
+
+	html {
+		scroll-behavior: smooth;
+		background-color: var(--bg-primary);
+		color: var(--text-primary);
+		font-family: var(--font-body);
+		line-height: 1.6;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	body {
+		min-height: 100vh;
+		overflow-x: hidden;
+		background: radial-gradient(circle at 50% 0%, var(--bg-secondary) 0%, var(--bg-primary) 70%);
+	}
+
+	a {
+		color: inherit;
+		text-decoration: none;
+		transition: var(--transition);
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		font-family: var(--font-heading);
+		font-weight: 700;
+		letter-spacing: -0.02em;
+	}
+
+	code, pre {
+		font-family: var(--font-mono);
+	}
+
+	/* Scrollbar Styling */
+	::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
+	::-webkit-scrollbar-track {
+		background: var(--bg-primary);
+	}
+	::-webkit-scrollbar-thumb {
+		background: var(--bg-tertiary);
+		border-radius: 4px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: var(--accent);
+	}
+
+	/* Utility Classes */
+	.container {
+		width: 100%;
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 2rem;
+	}
+
+	.text-gradient {
+		background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+</style>
