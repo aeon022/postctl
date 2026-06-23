@@ -85,8 +85,8 @@ import Layout from '../layouts/Layout.astro';
 					<!-- Feature 2 -->
 					<div class="feature-card">
 						<div class="feature-icon">🖥️</div>
-						<h3 class="feature-title">TUI & CLI Modes</h3>
-						<p class="feature-desc">Use CLI commands for instant scriptability or open the full Bubbletea-based TUI to view, edit, filter, and schedule posts interactively without context-switching.</p>
+						<h3 class="feature-title">Interactive TUI Editor</h3>
+						<p class="feature-desc">Draft and edit posts directly inside the terminal. Form validations catch platform errors, automatic splitting parses Twitter threads, and `ctrl+v` opens Neovim/Vim instantly.</p>
 					</div>
 					<!-- Feature 3 -->
 					<div class="feature-card">
@@ -99,6 +99,18 @@ import Layout from '../layouts/Layout.astro';
 						<div class="feature-icon">⚡</div>
 						<h3 class="feature-title">Zero Infrastructure</h3>
 						<p class="feature-desc">Built in Go with a CGO-free SQLite storage engine. Packaged as a single offline-first binary. Copy the database file to backup all your posts and schedules.</p>
+					</div>
+					<!-- Feature 5 -->
+					<div class="feature-card">
+						<div class="feature-icon">📖</div>
+						<h3 class="feature-title">Offline Documentation</h3>
+						<p class="feature-desc">Access the full README directly inside the app with a split-pane layout, interactive table of contents, and responsive terminal scrolling—no browser required.</p>
+					</div>
+					<!-- Feature 6 -->
+					<div class="feature-card">
+						<div class="feature-icon">🔒</div>
+						<h3 class="feature-title">AES-256 Encrypted Sync</h3>
+						<p class="feature-desc">Securely sync your local database and config files. Backups are encrypted using AES-256-GCM and key-stretched (PBKDF2) for safe storage in public Git repos.</p>
 					</div>
 				</div>
 			</div>
@@ -207,6 +219,8 @@ Campaign successfully posted!
 							<button class="tui-tab" data-tab="1">◷ Posts</button>
 							<button class="tui-tab" data-tab="2">↺ Schedule</button>
 							<button class="tui-tab" data-tab="3">⚙ Settings</button>
+							<button class="tui-tab" data-tab="4">✏ Editor</button>
+							<button class="tui-tab" data-tab="5">📖 README</button>
 						</div>
 						
 						<!-- TUI Tab Contents -->
@@ -330,6 +344,48 @@ Campaign successfully posted!
 								<div class="tui-footer-tip" style="margin-top: 1.5rem;">
 									<span class="tui-muted">Tip: Activate your Pro key via command line anytime:</span><br/>
 									<code>postctl config set license_key PCTL-PRO-XXXX...</code>
+								</div>
+							</div>
+
+							<!-- Tab 4: Editor -->
+							<div class="tui-tab-content" id="tui-tab-4">
+								<div class="tui-sub-header">BEITRAG BEARBEITEN (NEOVIM-READY)</div>
+								<div class="editor-mock">
+									<div class="editor-row"><span class="color-accent">➔</span> Plattform:  <span class="color-accent">[TWITTER]</span>   LINKEDIN   THREADS</div>
+									<div class="editor-row">  Kampagne:   <span class="editor-input-mock">launch-v1</span></div>
+									<div class="editor-row">  Geplant am: <span class="editor-input-mock">25.06.2026 09:00</span></div>
+									<div class="editor-row">  Bilder:     <span class="editor-input-mock">img/dashboard.png</span></div>
+									<div class="editor-row">  Beitrag / Inhalt: <span class="tui-muted">(Nutze '---' für Thread-Tweets)</span></div>
+									<div class="editor-textarea-mock">This is a live preview of the post.
+We support multi-line text and Twitter thread-splitting by adding '---' dividers!</div>
+									<div class="editor-actions">
+										<span class="btn-mock color-posted">[ SPEICHERN ]</span> &nbsp; 
+										<span class="btn-mock color-failed">[ ABBRECHEN ]</span> &nbsp;
+										<span class="btn-mock color-accent">[ ctrl+v: Neovim ]</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- Tab 5: README -->
+							<div class="tui-tab-content" id="tui-tab-5">
+								<div class="readme-split-mock">
+									<div class="readme-toc-mock">
+										<div class="tui-sub-header">INHALTSVERZEICHNIS</div>
+										<ul class="tui-list">
+											<li class="selected">&gt; Einleitung</li>
+											<li>  Installation</li>
+											<li>  Konfiguration</li>
+											<li>  TUI Editor</li>
+											<li>  AES-Sync</li>
+										</ul>
+									</div>
+									<div class="readme-body-mock">
+										<div class="tui-sub-header">README.md Browser</div>
+										<div class="readme-text-mock"># postctl Social Media CLI
+
+Willkommen bei postctl, deinem terminal-nativen Social-Media-Manager. 
+Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit offline in der TUI zur Verfügung!</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -1122,6 +1178,66 @@ Campaign successfully posted!
 	.setting-label {
 		color: var(--text-secondary);
 		min-width: 120px;
+	}
+
+	/* Editor Mock TUI */
+	.editor-mock {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		font-size: 0.76rem;
+	}
+	.editor-row {
+		margin-bottom: 0.1rem;
+	}
+	.editor-input-mock {
+		color: var(--accent);
+		background: #272930;
+		padding: 0.1rem 0.4rem;
+		border-radius: 2px;
+	}
+	.editor-textarea-mock {
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 4px;
+		background: #111318;
+		padding: 0.4rem;
+		font-size: 0.7rem;
+		color: var(--text-primary);
+		min-height: 55px;
+		white-space: pre-wrap;
+		line-height: 1.25;
+	}
+	.editor-actions {
+		margin-top: 0.25rem;
+		display: flex;
+		gap: 0.6rem;
+	}
+	.btn-mock {
+		font-weight: bold;
+		cursor: pointer;
+		font-size: 0.72rem;
+	}
+
+	/* Readme Mock TUI */
+	.readme-split-mock {
+		display: grid;
+		grid-template-columns: 1fr 1.8fr;
+		gap: 1rem;
+		height: 220px;
+	}
+	.readme-toc-mock {
+		border-right: 1px dashed rgba(255, 255, 255, 0.1);
+		padding-right: 0.5rem;
+	}
+	.readme-body-mock {
+		padding-left: 0.5rem;
+		overflow-y: auto;
+	}
+	.readme-text-mock {
+		font-size: 0.7rem;
+		line-height: 1.35;
+		color: var(--text-secondary);
+		white-space: pre-wrap;
 	}
 
 	.tui-help-bar {
