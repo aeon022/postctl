@@ -103,7 +103,7 @@ func (m Model) renderDetailView() string {
 
 	// Legend / Action-Guide für den Footer
 	builder.WriteString("\n")
-	builder.WriteString(StyleHelp.Render("esc: back  ·  d: delete  ·  r: repurpose via AI"))
+	builder.WriteString(StyleHelp.Render("esc: back  ·  e: edit  ·  d: delete  ·  r: repurpose via AI"))
 
 	// Verwende eine große Box für die Detailansicht
 	return StyleBox.Width(78).Height(20).Render(builder.String())

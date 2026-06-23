@@ -16,6 +16,8 @@ import (
 	"github.com/aeon022/postctl/internal/scheduler"
 	"github.com/aeon022/postctl/internal/store"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/textarea"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -50,6 +52,15 @@ type Model struct {
 	loading        bool
 	repurposing    bool
 	statusMessage  string
+	
+	// Editor Zustand
+	editorPostID      string
+	editorPlatform    string
+	editorCampaign    textinput.Model
+	editorScheduledAt textinput.Model
+	editorImages      textinput.Model
+	editorBody        textarea.Model
+	editorFocus       int
 	
 	// README Viewer Zustand
 	showReadme   bool
@@ -281,6 +292,71 @@ func (m Model) publishDuePostsCmd() tea.Msg {
 
 // Update reagiert auf Events und aktualisiert den Zustand
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.isEditing {
+		if keyMsg, ok := msg.(tea.KeyMsg); ok {
+			switch keyMsg.String() {
+			case "esc":
+				m.isEditing = false
+				return m, nil
+			case "tab":
+				m.editorFocus = (m.editorFocus + 1) % 7
+				m.updateEditorFocus()
+				return m, nil
+			case "shift+tab":
+				m.editorFocus = (m.editorFocus - 1 + 7) % 7
+				m.updateEditorFocus()
+				return m, nil
+			case "enter":
+				if m.editorFocus == 5 { // Save
+					if err := m.saveEditedPost(); err != nil {
+						m.err = err
+						return m, nil
+					}
+					m.isEditing = false
+					return m, m.loadDataCmd
+				} else if m.editorFocus == 6 { // Cancel
+					m.isEditing = false
+					return m, nil
+				}
+			}
+
+			if m.editorFocus == 0 {
+				platformsList := []string{"twitter", "linkedin", "threads"}
+				currIdx := -1
+				for idx, p := range platformsList {
+					if p == m.editorPlatform {
+						currIdx = idx
+						break
+					}
+				}
+				if keyMsg.String() == "left" || keyMsg.String() == "h" {
+					if currIdx != -1 {
+						m.editorPlatform = platformsList[(currIdx-1+len(platformsList))%len(platformsList)]
+					}
+					return m, nil
+				} else if keyMsg.String() == "right" || keyMsg.String() == "l" {
+					if currIdx != -1 {
+						m.editorPlatform = platformsList[(currIdx+1)%len(platformsList)]
+						return m, nil
+					}
+				}
+			}
+
+			var cmd tea.Cmd
+			switch m.editorFocus {
+			case 1:
+				m.editorCampaign, cmd = m.editorCampaign.Update(msg)
+			case 2:
+				m.editorScheduledAt, cmd = m.editorScheduledAt.Update(msg)
+			case 3:
+				m.editorImages, cmd = m.editorImages.Update(msg)
+			case 4:
+				m.editorBody, cmd = m.editorBody.Update(msg)
+			}
+			return m, cmd
+		}
+	}
+
 	switch msg := msg.(type) {
 	
 	case tea.WindowSizeMsg:
@@ -460,6 +536,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case key.Matches(msg, Keys.Delete):
 				idToDelete := m.selectedPost.ID
 				return m, m.deletePostCmd(idToDelete)
+			case key.Matches(msg, Keys.Edit):
+				postToEdit := *m.selectedPost
+				m.selectedPost = nil
+				m.initEditor(&postToEdit)
+				return m, nil
 			case key.Matches(msg, Keys.Repurpose):
 				if m.repurposing {
 					return m, nil
@@ -579,6 +660,31 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, nil
 
+		case key.Matches(msg, Keys.NewPost):
+			if m.selectedPost == nil && !m.showReadme {
+				m.initEditor(nil)
+				return m, nil
+			}
+
+		case key.Matches(msg, Keys.Edit):
+			if m.selectedPost == nil && !m.showReadme {
+				if m.activeTab == 1 { // Posts
+					filtered := m.getFilteredPosts()
+					if len(filtered) > 0 && m.cursor < len(filtered) {
+						postToEdit := filtered[m.cursor]
+						m.initEditor(&postToEdit)
+						return m, nil
+					}
+				} else if m.activeTab == 2 { // Schedule
+					if len(m.nextUp) > 0 && m.cursor < len(m.nextUp) {
+						postToEdit := m.nextUp[m.cursor]
+						m.initEditor(&postToEdit)
+						return m, nil
+					}
+				}
+			}
+			return m, nil
+
 		case key.Matches(msg, Keys.Readme):
 			if m.selectedPost == nil {
 				lines, toc := getReadmeData()
@@ -640,6 +746,10 @@ func (m Model) View() string {
 	
 	if m.err != nil {
 		return fmt.Sprintf("\n  [FEHLER]: %v\n\n  Drücke ESC zum Schließen.\n", m.err)
+	}
+
+	if m.isEditing {
+		return m.renderEditor()
 	}
 
 	// Detailansicht anzeigen, falls ein Post ausgewählt ist

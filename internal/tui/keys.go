@@ -14,13 +14,14 @@ type KeyMap struct {
 	Esc      key.Binding
 	Post     key.Binding
 	Schedule key.Binding
-	Edit     key.Binding
-	Delete   key.Binding
+	Edit      key.Binding
+	NewPost   key.Binding
+	Delete    key.Binding
 	Repurpose key.Binding
 	Import    key.Binding
 	Readme    key.Binding
-	Quit     key.Binding
-	Help     key.Binding
+	Quit      key.Binding
+	Help      key.Binding
 }
 
 // Keys ist die globale KeyMap Instanz
@@ -68,6 +69,10 @@ var Keys = KeyMap{
 	Edit: key.NewBinding(
 		key.WithKeys("e"),
 		key.WithHelp("e", "edit"),
+	),
+	NewPost: key.NewBinding(
+		key.WithKeys("n"),
+		key.WithHelp("n", "new post"),
 	),
 	Delete: key.NewBinding(
 		key.WithKeys("d"),

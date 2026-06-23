@@ -75,6 +75,8 @@ func (m Model) renderHelp() string {
 		builder.WriteString("  ↑/k        Move Up\n")
 		builder.WriteString("  ↓/j        Move Down\n")
 		builder.WriteString("  enter      Select / Open Preview (on Posts list) / Filter by campaign (on Dashboard)\n")
+		builder.WriteString("  n          Create a new post draft\n")
+		builder.WriteString("  e          Edit selected post draft\n")
 		builder.WriteString("  i          Import posts from Markdown files/folders (pauses TUI)\n")
 		builder.WriteString("  d          Delete selected post\n")
 		builder.WriteString("  r          Repurpose selected post via AI to other platforms\n")
@@ -85,7 +87,7 @@ func (m Model) renderHelp() string {
 		sb.WriteString(StyleHelp.Render(builder.String()))
 	} else {
 		// Standard Kurzhilfe (zweizeilig)
-		line1 := "tab: next tab  ·  ↑↓: navigate  ·  enter: select  ·  i: import  ·  d: delete  ·  r: repurpose  ·  q: quit"
+		line1 := "tab: next tab  ·  ↑↓: navigate  ·  enter: select  ·  n: new  ·  e: edit  ·  i: import  ·  d: delete  ·  r: repurpose  ·  q: quit"
 		if m.activeTab == 1 && m.filterCampaign != "" {
 			line1 = "esc: clear filter  ·  " + line1
 		}

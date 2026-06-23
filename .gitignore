@@ -26,3 +26,8 @@ postctl.exe
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Astro / Frontend build directories
+.astro/
+dist/
+node_modules/
