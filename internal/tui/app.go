@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -80,6 +81,11 @@ type postRepurposedMsg struct {
 
 type authResultMsg struct {
 	platform string
+	err      error
+}
+
+type backupFinishedMsg struct {
+	isExport bool
 	err      error
 }
 
@@ -219,6 +225,22 @@ func (m Model) runAuthCmd(platformName string) tea.Cmd {
 	}
 }
 
+// runBackupExportCmd pausiert die TUI und startet interaktiv den CLI-Export
+func (m Model) runBackupExportCmd() tea.Cmd {
+	c := exec.Command("./postctl", "config", "export")
+	return tea.ExecProcess(c, func(err error) tea.Msg {
+		return backupFinishedMsg{isExport: true, err: err}
+	})
+}
+
+// runBackupImportCmd pausiert die TUI und startet interaktiv den CLI-Import
+func (m Model) runBackupImportCmd() tea.Cmd {
+	c := exec.Command("./postctl", "config", "import")
+	return tea.ExecProcess(c, func(err error) tea.Msg {
+		return backupFinishedMsg{isExport: false, err: err}
+	})
+}
+
 // publishDuePostsCmd prüft und veröffentlicht fällige Posts im TUI-Hintergrund
 func (m Model) publishDuePostsCmd() tea.Msg {
 	ctx := context.Background()
@@ -270,6 +292,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.statusMessage = ""
 		} else {
 			m.statusMessage = fmt.Sprintf("Erfolgreich mit %s verbunden!", msg.platform)
+		}
+		return m, m.loadDataCmd
+
+	case backupFinishedMsg:
+		if msg.err != nil {
+			m.err = fmt.Errorf("Backup-Aktion fehlgeschlagen: %w", msg.err)
+			m.statusMessage = ""
+		} else {
+			action := "importiert"
+			if msg.isExport {
+				action = "exportiert (postctl_backup.bin)"
+			}
+			m.statusMessage = fmt.Sprintf("Konfiguration erfolgreich %s!", action)
 		}
 		return m, m.loadDataCmd
 
@@ -385,7 +420,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 4 {
-				if m.cursor >= 4 {
+				if m.cursor >= 4 && m.cursor <= 6 {
 					var platName string
 					switch m.cursor {
 					case 4:
@@ -398,6 +433,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.loading = true
 					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
 					return m, m.runAuthCmd(platName)
+				}
+				if m.cursor == 7 {
+					return m, m.runBackupExportCmd()
+				}
+				if m.cursor == 8 {
+					return m, m.runBackupImportCmd()
 				}
 				m.cycleSetting()
 				return m, nil
@@ -447,7 +488,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 4: // Settings
-		return 7
+		return 9
 	default:
 		return 0
 	}
