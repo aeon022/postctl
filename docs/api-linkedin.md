@@ -1,6 +1,6 @@
 # LinkedIn API Setup Guide für postctl
 
-Dieses Dokument beschreibt Schritt für Schritt, wie du eine LinkedIn-Entwickler-App erstellst, um automatisiert Beiträge über `postctl` zu veröffentlichen.
+Dieses Dokument beschreibt Schritt für Schritt, wie du eine LinkedIn-Entwickler-App erstellst, diese auf das moderne OpenID Connect (OIDC) migrierst und deine Zugangsdaten für `postctl` einrichtest.
 
 ---
 
@@ -10,19 +10,19 @@ Dieses Dokument beschreibt Schritt für Schritt, wie du eine LinkedIn-Entwickler
 2. Melde dich mit deinem persönlichen LinkedIn-Konto an.
 3. Klicke auf **Create App**:
    * **App Name**: Gib deiner App einen Namen (z. B. `postctl-publisher`).
-   * **LinkedIn Page**: Verknüpfe die App mit deiner LinkedIn-Unternehmensseite (falls vorhanden) oder erstelle eine temporäre Seite.
-   * **App Logo**: Lade ein beliebiges quadratisches Bild als Logo hoch.
+   * **LinkedIn Page**: Verknüpfe die App mit deiner LinkedIn-Unternehmensseite oder erstelle eine temporäre Seite (Pflichtfeld).
+   * **App Logo**: Lade das generierte Logo aus `postctl/icons` (oder ein anderes quadratisches Bild) hoch.
    * **Legal Terms**: Stimme den Bedingungen zu und klicke auf **Create app**.
 
 ---
 
 ## 2. Produkte hinzufügen (Sehr wichtig!)
 
-Standardmäßig hat eine neue LinkedIn-App keine Berechtigungen für Beitrags-Postings. Du musst die passenden API-Produkte aktivieren:
+Standardmäßig hat eine neue LinkedIn-App keine Berechtigungen für Beitrags-Postings. Seit August 2023 hat LinkedIn die alten Berechtigungen (`r_liteprofile`) abgelöst. Du musst die folgenden Produkte aktivieren:
 
 1. Gehe in deiner App zum Reiter **Products**.
-2. Suche nach **Share on LinkedIn** und klicke auf **Request access** (dies wird in der Regel sofort und automatisch genehmigt).
-3. Suche nach **Sign In with LinkedIn v2** (oder **Sign In with LinkedIn**) und aktiviere auch dieses Produkt, um die Profil-IDs abzurufen.
+2. Suche nach **Share on LinkedIn** und klicke auf **Request access** (dies wird in der Regel sofort genehmigt).
+3. Suche nach **Sign In with LinkedIn using OpenID Connect** (nicht das veraltete *Sign In with LinkedIn*) und aktiviere dieses, um den modernen OIDC-Login freizuschalten.
 
 ---
 
@@ -33,6 +33,8 @@ Standardmäßig hat eine neue LinkedIn-App keine Berechtigungen für Beitrags-Po
    * Füge unter **Authorized Redirect URLs** folgenden Callback hinzu:
      `http://localhost:8753/callback`
    * Klicke auf **Update**.
+3. Überprüfe im Bereich **OAuth 2.0 scopes**, ob dir nun folgende Scopes angezeigt werden:
+   * `openid`, `profile`, `w_member_social`, `email`.
 
 ---
 
@@ -45,19 +47,19 @@ Standardmäßig hat eine neue LinkedIn-App keine Berechtigungen für Beitrags-Po
 
 ## 5. In `postctl` konfigurieren
 
-Nutze das CLI, um die Zugangsdaten in deiner `config.yaml` zu speichern:
+Nutze das CLI, um die Zugangsdaten in deiner `config.yaml` zu speichern (nutze das lokale Binary `./postctl`):
 
 ```bash
 # Client ID konfigurieren
-postctl config set linkedin.client_id "DEINE_CLIENT_ID"
+./postctl config set linkedin.client_id "DEINE_CLIENT_ID"
 
 # Client Secret konfigurieren
-postctl config set linkedin.client_secret "DEIN_CLIENT_SECRET"
+./postctl config set linkedin.client_secret "DEIN_CLIENT_SECRET"
 ```
 
 Überprüfe die Einstellungen:
 ```bash
-postctl config show
+./postctl config show
 ```
 
 ---
@@ -67,10 +69,10 @@ postctl config show
 Starte den Authentifizierungs-Flow:
 
 ```bash
-postctl auth linkedin
+./postctl auth linkedin
 ```
 
 1. Es öffnet sich automatisch ein Browserfenster, das dich auffordert, deiner App den Zugriff auf dein LinkedIn-Profil zu erlauben.
 2. Nach Klick auf **Zulassen/Allow** wirst du zum lokalen Webserver weitergeleitet.
-3. Das CLI fängt das Token ab, verschlüsselt es mit AES-256-GCM und speichert es in der lokalen SQLite-Datenbank.
-4. Du bist nun bereit, Beiträge auf LinkedIn zu posten!
+3. Das CLI fängt das Token über den OIDC-Flow ab, ermittelt die Benutzer-ID (über `/v2/userinfo`), verschlüsselt das Access Token und speichert es in der lokalen SQLite-Datenbank.
+4. Du bist nun bereit, Beiträge auf LinkedIn zu veröffentlichen!
