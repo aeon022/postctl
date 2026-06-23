@@ -17,12 +17,25 @@ import (
 
 // importCmd repräsentiert den Import-Befehl
 var importCmd = &cobra.Command{
-	Use:   "import <path>",
+	Use:   "import [path]",
 	Short: "Import social media posts from Markdown files",
 	Long:  `Scan a file or directory for Markdown posts, validate them, and import them into the database.`,
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		targetPath := args[0]
+		var targetPath string
+		if len(args) == 1 {
+			targetPath = args[0]
+		} else {
+			fmt.Print("Gib den Pfad zu einer Markdown-Datei oder einem Ordner ein: ")
+			fmt.Scanln(&targetPath)
+			targetPath = strings.TrimSpace(targetPath)
+		}
+
+		if targetPath == "" {
+			reportError(fmt.Errorf("Pfad darf nicht leer sein"), 1)
+			return
+		}
+
 		ctx := context.Background()
 
 		// 1. Dateien sammeln

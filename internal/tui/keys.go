@@ -17,6 +17,7 @@ type KeyMap struct {
 	Edit     key.Binding
 	Delete   key.Binding
 	Repurpose key.Binding
+	Import    key.Binding
 	Quit     key.Binding
 	Help     key.Binding
 }
@@ -74,6 +75,10 @@ var Keys = KeyMap{
 	Repurpose: key.NewBinding(
 		key.WithKeys("r"),
 		key.WithHelp("r", "repurpose via AI"),
+	),
+	Import: key.NewBinding(
+		key.WithKeys("i"),
+		key.WithHelp("i", "import posts"),
 	),
 	Quit: key.NewBinding(
 		key.WithKeys("q", "ctrl+c"),

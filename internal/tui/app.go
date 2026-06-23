@@ -89,6 +89,10 @@ type backupFinishedMsg struct {
 	err      error
 }
 
+type importFinishedMsg struct {
+	err error
+}
+
 type tickMsg struct{}
 
 // NewModel initialisiert ein TUI-Model
@@ -241,6 +245,14 @@ func (m Model) runBackupImportCmd() tea.Cmd {
 	})
 }
 
+// runImportPostsCmd pausiert die TUI und startet interaktiv den CLI-Post-Import
+func (m Model) runImportPostsCmd() tea.Cmd {
+	c := exec.Command("./postctl", "import")
+	return tea.ExecProcess(c, func(err error) tea.Msg {
+		return importFinishedMsg{err: err}
+	})
+}
+
 // publishDuePostsCmd prüft und veröffentlicht fällige Posts im TUI-Hintergrund
 func (m Model) publishDuePostsCmd() tea.Msg {
 	ctx := context.Background()
@@ -305,6 +317,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				action = "exportiert (postctl_backup.bin)"
 			}
 			m.statusMessage = fmt.Sprintf("Konfiguration erfolgreich %s!", action)
+		}
+		return m, m.loadDataCmd
+
+	case importFinishedMsg:
+		if msg.err != nil {
+			m.statusMessage = fmt.Sprintf("Import fehlgeschlagen: %v", msg.err)
+		} else {
+			m.statusMessage = "Beiträge erfolgreich importiert!"
 		}
 		return m, m.loadDataCmd
 
@@ -464,6 +484,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					idToDelete := filtered[m.cursor].ID
 					return m, m.deletePostCmd(idToDelete)
 				}
+			}
+			return m, nil
+
+		case key.Matches(msg, Keys.Import):
+			if m.selectedPost == nil {
+				return m, m.runImportPostsCmd()
 			}
 			return m, nil
 
