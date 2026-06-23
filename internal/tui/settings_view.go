@@ -39,6 +39,8 @@ func (m Model) renderSettings() string {
 		{"Twitter/X    ", getPlatformStatus(models.PlatformTwitter), true},
 		{"LinkedIn     ", getPlatformStatus(models.PlatformLinkedIn), true},
 		{"Threads      ", getPlatformStatus(models.PlatformThreads), true},
+		{"Backup Exp.  ", "Ausführen (Enter drücken)", true},
+		{"Backup Imp.  ", "Ausführen (Enter drücken)", true},
 	}
 
 	for i, opt := range options {
@@ -79,6 +81,10 @@ func (m Model) renderSettings() string {
 		// Einen kleinen visuellen Trenner vor den Plattformen einfügen
 		if i == 3 {
 			builder.WriteString("\n" + StyleHeader.Render("PLATFORM ACCOUNTS") + "\n")
+		}
+		// Einen kleinen visuellen Trenner vor Backup & Sync einfügen
+		if i == 6 {
+			builder.WriteString("\n" + StyleHeader.Render("BACKUP & SYNC") + "\n")
 		}
 	}
 
