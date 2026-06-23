@@ -373,10 +373,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case "ctrl+v":
 				return m, m.runExternalEditorCmd()
-			case "v":
-				if m.editorFocus == 0 || m.editorFocus == 5 || m.editorFocus == 6 {
-					return m, m.runExternalEditorCmd()
-				}
 			}
 
 			if m.editorFocus == 0 {

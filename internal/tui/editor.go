@@ -268,7 +268,7 @@ func (m Model) renderEditor() string {
 	builder.WriteString("  " + saveLabel + "     " + cancelLabel + "\n\n")
 
 	// Help footer
-	helpStr := "tab / shift+tab: Feld wechseln  ·  ←/→: Plattform ändern  ·  v / ctrl+v: Neovim  ·  esc: Abbrechen"
+	helpStr := "tab / shift+tab: Feld wechseln  ·  ←/→: Plattform ändern  ·  ctrl+v: Neovim  ·  esc: Abbrechen"
 	builder.WriteString(StyleHelp.Render(helpStr))
 
 	return StyleBox.Width(78).Height(24).Render(builder.String())
