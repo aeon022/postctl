@@ -46,7 +46,7 @@ func (t *ThreadsPlatform) Auth(ctx context.Context) error {
 	}
 
 	state := fmt.Sprintf("state-%d", time.Now().UnixNano())
-	redirectURI := "http://localhost:8753/callback"
+	redirectURI := "https://localhost:8753/callback"
 	
 	// Scopes für Threads
 	scopes := "threads_basic,threads_content_publish"
@@ -66,7 +66,7 @@ func (t *ThreadsPlatform) Auth(ctx context.Context) error {
 		// Nicht-kritisch
 	}
 
-	code, err := StartCallbackServer(state, 3*time.Minute)
+	code, err := StartCallbackServerTLS(state, 3*time.Minute)
 	if err != nil {
 		return fmt.Errorf("callback server error: %w", err)
 	}
