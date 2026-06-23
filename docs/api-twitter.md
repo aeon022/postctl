@@ -4,13 +4,20 @@ Dieses Dokument beschreibt Schritt für Schritt, wie du deine eigenen API-Anmeld
 
 ---
 
-## 1. Twitter Developer Account erstellen
+## 1. Twitter Developer Account & Kostenpflichtiges API-Tier einrichten
+
+> [!IMPORTANT]
+> **Wichtiger Hinweis zum Preismodell (Stand 2026):**
+> Twitter/X hat alle kostenlosen Tarife („Free Tier“) für den Schreibzugriff (Veröffentlichen von Tweets) vollständig eingestellt. 
+> Um Beiträge über `postctl` posten zu können, benötigst du einen kostenpflichtigen Zugang:
+> * **Prepaid / Pay-Per-Use (Pay-as-you-go):** Abrechnung nach tatsächlicher Nutzung.
+> * **Basic Tier (ca. $100/Monat):** Ermöglicht das automatisierte Veröffentlichen von Beiträgen sowie grundlegende Lesezugriffe über die v2 API.
+> 
+> Ohne ein aktives, bezahltes Abonnement oder aufgeladenes Prepaid-Guthaben im Twitter Developer Portal wird jeder Versuch, einen Beitrag zu posten, mit einem API-Fehler (`403 Forbidden`) abgebrochen.
 
 1. Gehe auf das [Twitter Developer Portal](https://developer.twitter.com).
-2. Melde dich mit deinem Twitter-Konto an.
-3. Wähle den **Free Tier** (kostenlos) oder ein anderes Paket aus:
-   * **Free Tier Limit**: Reicht aus, um bis zu 1.500 Tweets pro Monat (~50 Tweets pro Tag) zu posten.
-   * **Basic Tier ($100/Monat)**: Höhere Limits für Lese- und Schreibzugriffe sowie Medien-Uploads.
+2. Melde dich mit deinem Twitter/X-Konto an.
+3. Richte dein API-Abonnement (Basic Tier oder Prepaid API Credits) ein, um Schreibrechte zu erhalten.
 
 ---
 
@@ -36,19 +43,19 @@ Nach dem Speichern der Authentifizierungseinstellungen zeigt dir das Developer P
 
 ## 4. In `postctl` eintragen
 
-Verwende das `postctl config set` Kommando, um deine Schlüssel zu speichern:
+Verwende das `postctl config set` Kommando, um deine Schlüssel zu speichern (nutze das lokale Binary `./postctl`):
 
 ```bash
 # Client ID eintragen
-postctl config set twitter.client_id "DEINE_CLIENT_ID"
+./postctl config set twitter.client_id "DEINE_CLIENT_ID"
 
 # Client Secret eintragen
-postctl config set twitter.client_secret "DEIN_CLIENT_SECRET"
+./postctl config set twitter.client_secret "DEIN_CLIENT_SECRET"
 ```
 
 Du kannst die Konfiguration mit folgendem Befehl überprüfen:
 ```bash
-postctl config show
+./postctl config show
 ```
 
 ---
@@ -58,10 +65,10 @@ postctl config show
 Führe danach den OAuth-Flow aus:
 
 ```bash
-postctl auth twitter
+./postctl auth twitter
 ```
 
 1. Es öffnet sich automatisch ein Browserfenster mit dem Twitter-Autorisierungsdialog.
 2. Bestätige den Zugriff.
 3. Nach erfolgreicher Bestätigung speichert `postctl` dein verschlüsseltes Access- und Refresh-Token in der SQLite-Datenbank.
-4. Du bist nun bereit, Tweets mit `postctl post` oder `postctl schedule` zu veröffentlichen!
+4. Du bist nun bereit, Tweets mit `./postctl post` oder `./postctl campaign post` zu veröffentlichen (sofern ein bezahltes API-Tier aktiv ist).
