@@ -50,8 +50,8 @@ func (l *LinkedInPlatform) Auth(ctx context.Context) error {
 	state := fmt.Sprintf("state-%d", time.Now().UnixNano())
 	redirectURI := "http://localhost:8753/callback"
 	
-	// Scopes für LinkedIn Posting und Lite Profile
-	scopes := "w_member_social r_liteprofile"
+	// Scopes für LinkedIn Posting und OIDC Profil
+	scopes := "w_member_social openid profile"
 
 	authURL := fmt.Sprintf(
 		"https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=%s&redirect_uri=%s&state=%s&scope=%s",
@@ -125,7 +125,7 @@ func (l *LinkedInPlatform) exchangeCodeForToken(ctx context.Context, code, redir
 
 // getMe urn liest den URN des angemeldeten Benutzers aus (z. B. urn:li:person:12345)
 func (l *LinkedInPlatform) getMeURN(ctx context.Context, token string) (string, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", "https://api.linkedin.com/v2/me", nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://api.linkedin.com/v2/userinfo", nil)
 	if err != nil {
 		return "", err
 	}
@@ -133,23 +133,23 @@ func (l *LinkedInPlatform) getMeURN(ctx context.Context, token string) (string, 
 
 	resp, err := l.client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("http me request: %w", err)
+		return "", fmt.Errorf("http userinfo request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return "", fmt.Errorf("failed to fetch user profile (status %d): %s", resp.StatusCode, string(body))
+		return "", fmt.Errorf("failed to fetch user profile via OIDC userinfo (status %d): %s", resp.StatusCode, string(body))
 	}
 
 	var meResp struct {
-		ID string `json:"id"`
+		Sub string `json:"sub"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&meResp); err != nil {
-		return "", fmt.Errorf("decode me response: %w", err)
+		return "", fmt.Errorf("decode userinfo response: %w", err)
 	}
 
-	return "urn:li:person:" + meResp.ID, nil
+	return "urn:li:person:" + meResp.Sub, nil
 }
 
 // Register und Upload für Bilder
