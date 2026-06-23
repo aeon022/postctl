@@ -30,7 +30,7 @@ func runTUI() error {
 	defer s.Close()
 
 	model := tui.NewModel(s)
-	p := tea.NewProgram(model, tea.WithAltScreen())
+	p := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	
 	if _, err := p.Run(); err != nil {
 		return fmt.Errorf("run bubbletea program: %w", err)

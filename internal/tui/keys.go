@@ -18,6 +18,7 @@ type KeyMap struct {
 	Delete   key.Binding
 	Repurpose key.Binding
 	Import    key.Binding
+	Readme    key.Binding
 	Quit     key.Binding
 	Help     key.Binding
 }
@@ -80,12 +81,16 @@ var Keys = KeyMap{
 		key.WithKeys("i"),
 		key.WithHelp("i", "import posts"),
 	),
+	Readme: key.NewBinding(
+		key.WithKeys("f1", "R"),
+		key.WithHelp("f1/R", "open readme"),
+	),
 	Quit: key.NewBinding(
 		key.WithKeys("q", "ctrl+c"),
 		key.WithHelp("q", "quit"),
 	),
 	Help: key.NewBinding(
 		key.WithKeys("?"),
-		key.WithHelp("?", "toggle help"),
+		key.WithHelp("?", "toggle quick help"),
 	),
 }

@@ -75,18 +75,21 @@ func (m Model) renderHelp() string {
 		builder.WriteString("  ↑/k        Move Up\n")
 		builder.WriteString("  ↓/j        Move Down\n")
 		builder.WriteString("  enter      Select / Open Preview (on Posts list) / Filter by campaign (on Dashboard)\n")
+		builder.WriteString("  i          Import posts from Markdown files/folders (pauses TUI)\n")
 		builder.WriteString("  d          Delete selected post\n")
 		builder.WriteString("  r          Repurpose selected post via AI to other platforms\n")
 		builder.WriteString("  esc        Close Preview / Clear filter\n")
-		builder.WriteString("  ?          Toggle Help\n")
+		builder.WriteString("  f1/R       Open complete README documentation with TOC\n")
+		builder.WriteString("  ?          Toggle Quick Help\n")
 		builder.WriteString("  q/ctrl+c   Quit application\n")
 		sb.WriteString(StyleHelp.Render(builder.String()))
 	} else {
-		// Standard Kurzhilfe
-		helpText := "tab: next tab  ·  ↑↓: navigate  ·  enter: select  ·  d: delete  ·  r: repurpose  ·  ?: help  ·  q: quit"
+		// Standard Kurzhilfe (zweizeilig)
+		line1 := "tab: next tab  ·  ↑↓: navigate  ·  enter: select  ·  i: import  ·  d: delete  ·  r: repurpose  ·  q: quit"
 		if m.activeTab == 1 && m.filterCampaign != "" {
-			helpText = "esc: clear filter  ·  " + helpText
+			line1 = "esc: clear filter  ·  " + line1
 		}
+		helpText := line1 + "\n" + "f1/R: readme  ·  ?: quick help"
 		sb.WriteString(StyleHelp.Render(helpText))
 	}
 	return sb.String()

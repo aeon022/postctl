@@ -15,6 +15,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var isInteractiveImport bool
+
 // importCmd repräsentiert den Import-Befehl
 var importCmd = &cobra.Command{
 	Use:   "import [path]",
@@ -23,20 +25,21 @@ var importCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		var targetPath string
-		if len(args) == 1 {
+		isInteractiveImport = len(args) == 0
+
+		if !isInteractiveImport {
 			targetPath = args[0]
 		} else {
-			// Terminal leeren (ANSI Escape Codes)
-			fmt.Print("\033[H\033[2J")
+			// Terminal komplett leeren (wie clear)
+			fmt.Print("\033[H\033[2J\033[3J")
 
 			// Hilfe-Header ausgeben
 			fmt.Println("=== postctl BEITRAGS-IMPORT / POST IMPORT ===")
-			fmt.Println("Importiere Social-Media-Beiträge aus Markdown-Dateien oder ganzen Ordnern.")
-			fmt.Println()
-			fmt.Println("💡 TIPP: Du kannst eine Datei oder einen Ordner einfach per Drag & Drop")
-			fmt.Println("   aus dem Finder direkt in dieses Terminalfenster ziehen!")
-			fmt.Println("   Drücke Enter ohne Eingabe, um den Vorgang abzubrechen.")
-			fmt.Println("=============================================================")
+			fmt.Println("Beschreibung: Importiert Social-Media-Beiträge aus Markdown-Dateien oder ganzen Ordnern.")
+			fmt.Println("Hilfe: Du kannst den Pfad zu einer Datei oder einem Ordner einfach per Drag & Drop")
+			fmt.Println("       aus dem Finder direkt in dieses Terminalfenster schieben/ziehen!")
+			fmt.Println("       Drücke Enter ohne Eingabe, um den Vorgang abzubrechen.")
+			fmt.Println("==========================================================================")
 			fmt.Println()
 			fmt.Print("➔ Pfad oder Ordner: ")
 
@@ -51,6 +54,11 @@ var importCmd = &cobra.Command{
 
 		if targetPath == "" {
 			fmt.Println("\nImport abgebrochen.")
+			if isInteractiveImport {
+				fmt.Println("Drücke Enter, um zur TUI zurückzukehren...")
+				var wait string
+				fmt.Scanln(&wait)
+			}
 			os.Exit(0)
 		}
 
@@ -160,6 +168,13 @@ var importCmd = &cobra.Command{
 
 		// 5. Erfolgsmeldung ausgeben
 		reportSuccess(len(files), len(posts))
+
+		if isInteractiveImport {
+			fmt.Println()
+			fmt.Println("Drücke Enter, um zur TUI zurückzukehren...")
+			var wait string
+			fmt.Scanln(&wait)
+		}
 	},
 }
 
@@ -240,6 +255,12 @@ func reportValidationErrors(errs []string, filesScanned int) {
 		}
 		fmt.Fprintf(os.Stderr, "\nScanned %d files. No posts were saved.\n", filesScanned)
 	}
+	if isInteractiveImport {
+		fmt.Println("\nDrücke Enter, um zur TUI zurückzukehren...")
+		var wait string
+		fmt.Scanln(&wait)
+	}
+	os.Exit(1)
 }
 
 func reportError(err error, exitCode int) {
@@ -254,7 +275,12 @@ func reportError(err error, exitCode int) {
 	} else {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 	}
-	os.Exit(exitCode)
+	if isInteractiveImport {
+		fmt.Println("\nDrücke Enter, um zur TUI zurückzukehren...")
+		var wait string
+		fmt.Scanln(&wait)
+	}
+	exitFunc(exitCode)
 }
 
 func init() {

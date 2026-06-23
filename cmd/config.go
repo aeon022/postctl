@@ -186,6 +186,8 @@ func reportConfigSuccess(cmd *cobra.Command, key, value string) {
 	}
 }
 
+var isInteractiveConfig bool
+
 func reportConfigError(cmd *cobra.Command, err error, exitCode int) {
 	outErr := cmd.ErrOrStderr()
 	if FormatFlag == "json" {
@@ -199,6 +201,11 @@ func reportConfigError(cmd *cobra.Command, err error, exitCode int) {
 	} else {
 		fmt.Fprintf(outErr, "Config Error: %v\n", err)
 	}
+	if isInteractiveConfig {
+		fmt.Println("\nDrücke Enter, um zur TUI zurückzukehren...")
+		var wait string
+		fmt.Scanln(&wait)
+	}
 	exitFunc(exitCode)
 }
 
@@ -210,13 +217,37 @@ var configExportCmd = &cobra.Command{
 	Short: "Export configuration and database",
 	Long:  `Export the active configuration and SQLite database into a secure, encrypted backup package.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if exportPassword == "" {
-			fmt.Print("Gib ein Master-Passwort für die Verschlüsselung ein: ")
+		isInteractiveConfig = exportPassword == ""
+
+		if isInteractiveConfig {
+			// Terminal komplett leeren (wie clear)
+			fmt.Print("\033[H\033[2J\033[3J")
+			fmt.Println("=== postctl KONFIGURATIONS-EXPORT / BACKUP EXPORT ===")
+			fmt.Println("Beschreibung: Sichert und verschlüsselt deine Konfiguration und die SQLite-Datenbank.")
+			fmt.Println("Hilfe: Gib ein Master-Passwort für die AES-Verschlüsselung an. Dieses Passwort")
+			fmt.Println("       wird auf dem anderen Gerät benötigt, um das Backup wiederherzustellen.")
+			fmt.Println("       Du kannst den Ziel-Dateipfad per Drag & Drop in dieses Terminal schieben/ziehen.")
+			fmt.Println("==========================================================================")
+			fmt.Println()
+
+			fmt.Print("➔ Gib ein Master-Passwort für die Verschlüsselung ein: ")
 			fmt.Scanln(&exportPassword)
-		}
-		if exportPassword == "" {
-			reportConfigError(cmd, fmt.Errorf("Passwort darf nicht leer sein"), 1)
-			return
+			if exportPassword == "" {
+				reportConfigError(cmd, fmt.Errorf("Passwort darf nicht leer sein"), 1)
+				return
+			}
+
+			if !cmd.Flags().Changed("output") {
+				fmt.Printf("➔ Ziel-Dateipfad für das Backup [Standard: %s]: ", exportOutputFile)
+				var inputPath string
+				fmt.Scanln(&inputPath)
+				inputPath = strings.TrimSpace(inputPath)
+				inputPath = strings.ReplaceAll(inputPath, "\"", "")
+				inputPath = strings.ReplaceAll(inputPath, "'", "")
+				if inputPath != "" {
+					exportOutputFile = inputPath
+				}
+			}
 		}
 
 		err := config.ExportConfig(exportPassword, exportOutputFile)
@@ -225,7 +256,15 @@ var configExportCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("Konfiguration und Datenbank erfolgreich verschlüsselt exportiert nach: %s\n", exportOutputFile)
+		if isInteractiveConfig {
+			fmt.Println()
+			fmt.Printf("✅ Konfiguration und Datenbank erfolgreich verschlüsselt exportiert nach:\n   %s\n", exportOutputFile)
+			fmt.Println("\nDrücke Enter, um zur TUI zurückzukehren...")
+			var wait string
+			fmt.Scanln(&wait)
+		} else {
+			fmt.Printf("Konfiguration und Datenbank erfolgreich verschlüsselt exportiert nach: %s\n", exportOutputFile)
+		}
 	},
 }
 
@@ -237,13 +276,37 @@ var configImportCmd = &cobra.Command{
 	Short: "Import configuration and database",
 	Long:  `Import and decrypt a postctl backup package to restore your configuration and database.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if importPassword == "" {
-			fmt.Print("Gib das Master-Passwort zur Entschlüsselung ein: ")
+		isInteractiveConfig = importPassword == ""
+
+		if isInteractiveConfig {
+			// Terminal komplett leeren (wie clear)
+			fmt.Print("\033[H\033[2J\033[3J")
+			fmt.Println("=== postctl KONFIGURATIONS-IMPORT / BACKUP IMPORT ===")
+			fmt.Println("Beschreibung: Stellt deine Konfiguration und SQLite-Datenbank aus einem Backup wieder her.")
+			fmt.Println("Hilfe: Gib das Master-Passwort an, das beim Exportieren verwendet wurde.")
+			fmt.Println("       Du kannst die Backup-Datei (.bin) einfach per Drag & Drop")
+			fmt.Println("       aus dem Finder direkt in dieses Terminalfenster schieben/ziehen!")
+			fmt.Println("==========================================================================")
+			fmt.Println()
+
+			fmt.Print("➔ Gib das Master-Passwort zur Entschlüsselung ein: ")
 			fmt.Scanln(&importPassword)
-		}
-		if importPassword == "" {
-			reportConfigError(cmd, fmt.Errorf("Passwort darf nicht leer sein"), 1)
-			return
+			if importPassword == "" {
+				reportConfigError(cmd, fmt.Errorf("Passwort darf nicht leer sein"), 1)
+				return
+			}
+
+			if !cmd.Flags().Changed("file") {
+				fmt.Printf("➔ Dateipfad der Backup-Datei [Standard: %s]: ", importInputFile)
+				var inputPath string
+				fmt.Scanln(&inputPath)
+				inputPath = strings.TrimSpace(inputPath)
+				inputPath = strings.ReplaceAll(inputPath, "\"", "")
+				inputPath = strings.ReplaceAll(inputPath, "'", "")
+				if inputPath != "" {
+					importInputFile = inputPath
+				}
+			}
 		}
 
 		err := config.ImportConfig(importPassword, importInputFile)
@@ -252,7 +315,15 @@ var configImportCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Println("Konfiguration und Datenbank erfolgreich entschlüsselt und wiederhergestellt!")
+		if isInteractiveConfig {
+			fmt.Println()
+			fmt.Println("✅ Konfiguration und Datenbank erfolgreich entschlüsselt und wiederhergestellt!")
+			fmt.Println("\nDrücke Enter, um zur TUI zurückzukehren...")
+			var wait string
+			fmt.Scanln(&wait)
+		} else {
+			fmt.Println("Konfiguration und Datenbank erfolgreich entschlüsselt und wiederhergestellt!")
+		}
 	},
 }
 

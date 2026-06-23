@@ -51,6 +51,14 @@ type Model struct {
 	repurposing    bool
 	statusMessage  string
 	
+	// README Viewer Zustand
+	showReadme   bool
+	readmeLines  []string
+	readmeTOC    []tocItem
+	readmeScroll int
+	tocCursor    int
+	readmeFocus  int // 0: TOC, 1: Content
+	
 	// Terminal Dimensionen
 	width  int
 	height int
@@ -349,7 +357,85 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.cursor = 0
 		return m, m.loadDataCmd
 		
+	case tea.MouseMsg:
+		if m.showReadme {
+			if m.readmeFocus == 0 {
+				switch msg.Button {
+				case tea.MouseButtonWheelUp:
+					m.tocCursor = max(0, m.tocCursor - 1)
+					return m, nil
+				case tea.MouseButtonWheelDown:
+					m.tocCursor = min(len(m.readmeTOC) - 1, m.tocCursor + 1)
+					return m, nil
+				}
+			} else {
+				switch msg.Button {
+				case tea.MouseButtonWheelUp:
+					m.readmeScroll = max(0, m.readmeScroll - 1)
+					return m, nil
+				case tea.MouseButtonWheelDown:
+					maxScroll := len(m.readmeLines) - m.getReadmeViewportHeight()
+					if maxScroll < 0 {
+						maxScroll = 0
+					}
+					m.readmeScroll = min(maxScroll, m.readmeScroll + 1)
+					return m, nil
+				}
+			}
+		}
+		return m, nil
+
 	case tea.KeyMsg:
+		// Wenn README offen ist, verarbeite nur README-Tasten
+		if m.showReadme {
+			if m.readmeFocus == 1 && (msg.String() == "t" || msg.String() == "backspace") {
+				m.readmeFocus = 0
+				return m, nil
+			}
+
+			switch {
+			case key.Matches(msg, Keys.Quit) || key.Matches(msg, Keys.Esc):
+				m.showReadme = false
+				return m, nil
+
+			case key.Matches(msg, Keys.Tab):
+				m.readmeFocus = (m.readmeFocus + 1) % 2
+				return m, nil
+
+			case key.Matches(msg, Keys.ShiftTab):
+				m.readmeFocus = (m.readmeFocus - 1 + 2) % 2
+				return m, nil
+
+			case key.Matches(msg, Keys.Up):
+				if m.readmeFocus == 0 {
+					m.tocCursor = max(0, m.tocCursor - 1)
+				} else {
+					m.readmeScroll = max(0, m.readmeScroll - 1)
+				}
+				return m, nil
+
+			case key.Matches(msg, Keys.Down):
+				if m.readmeFocus == 0 {
+					m.tocCursor = min(len(m.readmeTOC) - 1, m.tocCursor + 1)
+				} else {
+					maxScroll := len(m.readmeLines) - m.getReadmeViewportHeight()
+					if maxScroll < 0 {
+						maxScroll = 0
+					}
+					m.readmeScroll = min(maxScroll, m.readmeScroll + 1)
+				}
+				return m, nil
+
+			case key.Matches(msg, Keys.Enter):
+				if m.readmeFocus == 0 && len(m.readmeTOC) > 0 {
+					m.readmeScroll = m.readmeTOC[m.tocCursor].line
+					m.readmeFocus = 1 // direkt zum Inhalt springen und fokussieren
+				}
+				return m, nil
+			}
+			return m, nil
+		}
+
 		// Wenn eine Fehlermeldung angezeigt wird, schließt Esc diese
 		if m.err != nil && msg.String() == "esc" {
 			m.err = nil
@@ -493,6 +579,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, nil
 
+		case key.Matches(msg, Keys.Readme):
+			if m.selectedPost == nil {
+				lines, toc := getReadmeData()
+				m.readmeLines = lines
+				m.readmeTOC = toc
+				m.readmeScroll = 0
+				m.tocCursor = 0
+				m.readmeFocus = 0
+				m.showReadme = true
+			}
+			return m, nil
+
 		case key.Matches(msg, Keys.Help):
 			m.showHelp = !m.showHelp
 			return m, nil
@@ -547,6 +645,11 @@ func (m Model) View() string {
 	// Detailansicht anzeigen, falls ein Post ausgewählt ist
 	if m.selectedPost != nil {
 		return m.renderDetailView()
+	}
+
+	// README / System-Dokumentation anzeigen, falls geöffnet
+	if m.showReadme {
+		return m.renderReadme()
 	}
 
 	var builder strings.Builder
@@ -686,5 +789,14 @@ func (m *Model) cycleSetting() {
 
 	// In config.yaml speichern
 	_ = config.SaveConfig()
+}
+
+func (m Model) getReadmeViewportHeight() int {
+	outerHeight := 22
+	if m.height > 10 {
+		outerHeight = max(22, m.height - 4)
+	}
+	innerHeight := outerHeight - 4
+	return innerHeight - 2
 }
 
