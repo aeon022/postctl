@@ -58,7 +58,7 @@ chmod +x setup.sh
 ### ⚙️ Settings & Auth in TUI
 Run `./postctl tui` and navigate to the **Settings** tab:
 * **Account Auth:** Highlight an account under **PLATFORM ACCOUNTS** and press **Enter** to start the OAuth login. The TUI pauses, opens your standard browser, and displays a status message upon completion.
-* **Interactive Post Import:** In any main tab (Dashboard, Posts, Schedule, History), you can press **`i`** to trigger an interactive post import. The TUI will temporarily pause, prompt you for the Markdown file/directory path in the console, validate the posts/images, import them, and return to the TUI.
+* **Interactive Post Import:** In any main tab (Dashboard, Posts, Schedule, History), you can press **`i`** to trigger an interactive post import. The TUI will temporarily pause, clear the terminal, and prompt you for the Markdown file/directory path. **Tip: You can simply drag and drop the file or folder directly from your Finder into the terminal window.** The tool automatically cleans quote characters, validates the posts/images, imports them, and returns to the TUI.
 * **Backup & Sync:** Go to **BACKUP & SYNC** at the bottom, select `Backup Exp.` (Export) or `Backup Imp.` (Import), and press **Enter** to enter your master password.
   * CLI Commands: `./postctl config export -o backup.bin` and `./postctl config import -f backup.bin`.
 
@@ -117,6 +117,6 @@ chmod +x setup.sh
 ### ⚙️ Einstellungen & Auth in der TUI
 Führe `./postctl tui` aus und wechsle in den **Settings**-Tab:
 * **Account Auth:** Wähle einen Account unter **PLATFORM ACCOUNTS** und drücke **Enter**. Die TUI pausiert, öffnet deinen Browser und aktualisiert den Status nach erfolgreichem Login.
-* **Interaktiver Beitrags-Import:** In jedem Haupt-Tab (Dashboard, Posts, Schedule, History) kannst du die Taste **`i`** drücken, um einen interaktiven Import zu starten. Die TUI pausiert kurz, bittet dich im Terminal um die Eingabe des Pfades zur Markdown-Datei oder zum Ordner, validiert die Beiträge/Bilder und kehrt direkt wieder zur TUI zurück.
+* **Interaktiver Beitrags-Import:** In jedem Haupt-Tab (Dashboard, Posts, Schedule, History) kannst du die Taste **`i`** drücken, um einen interaktiven Import zu starten. Die TUI pausiert kurz, leert das Terminal und bittet dich um den Pfad zur Markdown-Datei oder zum Ordner. **Tipp: Du kannst die Datei oder den Ordner einfach per Drag & Drop aus dem Finder direkt in das Terminalfenster ziehen.** Das Tool entfernt automatisch störende Anführungszeichen, validiert die Beiträge/Bilder und kehrt direkt wieder zur TUI zurück.
 * **Backup & Sync:** Wähle unten im Bereich **BACKUP & SYNC** entweder `Backup Exp.` (Export) oder `Backup Imp.` (Import) und drücke **Enter**, um dein Master-Passwort einzugeben.
   * CLI-Befehle: `./postctl config export -o backup.bin` und `./postctl config import -f backup.bin`.

@@ -26,14 +26,32 @@ var importCmd = &cobra.Command{
 		if len(args) == 1 {
 			targetPath = args[0]
 		} else {
-			fmt.Print("Gib den Pfad zu einer Markdown-Datei oder einem Ordner ein: ")
+			// Terminal leeren (ANSI Escape Codes)
+			fmt.Print("\033[H\033[2J")
+
+			// Hilfe-Header ausgeben
+			fmt.Println("=== postctl BEITRAGS-IMPORT / POST IMPORT ===")
+			fmt.Println("Importiere Social-Media-Beiträge aus Markdown-Dateien oder ganzen Ordnern.")
+			fmt.Println()
+			fmt.Println("💡 TIPP: Du kannst eine Datei oder einen Ordner einfach per Drag & Drop")
+			fmt.Println("   aus dem Finder direkt in dieses Terminalfenster ziehen!")
+			fmt.Println("   Drücke Enter ohne Eingabe, um den Vorgang abzubrechen.")
+			fmt.Println("=============================================================")
+			fmt.Println()
+			fmt.Print("➔ Pfad oder Ordner: ")
+
 			fmt.Scanln(&targetPath)
+			targetPath = strings.TrimSpace(targetPath)
+			
+			// Anführungszeichen entfernen, die Terminals bei Drag & Drop um Pfade mit Leerzeichen setzen
+			targetPath = strings.ReplaceAll(targetPath, "\"", "")
+			targetPath = strings.ReplaceAll(targetPath, "'", "")
 			targetPath = strings.TrimSpace(targetPath)
 		}
 
 		if targetPath == "" {
-			reportError(fmt.Errorf("Pfad darf nicht leer sein"), 1)
-			return
+			fmt.Println("\nImport abgebrochen.")
+			os.Exit(0)
 		}
 
 		ctx := context.Background()
