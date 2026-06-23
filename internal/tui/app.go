@@ -11,6 +11,7 @@ import (
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/generator"
 	"github.com/aeon022/postctl/internal/models"
+	"github.com/aeon022/postctl/internal/platforms"
 	"github.com/aeon022/postctl/internal/scheduler"
 	"github.com/aeon022/postctl/internal/store"
 	"github.com/charmbracelet/bubbles/key"
@@ -75,6 +76,11 @@ type postDeletedMsg struct {
 type postRepurposedMsg struct {
 	files []string
 	err   error
+}
+
+type authResultMsg struct {
+	platform string
+	err      error
 }
 
 type tickMsg struct{}
@@ -199,6 +205,20 @@ func (m Model) deletePostCmd(id string) tea.Cmd {
 	}
 }
 
+// runAuthCmd startet den Authentifizierungs-Flow für eine Plattform asynchron im Hintergrund
+func (m Model) runAuthCmd(platformName string) tea.Cmd {
+	return func() tea.Msg {
+		ctx := context.Background()
+		plat, err := platforms.GetPlatform(platformName, m.store, false)
+		if err != nil {
+			return authResultMsg{platform: platformName, err: err}
+		}
+
+		err = plat.Auth(ctx)
+		return authResultMsg{platform: platformName, err: err}
+	}
+}
+
 // publishDuePostsCmd prüft und veröffentlicht fällige Posts im TUI-Hintergrund
 func (m Model) publishDuePostsCmd() tea.Msg {
 	ctx := context.Background()
@@ -241,6 +261,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		m.statusMessage = fmt.Sprintf("Erfolgreich konvertiert: %s", strings.Join(msg.files, ", "))
+		return m, m.loadDataCmd
+
+	case authResultMsg:
+		m.loading = false
+		if msg.err != nil {
+			m.err = fmt.Errorf("Authentifizierung fehlgeschlagen: %w", msg.err)
+			m.statusMessage = ""
+		} else {
+			m.statusMessage = fmt.Sprintf("Erfolgreich mit %s verbunden!", msg.platform)
+		}
 		return m, m.loadDataCmd
 
 	case dataLoadedMsg:
@@ -330,6 +360,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, Keys.Up):
 			if m.cursor > 0 {
 				m.cursor--
+				if m.activeTab == 4 && m.cursor == 3 {
+					m.cursor--
+				}
 			}
 			return m, nil
 			
@@ -337,11 +370,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			maxItems := m.maxCursorItems()
 			if m.cursor < maxItems-1 {
 				m.cursor++
+				if m.activeTab == 4 && m.cursor == 3 {
+					m.cursor++
+				}
 			}
 			return m, nil
 
 		case key.Matches(msg, Keys.Left), key.Matches(msg, Keys.Right):
-			if m.activeTab == 4 {
+			if m.activeTab == 4 && m.cursor < 3 {
 				m.cycleSetting()
 				return m, nil
 			}
@@ -349,6 +385,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 4 {
+				if m.cursor >= 4 {
+					var platName string
+					switch m.cursor {
+					case 4:
+						platName = models.PlatformTwitter
+					case 5:
+						platName = models.PlatformLinkedIn
+					case 6:
+						platName = models.PlatformThreads
+					}
+					m.loading = true
+					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
+					return m, m.runAuthCmd(platName)
+				}
 				m.cycleSetting()
 				return m, nil
 			}
@@ -397,7 +447,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 4: // Settings
-		return 3
+		return 7
 	default:
 		return 0
 	}

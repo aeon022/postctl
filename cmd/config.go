@@ -202,8 +202,70 @@ func reportConfigError(cmd *cobra.Command, err error, exitCode int) {
 	exitFunc(exitCode)
 }
 
+var exportPassword string
+var exportOutputFile string
+
+var configExportCmd = &cobra.Command{
+	Use:   "export",
+	Short: "Export configuration and database",
+	Long:  `Export the active configuration and SQLite database into a secure, encrypted backup package.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if exportPassword == "" {
+			fmt.Print("Gib ein Master-Passwort für die Verschlüsselung ein: ")
+			fmt.Scanln(&exportPassword)
+		}
+		if exportPassword == "" {
+			reportConfigError(cmd, fmt.Errorf("Passwort darf nicht leer sein"), 1)
+			return
+		}
+
+		err := config.ExportConfig(exportPassword, exportOutputFile)
+		if err != nil {
+			reportConfigError(cmd, fmt.Errorf("Export fehlgeschlagen: %w", err), 2)
+			return
+		}
+
+		fmt.Printf("Konfiguration und Datenbank erfolgreich verschlüsselt exportiert nach: %s\n", exportOutputFile)
+	},
+}
+
+var importPassword string
+var importInputFile string
+
+var configImportCmd = &cobra.Command{
+	Use:   "import",
+	Short: "Import configuration and database",
+	Long:  `Import and decrypt a postctl backup package to restore your configuration and database.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if importPassword == "" {
+			fmt.Print("Gib das Master-Passwort zur Entschlüsselung ein: ")
+			fmt.Scanln(&importPassword)
+		}
+		if importPassword == "" {
+			reportConfigError(cmd, fmt.Errorf("Passwort darf nicht leer sein"), 1)
+			return
+		}
+
+		err := config.ImportConfig(importPassword, importInputFile)
+		if err != nil {
+			reportConfigError(cmd, fmt.Errorf("Import fehlgeschlagen: %w", err), 2)
+			return
+		}
+
+		fmt.Println("Konfiguration und Datenbank erfolgreich entschlüsselt und wiederhergestellt!")
+	},
+}
+
 func init() {
+	configExportCmd.Flags().StringVarP(&exportPassword, "password", "p", "", "Master password for encryption")
+	configExportCmd.Flags().StringVarP(&exportOutputFile, "output", "o", "postctl_backup.bin", "Path to the output encrypted backup file")
+
+	configImportCmd.Flags().StringVarP(&importPassword, "password", "p", "", "Master password for decryption")
+	configImportCmd.Flags().StringVarP(&importInputFile, "file", "f", "postctl_backup.bin", "Path to the encrypted backup file to import")
+
 	configCmd.AddCommand(configShowCmd)
 	configCmd.AddCommand(configSetCmd)
+	configCmd.AddCommand(configExportCmd)
+	configCmd.AddCommand(configImportCmd)
 	rootCmd.AddCommand(configCmd)
 }
