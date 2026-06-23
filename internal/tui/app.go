@@ -112,6 +112,11 @@ type importFinishedMsg struct {
 	err error
 }
 
+type externalEditorFinishedMsg struct {
+	content string
+	err     error
+}
+
 type tickMsg struct{}
 
 // NewModel initialisiert ein TUI-Model
@@ -272,6 +277,54 @@ func (m Model) runImportPostsCmd() tea.Cmd {
 	})
 }
 
+// runExternalEditorCmd pausiert die TUI und öffnet Neovim/Vim, um den Textinhalt zu bearbeiten
+func (m Model) runExternalEditorCmd() tea.Cmd {
+	// Temp-Datei erstellen
+	tmpFile, err := os.CreateTemp("", "postctl-body-*.md")
+	if err != nil {
+		return func() tea.Msg {
+			return externalEditorFinishedMsg{err: err}
+		}
+	}
+	
+	// Aktuellen Text reinschreiben
+	if _, err := tmpFile.WriteString(m.editorBody.Value()); err != nil {
+		_ = tmpFile.Close()
+		_ = os.Remove(tmpFile.Name())
+		return func() tea.Msg {
+			return externalEditorFinishedMsg{err: err}
+		}
+	}
+	_ = tmpFile.Close()
+
+	// Editor bestimmen (EDITOR Env-Var, sonst nvim, sonst vim)
+	editorCmd := os.Getenv("EDITOR")
+	if editorCmd == "" {
+		editorCmd = "nvim"
+	}
+	// Fallback-Check: Falls nvim nicht gefunden wird, probiere vim
+	if _, err := exec.LookPath(editorCmd); err != nil && editorCmd == "nvim" {
+		editorCmd = "vim"
+	}
+
+	c := exec.Command(editorCmd, tmpFile.Name())
+	return tea.ExecProcess(c, func(err error) tea.Msg {
+		if err != nil {
+			_ = os.Remove(tmpFile.Name())
+			return externalEditorFinishedMsg{err: err}
+		}
+		
+		// Datei wieder einlesen
+		data, readErr := os.ReadFile(tmpFile.Name())
+		_ = os.Remove(tmpFile.Name())
+		if readErr != nil {
+			return externalEditorFinishedMsg{err: readErr}
+		}
+		
+		return externalEditorFinishedMsg{content: string(data)}
+	})
+}
+
 // publishDuePostsCmd prüft und veröffentlicht fällige Posts im TUI-Hintergrund
 func (m Model) publishDuePostsCmd() tea.Msg {
 	ctx := context.Background()
@@ -317,6 +370,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				} else if m.editorFocus == 6 { // Cancel
 					m.isEditing = false
 					return m, nil
+				}
+			case "ctrl+v":
+				return m, m.runExternalEditorCmd()
+			case "v":
+				if m.editorFocus == 0 || m.editorFocus == 5 || m.editorFocus == 6 {
+					return m, m.runExternalEditorCmd()
 				}
 			}
 
@@ -411,6 +470,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.statusMessage = "Beiträge erfolgreich importiert!"
 		}
 		return m, m.loadDataCmd
+
+	case externalEditorFinishedMsg:
+		if msg.err != nil {
+			m.err = fmt.Errorf("Fehler beim Bearbeiten mit externem Editor: %w", msg.err)
+		} else {
+			m.editorBody.SetValue(msg.content)
+		}
+		return m, nil
 
 	case dataLoadedMsg:
 		m.posts = msg.posts
