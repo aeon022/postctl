@@ -13,6 +13,9 @@ import (
 
 // PublishPost veröffentlicht einen Post und aktualisiert den DB-Status sowie die Historie
 func PublishPost(ctx context.Context, s store.Store, post *models.Post, dryRun bool) (string, error) {
+	// Falls es ein Thread-Post ist, verteile die globalen Bilder auf die einzelnen Tweets
+	post.PrepareTweets()
+
 	// Plattform holen
 	plat, err := platforms.GetPlatform(post.Platform, s, dryRun)
 	if err != nil {

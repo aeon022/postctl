@@ -51,3 +51,64 @@ func TestDeriveTitle(t *testing.T) {
 		})
 	}
 }
+
+func TestPrepareTweets(t *testing.T) {
+	t.Run("Thread with global images and empty tweet images", func(t *testing.T) {
+		post := &Post{
+			Type:   "thread",
+			Images: []string{"img1.png", "img2.png"},
+			Tweets: []Tweet{
+				{Index: 1, Content: "First tweet"},
+				{Index: 2, Content: "Second tweet"},
+				{Index: 3, Content: "Third tweet"},
+			},
+		}
+		post.PrepareTweets()
+
+		if post.Tweets[0].Image != "img1.png" {
+			t.Errorf("expected Tweets[0].Image to be 'img1.png', got %q", post.Tweets[0].Image)
+		}
+		if post.Tweets[1].Image != "img2.png" {
+			t.Errorf("expected Tweets[1].Image to be 'img2.png', got %q", post.Tweets[1].Image)
+		}
+		if post.Tweets[2].Image != "" {
+			t.Errorf("expected Tweets[2].Image to be '', got %q", post.Tweets[2].Image)
+		}
+	})
+
+	t.Run("Thread with some preset tweet images", func(t *testing.T) {
+		post := &Post{
+			Type:   "thread",
+			Images: []string{"img1.png", "img2.png"},
+			Tweets: []Tweet{
+				{Index: 1, Content: "First tweet"},
+				{Index: 2, Content: "Second tweet", Image: "preset.png"},
+			},
+		}
+		post.PrepareTweets()
+
+		// Presets should prevent fallback distribution
+		if post.Tweets[0].Image != "" {
+			t.Errorf("expected Tweets[0].Image to remain empty, got %q", post.Tweets[0].Image)
+		}
+		if post.Tweets[1].Image != "preset.png" {
+			t.Errorf("expected Tweets[1].Image to remain 'preset.png', got %q", post.Tweets[1].Image)
+		}
+	})
+
+	t.Run("Single post with global images", func(t *testing.T) {
+		post := &Post{
+			Type:   "single",
+			Images: []string{"img1.png"},
+			Tweets: []Tweet{
+				{Index: 1, Content: "Single tweet content"},
+			},
+		}
+		post.PrepareTweets()
+
+		if post.Tweets[0].Image != "" {
+			t.Errorf("expected Tweets[0].Image to remain empty, got %q", post.Tweets[0].Image)
+		}
+	})
+}
+

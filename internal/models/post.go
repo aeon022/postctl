@@ -108,3 +108,30 @@ func DeriveTitle(body string) string {
 	}
 	return "Unbenannter Beitrag"
 }
+
+// PrepareTweets stellt sicher, dass bei einem Thread-Post die Bilder aus Images auf die Tweets verteilt werden,
+// falls alle Tweets bisher keine Bilder zugewiesen haben.
+func (p *Post) PrepareTweets() {
+	if p.Type != "thread" || len(p.Images) == 0 {
+		return
+	}
+
+	// Prüfen, ob bereits irgendein Tweet ein Bild zugewiesen hat
+	hasAnyTweetImage := false
+	for _, t := range p.Tweets {
+		if t.Image != "" {
+			hasAnyTweetImage = true
+			break
+		}
+	}
+
+	// Falls kein Tweet ein Bild hat, verteilen wir die globalen Bilder
+	if !hasAnyTweetImage {
+		for i := range p.Tweets {
+			if i < len(p.Images) {
+				p.Tweets[i].Image = p.Images[i]
+			}
+		}
+	}
+}
+

@@ -179,6 +179,9 @@ func (m *Model) saveEditedPost() error {
 		post.Type = "single"
 		post.Body = body
 	}
+
+	post.PrepareTweets()
+
 	
 	// In SQLite speichern
 	if err := m.store.SavePost(ctx, &post); err != nil {
