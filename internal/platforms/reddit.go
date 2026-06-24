@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
 )
@@ -43,7 +44,24 @@ func (r *RedditPlatform) IsAuthenticated(ctx context.Context) bool {
 // Auth startet den OAuth Flow für Reddit (mit permanenter Dauer für Refresh Token)
 func (r *RedditPlatform) Auth(ctx context.Context) error {
 	if r.clientID == "" || r.clientSecret == "" {
-		return fmt.Errorf("reddit client_id or client_secret not configured in config.yaml")
+		if config.ActiveConfig.Defaults.Language == "de" {
+			return fmt.Errorf("Reddit-Konfiguration fehlt! Bitte folge diesen Schritten:\n" +
+				"  1. Gehe zu https://www.reddit.com/prefs/apps\n" +
+				"  2. Klicke ganz unten auf \"Create Another App...\".\n" +
+				"  3. Wähle \"personal use script\" und trage Redirect URI \"http://localhost:8753/callback\" ein.\n" +
+				"  4. Trage die erhaltenen Zugangsdaten im Terminal ein:\n" +
+				"     postctl config set reddit.client_id \"DEINE_CLIENT_ID\"\n" +
+				"     postctl config set reddit.client_secret \"DEIN_CLIENT_SECRET\"\n" +
+				"  5. Führe danach die Authentifizierung erneut aus.")
+		}
+		return fmt.Errorf("Reddit configuration is missing! Please follow these steps:\n" +
+			"  1. Go to https://www.reddit.com/prefs/apps\n" +
+			"  2. Scroll to the bottom and click \"Create Another App...\".\n" +
+			"  3. Select \"personal use script\" and set redirect URI to \"http://localhost:8753/callback\".\n" +
+			"  4. Configure postctl in your terminal:\n" +
+			"     postctl config set reddit.client_id \"YOUR_CLIENT_ID\"\n" +
+			"     postctl config set reddit.client_secret \"YOUR_CLIENT_SECRET\"\n" +
+			"  5. Run the authentication command again.")
 	}
 
 	state := fmt.Sprintf("state-%d", time.Now().UnixNano())

@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
 )
@@ -44,7 +45,22 @@ func (b *BlueskyPlatform) IsAuthenticated(ctx context.Context) bool {
 // Auth führt die Authentifizierung bei Bluesky über ein App-Passwort durch
 func (b *BlueskyPlatform) Auth(ctx context.Context) error {
 	if b.handle == "" || b.appPassword == "" {
-		return fmt.Errorf("bluesky handle and app_password must be configured in config.yaml")
+		if config.ActiveConfig.Defaults.Language == "de" {
+			return fmt.Errorf("Bluesky-Konfiguration fehlt! Bitte folge diesen Schritten:\n" +
+				"  1. Gehe in deinem Bluesky-Account zu Einstellungen ➔ App-Passwörter.\n" +
+				"  2. Erstelle ein neues App-Passwort und kopiere es.\n" +
+				"  3. Trage deine Zugangsdaten im Terminal ein:\n" +
+				"     postctl config set bluesky.handle \"deinname.bsky.social\"\n" +
+				"     postctl config set bluesky.app_password \"xxxx-xxxx-xxxx-xxxx\"\n" +
+				"  4. Führe danach die Authentifizierung erneut aus.")
+		}
+		return fmt.Errorf("Bluesky configuration is missing! Please follow these steps:\n" +
+			"  1. Go to your Bluesky account Settings ➔ App Passwords.\n" +
+			"  2. Create a new App Password and copy it.\n" +
+			"  3. Configure postctl in your terminal:\n" +
+			"     postctl config set bluesky.handle \"yourname.bsky.social\"\n" +
+			"     postctl config set bluesky.app_password \"xxxx-xxxx-xxxx-xxxx\"\n" +
+			"  4. Run the authentication command again.")
 	}
 
 	sessionURL := "https://bsky.social/xrpc/com.atproto.server.createSession"

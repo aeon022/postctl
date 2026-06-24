@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
 )
@@ -44,7 +45,24 @@ func (l *LinkedInPlatform) IsAuthenticated(ctx context.Context) bool {
 // Auth startet den OAuth 2.0 Flow für LinkedIn
 func (l *LinkedInPlatform) Auth(ctx context.Context) error {
 	if l.clientID == "" || l.clientSecret == "" {
-		return fmt.Errorf("linkedin client_id or client_secret not configured in config.yaml")
+		if config.ActiveConfig.Defaults.Language == "de" {
+			return fmt.Errorf("LinkedIn-Konfiguration fehlt! Bitte folge diesen Schritten:\n" +
+				"  1. Gehe zum LinkedIn Developer Portal unter https://linkedin.com/developers\n" +
+				"  2. Erstelle eine App und aktiviere \"Share on LinkedIn\" sowie \"Sign In with LinkedIn using OIDC\" unter Products.\n" +
+				"  3. Setze die Redirect URI unter Auth auf \"http://localhost:8753/callback\".\n" +
+				"  4. Trage deine Zugangsdaten im Terminal ein:\n" +
+				"     postctl config set linkedin.client_id \"DEINE_CLIENT_ID\"\n" +
+				"     postctl config set linkedin.client_secret \"DEIN_CLIENT_SECRET\"\n" +
+				"  5. Führe danach die Authentifizierung erneut aus.")
+		}
+		return fmt.Errorf("LinkedIn configuration is missing! Please follow these steps:\n" +
+			"  1. Go to LinkedIn Developer Portal at https://linkedin.com/developers\n" +
+			"  2. Create an app and add products \"Share on LinkedIn\" and \"Sign In with LinkedIn using OIDC\".\n" +
+			"  3. Set redirect URI under Auth to \"http://localhost:8753/callback\".\n" +
+			"  4. Configure postctl in your terminal:\n" +
+			"     postctl config set linkedin.client_id \"YOUR_CLIENT_ID\"\n" +
+			"     postctl config set linkedin.client_secret \"YOUR_CLIENT_SECRET\"\n" +
+			"  5. Run the authentication command again.")
 	}
 
 	state := fmt.Sprintf("state-%d", time.Now().UnixNano())

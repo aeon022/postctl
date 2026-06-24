@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
 )
@@ -42,7 +43,30 @@ func (t *ThreadsPlatform) IsAuthenticated(ctx context.Context) bool {
 // Auth startet den OAuth Flow für Threads (Meta Graph API)
 func (t *ThreadsPlatform) Auth(ctx context.Context) error {
 	if t.appID == "" || t.appSecret == "" {
-		return fmt.Errorf("threads app_id or app_secret not configured in config.yaml")
+		if config.ActiveConfig.Defaults.Language == "de" {
+			return fmt.Errorf("Threads-Konfiguration fehlt! Bitte folge diesen Schritten:\n" +
+				"  1. Gehe zum Meta Developer Portal unter https://developers.facebook.com\n" +
+				"  2. Erstelle eine App vom Typ Consumer und füge \"Threads API\" hinzu.\n" +
+				"  3. Setze die Redirect URIs in den Einstellungen auf:\n" +
+				"     - Valid OAuth Redirect: https://localhost:8753/callback\n" +
+				"     - Deinstallations-URL: https://localhost:8753/uninstall\n" +
+				"     - Datenlöschungs-URL:  https://localhost:8753/delete\n" +
+				"  4. Trage deine Zugangsdaten im Terminal ein:\n" +
+				"     postctl config set threads.app_id \"DEINE_APP_ID\"\n" +
+				"     postctl config set threads.app_secret \"DEIN_APP_SECRET\"\n" +
+				"  5. Führe danach die Authentifizierung erneut aus.")
+		}
+		return fmt.Errorf("Threads configuration is missing! Please follow these steps:\n" +
+			"  1. Go to Meta Developer Portal at https://developers.facebook.com\n" +
+			"  2. Create a consumer app and add \"Threads API\".\n" +
+			"  3. Configure your Redirect URIs in settings as follows:\n" +
+			"     - Valid OAuth Redirect: https://localhost:8753/callback\n" +
+			"     - Uninstall Callback:  https://localhost:8753/uninstall\n" +
+			"     - Data Delete Callback: https://localhost:8753/delete\n" +
+			"  4. Configure postctl in your terminal:\n" +
+			"     postctl config set threads.app_id \"YOUR_APP_ID\"\n" +
+			"     postctl config set threads.app_secret \"YOUR_APP_SECRET\"\n" +
+			"  5. Run the authentication command again.")
 	}
 
 	state := fmt.Sprintf("state-%d", time.Now().UnixNano())

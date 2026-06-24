@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
 )
@@ -47,7 +48,24 @@ func (t *TwitterPlatform) IsAuthenticated(ctx context.Context) bool {
 // Auth startet den OAuth 2.0 PKCE Flow für Twitter/X
 func (t *TwitterPlatform) Auth(ctx context.Context) error {
 	if t.clientID == "" || t.clientSecret == "" {
-		return fmt.Errorf("twitter client_id or client_secret not configured in config.yaml")
+		if config.ActiveConfig.Defaults.Language == "de" {
+			return fmt.Errorf("Twitter/X-Konfiguration fehlt! Bitte folge diesen Schritten:\n" +
+				"  1. Gehe zum Twitter Developer Portal unter https://developer.twitter.com\n" +
+				"  2. Erstelle eine App mit OAuth 2.0 PKCE (App-Typ: Web App / Native App).\n" +
+				"  3. Setze die Redirect URI auf \"http://localhost:8753/callback\" und Berechtigungen auf \"Read and Write\".\n" +
+				"  4. Trage deine Zugangsdaten im Terminal ein:\n" +
+				"     postctl config set twitter.client_id \"DEINE_CLIENT_ID\"\n" +
+				"     postctl config set twitter.client_secret \"DEIN_CLIENT_SECRET\"\n" +
+				"  5. Führe danach die Authentifizierung erneut aus.")
+		}
+		return fmt.Errorf("Twitter/X configuration is missing! Please follow these steps:\n" +
+			"  1. Go to Twitter Developer Portal at https://developer.twitter.com\n" +
+			"  2. Create an app with OAuth 2.0 PKCE (App Type: Web App / Native App).\n" +
+			"  3. Set redirect URI to \"http://localhost:8753/callback\" and permissions to \"Read and Write\".\n" +
+			"  4. Configure postctl in your terminal:\n" +
+			"     postctl config set twitter.client_id \"YOUR_CLIENT_ID\"\n" +
+			"     postctl config set twitter.client_secret \"YOUR_CLIENT_SECRET\"\n" +
+			"  5. Run the authentication command again.")
 	}
 
 	state := fmt.Sprintf("state-%d", time.Now().UnixNano())

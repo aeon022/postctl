@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
 )
@@ -48,7 +49,24 @@ func (f *FacebookPlatform) IsAuthenticated(ctx context.Context) bool {
 // Auth startet den OAuth Flow für Facebook via StartCallbackServerTLS (HTTPS)
 func (f *FacebookPlatform) Auth(ctx context.Context) error {
 	if f.appID == "" || f.appSecret == "" || f.pageID == "" {
-		return fmt.Errorf("facebook app_id, app_secret, and page_id must be configured in config.yaml")
+		if config.ActiveConfig.Defaults.Language == "de" {
+			return fmt.Errorf("Facebook-Konfiguration fehlt! Bitte folge diesen Schritten:\n" +
+				"  1. Gehe zum Meta Developer Portal unter https://developers.facebook.com\n" +
+				"  2. Erstelle eine App und füge \"Facebook Login\" mit Redirect URI \"https://localhost:8753/callback\" hinzu.\n" +
+				"  3. Trage deine App-Daten und die Facebook-Page-ID im Terminal ein:\n" +
+				"     postctl config set facebook.app_id \"DEINE_APP_ID\"\n" +
+				"     postctl config set facebook.app_secret \"DEIN_APP_SECRET\"\n" +
+				"     postctl config set facebook.page_id \"DEINE_PAGE_ID\"\n" +
+				"  4. Führe danach die Authentifizierung erneut aus.")
+		}
+		return fmt.Errorf("Facebook configuration is missing! Please follow these steps:\n" +
+			"  1. Go to Meta Developer Portal at https://developers.facebook.com\n" +
+			"  2. Create an app and add \"Facebook Login\" with redirect URI \"https://localhost:8753/callback\".\n" +
+			"  3. Configure postctl in your terminal:\n" +
+			"     postctl config set facebook.app_id \"YOUR_APP_ID\"\n" +
+			"     postctl config set facebook.app_secret \"YOUR_APP_SECRET\"\n" +
+			"     postctl config set facebook.page_id \"YOUR_PAGE_ID\"\n" +
+			"  4. Run the authentication command again.")
 	}
 
 	state := fmt.Sprintf("state-%d", time.Now().UnixNano())
