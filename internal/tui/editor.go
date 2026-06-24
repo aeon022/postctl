@@ -270,7 +270,12 @@ func (m Model) renderEditor() string {
 		imgStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 	}
 	imgLabel := imgPrefix + Tr("editor_label_images")
-	builder.WriteString(imgStyle.Render(imgLabel) + m.editorImages.View() + "\n\n")
+	builder.WriteString(imgStyle.Render(imgLabel) + m.editorImages.View() + "\n")
+	if m.editorFocus == 3 {
+		builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render(Tr("editor_images_help")) + "\n\n")
+	} else {
+		builder.WriteString("\n")
+	}
 
 	// 5. Text-Inhalt
 	bodyPrefix := "  "

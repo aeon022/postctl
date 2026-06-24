@@ -95,6 +95,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Bilder:     ",
 		"en": "Images:     ",
 	},
+	"editor_images_help": {
+		"de": "     (Tipp: Pfad eintragen oder Bild per Finder Drag & Drop ins Terminal ziehen)",
+		"en": "     (Tip: Enter path or drag & drop image from Finder into terminal)",
+	},
 	"editor_label_body": {
 		"de": "Beitrag / Inhalt: ",
 		"en": "Post / Body: ",
@@ -336,8 +340,8 @@ var translationsMap = map[string]map[string]string{
 		"en": "   Length: %d chars\n",
 	},
 	"editor_helper_note_strip": {
-		"de": "\n HINWEIS: Dieser Hilfeblock wird beim Speichern automatisch gelöscht.\n Schreibe deinen Beitrag unter diesem Kommentar:\n",
-		"en": "\n NOTE: This helper block will be stripped out automatically upon save.\n Write your post content below this comment:\n",
+		"de": "\n HINWEIS: Dieser Hilfeblock wird beim Speichern automatisch gelöscht.\n Bilder hinzufügen:\n   - Einzelpost: Pfad im Feld 'images' oben eintragen oder Drag&Drop im TUI.\n   - Threads: Nutze inline <!-- image: /pfad/zum/bild.png --> (per Finder Drag&Drop ins Terminal ziehen).\n\n Schreibe deinen Beitrag unter diesem Kommentar:\n",
+		"en": "\n NOTE: This helper block will be stripped out automatically upon save.\n Adding images:\n   - Single Post: Enter path in the 'images' field above or drag & drop in the TUI.\n   - Threads: Use inline <!-- image: /path/to/image.png --> (drag & drop from Finder into terminal).\n\n Write your post content below this comment:\n",
 	},
 	"editor_helper_title_other": {
 		"de": " postctl Editor-Hilfe (%s)\n ==================================\n\n",
