@@ -62,6 +62,8 @@ type Model struct {
 	editorImages      textinput.Model
 	editorBody        textarea.Model
 	editorFocus       int
+	showDatePicker    bool
+	datePickerDate    time.Time
 	
 	// README Viewer Zustand
 	showReadme   bool
@@ -554,6 +556,45 @@ func (m Model) publishDuePostsCmd() tea.Msg {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.isEditing {
 		if keyMsg, ok := msg.(tea.KeyMsg); ok {
+			if m.showDatePicker {
+				switch keyMsg.String() {
+				case "esc", "ctrl+d":
+					m.showDatePicker = false
+					return m, nil
+				case "left", "h":
+					m.datePickerDate = m.datePickerDate.AddDate(0, 0, -1)
+					return m, nil
+				case "right", "l":
+					m.datePickerDate = m.datePickerDate.AddDate(0, 0, 1)
+					return m, nil
+				case "up", "k":
+					m.datePickerDate = m.datePickerDate.AddDate(0, 0, -7)
+					return m, nil
+				case "down", "j":
+					m.datePickerDate = m.datePickerDate.AddDate(0, 0, 7)
+					return m, nil
+				case "pageup", "p":
+					m.datePickerDate = m.datePickerDate.AddDate(0, -1, 0)
+					return m, nil
+				case "pagedown", "n":
+					m.datePickerDate = m.datePickerDate.AddDate(0, 1, 0)
+					return m, nil
+				case "enter":
+					currentTime := "09:00"
+					existingVal := m.editorScheduledAt.Value()
+					if len(existingVal) >= 16 {
+						parts := strings.Split(existingVal, " ")
+						if len(parts) == 2 {
+							currentTime = parts[1]
+						}
+					}
+					m.editorScheduledAt.SetValue(fmt.Sprintf("%s %s", m.datePickerDate.Format("02.01.2006"), currentTime))
+					m.showDatePicker = false
+					return m, nil
+				}
+				return m, nil
+			}
+
 			switch keyMsg.String() {
 			case "esc":
 				m.isEditing = false
@@ -580,6 +621,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case "ctrl+v":
 				return m, m.runExternalEditorCmd()
+			case "ctrl+d":
+				if m.editorFocus == 2 {
+					m.showDatePicker = true
+					m.datePickerDate = time.Now()
+					return m, nil
+				}
 			}
 
 			if m.editorFocus == 0 {

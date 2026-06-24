@@ -18,7 +18,7 @@ func (m *Model) initEditor(p *models.Post) {
 	campaignInput.Placeholder = "z.B. launch-2026"
 	
 	schedInput := textinput.New()
-	schedInput.Placeholder = "leer lassen für Entwurf (Draft) oder 'DD.MM.YYYY HH:MM'"
+	schedInput.Placeholder = "leer für Entwurf, 'now' für sofort, oder 'TT.MM.JJJJ HH:MM' [ctrl+d für Kalender]"
 	
 	imagesInput := textinput.New()
 	imagesInput.Placeholder = "z.B. bild1.png, bild2.png (Komma-separiert)"
@@ -100,16 +100,22 @@ func (m *Model) saveEditedPost() error {
 		campaign = "default"
 	}
 	
-	schedStr := strings.TrimSpace(m.editorScheduledAt.Value())
+	schedStr := strings.TrimSpace(strings.ToLower(m.editorScheduledAt.Value()))
 	var scheduledAt *time.Time
 	status := "draft"
 	if schedStr != "" {
-		t, err := time.ParseInLocation("02.01.2006 15:04", schedStr, time.Local)
-		if err != nil {
-			return fmt.Errorf("ungültiges Datumformat. Bitte verwende 'DD.MM.YYYY HH:MM'")
+		if schedStr == "now" || schedStr == "jetzt" {
+			t := time.Now()
+			scheduledAt = &t
+			status = "scheduled"
+		} else {
+			t, err := time.ParseInLocation("02.01.2006 15:04", m.editorScheduledAt.Value(), time.Local)
+			if err != nil {
+				return fmt.Errorf("ungültiges Datumformat. Bitte verwende 'DD.MM.YYYY HH:MM' oder 'now' / 'jetzt'")
+			}
+			scheduledAt = &t
+			status = "scheduled"
 		}
-		scheduledAt = &t
-		status = "scheduled"
 	}
 	
 	// Parse Bilder
@@ -224,7 +230,12 @@ func (m Model) renderEditor() string {
 		schedStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 	}
 	schedLabel := schedPrefix + Tr("editor_label_schedule")
-	builder.WriteString(schedStyle.Render(schedLabel) + m.editorScheduledAt.View() + "\n\n")
+	builder.WriteString(schedStyle.Render(schedLabel) + m.editorScheduledAt.View() + "\n")
+	if m.showDatePicker {
+		builder.WriteString(m.renderCalendar(m.datePickerDate) + "\n\n")
+	} else {
+		builder.WriteString("\n")
+	}
 
 	// 4. Bilder
 	imgPrefix := "  "
@@ -269,7 +280,61 @@ func (m Model) renderEditor() string {
 
 	// Help footer
 	helpStr := Tr("editor_help_footer")
+	if m.editorFocus == 2 {
+		helpStr += "  ·  ctrl+d: Kalender"
+	}
 	builder.WriteString(StyleHelp.Render(helpStr))
 
-	return StyleBox.Width(78).Height(24).Render(builder.String())
+	height := 24
+	if m.showDatePicker {
+		height = 33
+	}
+	return StyleBox.Width(78).Height(height).Render(builder.String())
+}
+
+// renderCalendar zeichnet den interaktiven Kalender
+func (m Model) renderCalendar(selectedDate time.Time) string {
+	year := selectedDate.Year()
+	month := selectedDate.Month()
+	
+	firstDay := time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
+	lastDay := time.Date(year, month+1, 0, 0, 0, 0, 0, time.Local)
+	
+	startOffset := int(firstDay.Weekday()) - 1
+	if startOffset < 0 {
+		startOffset = 6
+	}
+	
+	numDays := lastDay.Day()
+	
+	var sb strings.Builder
+	header := fmt.Sprintf("  <<< %s %d >>>  ", month.String(), year)
+	
+	sb.WriteString("  " + lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true).Render(header) + "\n")
+	sb.WriteString("   Mo Di Mi Do Fr Sa So\n")
+	sb.WriteString("   ")
+	
+	for i := 0; i < startOffset; i++ {
+		sb.WriteString("   ")
+	}
+	
+	for day := 1; day <= numDays; day++ {
+		if (startOffset+day-1)%7 == 0 && day > 1 {
+			sb.WriteString("\n   ")
+		}
+		
+		dayStr := fmt.Sprintf("%2d", day)
+		if day == selectedDate.Day() {
+			sb.WriteString(lipgloss.NewStyle().
+				Bold(true).
+				Foreground(ColorBg).
+				Background(ColorSecondary).
+				Render(dayStr) + " ")
+		} else {
+			sb.WriteString(dayStr + " ")
+		}
+	}
+	
+	sb.WriteString("\n  (Pfeiltasten: Tag | p/n: Monat | Enter: Wählen | Esc: Schließen)")
+	return sb.String()
 }
