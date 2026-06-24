@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/aeon022/postctl/internal/config"
@@ -102,10 +104,6 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Bluesky.Handle = value
 	case "bluesky.app_password":
 		config.ActiveConfig.Bluesky.AppPassword = value
-	case "reddit.client_id":
-		config.ActiveConfig.Reddit.ClientID = value
-	case "reddit.client_secret":
-		config.ActiveConfig.Reddit.ClientSecret = value
 	case "facebook.app_id":
 		config.ActiveConfig.Facebook.AppID = value
 	case "facebook.app_secret":
@@ -147,7 +145,6 @@ func reportConfigShow(cmd *cobra.Command) {
 	masked.Threads.AppSecret = maskSecret(masked.Threads.AppSecret)
 	masked.Mastodon.ClientSecret = maskSecret(masked.Mastodon.ClientSecret)
 	masked.Bluesky.AppPassword = maskSecret(masked.Bluesky.AppPassword)
-	masked.Reddit.ClientSecret = maskSecret(masked.Reddit.ClientSecret)
 	masked.Facebook.AppSecret = maskSecret(masked.Facebook.AppSecret)
 	masked.LicenseKey = maskSecret(masked.LicenseKey)
 
@@ -189,9 +186,6 @@ func reportConfigShow(cmd *cobra.Command) {
 		fmt.Fprintln(out, "  bluesky:")
 		fmt.Fprintf(out, "    handle:          %s\n", masked.Bluesky.Handle)
 		fmt.Fprintf(out, "    app_password:    %s\n\n", masked.Bluesky.AppPassword)
-		fmt.Fprintln(out, "  reddit:")
-		fmt.Fprintf(out, "    client_id:       %s\n", masked.Reddit.ClientID)
-		fmt.Fprintf(out, "    client_secret:   %s\n\n", masked.Reddit.ClientSecret)
 		fmt.Fprintln(out, "  facebook:")
 		fmt.Fprintf(out, "    app_id:          %s\n", masked.Facebook.AppID)
 		fmt.Fprintf(out, "    app_secret:      %s\n", masked.Facebook.AppSecret)
@@ -365,6 +359,202 @@ var configImportCmd = &cobra.Command{
 	},
 }
 
+var configSetupCmd = &cobra.Command{
+	Use:   "setup [platform]",
+	Short: "Interactive platform configuration assistant",
+	Long:  `Run an interactive step-by-step setup wizard to configure API credentials for a platform (Twitter, LinkedIn, Threads, Mastodon, Bluesky, Reddit, Facebook).`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			fmt.Println("Bitte gib eine Plattform an (z. B. twitter, linkedin, threads, mastodon, bluesky, reddit, facebook).")
+			return
+		}
+
+		platform := strings.ToLower(strings.TrimSpace(args[0]))
+		
+		// Terminal komplett leeren
+		fmt.Print("\033[H\033[2J\033[3J")
+		
+		// Titel ausgeben
+		fmt.Printf("=== postctl CONFIGURATION ASSISTANT: %s ===\n", strings.ToUpper(platform))
+		fmt.Println("Beschreibung: Dieser Assistent hilft dir, die nötigen API-Schlüssel für die")
+		fmt.Printf("              Plattform %s zu hinterlegen.\n", strings.ToUpper(platform))
+		fmt.Println("==========================================================================")
+		fmt.Println()
+
+		reader := bufio.NewReader(os.Stdin)
+
+		switch platform {
+		case "twitter":
+			fmt.Println("Schritt 1: Gehe zum Twitter Developer Portal unter https://developer.twitter.com")
+			fmt.Println("Schritt 2: Erstelle ein Projekt und eine App mit OAuth 2.0 PKCE (App-Typ: Web/Native App)")
+			fmt.Println("Schritt 3: Setze die Redirect-URI auf: http://localhost:8753/callback")
+			fmt.Println("Schritt 4: Trage unten die erhaltene Client ID & Client Secret ein:")
+			fmt.Println()
+
+			fmt.Print("➔ Client ID: ")
+			clientID, _ := reader.ReadString('\n')
+			clientID = strings.TrimSpace(clientID)
+
+			fmt.Print("➔ Client Secret: ")
+			clientSecret, _ := reader.ReadString('\n')
+			clientSecret = strings.TrimSpace(clientSecret)
+
+			if clientID != "" {
+				config.ActiveConfig.Twitter.ClientID = clientID
+			}
+			if clientSecret != "" {
+				config.ActiveConfig.Twitter.ClientSecret = clientSecret
+			}
+
+		case "linkedin":
+			fmt.Println("Schritt 1: Gehe zum LinkedIn Developer Portal unter https://linkedin.com/developers")
+			fmt.Println("Schritt 2: Erstelle eine App und aktiviere unter 'Products':")
+			fmt.Println("           - Share on LinkedIn")
+			fmt.Println("           - Sign In with LinkedIn using OIDC")
+			fmt.Println("Schritt 3: Setze die Redirect-URI unter 'Auth' auf: http://localhost:8753/callback")
+			fmt.Println("Schritt 4: Trage unten die erhaltene Client ID & Client Secret ein:")
+			fmt.Println()
+
+			fmt.Print("➔ Client ID: ")
+			clientID, _ := reader.ReadString('\n')
+			clientID = strings.TrimSpace(clientID)
+
+			fmt.Print("➔ Client Secret: ")
+			clientSecret, _ := reader.ReadString('\n')
+			clientSecret = strings.TrimSpace(clientSecret)
+
+			if clientID != "" {
+				config.ActiveConfig.LinkedIn.ClientID = clientID
+			}
+			if clientSecret != "" {
+				config.ActiveConfig.LinkedIn.ClientSecret = clientSecret
+			}
+
+		case "threads":
+			fmt.Println("Schritt 1: Gehe zum Meta Developer Portal unter https://developers.facebook.com")
+			fmt.Println("Schritt 2: Erstelle eine App vom Typ 'Consumer' und füge 'Threads API' hinzu")
+			fmt.Println("Schritt 3: Setze Redirect-URIs unter 'Threads API' ➔ 'Threads-Einstellungen' auf:")
+			fmt.Println("           - Valid OAuth Redirect: https://localhost:8753/callback")
+			fmt.Println("           - Deinstallations-URL:  https://localhost:8753/uninstall")
+			fmt.Println("           - Datenlöschungs-URL:   https://localhost:8753/delete")
+			fmt.Println("Schritt 4: Trage unten die erhaltene App-ID & App Secret ein:")
+			fmt.Println()
+
+			fmt.Print("➔ App-ID: ")
+			appID, _ := reader.ReadString('\n')
+			appID = strings.TrimSpace(appID)
+
+			fmt.Print("➔ App Secret: ")
+			appSecret, _ := reader.ReadString('\n')
+			appSecret = strings.TrimSpace(appSecret)
+
+			if appID != "" {
+				config.ActiveConfig.Threads.AppID = appID
+			}
+			if appSecret != "" {
+				config.ActiveConfig.Threads.AppSecret = appSecret
+			}
+
+		case "mastodon":
+			fmt.Println("Schritt 1: Trage die Instanz-URL ein (z. B. https://mastodon.social)")
+			fmt.Println("Schritt 2: (Optional) Trage Client ID und Client Secret ein, falls du bereits")
+			fmt.Println("           eine registrierte App hast. Falls nicht, registriert postctl")
+			fmt.Println("           die App beim Authentifizieren automatisch!")
+			fmt.Println()
+
+			fmt.Print("➔ Instanz-URL [Standard: https://mastodon.social]: ")
+			instanceURL, _ := reader.ReadString('\n')
+			instanceURL = strings.TrimSpace(instanceURL)
+			if instanceURL == "" {
+				instanceURL = "https://mastodon.social"
+			}
+
+			fmt.Print("➔ Client ID (Optional, Enter zum Überspringen): ")
+			clientID, _ := reader.ReadString('\n')
+			clientID = strings.TrimSpace(clientID)
+
+			fmt.Print("➔ Client Secret (Optional, Enter zum Überspringen): ")
+			clientSecret, _ := reader.ReadString('\n')
+			clientSecret = strings.TrimSpace(clientSecret)
+
+			config.ActiveConfig.Mastodon.InstanceURL = instanceURL
+			if clientID != "" {
+				config.ActiveConfig.Mastodon.ClientID = clientID
+			}
+			if clientSecret != "" {
+				config.ActiveConfig.Mastodon.ClientSecret = clientSecret
+			}
+
+		case "bluesky":
+			fmt.Println("Schritt 1: Logge dich bei Bluesky in deinem Profil ein")
+			fmt.Println("Schritt 2: Gehe zu Einstellungen ➔ App-Passwörter")
+			fmt.Println("Schritt 3: Erstelle ein neues App-Passwort (z. B. 'postctl')")
+			fmt.Println("Schritt 4: Trage unten deinen Handle und das generierte App-Passwort ein:")
+			fmt.Println()
+
+			fmt.Print("➔ Bluesky Handle (z.B. deinname.bsky.social): ")
+			handle, _ := reader.ReadString('\n')
+			handle = strings.TrimSpace(handle)
+
+			fmt.Print("➔ App-Passwort (z.B. xxxx-xxxx-xxxx-xxxx): ")
+			appPassword, _ := reader.ReadString('\n')
+			appPassword = strings.TrimSpace(appPassword)
+
+			if handle != "" {
+				config.ActiveConfig.Bluesky.Handle = handle
+			}
+			if appPassword != "" {
+				config.ActiveConfig.Bluesky.AppPassword = appPassword
+			}
+
+		case "facebook":
+			fmt.Println("Schritt 1: Gehe zum Meta Developer Portal unter https://developers.facebook.com")
+			fmt.Println("Schritt 2: Erstelle eine App und füge das Produkt 'Facebook Login' hinzu")
+			fmt.Println("           mit Redirect-URI: https://localhost:8753/callback")
+			fmt.Println("Schritt 3: Finde deine Facebook-Page-ID auf der Info-Seite deiner Facebook-Seite")
+			fmt.Println("Schritt 4: Trage unten App-ID, App Secret und die Page-ID ein:")
+			fmt.Println()
+
+			fmt.Print("➔ App-ID: ")
+			appID, _ := reader.ReadString('\n')
+			appID = strings.TrimSpace(appID)
+
+			fmt.Print("➔ App Secret: ")
+			appSecret, _ := reader.ReadString('\n')
+			appSecret = strings.TrimSpace(appSecret)
+
+			fmt.Print("➔ Facebook Page ID: ")
+			pageID, _ := reader.ReadString('\n')
+			pageID = strings.TrimSpace(pageID)
+
+			if appID != "" {
+				config.ActiveConfig.Facebook.AppID = appID
+			}
+			if appSecret != "" {
+				config.ActiveConfig.Facebook.AppSecret = appSecret
+			}
+			if pageID != "" {
+				config.ActiveConfig.Facebook.PageID = pageID
+			}
+
+		default:
+			fmt.Printf("Unbekannte Plattform: %s\n", platform)
+			return
+		}
+
+		// Speichern
+		if err := config.SaveConfig(); err != nil {
+			fmt.Printf("\n❌ Fehler beim Speichern der Konfiguration: %v\n", err)
+			return
+		}
+
+		fmt.Println()
+		fmt.Println("✅ Konfiguration erfolgreich in config.yaml gespeichert!")
+		fmt.Println("\nDrücke Enter, um fortzufahren...")
+		_, _ = reader.ReadString('\n')
+	},
+}
+
 func init() {
 	configExportCmd.Flags().StringVarP(&exportPassword, "password", "p", "", "Master password for encryption")
 	configExportCmd.Flags().StringVarP(&exportOutputFile, "output", "o", "postctl_backup.bin", "Path to the output encrypted backup file")
@@ -376,5 +566,6 @@ func init() {
 	configCmd.AddCommand(configSetCmd)
 	configCmd.AddCommand(configExportCmd)
 	configCmd.AddCommand(configImportCmd)
+	configCmd.AddCommand(configSetupCmd)
 	rootCmd.AddCommand(configCmd)
 }

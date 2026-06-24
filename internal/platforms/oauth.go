@@ -12,6 +12,8 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
+	"io"
+	"log"
 	"math/big"
 	"net"
 	"net/http"
@@ -62,8 +64,9 @@ func StartCallbackServer(expectedState string, timeout time.Duration) (string, e
 
 	mux := http.NewServeMux()
 	server := &http.Server{
-		Addr:    "127.0.0.1:8753",
-		Handler: mux,
+		Addr:     "127.0.0.1:8753",
+		Handler:  mux,
+		ErrorLog: log.New(io.Discard, "", 0),
 	}
 
 	mux.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
@@ -153,8 +156,9 @@ func StartCallbackServerTLS(expectedState string, timeout time.Duration) (string
 
 	mux := http.NewServeMux()
 	server := &http.Server{
-		Addr:    "127.0.0.1:8753",
-		Handler: mux,
+		Addr:     "127.0.0.1:8753",
+		Handler:  mux,
+		ErrorLog: log.New(io.Discard, "", 0),
 	}
 
 	cert, err := generateSelfSignedCert()

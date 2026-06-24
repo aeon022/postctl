@@ -78,7 +78,7 @@ type authErrorJSON struct {
 }
 
 func reportAuthStatus(ctx context.Context, s store.Store) {
-	plats := []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon, models.PlatformBluesky, models.PlatformReddit, models.PlatformFacebook}
+	plats := []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon, models.PlatformBluesky, models.PlatformFacebook}
 	statusMap := make(map[string]bool)
 
 	for _, p := range plats {
@@ -115,8 +115,6 @@ func reportAuthStatus(ctx context.Context, s store.Store) {
 				name = "Mastodon"
 			} else if p == models.PlatformBluesky {
 				name = "Bluesky"
-			} else if p == models.PlatformReddit {
-				name = "Reddit"
 			} else if p == models.PlatformFacebook {
 				name = "Facebook"
 			}

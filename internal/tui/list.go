@@ -63,7 +63,7 @@ func (m Model) renderDashboard() string {
 	col2.WriteString("\n\n")
 
 	col2.WriteString(StyleHeader.Render(Tr("dash_platforms")) + "\n")
-	platforms := []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon, models.PlatformBluesky, models.PlatformReddit, models.PlatformFacebook}
+	platforms := []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon, models.PlatformBluesky, models.PlatformFacebook}
 	for _, p := range platforms {
 		status := Tr("dash_not_auth")
 		if m.platforms[p] {
@@ -80,8 +80,6 @@ func (m Model) renderDashboard() string {
 			name = "Mastodon"
 		} else if p == models.PlatformBluesky {
 			name = "Bluesky"
-		} else if p == models.PlatformReddit {
-			name = "Reddit"
 		} else if p == models.PlatformFacebook {
 			name = "Facebook"
 		}

@@ -33,10 +33,6 @@ type Config struct {
 		Handle      string `mapstructure:"handle" yaml:"handle"`
 		AppPassword string `mapstructure:"app_password" yaml:"app_password"`
 	} `mapstructure:"bluesky" yaml:"bluesky"`
-	Reddit struct {
-		ClientID     string `mapstructure:"client_id" yaml:"client_id"`
-		ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
-	} `mapstructure:"reddit" yaml:"reddit"`
 	Facebook struct {
 		AppID     string `mapstructure:"app_id" yaml:"app_id"`
 		AppSecret string `mapstructure:"app_secret" yaml:"app_secret"`
@@ -85,6 +81,7 @@ func ValidateLicenseKey(key string) bool {
 
 // LoadConfig lädt die Konfiguration aus ~/.config/postctl/config.yaml oder setzt Defaultwerte
 func LoadConfig() error {
+	viper.Reset()
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return fmt.Errorf("get user home dir: %w", err)
@@ -153,10 +150,6 @@ mastodon:
 bluesky:
   handle: ""
   app_password: ""
-
-reddit:
-  client_id: ""
-  client_secret: ""
 
 facebook:
   app_id: ""
@@ -234,8 +227,6 @@ func SaveConfig() error {
 	viper.Set("mastodon.client_secret", ActiveConfig.Mastodon.ClientSecret)
 	viper.Set("bluesky.handle", ActiveConfig.Bluesky.Handle)
 	viper.Set("bluesky.app_password", ActiveConfig.Bluesky.AppPassword)
-	viper.Set("reddit.client_id", ActiveConfig.Reddit.ClientID)
-	viper.Set("reddit.client_secret", ActiveConfig.Reddit.ClientSecret)
 	viper.Set("facebook.app_id", ActiveConfig.Facebook.AppID)
 	viper.Set("facebook.app_secret", ActiveConfig.Facebook.AppSecret)
 	viper.Set("facebook.page_id", ActiveConfig.Facebook.PageID)

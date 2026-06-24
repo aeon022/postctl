@@ -187,10 +187,6 @@ var translationsMap = map[string]map[string]string{
 		"de": "Bluesky      ",
 		"en": "Bluesky      ",
 	},
-	"settings_auth_reddit": {
-		"de": "Reddit       ",
-		"en": "Reddit       ",
-	},
 	"settings_auth_facebook": {
 		"de": "Facebook     ",
 		"en": "Facebook     ",
@@ -216,8 +212,8 @@ var translationsMap = map[string]map[string]string{
 		"en": "Execute (Press Enter)",
 	},
 	"settings_help_footer": {
-		"de": "←/→ / enter: Werte ändern / Verbinden  ·  Änderungen werden sofort gespeichert.\nPro-Lizenz über CLI aktivieren: postctl config set license_key <key>",
-		"en": "←/→ / enter: Change values / Connect  ·  Changes are saved instantly.\nActivate Pro license via CLI: postctl config set license_key <key>",
+		"de": "←/→ / enter: Ändern / Verbinden  ·  d: Reset/Disconnect  ·  Sofort gespeichert.\nPro-Lizenz über CLI aktivieren: postctl config set license_key <key>",
+		"en": "←/→ / enter: Change / Connect  ·  d: Reset/Disconnect  ·  Saved instantly.\nActivate Pro license via CLI: postctl config set license_key <key>",
 	},
 
 	// Posts View

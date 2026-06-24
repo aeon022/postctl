@@ -25,6 +25,9 @@ type BlueskyPlatform struct {
 }
 
 func NewBlueskyPlatform(s store.Store, handle, appPassword string) *BlueskyPlatform {
+	if handle != "" && !strings.Contains(handle, ".") {
+		handle = handle + ".bsky.social"
+	}
 	return &BlueskyPlatform{
 		store:       s,
 		handle:      handle,

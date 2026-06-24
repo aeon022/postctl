@@ -122,6 +122,16 @@ type externalEditorFinishedMsg struct {
 	err      error
 }
 
+type setupWizardFinishedMsg struct {
+	platform string
+	err      error
+}
+
+type platformClearedMsg struct {
+	platform string
+	err      error
+}
+
 type tickMsg struct{}
 
 // NewModel initialisiert ein TUI-Model
@@ -217,7 +227,6 @@ func (m Model) loadDataCmd() tea.Msg {
 		models.PlatformThreads:  false,
 		models.PlatformMastodon: false,
 		models.PlatformBluesky:  false,
-		models.PlatformReddit:   false,
 		models.PlatformFacebook: false,
 	}
 	for p := range platforms {
@@ -262,9 +271,83 @@ func (m Model) runAuthCmd(platformName string) tea.Cmd {
 	}
 }
 
+func getExecutablePath() string {
+	exe, err := os.Executable()
+	if err != nil {
+		return "./postctl"
+	}
+	return exe
+}
+
+func platformNeedsSetup(platformName string) bool {
+	switch platformName {
+	case models.PlatformTwitter:
+		return config.ActiveConfig.Twitter.ClientID == "" || config.ActiveConfig.Twitter.ClientSecret == ""
+	case models.PlatformLinkedIn:
+		return config.ActiveConfig.LinkedIn.ClientID == "" || config.ActiveConfig.LinkedIn.ClientSecret == ""
+	case models.PlatformThreads:
+		return config.ActiveConfig.Threads.AppID == "" || config.ActiveConfig.Threads.AppSecret == ""
+	case models.PlatformMastodon:
+		return false
+	case models.PlatformBluesky:
+		return config.ActiveConfig.Bluesky.Handle == "" || config.ActiveConfig.Bluesky.AppPassword == ""
+	case models.PlatformFacebook:
+		return config.ActiveConfig.Facebook.AppID == "" || config.ActiveConfig.Facebook.AppSecret == ""
+	}
+	return false
+}
+
+// runSetupWizardCmd startet das interaktive CLI Setup für eine Plattform
+func (m Model) runSetupWizardCmd(platformName string) tea.Cmd {
+	c := exec.Command(getExecutablePath(), "config", "setup", platformName)
+	return tea.ExecProcess(c, func(err error) tea.Msg {
+		return setupWizardFinishedMsg{platform: platformName, err: err}
+	})
+}
+
+// clearPlatformCmd löscht die Zugangsdaten einer Plattform aus Config & DB
+func (m Model) clearPlatformCmd(platformName string) tea.Cmd {
+	return func() tea.Msg {
+		ctx := context.Background()
+		// 1. Token in DB löschen
+		_ = m.store.DeleteToken(ctx, platformName)
+
+		// 2. Zugangsdaten aus Config entfernen
+		switch platformName {
+		case models.PlatformTwitter:
+			config.ActiveConfig.Twitter.ClientID = ""
+			config.ActiveConfig.Twitter.ClientSecret = ""
+		case models.PlatformLinkedIn:
+			config.ActiveConfig.LinkedIn.ClientID = ""
+			config.ActiveConfig.LinkedIn.ClientSecret = ""
+		case models.PlatformThreads:
+			config.ActiveConfig.Threads.AppID = ""
+			config.ActiveConfig.Threads.AppSecret = ""
+		case models.PlatformMastodon:
+			config.ActiveConfig.Mastodon.ClientID = ""
+			config.ActiveConfig.Mastodon.ClientSecret = ""
+			config.ActiveConfig.Mastodon.InstanceURL = "https://mastodon.social"
+		case models.PlatformBluesky:
+			config.ActiveConfig.Bluesky.Handle = ""
+			config.ActiveConfig.Bluesky.AppPassword = ""
+		case models.PlatformFacebook:
+			config.ActiveConfig.Facebook.AppID = ""
+			config.ActiveConfig.Facebook.AppSecret = ""
+			config.ActiveConfig.Facebook.PageID = ""
+		}
+
+		// 3. Speichern
+		if err := config.SaveConfig(); err != nil {
+			return platformClearedMsg{platform: platformName, err: err}
+		}
+
+		return platformClearedMsg{platform: platformName, err: nil}
+	}
+}
+
 // runBackupExportCmd pausiert die TUI und startet interaktiv den CLI-Export
 func (m Model) runBackupExportCmd() tea.Cmd {
-	c := exec.Command("./postctl", "config", "export")
+	c := exec.Command(getExecutablePath(), "config", "export")
 	return tea.ExecProcess(c, func(err error) tea.Msg {
 		return backupFinishedMsg{isExport: true, err: err}
 	})
@@ -272,7 +355,7 @@ func (m Model) runBackupExportCmd() tea.Cmd {
 
 // runBackupImportCmd pausiert die TUI und startet interaktiv den CLI-Import
 func (m Model) runBackupImportCmd() tea.Cmd {
-	c := exec.Command("./postctl", "config", "import")
+	c := exec.Command(getExecutablePath(), "config", "import")
 	return tea.ExecProcess(c, func(err error) tea.Msg {
 		return backupFinishedMsg{isExport: false, err: err}
 	})
@@ -280,7 +363,7 @@ func (m Model) runBackupImportCmd() tea.Cmd {
 
 // runImportPostsCmd pausiert die TUI und startet interaktiv den CLI-Post-Import
 func (m Model) runImportPostsCmd() tea.Cmd {
-	c := exec.Command("./postctl", "import")
+	c := exec.Command(getExecutablePath(), "import")
 	return tea.ExecProcess(c, func(err error) tea.Msg {
 		return importFinishedMsg{err: err}
 	})
@@ -500,7 +583,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			if m.editorFocus == 0 {
-				platformsList := []string{"twitter", "linkedin", "threads"}
+				platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook"}
 				currIdx := -1
 				for idx, p := range platformsList {
 					if p == m.editorPlatform {
@@ -559,6 +642,32 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.statusMessage = fmt.Sprintf("Erfolgreich konvertiert: %s", strings.Join(msg.files, ", "))
 		return m, m.loadDataCmd
+
+	case setupWizardFinishedMsg:
+		if msg.err != nil {
+			m.err = fmt.Errorf("Setup für %s abgebrochen oder fehlgeschlagen: %w", msg.platform, msg.err)
+			return m, nil
+		}
+		// Konfiguration neu laden
+		if err := config.LoadConfig(); err != nil {
+			m.err = fmt.Errorf("Fehler beim Neuladen der Konfiguration: %w", err)
+			return m, nil
+		}
+		// Jetzt direkt OAuth-Flow starten
+		m.loading = true
+		m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", msg.platform)
+		return m, m.runAuthCmd(msg.platform)
+
+	case platformClearedMsg:
+		m.loading = false
+		if msg.err != nil {
+			m.err = fmt.Errorf("Fehler beim Zurücksetzen von %s: %w", msg.platform, msg.err)
+			m.statusMessage = ""
+			return m, nil
+		} else {
+			m.statusMessage = fmt.Sprintf("Verbindung und Einstellungen für %s wurden zurückgesetzt.", strings.ToUpper(msg.platform))
+			return m, m.loadDataCmd
+		}
 
 	case authResultMsg:
 		m.loading = false
@@ -748,7 +857,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					models.PlatformThreads,
 					models.PlatformMastodon,
 					models.PlatformBluesky,
-					models.PlatformReddit,
 					models.PlatformFacebook,
 				}
 				for _, plat := range allPlats {
@@ -806,7 +914,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 4 {
-				if m.cursor >= 5 && m.cursor <= 11 {
+				if m.cursor >= 5 && m.cursor <= 10 {
 					var platName string
 					switch m.cursor {
 					case 5:
@@ -820,18 +928,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					case 9:
 						platName = models.PlatformBluesky
 					case 10:
-						platName = models.PlatformReddit
-					case 11:
 						platName = models.PlatformFacebook
+					}
+					if platformNeedsSetup(platName) {
+						return m, m.runSetupWizardCmd(platName)
 					}
 					m.loading = true
 					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
 					return m, m.runAuthCmd(platName)
 				}
-				if m.cursor == 12 {
+				if m.cursor == 11 {
 					return m, m.runBackupExportCmd()
 				}
-				if m.cursor == 13 {
+				if m.cursor == 12 {
 					return m, m.runBackupImportCmd()
 				}
 				m.cycleSetting()
@@ -857,6 +966,27 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if len(filtered) > 0 {
 					idToDelete := filtered[m.cursor].ID
 					return m, m.deletePostCmd(idToDelete)
+				}
+			} else if m.activeTab == 4 { // Settings
+				if m.cursor >= 5 && m.cursor <= 10 {
+					var platName string
+					switch m.cursor {
+					case 5:
+						platName = models.PlatformTwitter
+					case 6:
+						platName = models.PlatformLinkedIn
+					case 7:
+						platName = models.PlatformThreads
+					case 8:
+						platName = models.PlatformMastodon
+					case 9:
+						platName = models.PlatformBluesky
+					case 10:
+						platName = models.PlatformFacebook
+					}
+					m.loading = true
+					m.statusMessage = fmt.Sprintf("Setze %s zurück...", platName)
+					return m, m.clearPlatformCmd(platName)
 				}
 			}
 			return m, nil
@@ -925,7 +1055,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 4: // Settings
-		return 14
+		return 13
 	default:
 		return 0
 	}

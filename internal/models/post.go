@@ -21,7 +21,6 @@ const (
 	PlatformThreads  = "threads"
 	PlatformMastodon = "mastodon"
 	PlatformBluesky  = "bluesky"
-	PlatformReddit   = "reddit"
 	PlatformFacebook = "facebook"
 )
 

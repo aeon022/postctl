@@ -196,7 +196,7 @@ func (m Model) renderEditor() string {
 	platformLabel := platPrefix + Tr("editor_label_platform")
 	
 	platSelect := ""
-	platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "reddit", "facebook"}
+	platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook"}
 	for _, p := range platformsList {
 		if p == m.editorPlatform {
 			platSelect += lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render(" [" + strings.ToUpper(p) + "] ")

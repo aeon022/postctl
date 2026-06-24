@@ -88,15 +88,6 @@ func reportPostSuccess(post *models.Post, platformID string) {
 		} else {
 			urls = append(urls, fmt.Sprintf("https://bsky.app/profile/%s", config.ActiveConfig.Bluesky.Handle))
 		}
-	case models.PlatformReddit:
-		subreddit := post.Campaign
-		if subreddit == "" || subreddit == "default" {
-			subreddit = "test"
-		}
-		subreddit = strings.TrimPrefix(subreddit, "r/")
-		subreddit = strings.TrimSpace(subreddit)
-		redditID := strings.TrimPrefix(platformID, "t3_")
-		urls = append(urls, fmt.Sprintf("https://www.reddit.com/r/%s/comments/%s", subreddit, redditID))
 	case models.PlatformFacebook:
 		parts := strings.Split(platformID, "_")
 		postID := platformID

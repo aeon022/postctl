@@ -91,7 +91,7 @@ func ParseContent(content, sourcePath string) ([]models.Post, error) {
 	var targetPlatforms []string
 	pLower := strings.ToLower(strings.TrimSpace(fm.Platform))
 	if pLower == "all" || pLower == "" {
-		targetPlatforms = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon, models.PlatformBluesky, models.PlatformReddit, models.PlatformFacebook}
+		targetPlatforms = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon, models.PlatformBluesky, models.PlatformFacebook}
 	} else {
 		// Komma-separiert erlauben
 		rawPlats := strings.Split(pLower, ",")
