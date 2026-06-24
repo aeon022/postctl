@@ -92,6 +92,26 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Threads.AppID = value
 	case "threads.app_secret":
 		config.ActiveConfig.Threads.AppSecret = value
+	case "mastodon.instance_url":
+		config.ActiveConfig.Mastodon.InstanceURL = value
+	case "mastodon.client_id":
+		config.ActiveConfig.Mastodon.ClientID = value
+	case "mastodon.client_secret":
+		config.ActiveConfig.Mastodon.ClientSecret = value
+	case "bluesky.handle":
+		config.ActiveConfig.Bluesky.Handle = value
+	case "bluesky.app_password":
+		config.ActiveConfig.Bluesky.AppPassword = value
+	case "reddit.client_id":
+		config.ActiveConfig.Reddit.ClientID = value
+	case "reddit.client_secret":
+		config.ActiveConfig.Reddit.ClientSecret = value
+	case "facebook.app_id":
+		config.ActiveConfig.Facebook.AppID = value
+	case "facebook.app_secret":
+		config.ActiveConfig.Facebook.AppSecret = value
+	case "facebook.page_id":
+		config.ActiveConfig.Facebook.PageID = value
 	case "license_key", "licensekey":
 		config.ActiveConfig.LicenseKey = value
 	default:
@@ -125,6 +145,10 @@ func reportConfigShow(cmd *cobra.Command) {
 	masked.Twitter.ClientSecret = maskSecret(masked.Twitter.ClientSecret)
 	masked.LinkedIn.ClientSecret = maskSecret(masked.LinkedIn.ClientSecret)
 	masked.Threads.AppSecret = maskSecret(masked.Threads.AppSecret)
+	masked.Mastodon.ClientSecret = maskSecret(masked.Mastodon.ClientSecret)
+	masked.Bluesky.AppPassword = maskSecret(masked.Bluesky.AppPassword)
+	masked.Reddit.ClientSecret = maskSecret(masked.Reddit.ClientSecret)
+	masked.Facebook.AppSecret = maskSecret(masked.Facebook.AppSecret)
 	masked.LicenseKey = maskSecret(masked.LicenseKey)
 
 	out := cmd.OutOrStdout()
@@ -158,6 +182,20 @@ func reportConfigShow(cmd *cobra.Command) {
 		fmt.Fprintln(out, "  threads:")
 		fmt.Fprintf(out, "    app_id:          %s\n", masked.Threads.AppID)
 		fmt.Fprintf(out, "    app_secret:      %s\n\n", masked.Threads.AppSecret)
+		fmt.Fprintln(out, "  mastodon:")
+		fmt.Fprintf(out, "    instance_url:    %s\n", masked.Mastodon.InstanceURL)
+		fmt.Fprintf(out, "    client_id:       %s\n", masked.Mastodon.ClientID)
+		fmt.Fprintf(out, "    client_secret:   %s\n\n", masked.Mastodon.ClientSecret)
+		fmt.Fprintln(out, "  bluesky:")
+		fmt.Fprintf(out, "    handle:          %s\n", masked.Bluesky.Handle)
+		fmt.Fprintf(out, "    app_password:    %s\n\n", masked.Bluesky.AppPassword)
+		fmt.Fprintln(out, "  reddit:")
+		fmt.Fprintf(out, "    client_id:       %s\n", masked.Reddit.ClientID)
+		fmt.Fprintf(out, "    client_secret:   %s\n\n", masked.Reddit.ClientSecret)
+		fmt.Fprintln(out, "  facebook:")
+		fmt.Fprintf(out, "    app_id:          %s\n", masked.Facebook.AppID)
+		fmt.Fprintf(out, "    app_secret:      %s\n", masked.Facebook.AppSecret)
+		fmt.Fprintf(out, "    page_id:         %s\n\n", masked.Facebook.PageID)
 		
 		statusStr := "CORE"
 		if config.IsPro() {

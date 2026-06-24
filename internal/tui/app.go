@@ -565,23 +565,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.err != nil {
 			m.err = fmt.Errorf("Authentifizierung fehlgeschlagen: %w", msg.err)
 			m.statusMessage = ""
+			return m, nil
 		} else {
 			m.statusMessage = fmt.Sprintf("Erfolgreich mit %s verbunden!", msg.platform)
+			return m, m.loadDataCmd
 		}
-		return m, m.loadDataCmd
 
 	case backupFinishedMsg:
 		if msg.err != nil {
 			m.err = fmt.Errorf("Backup-Aktion fehlgeschlagen: %w", msg.err)
 			m.statusMessage = ""
+			return m, nil
 		} else {
 			action := "importiert"
 			if msg.isExport {
 				action = "exportiert (postctl_backup.bin)"
 			}
 			m.statusMessage = fmt.Sprintf("Konfiguration erfolgreich %s!", action)
+			return m, m.loadDataCmd
 		}
-		return m, m.loadDataCmd
 
 	case importFinishedMsg:
 		if msg.err != nil {
