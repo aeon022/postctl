@@ -28,6 +28,7 @@ type Config struct {
 		Timezone string `mapstructure:"timezone" yaml:"timezone"`
 		DryRun   bool   `mapstructure:"dry_run" yaml:"dry_run"`
 		ImageDir string `mapstructure:"image_dir" yaml:"image_dir"`
+		Language string `mapstructure:"language" yaml:"language"`
 	} `mapstructure:"defaults" yaml:"defaults"`
 	AI struct {
 		Provider string `mapstructure:"provider" yaml:"provider"`
@@ -78,6 +79,7 @@ func LoadConfig() error {
 	viper.SetDefault("defaults.timezone", "Europe/Vienna")
 	viper.SetDefault("defaults.dry_run", false)
 	viper.SetDefault("defaults.image_dir", "./screenshots")
+	viper.SetDefault("defaults.language", "en")
 	viper.SetDefault("ai.provider", "openai")
 	viper.SetDefault("ai.model", "gpt-4o-mini")
 	viper.SetDefault("license_key", "")
@@ -177,6 +179,7 @@ func SaveConfig() error {
 	viper.Set("defaults.timezone", ActiveConfig.Defaults.Timezone)
 	viper.Set("defaults.dry_run", ActiveConfig.Defaults.DryRun)
 	viper.Set("defaults.image_dir", ActiveConfig.Defaults.ImageDir)
+	viper.Set("defaults.language", ActiveConfig.Defaults.Language)
 	viper.Set("ai.provider", ActiveConfig.AI.Provider)
 	viper.Set("ai.model", ActiveConfig.AI.Model)
 	viper.Set("ai.api_key", ActiveConfig.AI.APIKey)

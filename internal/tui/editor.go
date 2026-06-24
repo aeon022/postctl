@@ -173,9 +173,9 @@ func (m *Model) saveEditedPost() error {
 func (m Model) renderEditor() string {
 	var builder strings.Builder
 
-	titleText := " BEITRAG ERSTELLEN "
+	titleText := Tr("editor_title_create")
 	if m.editorPostID != "" {
-		titleText = " BEITRAG BEARBEITEN "
+		titleText = Tr("editor_title_edit")
 	}
 
 	builder.WriteString(lipgloss.NewStyle().
@@ -193,7 +193,7 @@ func (m Model) renderEditor() string {
 		platPrefix = "➔ "
 		platStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 	}
-	platformLabel := platPrefix + "Plattform:  "
+	platformLabel := platPrefix + Tr("editor_label_platform")
 	
 	platSelect := ""
 	platformsList := []string{"twitter", "linkedin", "threads"}
@@ -213,7 +213,7 @@ func (m Model) renderEditor() string {
 		campPrefix = "➔ "
 		campStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 	}
-	campLabel := campPrefix + "Kampagne:   "
+	campLabel := campPrefix + Tr("editor_label_campaign")
 	builder.WriteString(campStyle.Render(campLabel) + m.editorCampaign.View() + "\n\n")
 
 	// 3. Geplantes Datum
@@ -223,7 +223,7 @@ func (m Model) renderEditor() string {
 		schedPrefix = "➔ "
 		schedStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 	}
-	schedLabel := schedPrefix + "Geplant am: "
+	schedLabel := schedPrefix + Tr("editor_label_schedule")
 	builder.WriteString(schedStyle.Render(schedLabel) + m.editorScheduledAt.View() + "\n\n")
 
 	// 4. Bilder
@@ -233,15 +233,15 @@ func (m Model) renderEditor() string {
 		imgPrefix = "➔ "
 		imgStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 	}
-	imgLabel := imgPrefix + "Bilder:     "
+	imgLabel := imgPrefix + Tr("editor_label_images")
 	builder.WriteString(imgStyle.Render(imgLabel) + m.editorImages.View() + "\n\n")
 
 	// 5. Text-Inhalt
 	bodyPrefix := "  "
 	bodyStyle := lipgloss.NewStyle().Foreground(ColorText)
-	bodyLabel := "Beitrag / Inhalt: "
+	bodyLabel := Tr("editor_label_body")
 	if m.editorPlatform == "twitter" {
-		bodyLabel += "(Nutze '---' für Thread-Tweets)"
+		bodyLabel += Tr("editor_twitter_thread_note")
 	}
 	if m.editorFocus == 4 {
 		bodyPrefix = "➔ "
@@ -250,8 +250,8 @@ func (m Model) renderEditor() string {
 	builder.WriteString(bodyStyle.Render(bodyPrefix + bodyLabel) + "\n" + m.editorBody.View() + "\n\n")
 
 	// 6. Action-Buttons
-	saveLabel := " [ SPEICHERN ] "
-	cancelLabel := " [ ABBRECHEN ] "
+	saveLabel := Tr("editor_save")
+	cancelLabel := Tr("editor_cancel")
 	
 	if m.editorFocus == 5 {
 		saveLabel = lipgloss.NewStyle().Bold(true).Foreground(ColorBg).Background(ColorPosted).Render(saveLabel)
@@ -268,7 +268,7 @@ func (m Model) renderEditor() string {
 	builder.WriteString("  " + saveLabel + "     " + cancelLabel + "\n\n")
 
 	// Help footer
-	helpStr := "tab / shift+tab: Feld wechseln  ·  ←/→: Plattform ändern  ·  ctrl+v: Neovim  ·  esc: Abbrechen"
+	helpStr := Tr("editor_help_footer")
 	builder.WriteString(StyleHelp.Render(helpStr))
 
 	return StyleBox.Width(78).Height(24).Render(builder.String())

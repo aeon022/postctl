@@ -291,16 +291,15 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 	var helper strings.Builder
 	if m.editorPlatform == "twitter" {
 		helper.WriteString("<!--\n")
-		helper.WriteString(" postctl Editor-Hilfe (Twitter / X)\n")
-		helper.WriteString(" ==================================\n\n")
-		helper.WriteString(" [Zeichen-Lineal (Max. 280 Zeichen pro Tweet)]\n")
+		helper.WriteString(Tr("editor_helper_title_twitter"))
+		helper.WriteString(Tr("editor_helper_ruler_twitter"))
 		helper.WriteString(" 000      030      060      090      120      150      180      210      240      270 280!\n")
 		helper.WriteString(" |--------|--------|--------|--------|--------|--------|--------|--------|--------|-|\n\n")
 		
 		bodyText := m.editorBody.Value()
 		if strings.Contains(bodyText, "\n---\n") {
 			tweets := strings.Split(bodyText, "\n---\n")
-			helper.WriteString(" Aktueller Thread-Status:\n")
+			helper.WriteString(Tr("editor_helper_status_thread"))
 			for i, tweet := range tweets {
 				trimmed := strings.TrimSpace(tweet)
 				runes := []rune(trimmed)
@@ -309,8 +308,11 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 				status := "✓"
 				if remaining < 0 {
 					status = "✗ ZU LANG"
+					if Tr("editor_helper_tweet_format") == "" {
+						status = "✗ TOO LONG"
+					}
 				}
-				helper.WriteString(fmt.Sprintf("   Tweet %d: %d Zeichen (%d verbleibend) [%s]\n", i+1, charCount, remaining, status))
+				helper.WriteString(fmt.Sprintf(Tr("editor_helper_tweet_format"), i+1, charCount, remaining, status))
 			}
 		} else {
 			trimmed := strings.TrimSpace(bodyText)
@@ -320,23 +322,20 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 			if remaining < 0 {
 				status = "✗ ZU LANG"
 			}
-			helper.WriteString(fmt.Sprintf("   Länge: %d Zeichen (%d verbleibend) [%s]\n", charCount, remaining, status))
+			helper.WriteString(fmt.Sprintf(Tr("editor_helper_status_single"), charCount, remaining, status))
 		}
 		
-		helper.WriteString("\n HINWEIS: Dieser Hilfeblock wird beim Speichern automatisch gelöscht.\n")
-		helper.WriteString(" Schreibe deinen Beitrag unter diesem Kommentar:\n")
+		helper.WriteString(Tr("editor_helper_note_strip"))
 		helper.WriteString("-->\n\n")
 	} else {
 		helper.WriteString("<!--\n")
-		helper.WriteString(fmt.Sprintf(" postctl Editor-Hilfe (%s)\n", strings.ToUpper(m.editorPlatform)))
-		helper.WriteString(" ==================================\n\n")
+		helper.WriteString(fmt.Sprintf(Tr("editor_helper_title_other"), strings.ToUpper(m.editorPlatform)))
 		bodyText := m.editorBody.Value()
 		trimmed := strings.TrimSpace(bodyText)
 		charCount := len([]rune(trimmed))
-		helper.WriteString(fmt.Sprintf("   Länge: %d Zeichen\n", charCount))
+		helper.WriteString(fmt.Sprintf(Tr("editor_helper_status_other"), charCount))
 		
-		helper.WriteString("\n HINWEIS: Dieser Hilfeblock wird beim Speichern automatisch gelöscht.\n")
-		helper.WriteString(" Schreibe deinen Beitrag unter diesem Kommentar:\n")
+		helper.WriteString(Tr("editor_helper_note_strip"))
 		helper.WriteString("-->\n\n")
 	}
 
@@ -707,7 +706,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, Keys.Up):
 			if m.cursor > 0 {
 				m.cursor--
-				if m.activeTab == 4 && m.cursor == 3 {
+				if m.activeTab == 4 && m.cursor == 4 {
 					m.cursor--
 				}
 			}
@@ -717,14 +716,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			maxItems := m.maxCursorItems()
 			if m.cursor < maxItems-1 {
 				m.cursor++
-				if m.activeTab == 4 && m.cursor == 3 {
+				if m.activeTab == 4 && m.cursor == 4 {
 					m.cursor++
 				}
 			}
 			return m, nil
 
 		case key.Matches(msg, Keys.Left), key.Matches(msg, Keys.Right):
-			if m.activeTab == 4 && m.cursor < 3 {
+			if m.activeTab == 4 && m.cursor < 4 {
 				m.cycleSetting()
 				return m, nil
 			}
@@ -732,24 +731,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 4 {
-				if m.cursor >= 4 && m.cursor <= 6 {
+				if m.cursor >= 5 && m.cursor <= 7 {
 					var platName string
 					switch m.cursor {
-					case 4:
-						platName = models.PlatformTwitter
 					case 5:
-						platName = models.PlatformLinkedIn
+						platName = models.PlatformTwitter
 					case 6:
+						platName = models.PlatformLinkedIn
+					case 7:
 						platName = models.PlatformThreads
 					}
 					m.loading = true
 					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
 					return m, m.runAuthCmd(platName)
 				}
-				if m.cursor == 7 {
+				if m.cursor == 8 {
 					return m, m.runBackupExportCmd()
 				}
-				if m.cursor == 8 {
+				if m.cursor == 9 {
 					return m, m.runBackupImportCmd()
 				}
 				m.cycleSetting()
@@ -843,7 +842,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 4: // Settings
-		return 9
+		return 10
 	default:
 		return 0
 	}
@@ -1020,6 +1019,13 @@ func (m *Model) cycleSetting() {
 		}
 	case 2: // Dry Run
 		config.ActiveConfig.Defaults.DryRun = !config.ActiveConfig.Defaults.DryRun
+	case 3: // Language
+		current := strings.ToLower(config.ActiveConfig.Defaults.Language)
+		if current == "en" || current == "" {
+			config.ActiveConfig.Defaults.Language = "de"
+		} else {
+			config.ActiveConfig.Defaults.Language = "en"
+		}
 	}
 
 	// In config.yaml speichern

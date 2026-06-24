@@ -13,24 +13,24 @@ func (m Model) renderDashboard() string {
 	// Spalte 1: Campaigns & Next Up
 	var col1 strings.Builder
 
-	col1.WriteString(StyleHeader.Render("CAMPAIGNS") + "\n")
+	col1.WriteString(StyleHeader.Render(Tr("dash_campaigns")) + "\n")
 	if len(m.campaigns) == 0 {
-		col1.WriteString("No campaigns found.\n")
+		col1.WriteString(Tr("dash_no_campaigns"))
 	} else {
 		for i, c := range m.campaigns {
 			cursor := "  "
 			if m.activeTab == 0 && i == m.cursor {
 				cursor = "> "
 			}
-			col1.WriteString(fmt.Sprintf("%s● %s\n   %d posts (%d posted, %d scheduled)\n", 
+			col1.WriteString(fmt.Sprintf("%s● %s\n"+Tr("dash_campaign_format"), 
 				cursor, c.Slug, len(c.Posts), c.Posted, c.Scheduled))
 		}
 	}
 	col1.WriteString("\n")
 
-	col1.WriteString(StyleHeader.Render("NEXT UP") + "\n")
+	col1.WriteString(StyleHeader.Render(Tr("dash_next_up")) + "\n")
 	if len(m.nextUp) == 0 {
-		col1.WriteString("No posts scheduled.\n")
+		col1.WriteString(Tr("dash_no_schedules"))
 	} else {
 		// Maximal 3 anstehende Posts anzeigen
 		limit := 3
@@ -55,19 +55,19 @@ func (m Model) renderDashboard() string {
 	// Spalte 2: Stats & Platforms
 	var col2 strings.Builder
 
-	col2.WriteString(StyleHeader.Render("STATS") + "\n")
-	col2.WriteString(fmt.Sprintf("Posted:    %d\n", m.stats.posted))
-	col2.WriteString(fmt.Sprintf("Scheduled: %d\n", m.stats.scheduled))
-	col2.WriteString(fmt.Sprintf("Drafts:    %d\n", m.stats.drafts))
-	col2.WriteString(fmt.Sprintf("Failed:    %d\n", m.stats.failed))
+	col2.WriteString(StyleHeader.Render(Tr("dash_stats")) + "\n")
+	col2.WriteString(fmt.Sprintf("%s%d\n", Tr("stats_posted"), m.stats.posted))
+	col2.WriteString(fmt.Sprintf("%s%d\n", Tr("stats_scheduled"), m.stats.scheduled))
+	col2.WriteString(fmt.Sprintf("%s%d\n", Tr("stats_drafts"), m.stats.drafts))
+	col2.WriteString(fmt.Sprintf("%s%d\n", Tr("stats_failed"), m.stats.failed))
 	col2.WriteString("\n\n")
 
-	col2.WriteString(StyleHeader.Render("PLATFORMS") + "\n")
+	col2.WriteString(StyleHeader.Render(Tr("dash_platforms")) + "\n")
 	platforms := []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads}
 	for _, p := range platforms {
-		status := "○ not auth'd"
+		status := Tr("dash_not_auth")
 		if m.platforms[p] {
-			status = "✓ connected"
+			status = Tr("dash_connected")
 		}
 		name := p
 		if p == models.PlatformTwitter {
@@ -91,20 +91,20 @@ func (m Model) renderDashboard() string {
 func (m Model) renderPostList() string {
 	var builder strings.Builder
 
-	headerText := "POSTS"
+	headerText := Tr("header_posts")
 	if m.filterCampaign != "" {
-		headerText = fmt.Sprintf("POSTS (Filter: Campaign = %s) [ESC to clear]", m.filterCampaign)
+		headerText = fmt.Sprintf(Tr("posts_header_filtered"), m.filterCampaign)
 	}
 	builder.WriteString(StyleHeader.Render(headerText) + "\n")
 
 	if len(m.posts) == 0 {
-		builder.WriteString("No posts found. Use 'postctl import <path>' to import markdown posts.\n")
+		builder.WriteString(Tr("posts_none_found"))
 		return StyleBox.Width(78).Height(12).Render(builder.String())
 	}
 
 	filtered := m.getFilteredPosts()
 	if len(filtered) == 0 {
-		builder.WriteString(fmt.Sprintf("No posts found for campaign %q.\n", m.filterCampaign))
+		builder.WriteString(fmt.Sprintf(Tr("posts_none_found_campaign"), m.filterCampaign))
 		return StyleBox.Width(78).Height(12).Render(builder.String())
 	}
 
@@ -140,15 +140,15 @@ func (m Model) renderPostList() string {
 		// Metadata Info
 		metaInfo := ""
 		if p.Type == "thread" {
-			metaInfo = fmt.Sprintf("thread · %d tweets", len(p.Tweets))
+			metaInfo = fmt.Sprintf(Tr("meta_thread"), len(p.Tweets))
 		} else {
-			metaInfo = "single"
+			metaInfo = Tr("meta_single")
 		}
 		if len(p.Images) > 0 {
-			metaInfo += fmt.Sprintf(" · 📎 %d images", len(p.Images))
+			metaInfo += " · " + fmt.Sprintf(Tr("meta_images"), len(p.Images))
 		}
 		if p.Campaign != "" {
-			metaInfo += fmt.Sprintf(" · 📁 %s", p.Campaign)
+			metaInfo += " · 📁 " + p.Campaign
 		}
 
 		titlePreview := p.Title

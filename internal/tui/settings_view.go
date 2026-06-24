@@ -13,18 +13,18 @@ import (
 func (m Model) renderSettings() string {
 	var builder strings.Builder
 
-	builder.WriteString(StyleHeader.Render("EINSTELLUNGEN & VERBINDUNGEN") + "\n\n")
+	builder.WriteString(StyleHeader.Render(Tr("header_settings")) + "\n\n")
 
-	licenseStatus := "Core (Gratis)"
+	licenseStatus := Tr("license_core")
 	if config.IsPro() {
-		licenseStatus = "Pro (Aktiv ✅)"
+		licenseStatus = Tr("license_pro")
 	}
 
 	getPlatformStatus := func(p string) string {
 		if m.platforms[p] {
-			return "Verbunden ✓"
+			return Tr("dash_connected")
 		}
-		return "Nicht verbunden (Enter drücken)"
+		return Tr("dash_not_auth")
 	}
 
 	options := []struct {
@@ -32,38 +32,39 @@ func (m Model) renderSettings() string {
 		value    string
 		isAction bool
 	}{
-		{"AI Provider  ", config.ActiveConfig.AI.Provider, false},
-		{"AI Model     ", config.ActiveConfig.AI.Model, false},
-		{"Dry Run      ", fmt.Sprintf("%t", config.ActiveConfig.Defaults.DryRun), false},
-		{"Lizenztyp    ", licenseStatus, false},
-		{"Twitter/X    ", getPlatformStatus(models.PlatformTwitter), true},
-		{"LinkedIn     ", getPlatformStatus(models.PlatformLinkedIn), true},
-		{"Threads      ", getPlatformStatus(models.PlatformThreads), true},
-		{"Backup Exp.  ", "Ausführen (Enter drücken)", true},
-		{"Backup Imp.  ", "Ausführen (Enter drücken)", true},
+		{Tr("settings_ai_provider"), config.ActiveConfig.AI.Provider, false},
+		{Tr("settings_ai_model"), config.ActiveConfig.AI.Model, false},
+		{Tr("settings_dry_run"), fmt.Sprintf("%t", config.ActiveConfig.Defaults.DryRun), false},
+		{Tr("settings_language"), config.ActiveConfig.Defaults.Language, false},
+		{Tr("settings_license"), licenseStatus, false},
+		{Tr("settings_auth_twitter"), getPlatformStatus(models.PlatformTwitter), true},
+		{Tr("settings_auth_linkedin"), getPlatformStatus(models.PlatformLinkedIn), true},
+		{Tr("settings_auth_threads"), getPlatformStatus(models.PlatformThreads), true},
+		{Tr("settings_config_export"), Tr("settings_run_action"), true},
+		{Tr("settings_config_import"), Tr("settings_run_action"), true},
 	}
 
 	for i, opt := range options {
 		cursorStr := "  "
-		// i == 3 ist Lizenztyp (nicht auswählbar)
-		if i == m.cursor && i != 3 {
+		// i == 4 ist Lizenztyp (nicht auswählbar)
+		if i == m.cursor && i != 4 {
 			cursorStr = "> "
 		}
 
 		labelStyle := lipgloss.NewStyle().Foreground(ColorText)
-		if i == m.cursor && i != 3 {
+		if i == m.cursor && i != 4 {
 			labelStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 		}
 
 		valStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
-		if opt.label == "Lizenztyp    " {
+		if i == 4 { // Lizenztyp
 			if config.IsPro() {
 				valStyle = lipgloss.NewStyle().Foreground(ColorPosted).Bold(true)
 			} else {
 				valStyle = lipgloss.NewStyle().Foreground(ColorLightGray)
 			}
 		} else if opt.isAction {
-			if strings.Contains(opt.value, "✓") {
+			if strings.Contains(opt.value, "✓") || strings.Contains(opt.value, "Verbunden") || strings.Contains(opt.value, "Connected") {
 				valStyle = lipgloss.NewStyle().Foreground(ColorPosted).Bold(true)
 			} else {
 				valStyle = lipgloss.NewStyle().Foreground(ColorFailed)
@@ -79,11 +80,11 @@ func (m Model) renderSettings() string {
 		builder.WriteString(fmt.Sprintf("%s%s: %s\n", cursorStr, labelStyle.Render(opt.label), valStyle.Render(opt.value)))
 
 		// Einen kleinen visuellen Trenner vor den Plattformen einfügen
-		if i == 3 {
+		if i == 4 {
 			builder.WriteString("\n" + StyleHeader.Render("PLATFORM ACCOUNTS") + "\n")
 		}
 		// Einen kleinen visuellen Trenner vor Backup & Sync einfügen
-		if i == 6 {
+		if i == 7 {
 			builder.WriteString("\n" + StyleHeader.Render("BACKUP & SYNC") + "\n")
 		}
 	}
@@ -92,7 +93,7 @@ func (m Model) renderSettings() string {
 	if m.statusMessage != "" {
 		builder.WriteString(lipgloss.NewStyle().Foreground(ColorSecondary).Render(m.statusMessage) + "\n")
 	}
-	builder.WriteString(StyleHelp.Render("←/→ / enter: Werte ändern / Verbinden  ·  Änderungen werden sofort gespeichert.\nPro-Lizenz über CLI aktivieren: postctl config set license_key <key>"))
+	builder.WriteString(StyleHelp.Render(Tr("settings_help_footer")))
 
 	return StyleBox.Width(78).Height(17).Render(builder.String())
 }

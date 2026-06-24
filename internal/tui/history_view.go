@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -11,9 +12,9 @@ import (
 func (m Model) renderHistory() string {
 	var builder strings.Builder
 
-	builder.WriteString(StyleHeader.Render("POSTING HISTORY") + "\n")
+	builder.WriteString(StyleHeader.Render(Tr("header_history")) + "\n")
 	if len(m.history) == 0 {
-		builder.WriteString("No posting history found.\n")
+		builder.WriteString(Tr("history_none_found"))
 		return StyleBox.Width(78).Height(12).Render(builder.String())
 	}
 
@@ -69,30 +70,40 @@ func (m Model) renderHelp() string {
 
 	if m.showHelp {
 		var builder strings.Builder
-		builder.WriteString(StyleHeader.Render("KEYBOARD HELP") + "\n")
-		builder.WriteString("  tab        Next Tab\n")
-		builder.WriteString("  shift+tab  Previous Tab\n")
-		builder.WriteString("  ↑/k        Move Up\n")
-		builder.WriteString("  ↓/j        Move Down\n")
-		builder.WriteString("  enter      Select / Open Preview (on Posts list) / Filter by campaign (on Dashboard)\n")
-		builder.WriteString("  n          Create a new post draft\n")
-		builder.WriteString("  e          Edit selected post draft\n")
-		builder.WriteString("  i          Import posts from Markdown files/folders (pauses TUI)\n")
-		builder.WriteString("  d          Delete selected post\n")
-		builder.WriteString("  r          Repurpose selected post via AI to other platforms\n")
-		builder.WriteString("  esc        Close Preview / Clear filter\n")
-		builder.WriteString("  f1/R       Open complete README documentation with TOC\n")
-		builder.WriteString("  ?          Toggle Quick Help\n")
-		builder.WriteString("  q/ctrl+c   Quit application\n")
+		builder.WriteString(StyleHeader.Render(Tr("help_title")) + "\n")
+		builder.WriteString("  tab        " + Tr("help_tab") + "\n")
+		builder.WriteString("  shift+tab  " + Tr("help_shifttab") + "\n")
+		builder.WriteString("  ↑/k        " + Tr("help_up") + "\n")
+		builder.WriteString("  ↓/j        " + Tr("help_down") + "\n")
+		builder.WriteString("  enter      " + Tr("help_enter") + "\n")
+		builder.WriteString("  n          " + Tr("help_new_post") + "\n")
+		builder.WriteString("  e          " + Tr("help_edit_post") + "\n")
+		builder.WriteString("  i          " + Tr("help_import") + "\n")
+		builder.WriteString("  d          " + Tr("help_delete") + "\n")
+		builder.WriteString("  r          " + Tr("help_repurpose") + "\n")
+		builder.WriteString("  esc        " + Tr("help_esc") + "\n")
+		builder.WriteString("  f1/R       " + Tr("help_readme") + "\n")
+		builder.WriteString("  ?          " + Tr("help_toggle") + "\n")
+		builder.WriteString("  q/ctrl+c   " + Tr("help_quit") + "\n")
 		sb.WriteString(StyleHelp.Render(builder.String()))
 	} else {
 		// Standard Kurzhilfe (zweizeilig)
-		line1 := "tab: next tab  ·  ↑↓: navigate  ·  enter: select  ·  n: new  ·  e: edit  ·  i: import  ·  d: delete  ·  r: repurpose  ·  q: quit"
-		if m.activeTab == 1 && m.filterCampaign != "" {
-			line1 = "esc: clear filter  ·  " + line1
+		var line1 string
+		if strings.ToLower(config.ActiveConfig.Defaults.Language) == "de" {
+			line1 = "tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Wählen  ·  n: Neu  ·  e: Bearbeiten  ·  i: Import  ·  d: Löschen  ·  r: Umschreiben  ·  q: Beenden"
+			if m.activeTab == 1 && m.filterCampaign != "" {
+				line1 = "esc: Filter löschen  ·  " + line1
+			}
+			helpText := line1 + "\n" + "f1/R: Handbuch  ·  ?: Schnellhilfe"
+			sb.WriteString(StyleHelp.Render(helpText))
+		} else {
+			line1 = "tab: next tab  ·  ↑↓: navigate  ·  enter: select  ·  n: new  ·  e: edit  ·  i: import  ·  d: delete  ·  r: repurpose  ·  q: quit"
+			if m.activeTab == 1 && m.filterCampaign != "" {
+				line1 = "esc: clear filter  ·  " + line1
+			}
+			helpText := line1 + "\n" + "f1/R: readme  ·  ?: quick help"
+			sb.WriteString(StyleHelp.Render(helpText))
 		}
-		helpText := line1 + "\n" + "f1/R: readme  ·  ?: quick help"
-		sb.WriteString(StyleHelp.Render(helpText))
 	}
 	return sb.String()
 }
