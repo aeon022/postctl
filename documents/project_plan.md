@@ -238,3 +238,15 @@ graph TD
   * Integration in die TUI (Dashboard, Einstellungsmenü zur interaktiven Authentifizierung per Tastendruck und Beitrags-Editor inklusive Thread-Unterstützung).
   * Aktualisierung der Landing Page und Testabdeckung im Markdown-Parser.
 
+### 22. Phase 22: Multi-Plattform-Ausbau (Bluesky, Reddit, Facebook) & Neovim-Ruler-Tuning (Erledigt ✅)
+* **Ziel**: Integration von Bluesky, Reddit und Facebook als Plattformen sowie Bereitstellung dynamischer Zeichenlineale und Längentests für Twitter (280), Bluesky (300) und Mastodon (500) beim Öffnen von Neovim.
+* **Erledigte Schritte**:
+  * Konfiguration in `config.go` um Strukturen für Bluesky (Handle, App-Passwort), Reddit (App-Credentials) und Facebook (Page-Credentials) erweitert.
+  * Implementierung von `internal/platforms/bluesky.go` (com.atproto posts, reply-chained threads, blob uploads, post thread analytics).
+  * Implementierung von `internal/platforms/reddit.go` (submitting self posts to target subreddit mapped from Campaign, upvotes/comments analytics).
+  * Implementierung von `internal/platforms/facebook.go` (feed message posts, photo posts with captions, engagement analytics).
+  * **Neovim-Refinement**: Dynamische Generierung von Zeichenlinealen und Thread-Validierungen basierend auf der ausgewählten Plattform (Twitter: 280, Bluesky: 300, Mastodon: 500) direkt im temporären Editor-Hilfetext.
+  * TUI-Integration (Dashboard, Settings, Editor und Parser-Tests).
+  * Website-Update auf dem Landingpage-Astro-Projekt.
+
+
