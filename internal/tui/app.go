@@ -210,6 +210,7 @@ func (m Model) loadDataCmd() tea.Msg {
 		models.PlatformTwitter:  false,
 		models.PlatformLinkedIn: false,
 		models.PlatformThreads:  false,
+		models.PlatformMastodon: false,
 	}
 	for p := range platforms {
 		_, _, _, err := m.store.GetToken(ctx, p)
@@ -673,13 +674,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				var targets []string
 				switch p.Platform {
 				case models.PlatformTwitter:
-					targets = []string{models.PlatformLinkedIn, models.PlatformThreads}
+					targets = []string{models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon}
 				case models.PlatformLinkedIn:
-					targets = []string{models.PlatformTwitter, models.PlatformThreads}
+					targets = []string{models.PlatformTwitter, models.PlatformThreads, models.PlatformMastodon}
 				case models.PlatformThreads:
-					targets = []string{models.PlatformTwitter, models.PlatformLinkedIn}
-				default:
+					targets = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformMastodon}
+				case models.PlatformMastodon:
 					targets = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads}
+				default:
+					targets = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon}
 				}
 				m.repurposing = true
 				m.statusMessage = "KI generiert Konvertierungen..."
@@ -731,7 +734,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 4 {
-				if m.cursor >= 5 && m.cursor <= 7 {
+				if m.cursor >= 5 && m.cursor <= 8 {
 					var platName string
 					switch m.cursor {
 					case 5:
@@ -740,15 +743,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						platName = models.PlatformLinkedIn
 					case 7:
 						platName = models.PlatformThreads
+					case 8:
+						platName = models.PlatformMastodon
 					}
 					m.loading = true
 					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
 					return m, m.runAuthCmd(platName)
 				}
-				if m.cursor == 8 {
+				if m.cursor == 9 {
 					return m, m.runBackupExportCmd()
 				}
-				if m.cursor == 9 {
+				if m.cursor == 10 {
 					return m, m.runBackupImportCmd()
 				}
 				m.cycleSetting()
@@ -842,7 +847,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 4: // Settings
-		return 10
+		return 11
 	default:
 		return 0
 	}

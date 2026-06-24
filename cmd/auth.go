@@ -19,7 +19,7 @@ var statusFlag bool
 var authCmd = &cobra.Command{
 	Use:   "auth [platform]",
 	Short: "Authenticate with social media platforms",
-	Long:  `Authenticate with Twitter/X, LinkedIn, or Threads using OAuth 2.0. If no platform is specified, use --status to check authentication status.`,
+	Long:  `Authenticate with Twitter/X, LinkedIn, Threads, or Mastodon using OAuth 2.0. If no platform is specified, use --status to check authentication status.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		dbPath := config.GetDBPath()
@@ -78,7 +78,7 @@ type authErrorJSON struct {
 }
 
 func reportAuthStatus(ctx context.Context, s store.Store) {
-	plats := []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads}
+	plats := []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon}
 	statusMap := make(map[string]bool)
 
 	for _, p := range plats {
@@ -111,8 +111,10 @@ func reportAuthStatus(ctx context.Context, s store.Store) {
 				name = "LinkedIn"
 			} else if p == models.PlatformThreads {
 				name = "Threads"
+			} else if p == models.PlatformMastodon {
+				name = "Mastodon"
 			}
-			fmt.Printf(" - %-10s %s\n", name+":", statusText)
+			fmt.Printf(" - %-12s %s\n", name+":", statusText)
 		}
 	}
 }

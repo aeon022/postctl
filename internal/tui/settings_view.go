@@ -40,6 +40,7 @@ func (m Model) renderSettings() string {
 		{Tr("settings_auth_twitter"), getPlatformStatus(models.PlatformTwitter), true},
 		{Tr("settings_auth_linkedin"), getPlatformStatus(models.PlatformLinkedIn), true},
 		{Tr("settings_auth_threads"), getPlatformStatus(models.PlatformThreads), true},
+		{Tr("settings_auth_mastodon"), getPlatformStatus(models.PlatformMastodon), true},
 		{Tr("settings_config_export"), Tr("settings_run_action"), true},
 		{Tr("settings_config_import"), Tr("settings_run_action"), true},
 	}
@@ -84,7 +85,7 @@ func (m Model) renderSettings() string {
 			builder.WriteString("\n" + StyleHeader.Render("PLATFORM ACCOUNTS") + "\n")
 		}
 		// Einen kleinen visuellen Trenner vor Backup & Sync einfügen
-		if i == 7 {
+		if i == 8 {
 			builder.WriteString("\n" + StyleHeader.Render("BACKUP & SYNC") + "\n")
 		}
 	}

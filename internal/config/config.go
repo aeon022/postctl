@@ -24,6 +24,11 @@ type Config struct {
 		AppID     string `mapstructure:"app_id" yaml:"app_id"`
 		AppSecret string `mapstructure:"app_secret" yaml:"app_secret"`
 	} `mapstructure:"threads" yaml:"threads"`
+	Mastodon struct {
+		InstanceURL  string `mapstructure:"instance_url" yaml:"instance_url"`
+		ClientID     string `mapstructure:"client_id" yaml:"client_id"`
+		ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
+	} `mapstructure:"mastodon" yaml:"mastodon"`
 	Defaults struct {
 		Timezone string `mapstructure:"timezone" yaml:"timezone"`
 		DryRun   bool   `mapstructure:"dry_run" yaml:"dry_run"`
@@ -83,6 +88,7 @@ func LoadConfig() error {
 	viper.SetDefault("ai.provider", "openai")
 	viper.SetDefault("ai.model", "gpt-4o-mini")
 	viper.SetDefault("license_key", "")
+	viper.SetDefault("mastodon.instance_url", "https://mastodon.social")
 
 	viper.AddConfigPath(configDir)
 	viper.SetConfigName("config")
@@ -125,6 +131,12 @@ linkedin:
 threads:
   app_id: ""
   app_secret: ""
+
+mastodon:
+  instance_url: "https://mastodon.social"
+  client_id: ""
+  client_secret: ""
+
 `
 		if err := os.WriteFile(configPath, []byte(dummyContent), 0644); err != nil {
 			return fmt.Errorf("create default config file: %w", err)
@@ -190,6 +202,9 @@ func SaveConfig() error {
 	viper.Set("linkedin.client_secret", ActiveConfig.LinkedIn.ClientSecret)
 	viper.Set("threads.app_id", ActiveConfig.Threads.AppID)
 	viper.Set("threads.app_secret", ActiveConfig.Threads.AppSecret)
+	viper.Set("mastodon.instance_url", ActiveConfig.Mastodon.InstanceURL)
+	viper.Set("mastodon.client_id", ActiveConfig.Mastodon.ClientID)
+	viper.Set("mastodon.client_secret", ActiveConfig.Mastodon.ClientSecret)
 	viper.Set("license_key", ActiveConfig.LicenseKey)
 
 	return nil

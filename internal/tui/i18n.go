@@ -179,6 +179,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Threads      ",
 		"en": "Threads      ",
 	},
+	"settings_auth_mastodon": {
+		"de": "Mastodon     ",
+		"en": "Mastodon     ",
+	},
 	"settings_config_export": {
 		"de": "Backup Exp.  ",
 		"en": "Backup Exp.  ",

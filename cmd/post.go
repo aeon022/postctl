@@ -74,6 +74,12 @@ func reportPostSuccess(post *models.Post, platformID string) {
 		urls = append(urls, fmt.Sprintf("https://www.linkedin.com/feed/update/%s", platformID))
 	case models.PlatformThreads:
 		urls = append(urls, fmt.Sprintf("https://www.threads.net/post/%s", platformID))
+	case models.PlatformMastodon:
+		instance := config.ActiveConfig.Mastodon.InstanceURL
+		if instance == "" {
+			instance = "https://mastodon.social"
+		}
+		urls = append(urls, fmt.Sprintf("%s/@user/%s", instance, platformID))
 	}
 
 	if FormatFlag == "json" {
@@ -82,8 +88,11 @@ func reportPostSuccess(post *models.Post, platformID string) {
 			Platform: post.Platform,
 			URLs:     urls,
 		}
-		if post.Platform == models.PlatformTwitter {
+		if post.Platform == models.PlatformTwitter || post.Platform == models.PlatformMastodon {
 			out.TweetsPosted = len(post.Tweets)
+			if out.TweetsPosted == 0 {
+				out.TweetsPosted = 1
+			}
 			out.ThreadID = platformID
 		} else {
 			out.PostID = platformID

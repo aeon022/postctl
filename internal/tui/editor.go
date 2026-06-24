@@ -146,8 +146,8 @@ func (m *Model) saveEditedPost() error {
 		UpdatedAt:   time.Now(),
 	}
 	
-	// Falls Plattform Twitter/X ist und '---' vorkommt, in Thread aufspalten
-	if platform == "twitter" && strings.Contains(body, "\n---\n") {
+	// Falls Plattform Twitter/X oder Mastodon ist und '---' vorkommt, in Thread aufspalten
+	if (platform == "twitter" || platform == "mastodon") && strings.Contains(body, "\n---\n") {
 		post.Type = "thread"
 		tweetParts := strings.Split(body, "\n---\n")
 		for i, part := range tweetParts {
@@ -196,7 +196,7 @@ func (m Model) renderEditor() string {
 	platformLabel := platPrefix + Tr("editor_label_platform")
 	
 	platSelect := ""
-	platformsList := []string{"twitter", "linkedin", "threads"}
+	platformsList := []string{"twitter", "linkedin", "threads", "mastodon"}
 	for _, p := range platformsList {
 		if p == m.editorPlatform {
 			platSelect += lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render(" [" + strings.ToUpper(p) + "] ")
@@ -240,7 +240,7 @@ func (m Model) renderEditor() string {
 	bodyPrefix := "  "
 	bodyStyle := lipgloss.NewStyle().Foreground(ColorText)
 	bodyLabel := Tr("editor_label_body")
-	if m.editorPlatform == "twitter" {
+	if m.editorPlatform == "twitter" || m.editorPlatform == "mastodon" {
 		bodyLabel += Tr("editor_twitter_thread_note")
 	}
 	if m.editorFocus == 4 {

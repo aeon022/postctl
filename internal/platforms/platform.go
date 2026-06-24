@@ -32,6 +32,8 @@ func GetPlatform(name string, s store.Store, dryRun bool) (Platform, error) {
 		return NewLinkedInPlatform(s, config.ActiveConfig.LinkedIn.ClientID, config.ActiveConfig.LinkedIn.ClientSecret), nil
 	case models.PlatformThreads:
 		return NewThreadsPlatform(s, config.ActiveConfig.Threads.AppID, config.ActiveConfig.Threads.AppSecret), nil
+	case models.PlatformMastodon:
+		return NewMastodonPlatform(s, config.ActiveConfig.Mastodon.InstanceURL, config.ActiveConfig.Mastodon.ClientID, config.ActiveConfig.Mastodon.ClientSecret), nil
 	default:
 		return nil, fmt.Errorf("unknown platform %q", name)
 	}

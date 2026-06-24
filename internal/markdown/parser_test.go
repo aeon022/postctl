@@ -202,8 +202,8 @@ Post everywhere!
 		t.Fatalf("ParseContent failed: %v", err)
 	}
 
-	if len(posts) != 3 {
-		t.Fatalf("expected 3 posts (twitter, linkedin, threads), got %d", len(posts))
+	if len(posts) != 4 {
+		t.Fatalf("expected 4 posts (twitter, linkedin, threads, mastodon), got %d", len(posts))
 	}
 
 	platforms := make(map[string]bool)
@@ -211,7 +211,7 @@ Post everywhere!
 		platforms[p.Platform] = true
 	}
 
-	if !platforms["twitter"] || !platforms["linkedin"] || !platforms["threads"] {
+	if !platforms["twitter"] || !platforms["linkedin"] || !platforms["threads"] || !platforms["mastodon"] {
 		t.Errorf("missing platforms, got: %v", platforms)
 	}
 }

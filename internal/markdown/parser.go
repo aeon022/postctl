@@ -91,7 +91,7 @@ func ParseContent(content, sourcePath string) ([]models.Post, error) {
 	var targetPlatforms []string
 	pLower := strings.ToLower(strings.TrimSpace(fm.Platform))
 	if pLower == "all" || pLower == "" {
-		targetPlatforms = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads}
+		targetPlatforms = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon}
 	} else {
 		// Komma-separiert erlauben
 		rawPlats := strings.Split(pLower, ",")
@@ -129,8 +129,8 @@ func ParseContent(content, sourcePath string) ([]models.Post, error) {
 		post.ID = fmt.Sprintf("%s-%s", baseID, platform)
 
 		// Inhalt parsen
-		if fm.Type == "thread" || platform == models.PlatformTwitter {
-			// Für Twitter oder explizite Threads teilen wir in Tweets auf
+		if fm.Type == "thread" || platform == models.PlatformTwitter || platform == models.PlatformMastodon {
+			// Für Twitter/Mastodon oder explizite Threads teilen wir in Tweets auf
 			post.Tweets = parseTweets(bodyStr, fm.Images)
 			
 			// Titel aus erstem Tweet generieren, falls leer

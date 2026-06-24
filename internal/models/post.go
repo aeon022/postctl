@@ -19,6 +19,7 @@ const (
 	PlatformTwitter  = "twitter"
 	PlatformLinkedIn = "linkedin"
 	PlatformThreads  = "threads"
+	PlatformMastodon = "mastodon"
 )
 
 // Post repräsentiert einen Social-Media-Post
