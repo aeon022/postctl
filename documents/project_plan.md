@@ -229,3 +229,12 @@ graph TD
   * Speichern und Aktualisieren der Posts direkt in der SQLite-Datenbank (inkl. Aufteilung von Twitter-Threads über `---`).
   * Integration der Tastatur-Shortcuts `n` (neu) und `e` (bearbeiten) im Dashboard, in der Beitragsliste und in der Detailansicht.
   * **Neovim/Vim-Integration**: Unterstützung für das Bearbeiten des Beitragsinhalts im externen Systemeditor (standardmäßig Neovim/Vim) über `ctrl+v` (inklusive eines dynamischen Zeichen-Lineals und Längen-Updates als Markdown-Kommentar am Dateianfang).
+
+### 21. Phase 21: Mastodon-Plattform-Integration (Erledigt ✅)
+* **Ziel**: Mastodon als vierte Plattform hinzufügen, um dezentrales Posten, dynamische App-Registrierung, OAuth, Threads und echtes Engagement-Tracking zu unterstützen.
+* **Erledigte Schritte**:
+  * Konfiguration in `config.go` um Mastodon-Instanz-URL und Client-Credentials erweitert.
+  * Implementierung von `internal/platforms/mastodon.go` zur Abwicklung von dynamischer App-Registrierung, sicherem OAuth-Flow, Medientransfer (Bild-Uploads), Thread-Verkettung (Reply-Chaining) und Live-Analytics via API.
+  * Integration in die TUI (Dashboard, Einstellungsmenü zur interaktiven Authentifizierung per Tastendruck und Beitrags-Editor inklusive Thread-Unterstützung).
+  * Aktualisierung der Landing Page und Testabdeckung im Markdown-Parser.
+
