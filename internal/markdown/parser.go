@@ -106,12 +106,17 @@ func ParseContent(content, sourcePath string) ([]models.Post, error) {
 	// Body parsen
 	var posts []models.Post
 	for _, platform := range targetPlatforms {
+		title := fm.Title
+		if title == "" {
+			title = models.DeriveTitle(bodyStr)
+		}
+
 		post := models.Post{
 			Platform:    platform,
 			Type:        fm.Type,
 			Language:    fm.Language,
 			Campaign:    fm.Campaign,
-			Title:       fm.Title,
+			Title:       title,
 			Images:      fm.Images,
 			Tags:        fm.Tags,
 			ScheduledAt: scheduledAt,

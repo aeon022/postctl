@@ -2,6 +2,7 @@ package models
 
 import (
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -85,4 +86,25 @@ type HistoryEntry struct {
 	PlatformID string    `json:"platform_id"`
 	Error      string    `json:"error"`
 	CreatedAt  time.Time `json:"created_at"`
+}
+
+// DeriveTitle generiert einen Titel aus dem Post-Inhalt
+func DeriveTitle(body string) string {
+	lines := strings.Split(body, "\n")
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed != "" && !strings.HasPrefix(trimmed, "##") && !strings.HasPrefix(trimmed, "---") {
+			// Markdown-Formatierung entfernen
+			trimmed = strings.ReplaceAll(trimmed, "*", "")
+			trimmed = strings.ReplaceAll(trimmed, "_", "")
+			trimmed = strings.ReplaceAll(trimmed, "`", "")
+			trimmed = strings.ReplaceAll(trimmed, "#", "")
+			trimmed = strings.TrimSpace(trimmed)
+			if len(trimmed) > 40 {
+				return trimmed[:37] + "..."
+			}
+			return trimmed
+		}
+	}
+	return "Unbenannter Beitrag"
 }

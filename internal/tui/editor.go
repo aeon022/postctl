@@ -139,11 +139,23 @@ func (m *Model) saveEditedPost() error {
 	if id == "" {
 		id = fmt.Sprintf("%s-%s-%d", campaign, platform, time.Now().UnixNano()/1e6)
 	}
+
+	// Vorhandenen Titel beibehalten oder automatisch generieren
+	title := ""
+	if m.editorPostID != "" {
+		if existing, err := m.store.GetPost(ctx, m.editorPostID); err == nil && existing != nil {
+			title = existing.Title
+		}
+	}
+	if title == "" {
+		title = models.DeriveTitle(body)
+	}
 	
 	post := models.Post{
 		ID:          id,
 		Platform:    platform,
 		Campaign:    campaign,
+		Title:       title,
 		Status:      status,
 		ScheduledAt: scheduledAt,
 		Images:      images,
