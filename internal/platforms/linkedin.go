@@ -176,9 +176,9 @@ func (l *LinkedInPlatform) registerUpload(ctx context.Context, token, authorURN 
 	
 	reqBody := map[string]interface{}{
 		"registerUploadRequest": map[string]interface{}{
-			"recipes": []string{"urn:li:digitalmediaRecipe:feedshare-image"},
-			"owner":   authorURN,
-			"relationshipType": "OWNER",
+			"recipes":                  []string{"urn:li:digitalmediaRecipe:feedshare-image"},
+			"owner":                    authorURN,
+			"supportedUploadMechanism": []string{"SYNCHRONOUS_UPLOAD"},
 		},
 	}
 

@@ -103,7 +103,8 @@ var importCmd = &cobra.Command{
 
 			postDir := filepath.Dir(file)
 
-			for _, post := range filePosts {
+			for j := range filePosts {
+				post := &filePosts[j]
 				// Validierung: Twitter Zeichenlänge
 				if post.Platform == models.PlatformTwitter {
 					for _, tweet := range post.Tweets {
@@ -116,29 +117,35 @@ var importCmd = &cobra.Command{
 					}
 				}
 
-				// Validierung: Bilder existieren
-				for _, img := range post.Images {
-					if !checkImageExists(postDir, img, config.ActiveConfig.Defaults.ImageDir) {
+				// Validierung: Bilder existieren und Pfad auflösen
+				for idx, img := range post.Images {
+					resolved, ok := resolveImagePath(postDir, img, config.ActiveConfig.Defaults.ImageDir)
+					if !ok {
 						validationErrors = append(validationErrors, fmt.Sprintf(
 							"file %s: image %q in post %s does not exist",
 							file, img, post.ID,
 						))
+					} else {
+						post.Images[idx] = resolved
 					}
 				}
 
-				// Validierung: Inline-Bilder der Tweets existieren
-				if post.Platform == models.PlatformTwitter {
-					for _, tweet := range post.Tweets {
-						if tweet.Image != "" && !checkImageExists(postDir, tweet.Image, config.ActiveConfig.Defaults.ImageDir) {
+				// Validierung: Inline-Bilder der Tweets existieren und Pfad auflösen
+				for idx, tweet := range post.Tweets {
+					if tweet.Image != "" {
+						resolved, ok := resolveImagePath(postDir, tweet.Image, config.ActiveConfig.Defaults.ImageDir)
+						if !ok {
 							validationErrors = append(validationErrors, fmt.Sprintf(
 								"file %s: inline image %q in tweet %d of post %s does not exist",
 								file, tweet.Image, tweet.Index, post.ID,
 							))
+						} else {
+							post.Tweets[idx].Image = resolved
 						}
 					}
 				}
 
-				posts = append(posts, post)
+				posts = append(posts, *post)
 			}
 		}
 
@@ -178,27 +185,35 @@ var importCmd = &cobra.Command{
 	},
 }
 
-// checkImageExists prüft, ob das Bild an einem der erwarteten Orte existiert
-func checkImageExists(postDir, imagePath, configImageDir string) bool {
+// resolveImagePath prüft, ob das Bild an einem der erwarteten Orte existiert, und gibt den absoluten Pfad zurück
+func resolveImagePath(postDir, imagePath, configImageDir string) (string, bool) {
+	var resolved string
 	if filepath.IsAbs(imagePath) {
-		_, err := os.Stat(imagePath)
-		return err == nil
-	}
-	// Relativ zum Verzeichnis der Markdown-Datei
-	if _, err := os.Stat(filepath.Join(postDir, imagePath)); err == nil {
-		return true
-	}
-	// Relativ zum aktuellen Arbeitsverzeichnis
-	if _, err := os.Stat(imagePath); err == nil {
-		return true
-	}
-	// Relativ zum konfigurierten Image-Verzeichnis
-	if configImageDir != "" {
-		if _, err := os.Stat(filepath.Join(configImageDir, imagePath)); err == nil {
-			return true
+		resolved = imagePath
+	} else if _, err := os.Stat(filepath.Join(postDir, imagePath)); err == nil {
+		resolved = filepath.Join(postDir, imagePath)
+	} else if _, err := os.Stat(imagePath); err == nil {
+		abs, err := filepath.Abs(imagePath)
+		if err == nil {
+			resolved = abs
+		} else {
+			resolved = imagePath
+		}
+	} else if configImageDir != "" {
+		fullPath := filepath.Join(configImageDir, imagePath)
+		if _, err := os.Stat(fullPath); err == nil {
+			resolved = fullPath
 		}
 	}
-	return false
+
+	if resolved != "" {
+		abs, err := filepath.Abs(resolved)
+		if err == nil {
+			return abs, true
+		}
+		return resolved, true
+	}
+	return "", false
 }
 
 // JSON-Strukturen für CLI Output
