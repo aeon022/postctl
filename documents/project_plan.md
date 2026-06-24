@@ -45,6 +45,16 @@ Dieses Dokument dient als zentrale Orientierung und Statusübersicht für die En
 
 Hier ist der strukturierte Ablauf zur schrittweisen Implementierung von **postctl**, abgeleitet aus dem Go-Lernpfad:
 
+```mermaid
+graph TD
+    P1[Phase 1: Hello Go / Cobra CLI Setup] --> P2[Phase 2: Models & Data Structs]
+    P2 --> P3[Phase 3: Markdown Parser & Tests]
+    P3 --> P4[Phase 4: SQLite Store & Migrations]
+    P4 --> P5[Phase 5: Bubbletea TUI Dashboard]
+    P5 --> P6[Phase 6: OAuth & API Integrations]
+    P6 --> P7[Phase 7: Scheduler & Polishing]
+```
+
 ### 1. Phase 1: CLI-Grundgerüst & Projekt-Setup (Erledigt ✅)
 * **Ziel**: Go Modul initialisieren und CLI-Struktur mit Cobra aufbauen.
 * **Dateien**:
@@ -172,14 +182,50 @@ Hier ist der strukturierte Ablauf zur schrittweisen Implementierung von **postct
   * [cmd/config_test.go](file:///Users/gweiher/Developing/Projects/postctl/cmd/config_test.go)
 * **Konzepte**: Modifizierbare Konfigurationsstrukturen mit automatischer Serialisierung in YAML, Sicherheitsmaskierung sensibler Anmeldedaten (API-Keys), mockbare Konfigurationsschreibtests.
 
-### 15. Phase 15: TUI Einstellungen / Settings (Erledigt ✅)
-* **Ziel**: Interaktives Ändern und Speichern von Einstellungen innerhalb des TUI-Dashboards über eine neue Tab-Ansicht.
+### 15. Phase 15: TUI Einstellungen & Mehrsprachigkeit (Erledigt ✅)
+* **Ziel**: Interaktives Ändern und Speichern von Einstellungen innerhalb des TUI-Dashboards über eine neue Tab-Ansicht sowie Unterstützung für Mehrsprachigkeit (Deutsch und Englisch).
 * **Dateien**:
   * [internal/tui/tabs.go](file:///Users/gweiher/Developing/Projects/postctl/internal/tui/tabs.go)
   * [internal/tui/settings_view.go](file:///Users/gweiher/Developing/Projects/postctl/internal/tui/settings_view.go)
   * [internal/tui/app.go](file:///Users/gweiher/Developing/Projects/postctl/internal/tui/app.go)
-* **Konzepte**: Dynamisches Hinzufügen von Tab-Elementen in Bubbletea, zyklische Wertänderungen im UI-Zustand durch Tastendruck, automatische Dateisynchronisation.
+  * [internal/tui/i18n.go](file:///Users/gweiher/Developing/Projects/postctl/internal/tui/i18n.go)
+* **Konzepte**: Dynamisches Hinzufügen von Tab-Elementen in Bubbletea, zyklische Wertänderungen im UI-Zustand durch Tastendruck, automatische Dateisynchronisation, Übersetzungs-Mapping (Tr-Helper) basierend auf der Sprach-Einstellung ("de" / "en").
 
+### 16. Phase 16: Git & GitHub Setup (Erledigt ✅)
+* **Ziel**: Versionierung des Projekts initialisieren und den Code auf GitHub bereitstellen.
+* **Erledigte Schritte**:
+  * Git initialisiert und alle notwendigen Projektdateien committet.
+  * Eine [.gitignore](file:///Users/gweiher/Developing/Projects/postctl/.gitignore) wurde angelegt, um Binaries und die SQLite-Datenbank auszuschließen.
+  * Ein privates GitHub-Repository über die GitHub CLI (`gh`) erstellt und der lokale Code dorthin gepusht (`https://github.com/aeon022/postctl`).
 
+### 17. Phase 17: AES-Backups & Multi-Geräte-Sync (Erledigt ✅)
+* **Ziel**: Ermöglichen der sicheren Synchronisation der lokalen SQLite-Datenbank und der Konfigurationsdatei über andere Geräte (z. B. via Git).
+* **Erledigte Schritte**:
+  * Krypto-Backup-Modul implementiert (AES-256-GCM mit PBKDF2 Schlüsselableitung).
+  * CLI-Subcommands `config export` und `config import` mit Passwortabfragen erstellt.
+  * Integration in die TUI-Settings zum fliegenden Pausieren, Ausführen und Fortsetzen.
 
+### 18. Phase 18: TUI-zu-CLI-Übergänge & Finder Drag-and-Drop (Erledigt ✅)
+* **Ziel**: Sauberer Wechsel aus der TUI in interaktive CLI-Vorgänge und komfortable Dateipfad-Eingaben für macOS Finder-Nutzer.
+* **Erledigte Schritte**:
+  * Vollständiges Terminal-Clearing vor interaktiven Prompts (Viewport & Scrollback-Buffer).
+  * Bereinigen von Pfad-Anführungszeichen, die Terminals beim Ziehen von Finder-Objekten setzen.
+  * Integration von Hilfestellungen und Erfolgsbestätigungen mit Warte-Prompts.
 
+### 19. Phase 19: Integrierter TUI Dokumenten-Browser (Erledigt ✅)
+* **Ziel**: Direktes Lesen der vollständigen `README.md` Dokumentation innerhalb des TUI-Dashboards ohne Browser-Zwang.
+* **Erledigte Schritte**:
+  * Go-Embedding der Dokumentation zur Compile-Zeit.
+  * Dynamisch mitskalierendes Split-Layout (Inhaltsverzeichnis + Inhalt-Viewport).
+  * Emojis für fehlerfreie Box-Rahmen herausgefiltert und Mausrad-Scrolling integriert.
+  * Schnellsprung-Verknüpfungen (TOC-Auswahl, `t`/`Backspace` zurück zum Anfang) implementiert.
+
+### 20. Phase 20: TUI Postings-Editor (Erledigt ✅)
+* **Ziel**: Einen interaktiven Editor direkt in das TUI-Dashboard integrieren, um Markdown-Beiträge direkt in der Anwendung verfassen, bearbeiten und in der SQLite-Datenbank speichern zu können.
+* **Erledigte Schritte**:
+  * Einbinden der Charmbracelet-Module `textinput` und `textarea` für mehrzeilige Editierfunktionen.
+  * Editor-Maske mit Feldern für Plattform, Kampagne, Planungsdatum, Bild-Pfade und Beitrags-Text.
+  * Formular-Navigation via Tab/Shift+Tab und Tastenfeld-Validierung für Plattformen und Planungsdatum.
+  * Speichern und Aktualisieren der Posts direkt in der SQLite-Datenbank (inkl. Aufteilung von Twitter-Threads über `---`).
+  * Integration der Tastatur-Shortcuts `n` (neu) und `e` (bearbeiten) im Dashboard, in der Beitragsliste und in der Detailansicht.
+  * **Neovim/Vim-Integration**: Unterstützung für das Bearbeiten des Beitragsinhalts im externen Systemeditor (standardmäßig Neovim/Vim) über `ctrl+v` (inklusive eines dynamischen Zeichen-Lineals und Längen-Updates als Markdown-Kommentar am Dateianfang).
