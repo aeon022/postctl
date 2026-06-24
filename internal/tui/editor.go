@@ -204,14 +204,17 @@ func (m Model) renderEditor() string {
 	
 	platSelect := ""
 	platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook"}
-	for _, p := range platformsList {
+	for i, p := range platformsList {
 		if p == m.editorPlatform {
-			platSelect += lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render(" [" + strings.ToUpper(p) + "] ")
+			platSelect += lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("[" + strings.ToUpper(p) + "]")
 		} else {
-			platSelect += "  " + strings.ToUpper(p) + "  "
+			platSelect += strings.ToUpper(p)
+		}
+		if i < len(platformsList)-1 {
+			platSelect += "  "
 		}
 	}
-	builder.WriteString(platStyle.Render(platformLabel) + platSelect + "\n\n")
+	builder.WriteString(platStyle.Render(platformLabel) + " " + platSelect + "\n\n")
 
 	// 2. Kampagne
 	campPrefix := "  "
