@@ -287,8 +287,61 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 		}
 	}
 	
-	// Aktuellen Text reinschreiben
-	if _, err := tmpFile.WriteString(m.editorBody.Value()); err != nil {
+	// Hilfetext generieren
+	var helper strings.Builder
+	if m.editorPlatform == "twitter" {
+		helper.WriteString("<!--\n")
+		helper.WriteString(" postctl Editor-Hilfe (Twitter / X)\n")
+		helper.WriteString(" ==================================\n\n")
+		helper.WriteString(" [Zeichen-Lineal (Max. 280 Zeichen pro Tweet)]\n")
+		helper.WriteString(" 000      030      060      090      120      150      180      210      240      270 280!\n")
+		helper.WriteString(" |--------|--------|--------|--------|--------|--------|--------|--------|--------|-|\n\n")
+		
+		bodyText := m.editorBody.Value()
+		if strings.Contains(bodyText, "\n---\n") {
+			tweets := strings.Split(bodyText, "\n---\n")
+			helper.WriteString(" Aktueller Thread-Status:\n")
+			for i, tweet := range tweets {
+				trimmed := strings.TrimSpace(tweet)
+				runes := []rune(trimmed)
+				charCount := len(runes)
+				remaining := 280 - charCount
+				status := "✓"
+				if remaining < 0 {
+					status = "✗ ZU LANG"
+				}
+				helper.WriteString(fmt.Sprintf("   Tweet %d: %d Zeichen (%d verbleibend) [%s]\n", i+1, charCount, remaining, status))
+			}
+		} else {
+			trimmed := strings.TrimSpace(bodyText)
+			charCount := len([]rune(trimmed))
+			remaining := 280 - charCount
+			status := "✓"
+			if remaining < 0 {
+				status = "✗ ZU LANG"
+			}
+			helper.WriteString(fmt.Sprintf("   Länge: %d Zeichen (%d verbleibend) [%s]\n", charCount, remaining, status))
+		}
+		
+		helper.WriteString("\n HINWEIS: Dieser Hilfeblock wird beim Speichern automatisch gelöscht.\n")
+		helper.WriteString(" Schreibe deinen Beitrag unter diesem Kommentar:\n")
+		helper.WriteString("-->\n\n")
+	} else {
+		helper.WriteString("<!--\n")
+		helper.WriteString(fmt.Sprintf(" postctl Editor-Hilfe (%s)\n", strings.ToUpper(m.editorPlatform)))
+		helper.WriteString(" ==================================\n\n")
+		bodyText := m.editorBody.Value()
+		trimmed := strings.TrimSpace(bodyText)
+		charCount := len([]rune(trimmed))
+		helper.WriteString(fmt.Sprintf("   Länge: %d Zeichen\n", charCount))
+		
+		helper.WriteString("\n HINWEIS: Dieser Hilfeblock wird beim Speichern automatisch gelöscht.\n")
+		helper.WriteString(" Schreibe deinen Beitrag unter diesem Kommentar:\n")
+		helper.WriteString("-->\n\n")
+	}
+
+	// Hilfetext + Aktuellen Text reinschreiben
+	if _, err := tmpFile.WriteString(helper.String() + m.editorBody.Value()); err != nil {
 		_ = tmpFile.Close()
 		_ = os.Remove(tmpFile.Name())
 		return func() tea.Msg {
@@ -321,7 +374,16 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 			return externalEditorFinishedMsg{err: readErr}
 		}
 		
-		return externalEditorFinishedMsg{content: string(data)}
+		// Hilfetext wieder entfernen
+		contentStr := string(data)
+		if strings.HasPrefix(contentStr, "<!--") {
+			if idx := strings.Index(contentStr, "-->"); idx != -1 {
+				contentStr = contentStr[idx+3:]
+				contentStr = strings.TrimLeft(contentStr, "\r\n")
+			}
+		}
+		
+		return externalEditorFinishedMsg{content: contentStr}
 	})
 }
 
