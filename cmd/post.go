@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
@@ -80,6 +81,29 @@ func reportPostSuccess(post *models.Post, platformID string) {
 			instance = "https://mastodon.social"
 		}
 		urls = append(urls, fmt.Sprintf("%s/@user/%s", instance, platformID))
+	case models.PlatformBluesky:
+		parts := strings.Split(platformID, "/")
+		if len(parts) >= 5 {
+			urls = append(urls, fmt.Sprintf("https://bsky.app/profile/%s/post/%s", parts[2], parts[4]))
+		} else {
+			urls = append(urls, fmt.Sprintf("https://bsky.app/profile/%s", config.ActiveConfig.Bluesky.Handle))
+		}
+	case models.PlatformReddit:
+		subreddit := post.Campaign
+		if subreddit == "" || subreddit == "default" {
+			subreddit = "test"
+		}
+		subreddit = strings.TrimPrefix(subreddit, "r/")
+		subreddit = strings.TrimSpace(subreddit)
+		redditID := strings.TrimPrefix(platformID, "t3_")
+		urls = append(urls, fmt.Sprintf("https://www.reddit.com/r/%s/comments/%s", subreddit, redditID))
+	case models.PlatformFacebook:
+		parts := strings.Split(platformID, "_")
+		postID := platformID
+		if len(parts) == 2 {
+			postID = parts[1]
+		}
+		urls = append(urls, fmt.Sprintf("https://facebook.com/%s/posts/%s", config.ActiveConfig.Facebook.PageID, postID))
 	}
 
 	if FormatFlag == "json" {
@@ -88,7 +112,7 @@ func reportPostSuccess(post *models.Post, platformID string) {
 			Platform: post.Platform,
 			URLs:     urls,
 		}
-		if post.Platform == models.PlatformTwitter || post.Platform == models.PlatformMastodon {
+		if post.Platform == models.PlatformTwitter || post.Platform == models.PlatformMastodon || post.Platform == models.PlatformBluesky {
 			out.TweetsPosted = len(post.Tweets)
 			if out.TweetsPosted == 0 {
 				out.TweetsPosted = 1

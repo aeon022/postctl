@@ -34,6 +34,12 @@ func GetPlatform(name string, s store.Store, dryRun bool) (Platform, error) {
 		return NewThreadsPlatform(s, config.ActiveConfig.Threads.AppID, config.ActiveConfig.Threads.AppSecret), nil
 	case models.PlatformMastodon:
 		return NewMastodonPlatform(s, config.ActiveConfig.Mastodon.InstanceURL, config.ActiveConfig.Mastodon.ClientID, config.ActiveConfig.Mastodon.ClientSecret), nil
+	case models.PlatformBluesky:
+		return NewBlueskyPlatform(s, config.ActiveConfig.Bluesky.Handle, config.ActiveConfig.Bluesky.AppPassword), nil
+	case models.PlatformReddit:
+		return NewRedditPlatform(s, config.ActiveConfig.Reddit.ClientID, config.ActiveConfig.Reddit.ClientSecret), nil
+	case models.PlatformFacebook:
+		return NewFacebookPlatform(s, config.ActiveConfig.Facebook.AppID, config.ActiveConfig.Facebook.AppSecret, config.ActiveConfig.Facebook.PageID), nil
 	default:
 		return nil, fmt.Errorf("unknown platform %q", name)
 	}

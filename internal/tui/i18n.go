@@ -183,6 +183,18 @@ var translationsMap = map[string]map[string]string{
 		"de": "Mastodon     ",
 		"en": "Mastodon     ",
 	},
+	"settings_auth_bluesky": {
+		"de": "Bluesky      ",
+		"en": "Bluesky      ",
+	},
+	"settings_auth_reddit": {
+		"de": "Reddit       ",
+		"en": "Reddit       ",
+	},
+	"settings_auth_facebook": {
+		"de": "Facebook     ",
+		"en": "Facebook     ",
+	},
 	"settings_config_export": {
 		"de": "Backup Exp.  ",
 		"en": "Backup Exp.  ",

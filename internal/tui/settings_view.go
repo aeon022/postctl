@@ -41,6 +41,9 @@ func (m Model) renderSettings() string {
 		{Tr("settings_auth_linkedin"), getPlatformStatus(models.PlatformLinkedIn), true},
 		{Tr("settings_auth_threads"), getPlatformStatus(models.PlatformThreads), true},
 		{Tr("settings_auth_mastodon"), getPlatformStatus(models.PlatformMastodon), true},
+		{Tr("settings_auth_bluesky"), getPlatformStatus(models.PlatformBluesky), true},
+		{Tr("settings_auth_reddit"), getPlatformStatus(models.PlatformReddit), true},
+		{Tr("settings_auth_facebook"), getPlatformStatus(models.PlatformFacebook), true},
 		{Tr("settings_config_export"), Tr("settings_run_action"), true},
 		{Tr("settings_config_import"), Tr("settings_run_action"), true},
 	}
@@ -85,7 +88,7 @@ func (m Model) renderSettings() string {
 			builder.WriteString("\n" + StyleHeader.Render("PLATFORM ACCOUNTS") + "\n")
 		}
 		// Einen kleinen visuellen Trenner vor Backup & Sync einfügen
-		if i == 8 {
+		if i == 11 {
 			builder.WriteString("\n" + StyleHeader.Render("BACKUP & SYNC") + "\n")
 		}
 	}

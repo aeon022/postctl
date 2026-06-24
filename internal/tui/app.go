@@ -211,6 +211,9 @@ func (m Model) loadDataCmd() tea.Msg {
 		models.PlatformLinkedIn: false,
 		models.PlatformThreads:  false,
 		models.PlatformMastodon: false,
+		models.PlatformBluesky:  false,
+		models.PlatformReddit:   false,
+		models.PlatformFacebook: false,
 	}
 	for p := range platforms {
 		_, _, _, err := m.store.GetToken(ctx, p)
@@ -290,12 +293,29 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 	
 	// Hilfetext generieren
 	var helper strings.Builder
-	if m.editorPlatform == "twitter" {
+	var limit int
+	var rulerNum, rulerLine string
+	switch m.editorPlatform {
+	case "twitter":
+		limit = 280
+		rulerNum =  " 000      030      060      090      120      150      180      210      240      270 280!\n"
+		rulerLine = " |--------|--------|--------|--------|--------|--------|--------|--------|--------|-|\n"
+	case "bluesky":
+		limit = 300
+		rulerNum =  " 000      030      060      090      120      150      180      210      240      270      300!\n"
+		rulerLine = " |--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|\n"
+	case "mastodon":
+		limit = 500
+		rulerNum =  " 000      050      100      150      200      250      300      350      400      450      500!\n"
+		rulerLine = " |--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|\n"
+	}
+
+	if limit > 0 {
 		helper.WriteString("<!--\n")
-		helper.WriteString(Tr("editor_helper_title_twitter"))
+		helper.WriteString(fmt.Sprintf(Tr("editor_helper_title_other"), strings.ToUpper(m.editorPlatform)))
 		helper.WriteString(Tr("editor_helper_ruler_twitter"))
-		helper.WriteString(" 000      030      060      090      120      150      180      210      240      270 280!\n")
-		helper.WriteString(" |--------|--------|--------|--------|--------|--------|--------|--------|--------|-|\n\n")
+		helper.WriteString(rulerNum)
+		helper.WriteString(rulerLine + "\n")
 		
 		bodyText := m.editorBody.Value()
 		if strings.Contains(bodyText, "\n---\n") {
@@ -305,7 +325,7 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 				trimmed := strings.TrimSpace(tweet)
 				runes := []rune(trimmed)
 				charCount := len(runes)
-				remaining := 280 - charCount
+				remaining := limit - charCount
 				status := "✓"
 				if remaining < 0 {
 					status = "✗ ZU LANG"
@@ -318,7 +338,7 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 		} else {
 			trimmed := strings.TrimSpace(bodyText)
 			charCount := len([]rune(trimmed))
-			remaining := 280 - charCount
+			remaining := limit - charCount
 			status := "✓"
 			if remaining < 0 {
 				status = "✗ ZU LANG"
@@ -672,17 +692,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				p := m.selectedPost
 				var targets []string
-				switch p.Platform {
-				case models.PlatformTwitter:
-					targets = []string{models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon}
-				case models.PlatformLinkedIn:
-					targets = []string{models.PlatformTwitter, models.PlatformThreads, models.PlatformMastodon}
-				case models.PlatformThreads:
-					targets = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformMastodon}
-				case models.PlatformMastodon:
-					targets = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads}
-				default:
-					targets = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon}
+				allPlats := []string{
+					models.PlatformTwitter,
+					models.PlatformLinkedIn,
+					models.PlatformThreads,
+					models.PlatformMastodon,
+					models.PlatformBluesky,
+					models.PlatformReddit,
+					models.PlatformFacebook,
+				}
+				for _, plat := range allPlats {
+					if plat != p.Platform {
+						targets = append(targets, plat)
+					}
 				}
 				m.repurposing = true
 				m.statusMessage = "KI generiert Konvertierungen..."
@@ -734,7 +756,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 4 {
-				if m.cursor >= 5 && m.cursor <= 8 {
+				if m.cursor >= 5 && m.cursor <= 11 {
 					var platName string
 					switch m.cursor {
 					case 5:
@@ -745,15 +767,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						platName = models.PlatformThreads
 					case 8:
 						platName = models.PlatformMastodon
+					case 9:
+						platName = models.PlatformBluesky
+					case 10:
+						platName = models.PlatformReddit
+					case 11:
+						platName = models.PlatformFacebook
 					}
 					m.loading = true
 					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
 					return m, m.runAuthCmd(platName)
 				}
-				if m.cursor == 9 {
+				if m.cursor == 12 {
 					return m, m.runBackupExportCmd()
 				}
-				if m.cursor == 10 {
+				if m.cursor == 13 {
 					return m, m.runBackupImportCmd()
 				}
 				m.cycleSetting()
@@ -847,7 +875,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 4: // Settings
-		return 11
+		return 14
 	default:
 		return 0
 	}
