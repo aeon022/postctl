@@ -19,6 +19,7 @@ import (
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"gopkg.in/yaml.v3"
 )
 
 // PostStats hält aggregierte Post-Statistiken
@@ -113,8 +114,12 @@ type importFinishedMsg struct {
 }
 
 type externalEditorFinishedMsg struct {
-	content string
-	err     error
+	content  string
+	platform string
+	campaign string
+	schedule string
+	images   string
+	err      error
 }
 
 type tickMsg struct{}
@@ -360,8 +365,16 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 		helper.WriteString("-->\n\n")
 	}
 
-	// Hilfetext + Aktuellen Text reinschreiben
-	if _, err := tmpFile.WriteString(helper.String() + m.editorBody.Value()); err != nil {
+	// Hilfetext + Frontmatter + Aktuellen Text reinschreiben
+	var frontmatter strings.Builder
+	frontmatter.WriteString("---\n")
+	frontmatter.WriteString(fmt.Sprintf("platform: %s\n", m.editorPlatform))
+	frontmatter.WriteString(fmt.Sprintf("campaign: %s\n", m.editorCampaign.Value()))
+	frontmatter.WriteString(fmt.Sprintf("schedule: %s\n", m.editorScheduledAt.Value()))
+	frontmatter.WriteString(fmt.Sprintf("images: %s\n", m.editorImages.Value()))
+	frontmatter.WriteString("---\n\n")
+
+	if _, err := tmpFile.WriteString(helper.String() + frontmatter.String() + m.editorBody.Value()); err != nil {
 		_ = tmpFile.Close()
 		_ = os.Remove(tmpFile.Name())
 		return func() tea.Msg {
@@ -402,8 +415,37 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 				contentStr = strings.TrimLeft(contentStr, "\r\n")
 			}
 		}
+
+		// Frontmatter parsen
+		var platform, campaign, schedule, images string
+		if strings.HasPrefix(contentStr, "---") {
+			if endIdx := strings.Index(contentStr[3:], "---"); endIdx != -1 {
+				yamlPart := contentStr[3 : endIdx+3]
+				contentStr = contentStr[endIdx+6:] // Skip ---\n
+				contentStr = strings.TrimLeft(contentStr, "\r\n")
+
+				var fm struct {
+					Platform string `yaml:"platform"`
+					Campaign string `yaml:"campaign"`
+					Schedule string `yaml:"schedule"`
+					Images   string `yaml:"images"`
+				}
+				if err := yaml.Unmarshal([]byte(yamlPart), &fm); err == nil {
+					platform = strings.TrimSpace(strings.ToLower(fm.Platform))
+					campaign = strings.TrimSpace(fm.Campaign)
+					schedule = strings.TrimSpace(fm.Schedule)
+					images = strings.TrimSpace(fm.Images)
+				}
+			}
+		}
 		
-		return externalEditorFinishedMsg{content: contentStr}
+		return externalEditorFinishedMsg{
+			content:  contentStr,
+			platform: platform,
+			campaign: campaign,
+			schedule: schedule,
+			images:   images,
+		}
 	})
 }
 
@@ -554,6 +596,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.err = fmt.Errorf("Fehler beim Bearbeiten mit externem Editor: %w", msg.err)
 		} else {
 			m.editorBody.SetValue(msg.content)
+			if msg.platform != "" {
+				m.editorPlatform = msg.platform
+			}
+			m.editorCampaign.SetValue(msg.campaign)
+			m.editorScheduledAt.SetValue(msg.schedule)
+			m.editorImages.SetValue(msg.images)
 		}
 		return m, nil
 

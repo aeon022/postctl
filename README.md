@@ -63,6 +63,52 @@ Run `./postctl tui` and navigate to the **Settings** tab:
   * CLI Commands: `./postctl config export -o backup.bin` and `./postctl config import -f backup.bin`.
 
 ---
+
+### 📝 Vim / Neovim External Editor Flow (Step-by-Step)
+
+When editing or creating a post within the TUI, you can spawn your favorite terminal text editor (like Vim or Neovim) for a rich, distraction-free editing environment.
+
+#### Step 1: Open the External Editor
+1. In the TUI, highlight or select a post and press **`e`** to open the built-in edit form.
+2. Press **`ctrl+v`** from any focused form field.
+3. The TUI will suspend itself and open Neovim/Vim (it uses your `$EDITOR` environment variable, falling back to `nvim` or `vim`).
+
+#### Step 2: Understand the Template Structure
+The temporary file opened in Vim contains three main parts:
+1. **Interactive Helper Block (`<!-- ... -->`)**:
+   - Contains a character ruler showing the maximum length for the current platform (e.g., 280 for Twitter, 300 for Bluesky, 500 for Mastodon).
+   - Shows live counts (at the time of launch) for single posts or thread segments (delimited by `---`).
+   - *Note:* This entire HTML comment block is automatically removed upon saving.
+2. **YAML Frontmatter Block**:
+   - Defined between the `---` delimiters:
+     ```yaml
+     ---
+     platform: twitter
+     campaign: launch-2026
+     schedule: 2026-06-25 15:00:00
+     images: ["logo.png"]
+     ---
+     ```
+   - **Bidirectional Sync:** You can edit these metadata values directly inside Vim! When you exit, `postctl` parses this YAML header and automatically updates the corresponding input fields back in the TUI form.
+3. **Post Body Content**:
+   - The actual content of your post starts directly below the closing `---` frontmatter delimiter.
+
+#### Step 3: Write Your Post / Thread
+- Write your post content.
+- If you are writing a thread (supported on platforms like Twitter/X), separate each post using a single line with `---`.
+- *Example:*
+  ```text
+  This is the first tweet of my thread.
+  ---
+  This is the second tweet of my thread.
+  ```
+
+#### Step 4: Save & Sync Back
+1. Save and exit the editor by typing **`:wq`** or **`:x`** (or press **`ZZ`** in normal mode).
+2. The TUI will resume instantly. The body text is updated, the helper comments are stripped, and the edited frontmatter values are synced back into the TUI fields.
+3. Review your changes in the TUI and navigate to the **`Save`** button (or press `Enter` when focused) to write the changes to the database.
+
+---
 ---
 
 ## Deutsche Version
@@ -120,3 +166,47 @@ Führe `./postctl tui` aus und wechsle in den **Settings**-Tab:
 * **Interaktiver Beitrags-Import:** In jedem Haupt-Tab (Dashboard, Posts, Schedule, History) kannst du die Taste **`i`** drücken, um einen interaktiven Import zu starten. Die TUI pausiert kurz, leert das Terminal und bittet dich um den Pfad zur Markdown-Datei oder zum Ordner. **Tipp: Du kannst die Datei oder den Ordner einfach per Drag & Drop aus dem Finder direkt in das Terminalfenster ziehen.** Das Tool entfernt automatisch störende Anführungszeichen, validiert die Beiträge/Bilder und kehrt direkt wieder zur TUI zurück.
 * **Backup & Sync:** Wähle unten im Bereich **BACKUP & SYNC** entweder `Backup Exp.` (Export) oder `Backup Imp.` (Import) und drücke **Enter**, um dein Master-Passwort einzugeben.
   * CLI-Befehle: `./postctl config export -o backup.bin` und `./postctl config import -f backup.bin`.
+
+### 📝 Vim- / Neovim-Bearbeitungsflow (Schritt für Schritt)
+
+Beim Bearbeiten oder Erstellen eines Beitrags in der TUI kannst du deinen bevorzugten Terminal-Texteditor (wie Vim oder Neovim) starten, um eine ablenkungsfreie und flexible Schreibumgebung zu nutzen.
+
+#### Schritt 1: Externen Editor öffnen
+1. Wähle in der TUI einen Beitrag aus und drücke **`e`**, um das Bearbeitungsformular zu öffnen.
+2. Drücke die Tastenkombination **`ctrl+v`** in einem beliebigen Eingabefeld.
+3. Die TUI pausiert und öffnet Neovim/Vim (das Tool nutzt die Umgebungsvariable `$EDITOR` und weicht bei Bedarf auf `nvim` oder `vim` aus).
+
+#### Schritt 2: Aufbau der Vorlage verstehen
+Die in Vim geöffnete temporäre Datei besteht aus drei Abschnitten:
+1. **Interaktiver Hilfeblock (`<!-- ... -->`)**:
+   - Zeigt ein Zeichenlineal passend zur aktuellen Plattform (z. B. 280 Zeichen für Twitter, 300 für Bluesky, 500 für Mastodon).
+   - Zeigt die Zeichenanzahl zum Zeitpunkt des Aufrufs für Einzelbeiträge oder Threads (getrennt durch `---`).
+   - *Hinweis:* Dieser HTML-Kommentarblock wird beim Speichern automatisch entfernt.
+2. **YAML-Frontmatter-Block**:
+   - Eingegrenzt durch die `---` Linien:
+     ```yaml
+     ---
+     platform: twitter
+     campaign: launch-2026
+     schedule: 2026-06-25 15:00:00
+     images: ["logo.png"]
+     ---
+     ```
+   - **Bidirektionale Synchronisierung:** Du kannst diese Metadaten direkt in Vim ändern! Nach dem Schließen parst `postctl` diesen YAML-Header und aktualisiert automatisch die Eingabefelder in der TUI.
+3. **Beitragsinhalt (Body)**:
+   - Der eigentliche Inhalt deines Beitrags beginnt direkt unter der schließenden `---`-Linie des Frontmatter-Blocks.
+
+#### Schritt 3: Beitrag oder Thread schreiben
+- Schreibe deinen gewünschten Text.
+- Wenn du einen mehrteiligen Thread verfasst (z. B. für Twitter/X), trenne die einzelnen Beiträge mit einer Zeile, die nur aus **`---`** besteht.
+- *Beispiel:*
+  ```text
+  Das ist der erste Tweet meines Threads.
+  ---
+  Das ist der zweite Tweet meines Threads.
+  ```
+
+#### Schritt 4: Speichern & Zurückkehren
+1. Speichere und schließe den Editor mit **`:wq`** oder **`:x`** (oder drücke **`ZZ`** im Normal-Modus).
+2. Die TUI wird sofort fortgesetzt. Der Textinhalt wird aktualisiert, die Hilfskommentare entfernt und die editierten Frontmatter-Metadaten werden direkt in die TUI-Formularfelder übernommen.
+3. Überprüfe die Änderungen in der TUI, navigiere auf den **`Save`**-Button und bestätige mit **`Enter`**, um den Beitrag in der Datenbank zu speichern.
