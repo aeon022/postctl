@@ -343,4 +343,12 @@ var translationsMap = map[string]map[string]string{
 		"de": " postctl Editor-Hilfe (%s)\n ==================================\n\n",
 		"en": " postctl Editor Help (%s)\n ==================================\n\n",
 	},
+	"editor_twitter_thread_note": {
+		"de": " (Nutze '---' für Thread-Teilung)",
+		"en": " (Use '---' to split into thread)",
+	},
+	"editor_help_footer": {
+		"de": "tab: Nächstes Feld  ·  shift+tab: Vorheriges Feld  ·  esc: Abbrechen  ·  ctrl+v: Neovim",
+		"en": "tab: next field  ·  shift+tab: prev field  ·  esc: cancel  ·  ctrl+v: nvim",
+	},
 }

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -233,6 +234,12 @@ func (m Model) renderEditor() string {
 	builder.WriteString(schedStyle.Render(schedLabel) + m.editorScheduledAt.View() + "\n")
 	if m.showDatePicker {
 		builder.WriteString(m.renderCalendar(m.datePickerDate) + "\n\n")
+	} else if m.editorFocus == 2 {
+		if config.ActiveConfig.Defaults.Language == "de" {
+			builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render("     (Tipp: Schreibe 'now' / 'jetzt' für sofortigen Versand oder drücke ctrl+d)") + "\n\n")
+		} else {
+			builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render("     (Tip: Type 'now' for immediate publication or press ctrl+d)") + "\n\n")
+		}
 	} else {
 		builder.WriteString("\n")
 	}
@@ -288,6 +295,8 @@ func (m Model) renderEditor() string {
 	height := 24
 	if m.showDatePicker {
 		height = 33
+	} else if m.editorFocus == 2 {
+		height = 25
 	}
 	return StyleBox.Width(78).Height(height).Render(builder.String())
 }
