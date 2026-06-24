@@ -3,6 +3,7 @@ package platforms
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -112,13 +113,125 @@ func (b *BlueskyPlatform) Auth(ctx context.Context) error {
 	return nil
 }
 
-// UploadImage lädt ein Bild auf Bluesky hoch und gibt das serialisierte Blob-JSON zurück
-func (b *BlueskyPlatform) UploadImage(ctx context.Context, path string) (string, error) {
-	token, _, _, err := b.store.GetToken(ctx, models.PlatformBluesky)
-	if err != nil {
-		return "", err
+func (b *BlueskyPlatform) getValidToken(ctx context.Context) (string, string, error) {
+	token, did, _, err := b.store.GetToken(ctx, models.PlatformBluesky)
+	if err != nil || token == "" || isJWTExpired(token) {
+		if err := b.Auth(ctx); err != nil {
+			return "", "", fmt.Errorf("failed to authenticate with bluesky: %w", err)
+		}
+		token, did, _, err = b.store.GetToken(ctx, models.PlatformBluesky)
+		if err != nil {
+			return "", "", err
+		}
+	}
+	return token, did, nil
+}
+
+func isJWTExpired(token string) bool {
+	parts := strings.Split(token, ".")
+	if len(parts) != 3 {
+		return true
 	}
 
+	payloadRaw := parts[1]
+	// Try URL-safe unpadded decoding first (standard for JWT)
+	payloadBytes, err := base64.RawURLEncoding.DecodeString(payloadRaw)
+	if err != nil {
+		// If that fails, try padded URL-safe decoding
+		if l := len(payloadRaw) % 4; l > 0 {
+			payloadRaw += strings.Repeat("=", 4-l)
+		}
+		payloadBytes, err = base64.URLEncoding.DecodeString(payloadRaw)
+		if err != nil {
+			return true
+		}
+	}
+
+	var claims struct {
+		Exp int64 `json:"exp"`
+	}
+	if err := json.Unmarshal(payloadBytes, &claims); err != nil {
+		return true
+	}
+
+	return time.Now().Unix() >= (claims.Exp - 10)
+}
+
+func (b *BlueskyPlatform) doRequest(ctx context.Context, method, apiURL string, body []byte, contentType string) (*http.Response, []byte, error) {
+	token, _, err := b.getValidToken(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	execute := func(t string) (*http.Response, []byte, error) {
+		var reqReader io.Reader
+		if body != nil {
+			reqReader = bytes.NewReader(body)
+		}
+		req, err := http.NewRequestWithContext(ctx, method, apiURL, reqReader)
+		if err != nil {
+			return nil, nil, err
+		}
+		req.Header.Set("Authorization", "Bearer "+t)
+		if contentType != "" {
+			req.Header.Set("Content-Type", contentType)
+		}
+
+		resp, err := b.client.Do(req)
+		if err != nil {
+			return nil, nil, err
+		}
+		defer resp.Body.Close()
+
+		respBody, err := io.ReadAll(resp.Body)
+		return resp, respBody, err
+	}
+
+	resp, respBody, err := execute(token)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		var errResp struct {
+			Error   string `json:"error"`
+			Message string `json:"message"`
+		}
+		_ = json.Unmarshal(respBody, &errResp)
+
+		if errResp.Error == "ExpiredToken" || strings.Contains(string(respBody), "ExpiredToken") {
+			// 1. Try to fetch the latest token from the store (in case another call refreshed it)
+			latestToken, _, _, storeErr := b.store.GetToken(ctx, models.PlatformBluesky)
+			if storeErr == nil && latestToken != "" && latestToken != token {
+				resp, respBody, err = execute(latestToken)
+				if err == nil && resp.StatusCode == http.StatusOK {
+					return resp, respBody, nil
+				}
+				_ = json.Unmarshal(respBody, &errResp)
+			}
+
+			// 2. If it's still expired or was the same, force re-authentication
+			if errResp.Error == "ExpiredToken" || strings.Contains(string(respBody), "ExpiredToken") {
+				if err := b.Auth(ctx); err != nil {
+					return nil, nil, fmt.Errorf("token expired and re-authentication failed: %w", err)
+				}
+				newToken, _, _, err := b.store.GetToken(ctx, models.PlatformBluesky)
+				if err != nil {
+					return nil, nil, fmt.Errorf("failed to get new token after re-authentication: %w", err)
+				}
+				resp, respBody, err = execute(newToken)
+				if err != nil {
+					return nil, nil, err
+				}
+			}
+		}
+	}
+
+	return resp, respBody, nil
+}
+
+// UploadImage lädt ein Bild auf Bluesky hoch und gibt das serialisierte Blob-JSON zurück
+func (b *BlueskyPlatform) UploadImage(ctx context.Context, path string) (string, error) {
 	fileBytes, err := os.ReadFile(path)
 	if err != nil {
 		return "", fmt.Errorf("read image file: %w", err)
@@ -132,22 +245,12 @@ func (b *BlueskyPlatform) UploadImage(ctx context.Context, path string) (string,
 	}
 
 	uploadURL := "https://bsky.social/xrpc/com.atproto.repo.uploadBlob"
-	req, err := http.NewRequestWithContext(ctx, "POST", uploadURL, bytes.NewReader(fileBytes))
+	resp, body, err := b.doRequest(ctx, "POST", uploadURL, fileBytes, contentType)
 	if err != nil {
 		return "", err
 	}
-
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", contentType)
-
-	resp, err := b.client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
 		return "", fmt.Errorf("blob upload failed (status %d): %s", resp.StatusCode, string(body))
 	}
 
@@ -155,7 +258,7 @@ func (b *BlueskyPlatform) UploadImage(ctx context.Context, path string) (string,
 		Blob interface{} `json:"blob"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&uploadResp); err != nil {
+	if err := json.Unmarshal(body, &uploadResp); err != nil {
 		return "", err
 	}
 
@@ -174,7 +277,7 @@ type bskyPostRef struct {
 
 // Post veröffentlicht einen einzelnen Beitrag oder einen Thread auf Bluesky
 func (b *BlueskyPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
-	token, did, _, err := b.store.GetToken(ctx, models.PlatformBluesky)
+	_, did, err := b.getValidToken(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -253,6 +356,13 @@ func (b *BlueskyPlatform) Post(ctx context.Context, post *models.Post) (string, 
 			}
 		}
 
+		if did == "" {
+			_, d, _, err := b.store.GetToken(ctx, models.PlatformBluesky)
+			if err == nil && d != "" {
+				did = d
+			}
+		}
+
 		reqBody, err := json.Marshal(map[string]interface{}{
 			"repo":       did,
 			"collection": "app.bsky.feed.post",
@@ -263,21 +373,12 @@ func (b *BlueskyPlatform) Post(ctx context.Context, post *models.Post) (string, 
 		}
 
 		postURL := "https://bsky.social/xrpc/com.atproto.repo.createRecord"
-		req, err := http.NewRequestWithContext(ctx, "POST", postURL, bytes.NewReader(reqBody))
+		resp, body, err := b.doRequest(ctx, "POST", postURL, reqBody, "application/json")
 		if err != nil {
 			return "", err
 		}
-		req.Header.Set("Authorization", "Bearer "+token)
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, err := b.client.Do(req)
-		if err != nil {
-			return "", err
-		}
-		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
-			body, _ := io.ReadAll(resp.Body)
 			return "", fmt.Errorf("create record status item %d failed (status %d): %s", i+1, resp.StatusCode, string(body))
 		}
 
@@ -286,7 +387,7 @@ func (b *BlueskyPlatform) Post(ctx context.Context, post *models.Post) (string, 
 			CID string `json:"cid"`
 		}
 
-		if err := json.NewDecoder(resp.Body).Decode(&createResp); err != nil {
+		if err := json.Unmarshal(body, &createResp); err != nil {
 			return "", err
 		}
 
@@ -307,27 +408,15 @@ func (b *BlueskyPlatform) Post(ctx context.Context, post *models.Post) (string, 
 
 // FetchAnalytics frägt Interaktionen über den com.atproto/app.bsky Thread-Endpoint ab
 func (b *BlueskyPlatform) FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error) {
-	token, _, _, err := b.store.GetToken(ctx, models.PlatformBluesky)
-	if err != nil {
-		return models.AnalyticsData{}, err
-	}
-
 	// platformID ist der URI-String, z.B. at://did:plc:xxx/app.bsky.feed.post/yyy
 	threadURL := fmt.Sprintf("https://bsky.social/xrpc/app.bsky.feed.getPostThread?uri=%s", url.QueryEscape(platformID))
-	req, err := http.NewRequestWithContext(ctx, "GET", threadURL, nil)
+	resp, body, err := b.doRequest(ctx, "GET", threadURL, nil, "")
 	if err != nil {
 		return models.AnalyticsData{}, err
 	}
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	resp, err := b.client.Do(req)
-	if err != nil {
-		return models.AnalyticsData{}, err
-	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return models.AnalyticsData{}, fmt.Errorf("fetch post thread returned status %d", resp.StatusCode)
+		return models.AnalyticsData{}, fmt.Errorf("fetch post thread returned status %d: %s", resp.StatusCode, string(body))
 	}
 
 	var threadResp struct {
@@ -340,7 +429,7 @@ func (b *BlueskyPlatform) FetchAnalytics(ctx context.Context, platformID string)
 		} `json:"thread"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&threadResp); err != nil {
+	if err := json.Unmarshal(body, &threadResp); err != nil {
 		return models.AnalyticsData{}, err
 	}
 
