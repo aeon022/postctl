@@ -1,0 +1,1218 @@
+---
+import Layout from '../layouts/Layout.astro';
+import * as ReadmeDoc from '../../README.md';
+import * as TwitterDoc from '../../docs/api-twitter.md';
+import * as LinkedinDoc from '../../docs/api-linkedin.md';
+import * as ThreadsDoc from '../../docs/api-threads.md';
+import * as SpecDoc from '../../documents/SPEC.md';
+import * as TutorialDoc from '../../documents/TUTORIAL.md';
+---
+
+<Layout title="postctl Docs — Terminal-Native Social Media Management">
+	<!-- Decorative Grid & Glow Background -->
+	<div class="bg-glow bg-glow-1"></div>
+	<div class="bg-glow bg-glow-2"></div>
+	<div class="grid-overlay"></div>
+
+	<!-- Navigation Header -->
+	<header class="header">
+		<div class="header-capsule">
+			<div class="logo">
+				<a href="/" class="logo-link">
+					<span class="logo-icon">&gt;_</span>
+					<span class="logo-text">postctl<span class="logo-blink">_</span></span>
+				</a>
+				<span class="system-status"><span class="status-dot"></span>DOCS_ONLINE</span>
+			</div>
+			<nav class="nav">
+				<a href="/" class="nav-link">Home</a>
+				<a href="/#features" class="nav-link">Features</a>
+				<a href="/#tui-demo" class="nav-link">TUI Demo</a>
+				<a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="nav-link github-link">
+					<svg height="14" viewBox="0 0 16 16" width="14" class="github-icon"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+					<span>src_code</span>
+				</a>
+			</nav>
+		</div>
+	</header>
+
+	<!-- Main Documentation Container -->
+	<div class="docs-wrapper">
+		<!-- Mobile Toggle Header -->
+		<div class="mobile-docs-bar">
+			<button class="menu-toggle-btn" id="sidebar-toggle" aria-label="Toggle Navigation">
+				<svg class="menu-icon" viewBox="0 0 24 24" width="20" height="20">
+					<line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+					<line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+					<line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+				</svg>
+				<span>Table of Contents</span>
+			</button>
+			<div class="mobile-doc-title">Introduction</div>
+		</div>
+
+		<div class="container docs-layout">
+			<!-- Left Sidebar: Menu Navigation -->
+			<aside class="docs-sidebar" id="docs-sidebar">
+				<div class="sidebar-search">
+					<div class="search-input-wrapper">
+						<span class="search-icon">🔍</span>
+						<input type="text" id="docs-search" placeholder="Filter documentation..." autocomplete="off" />
+						<button id="search-clear" class="search-clear-btn" aria-label="Clear Filter">×</button>
+					</div>
+				</div>
+
+				<nav class="sidebar-nav">
+					<div class="nav-group" data-group="getting-started">
+						<h4 class="group-title">Getting Started</h4>
+						<ul class="group-list">
+							<li><button class="nav-item active" data-doc="introduction">Introduction</button></li>
+							<li><button class="nav-item" data-doc="installation">Installation & Setup</button></li>
+						</ul>
+					</div>
+
+					<div class="nav-group" data-group="user-guides">
+						<h4 class="group-title">User Guides</h4>
+						<ul class="group-list">
+							<li><button class="nav-item" data-doc="vim-flow">Vim / Neovim Editor</button></li>
+							<li><button class="nav-item" data-doc="image-resolution">Image Path Resolution</button></li>
+						</ul>
+					</div>
+
+					<div class="nav-group" data-group="api-integrations">
+						<h4 class="group-title">API Integrations</h4>
+						<ul class="group-list">
+							<li><button class="nav-item" data-doc="api-twitter">Twitter / X</button></li>
+							<li><button class="nav-item" data-doc="api-linkedin">LinkedIn (OIDC)</button></li>
+							<li><button class="nav-item" data-doc="api-threads">Threads (Meta)</button></li>
+							<li><button class="nav-item" data-doc="api-bluesky-mastodon">Bluesky & Mastodon</button></li>
+							<li><button class="nav-item" data-doc="api-reddit-facebook">Reddit & Facebook</button></li>
+						</ul>
+					</div>
+
+					<div class="nav-group" data-group="technical-specs">
+						<h4 class="group-title">Architecture & Code</h4>
+						<ul class="group-list">
+							<li><button class="nav-item" data-doc="system-spec">System Specification</button></li>
+							<li><button class="nav-item" data-doc="go-tutorial">Go Tutorial Guide</button></li>
+						</ul>
+					</div>
+				</nav>
+			</aside>
+
+			<!-- Center Pane: Rendered Documentation -->
+			<main class="docs-content">
+				<!-- Tab 1: Introduction -->
+				<section class="doc-section active" id="doc-introduction">
+					<div class="doc-body markdown-content">
+						<ReadmeDoc.Content />
+					</div>
+				</section>
+
+				<!-- Tab 2: Installation -->
+				<section class="doc-section" id="doc-installation">
+					<div class="doc-body markdown-content">
+						<h1>Installation & Setup Guide</h1>
+						<p>Get started with <code>postctl</code> by building the binary and initializing your local developer workspace.</p>
+						
+						<h2>System Requirements</h2>
+						<ul>
+							<li><strong>Operating System:</strong> macOS, Linux, or Windows (WSL recommended).</li>
+							<li><strong>Go Toolchain:</strong> Go 1.22 or higher installed on your system.</li>
+							<li><strong>SQLite:</strong> Local SQLite client library (CGO-free driver is compiled directly inside).</li>
+						</ul>
+
+						<h2>One-Step Automatic setup</h2>
+						<p>The easiest way to initialize the application, databases, and dependencies is to run the interactive setup script:</p>
+						<pre class="code-block" data-lang="bash"><code>chmod +x setup.sh
+./setup.sh</code></pre>
+						<p>The setup script will:</p>
+						<ol>
+							<li>Verify your local Go environment.</li>
+							<li>Download required packages (including Bubble Tea, Cobra, and SQLite).</li>
+							<li>Build the production binary <code>postctl</code>.</li>
+							<li>Create the configuration directory at <code>~/.config/postctl/</code>.</li>
+							<li>Generate a default <code>config.yaml</code> and empty SQLite database.</li>
+						</ol>
+
+						<h2>Manual Compilation</h2>
+						<p>If you prefer to compile the application manually, run:</p>
+						<pre class="code-block" data-lang="bash"><code># Download dependencies
+go mod download
+
+# Build binary with embedded assets
+go build -o postctl main.go
+
+# Run help command to verify
+./postctl --help</code></pre>
+
+						<h2>Configuration Directory</h2>
+						<p>The application creates and expects files in the user config directory: <code>~/.config/postctl/</code></p>
+						<ul>
+							<li><code>config.yaml</code>: Holds all your global default preferences, AI configurations, and platform API credentials.</li>
+							<li><code>postctl.db</code>: The local SQLite database housing campaigns, post statuses, histories, and encrypted credentials.</li>
+						</ul>
+					</div>
+				</section>
+
+				<!-- Tab 3: Vim Flow -->
+				<section class="doc-section" id="doc-vim-flow">
+					<div class="doc-body markdown-content">
+						<h1>📝 Vim / Neovim External Editor Flow</h1>
+						<p>Inside the interactive Terminal UI, you can spawn your terminal-native text editor (like Neovim or Vim) to edit post text, adjust templates, or modify metadata on the fly.</p>
+						
+						<div class="callout tip">
+							<strong>Did you know?</strong> Any changes to metadata inside the YAML block in Vim will sync back into your TUI fields automatically.
+						</div>
+
+						<h2>How to trigger the Editor</h2>
+						<ol>
+							<li>Start the TUI dashboard: <code>./postctl tui</code></li>
+							<li>Navigate to a post or campaign and press <strong><code>e</code></strong> to open the edit form.</li>
+							<li>While focused on the body or any text input field, press <strong><code>ctrl+v</code></strong>.</li>
+							<li>The TUI process suspends, and your terminal launches your configured editor (reads <code>$EDITOR</code>, falling back to <code>nvim</code> or <code>vim</code>).</li>
+						</ol>
+
+						<h2>The Template File Structure</h2>
+						<p>Vim opens a temporary file formatted as Markdown. It contains three distinct blocks:</p>
+
+						<h3>1. Interactive Helper Block (HTML Comments)</h3>
+						<pre class="code-block" data-lang="markdown"><code>&lt;!--
+ postctl Editor Help (TWITTER)
+ ==================================
+ [Character Ruler (Max 280 characters per tweet)]
+ 000      030      060      090      120      150      180      210      240      270 280!
+ |--------|--------|--------|--------|--------|--------|--------|--------|--------|-|
+ 
+ Current Thread Status:
+   Tweet 1: 220 chars (60 remaining) [✓]
+   Tweet 2: 110 chars (170 remaining) [✓]
+
+ NOTE: This helper block will be stripped out automatically upon save.
+ Write your post content below this comment:
+--&gt;</code></pre>
+						<p>This block updates dynamically according to your target platform limits (280 for Twitter, 300 for Bluesky, 500 for Mastodon). It is stripped out automatically when saving.</p>
+
+						<h3>2. YAML Frontmatter Block</h3>
+						<pre class="code-block" data-lang="yaml"><code>---
+platform: twitter
+campaign: launch-2026
+schedule: 2026-06-25 15:00:00
+images: ["logo.png"]
+---</code></pre>
+						<p><strong>Bidirectional Syncing:</strong> You can edit these values inside Vim. Changing the campaign name, target platform, schedule timestamp, or image list updates the TUI form fields immediately upon return.</p>
+
+						<h3>3. Content Body</h3>
+						<p>The post body begins after the closing <code>---</code> frontmatter delimiter. Write your post in standard Markdown.</p>
+						<p>For multi-post threads, separate each section using a line containing only <code>---</code>.</p>
+					</div>
+				</section>
+
+				<!-- Tab 4: Image Resolution -->
+				<section class="doc-section" id="doc-image-resolution">
+					<div class="doc-body markdown-content">
+						<h1>🖼️ Image Path Resolution & Platform Uploads</h1>
+						<p>Manage and attach media assets seamlessly using local file references.</p>
+
+						<h2>How Image Paths Are Resolved</h2>
+						<p>When you reference a file name or path in your post frontmatter (e.g. <code>images: ["dashboard-screenshot.png"]</code>), <code>postctl</code> executes a fallback search in the following sequence:</p>
+						<ol>
+							<li><strong>Absolute Path Check:</strong> Is it a literal path on your system? (e.g. <code>/Users/user/Pictures/screenshot.png</code>)</li>
+							<li><strong>Relative to Markdown Document:</strong> If you imported a file from <code>/code/posts/announcement.md</code>, it checks <code>/code/posts/dashboard-screenshot.png</code>.</li>
+							<li><strong>Current Working Directory (CWD):</strong> Checks the folder where you launched the <code>postctl</code> command.</li>
+							<li><strong>Global Default Image Directory:</strong> Checks the directory specified by <code>defaults.image_dir</code> in your <code>~/.config/postctl/config.yaml</code> file.</li>
+						</ol>
+
+						<h2>Platform-Specific Upload Behavior</h2>
+						<p>Each platform API handles media uploads differently, which is automatically abstracted by the driver layers:</p>
+						<ul>
+							<li><strong>LinkedIn (Native Hosting):</strong> Images are uploaded as raw binary assets to LinkedIn. The API registers the upload, performs a <code>PUT</code>, and links the resulting URN (e.g., <code>urn:li:digitalmediaAsset:...</code>) to your post.</li>
+							<li><strong>Twitter / X (Native Hosting):</strong> Images are uploaded to the Twitter v1.1 Media Upload endpoint to obtain a <code>media_id</code>, which is attached to the v2 tweet.</li>
+							<li><strong>Mastodon / Bluesky (Native):</strong> Media files are uploaded to platform attachment endpoints (or blob records for Bluesky AT Protocol) and linked to the status.</li>
+							<li><strong>Threads (Meta HTTPS Requirement):</strong> The Threads API does not allow binary local uploads. Instead, it expects a public HTTPS URL (e.g. <code>https://yourdomain.com/assets/screenshot.png</code>) from which the Meta crawler fetches the image. If publishing to Threads, host your images on an external cloud (S3, R2, Imgur) and reference that HTTPS URL in the frontmatter.</li>
+						</ul>
+					</div>
+				</section>
+
+				<!-- Tab 5: Twitter / X Setup -->
+				<section class="doc-section" id="doc-api-twitter">
+					<div class="doc-body markdown-content">
+						<TwitterDoc.Content />
+					</div>
+				</section>
+
+				<!-- Tab 6: LinkedIn Setup -->
+				<section class="doc-section" id="doc-api-linkedin">
+					<div class="doc-body markdown-content">
+						<LinkedinDoc.Content />
+					</div>
+				</section>
+
+				<!-- Tab 7: Threads Setup -->
+				<section class="doc-section" id="doc-api-threads">
+					<div class="doc-body markdown-content">
+						<ThreadsDoc.Content />
+					</div>
+				</section>
+
+				<!-- Tab 8: Bluesky & Mastodon Setup -->
+				<section class="doc-section" id="doc-api-bluesky-mastodon">
+					<div class="doc-body markdown-content">
+						<h1>🦋 Bluesky & Mastodon Setup Guide</h1>
+						<p>Learn how to connect <code>postctl</code> to Bluesky (via the AT Protocol) and Mastodon instances.</p>
+
+						<h2>1. Bluesky Integration</h2>
+						<p>Bluesky uses the decentralized AT Protocol. Instead of complex OAuth, it uses secure App Passwords.</p>
+						
+						<h3>Step A: Create an App Password</h3>
+						<ol>
+							<li>Log in to your Bluesky account in your browser.</li>
+							<li>Go to <strong>Settings</strong> ➔ <strong>App Passwords</strong>.</li>
+							<li>Click <strong>Create App Password</strong>, give it a name (e.g. <code>postctl-cli</code>), and copy the generated password (usually looks like <code>xxxx-xxxx-xxxx-xxxx</code>).</li>
+						</ol>
+
+						<h3>Step B: Configure postctl</h3>
+						<p>Configure your handle and app password:</p>
+						<pre class="code-block" data-lang="bash"><code># Configure handle
+./postctl config set bluesky.handle "yourname.bsky.social"
+
+# Configure app password
+./postctl config set bluesky.app_password "xxxx-xxxx-xxxx-xxxx"</code></pre>
+
+						<h3>Step C: Authenticate</h3>
+						<pre class="code-block" data-lang="bash"><code>./postctl auth bluesky</code></pre>
+						<p>The CLI will test the connection, fetch your profile, and save the session tokens in your SQLite database. Bluesky posts support up to <strong>300 characters</strong>.</p>
+
+						<hr />
+
+						<h2>2. Mastodon Integration</h2>
+						<p>Mastodon supports federated instances and uses client credentials registration per instance.</p>
+						
+						<h3>Step A: Configure Instance URL</h3>
+						<p>By default, <code>postctl</code> connects to <code>https://mastodon.social</code>. If you are on a different instance, configure it first:</p>
+						<pre class="code-block" data-lang="bash"><code>./postctl config set mastodon.instance_url "https://fosstodon.org"</code></pre>
+
+						<h3>Step B: Authenticate</h3>
+						<p>Run the login workflow:</p>
+						<pre class="code-block" data-lang="bash"><code>./postctl auth mastodon</code></pre>
+						<ol>
+							<li>The CLI checks if a client application exists on that instance. If not, it registers a new app named <code>postctl</code> on your instance automatically.</li>
+							<li>A browser window will open, prompting you to authorize the app.</li>
+							<li>Log in and click <strong>Authorize</strong>.</li>
+							<li>The tokens are retrieved and securely stored in your local DB. Mastodon posts support up to <strong>500 characters</strong>.</li>
+						</ol>
+					</div>
+				</section>
+
+				<!-- Tab 9: Reddit & Facebook Setup -->
+				<section class="doc-section" id="doc-api-reddit-facebook">
+					<div class="doc-body markdown-content">
+						<h1>🤖 Reddit & Facebook Setup Guide</h1>
+						<p>Configure automated publication to Reddit subreddits and Facebook business/creator Pages.</p>
+
+						<h2>1. Reddit Integration</h2>
+						<p>Reddit postings require creating an OAuth application in your account preferences.</p>
+
+						<h3>Step A: Create Reddit Script App</h3>
+						<ol>
+							<li>Go to <a href="https://www.reddit.com/prefs/apps" target="_blank" rel="noopener noreferrer">Reddit App Preferences</a>.</li>
+							<li>Scroll to the bottom and click <strong>Create Another App...</strong>.</li>
+							<li>Fill in the fields:
+								<ul>
+									<li><strong>Name:</strong> <code>postctl-publisher</code></li>
+									<li><strong>App Type:</strong> Select the radio button for <strong>personal use script</strong>.</li>
+									<li><strong>Description:</strong> Terminal publisher CLI.</li>
+									<li><strong>Redirect URI:</strong> <code>http://localhost:8753/callback</code></li>
+								</ul>
+							</li>
+							<li>Click <strong>Create App</strong>.</li>
+							<li>Copy the Client ID (shown in bold text under the app title "personal use script") and the Client Secret (listed as "secret").</li>
+						</ol>
+
+						<h3>Step B: Save Preferences</h3>
+						<pre class="code-block" data-lang="bash"><code>./postctl config set reddit.client_id "YOUR_REDDIT_CLIENT_ID"
+./postctl config set reddit.client_secret "YOUR_REDDIT_CLIENT_SECRET"</code></pre>
+
+						<h3>Step C: Connect</h3>
+						<pre class="code-block" data-lang="bash"><code>./postctl auth reddit</code></pre>
+						<p>A browser window will open. Click <strong>Allow</strong>. In your frontmatter, map campaigns to specific subreddits using the <code>campaign</code> key or custom fields.</p>
+
+						<hr />
+
+						<h2>2. Facebook Integration</h2>
+						<p>Facebook posts are pushed directly to Business/Creator Pages using Meta Graph API tokens.</p>
+
+						<h3>Step A: Create App on Meta Portal</h3>
+						<ol>
+							<li>Go to the <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer">Meta Developer Portal</a>.</li>
+							<li>Create an app of type <strong>Business</strong> or <strong>Other</strong>.</li>
+							<li>Configure the OAuth Redirect URL: <code>http://localhost:8753/callback</code></li>
+							<li>Go to Settings ➔ Basic and copy your <strong>App ID</strong> and <strong>App Secret</strong>.</li>
+							<li>Identify the target Facebook Page ID (found in your Facebook Page "About" info).</li>
+						</ol>
+
+						<h3>Step B: Save to Configuration</h3>
+						<pre class="code-block" data-lang="bash"><code>./postctl config set facebook.app_id "YOUR_FB_APP_ID"
+./postctl config set facebook.app_secret "YOUR_FB_APP_SECRET"
+./postctl config set facebook.page_id "YOUR_FB_PAGE_ID"</code></pre>
+
+						<h3>Step C: Run Authentication</h3>
+						<pre class="code-block" data-lang="bash"><code>./postctl auth facebook</code></pre>
+						<p>Accept the prompt to authorize managing and publishing pages. The access token is exchanged for a permanent page access token and saved securely.</p>
+					</div>
+				</section>
+
+				<!-- Tab 10: System Spec -->
+				<section class="doc-section" id="doc-system-spec">
+					<div class="doc-body markdown-content">
+						<SpecDoc.Content />
+					</div>
+				</section>
+
+				<!-- Tab 11: Go Tutorial -->
+				<section class="doc-section" id="doc-go-tutorial">
+					<div class="doc-body markdown-content">
+						<TutorialDoc.Content />
+					</div>
+				</section>
+			</main>
+
+			<!-- Right Sidebar: On This Page -->
+			<aside class="docs-outline" id="docs-outline">
+				<div class="outline-container">
+					<h4 class="outline-title">On this page</h4>
+					<ul class="outline-list" id="toc-list">
+						<!-- Populated via Javascript -->
+					</ul>
+				</div>
+			</aside>
+		</div>
+	</div>
+
+	<!-- Back to Top Button -->
+	<button id="back-to-top" class="back-to-top" aria-label="Scroll back to top">↑</button>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<div class="container footer-container">
+			<div class="footer-left">
+				<span class="footer-logo">&gt;_ postctl</span>
+				<span class="footer-copyright">© 2026 gerwinweiher. Built for developer workflows.</span>
+			</div>
+			<div class="footer-right">
+				<a href="/" class="footer-link">Home</a>
+				<a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a>
+				<a href="https://polar.sh/aeon022/donate" target="_blank" rel="noopener noreferrer" class="footer-link">Donate</a>
+			</div>
+		</div>
+	</footer>
+</Layout>
+
+<style is:global>
+	/* Docs Page Layout Styling */
+	.docs-wrapper {
+		padding-top: 100px; /* Header spacing */
+		min-height: calc(100vh - 120px);
+		display: flex;
+		flex-direction: column;
+	}
+
+	.docs-layout {
+		display: grid;
+		grid-template-columns: 280px 1fr 240px;
+		gap: 3rem;
+		align-items: start;
+		padding-top: 2rem;
+		padding-bottom: 5rem;
+		position: relative;
+	}
+
+	/* Left Sidebar styling */
+	.docs-sidebar {
+		position: sticky;
+		top: 110px;
+		max-height: calc(100vh - 140px);
+		overflow-y: auto;
+		padding-right: 1.5rem;
+		scrollbar-width: thin;
+		z-index: 10;
+		border-right: 1px solid var(--border);
+	}
+
+	.sidebar-search {
+		margin-bottom: 1.5rem;
+	}
+
+	.search-input-wrapper {
+		position: relative;
+		display: flex;
+		align-items: center;
+	}
+
+	.search-icon {
+		position: absolute;
+		left: 12px;
+		font-size: 0.9rem;
+		color: var(--text-muted);
+	}
+
+	#docs-search {
+		width: 100%;
+		background: var(--bg-secondary);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		padding: 0.6rem 2.2rem 0.6rem 2.2rem;
+		font-family: var(--font-body);
+		color: var(--text-primary);
+		font-size: 0.9rem;
+		transition: var(--transition);
+	}
+
+	#docs-search:focus {
+		outline: none;
+		border-color: var(--accent);
+		box-shadow: 0 0 10px var(--accent-glow);
+	}
+
+	.search-clear-btn {
+		position: absolute;
+		right: 12px;
+		background: none;
+		border: none;
+		color: var(--text-muted);
+		font-size: 1.2rem;
+		cursor: pointer;
+		display: none;
+	}
+
+	.search-clear-btn.visible {
+		display: block;
+	}
+
+	.search-clear-btn:hover {
+		color: var(--text-primary);
+	}
+
+	.sidebar-nav {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.group-title {
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--accent);
+		font-weight: 700;
+		margin-bottom: 0.75rem;
+	}
+
+	.group-list {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.nav-item {
+		width: 100%;
+		text-align: left;
+		background: none;
+		border: none;
+		font-family: var(--font-body);
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+		padding: 0.4rem 0.8rem;
+		border-radius: 6px;
+		cursor: pointer;
+		transition: var(--transition);
+		display: block;
+		border-left: 2px solid transparent;
+	}
+
+	.nav-item:hover {
+		color: var(--text-primary);
+		background: rgba(255, 255, 255, 0.03);
+	}
+
+	.nav-item.active {
+		color: var(--text-primary);
+		background: rgba(139, 124, 248, 0.08);
+		border-left-color: var(--accent);
+		font-weight: 500;
+	}
+
+	.nav-group.hide {
+		display: none;
+	}
+
+	.nav-item.hide {
+		display: none;
+	}
+
+	/* Right Sidebar (ToC) styling */
+	.docs-outline {
+		position: sticky;
+		top: 110px;
+		max-height: calc(100vh - 140px);
+		overflow-y: auto;
+		padding-left: 1.5rem;
+		border-left: 1px solid var(--border);
+	}
+
+	.outline-title {
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--text-muted);
+		font-weight: 700;
+		margin-bottom: 0.75rem;
+	}
+
+	.outline-list {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.outline-link {
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+		transition: var(--transition);
+		display: block;
+		cursor: pointer;
+	}
+
+	.outline-link:hover {
+		color: var(--text-primary);
+	}
+
+	.outline-link.active {
+		color: var(--accent);
+		font-weight: 500;
+	}
+
+	.outline-link.indent-3 {
+		padding-left: 0.75rem;
+		font-size: 0.8rem;
+		color: var(--text-muted);
+	}
+
+	/* Center Content Area */
+	.docs-content {
+		min-width: 0;
+	}
+
+	.doc-section {
+		display: none;
+	}
+
+	.doc-section.active {
+		display: block;
+		animation: fadeIn 0.25s ease-out;
+	}
+
+	@keyframes fadeIn {
+		from { opacity: 0; transform: translateY(5px); }
+		to { opacity: 1; transform: translateY(0); }
+	}
+
+	/* Markdown Content Styling */
+	.markdown-content h1 {
+		font-size: 2.25rem;
+		line-height: 1.25;
+		margin-bottom: 1.5rem;
+		font-family: var(--font-heading);
+		font-weight: 700;
+		color: var(--text-primary);
+		letter-spacing: -0.02em;
+	}
+
+	.markdown-content h2 {
+		font-size: 1.5rem;
+		line-height: 1.35;
+		margin-top: 2.5rem;
+		margin-bottom: 1rem;
+		padding-bottom: 0.4rem;
+		border-bottom: 1px solid var(--border);
+		color: var(--text-primary);
+	}
+
+	.markdown-content h3 {
+		font-size: 1.15rem;
+		line-height: 1.4;
+		margin-top: 1.8rem;
+		margin-bottom: 0.75rem;
+		color: var(--text-primary);
+	}
+
+	.markdown-content p {
+		margin-bottom: 1.2rem;
+		color: var(--text-secondary);
+		line-height: 1.7;
+	}
+
+	.markdown-content ul, .markdown-content ol {
+		margin-bottom: 1.2rem;
+		padding-left: 1.5rem;
+		color: var(--text-secondary);
+	}
+
+	.markdown-content li {
+		margin-bottom: 0.4rem;
+		line-height: 1.6;
+	}
+
+	.markdown-content code {
+		font-family: var(--font-mono);
+		font-size: 0.85em;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid var(--border);
+		padding: 0.15rem 0.35rem;
+		border-radius: 4px;
+		color: #e5c07b; /* Subtle golden tint for code snippets */
+	}
+
+	/* Enhance code pre blocks as terminal lookalikes */
+	.markdown-content pre {
+		position: relative;
+		margin: 1.5rem 0;
+		padding: 1.25rem;
+		background: #0f1015;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		overflow-x: auto;
+		scrollbar-width: thin;
+	}
+
+	.markdown-content pre code {
+		background: none;
+		border: none;
+		padding: 0;
+		color: #abb2bf; /* standard code editor theme */
+		font-size: 0.85rem;
+		line-height: 1.5;
+	}
+
+	.markdown-content a {
+		color: var(--accent);
+		border-bottom: 1px dashed var(--accent);
+		padding-bottom: 1px;
+	}
+
+	.markdown-content a:hover {
+		color: var(--accent-hover);
+		border-bottom-style: solid;
+	}
+
+	/* Alert callouts standard */
+	.markdown-content blockquote {
+		margin: 1.5rem 0;
+		padding: 1rem 1.25rem;
+		border-left: 4px solid var(--border);
+		background: rgba(255, 255, 255, 0.02);
+		border-radius: 0 8px 8px 0;
+	}
+
+	.markdown-content blockquote p {
+		margin-bottom: 0;
+		color: var(--text-secondary);
+	}
+
+	/* Custom callouts */
+	.callout {
+		margin: 1.5rem 0;
+		padding: 1rem 1.25rem;
+		border-left: 4px solid;
+		border-radius: 0 8px 8px 0;
+	}
+
+	.callout.tip {
+		border-color: var(--accent);
+		background: rgba(139, 124, 248, 0.05);
+	}
+
+	.callout.warning, .callout.important {
+		border-color: var(--error);
+		background: rgba(239, 68, 68, 0.05);
+	}
+
+	.callout.note {
+		border-color: var(--success);
+		background: rgba(16, 185, 129, 0.05);
+	}
+
+	/* Terminal window decorative decorations */
+	.terminal-wrapper {
+		position: relative;
+		margin: 1.5rem 0;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		background: #0f1015;
+		overflow: hidden;
+		box-shadow: var(--shadow-md);
+	}
+
+	.terminal-decor-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.6rem 1rem;
+		background: #14161f;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.terminal-decor-dots {
+		display: flex;
+		gap: 6px;
+	}
+
+	.terminal-decor-dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+	}
+
+	.terminal-decor-dot.red { background: #ff5f56; }
+	.terminal-decor-dot.yellow { background: #ffbd2e; }
+	.terminal-decor-dot.green { background: #27c93f; }
+
+	.terminal-decor-title {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		color: var(--text-muted);
+	}
+
+	.terminal-copy-btn {
+		background: none;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		color: var(--text-muted);
+		font-size: 0.75rem;
+		padding: 0.2rem 0.5rem;
+		border-radius: 4px;
+		cursor: pointer;
+		font-family: var(--font-body);
+		transition: var(--transition);
+	}
+
+	.terminal-copy-btn:hover {
+		color: var(--text-primary);
+		border-color: rgba(255, 255, 255, 0.25);
+		background: rgba(255, 255, 255, 0.02);
+	}
+
+	.terminal-wrapper pre {
+		margin: 0;
+		border: none;
+		border-radius: 0;
+		background: none;
+	}
+
+	/* Mobile Docs Top Bar */
+	.mobile-docs-bar {
+		display: none;
+		position: sticky;
+		top: 80px;
+		left: 0;
+		width: 100%;
+		background: rgba(8, 9, 11, 0.95);
+		backdrop-filter: blur(12px);
+		border-bottom: 1px solid var(--border);
+		padding: 0.75rem 1.5rem;
+		z-index: 50;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.menu-toggle-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid var(--border);
+		color: var(--text-primary);
+		padding: 0.4rem 0.8rem;
+		border-radius: 6px;
+		font-size: 0.85rem;
+		cursor: pointer;
+	}
+
+	.mobile-doc-title {
+		font-family: var(--font-heading);
+		font-weight: 600;
+		font-size: 0.95rem;
+		color: var(--text-primary);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	/* Scroll to top button */
+	.back-to-top {
+		position: fixed;
+		bottom: 2rem;
+		right: 2rem;
+		background: var(--bg-tertiary);
+		border: 1px solid var(--border);
+		color: var(--text-primary);
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		font-size: 1.2rem;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		visibility: hidden;
+		transition: var(--transition);
+		z-index: 100;
+		box-shadow: var(--shadow-md);
+	}
+
+	.back-to-top.visible {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	.back-to-top:hover {
+		border-color: var(--accent);
+		background: var(--accent);
+		color: #fff;
+		transform: translateY(-2px);
+	}
+
+	/* Responsive breakpoints */
+	@media (max-width: 1024px) {
+		.docs-layout {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+		}
+
+		.docs-outline {
+			display: none;
+		}
+
+		.mobile-docs-bar {
+			display: flex;
+		}
+
+		.docs-sidebar {
+			position: fixed;
+			top: 130px;
+			left: -280px;
+			width: 280px;
+			height: calc(100vh - 130px);
+			background: var(--bg-primary);
+			border-right: 1px solid var(--border);
+			padding: 1.5rem;
+			z-index: 40;
+			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		.docs-sidebar.open {
+			transform: translateX(280px);
+		}
+
+		.docs-wrapper {
+			padding-top: 80px;
+		}
+	}
+</style>
+
+<script>
+	// Handle client side logic for active documents, sidebar filtering, and dynamic table of contents.
+	document.addEventListener("DOMContentLoaded", () => {
+		const navItems = document.querySelectorAll(".nav-item");
+		const docSections = document.querySelectorAll(".doc-section");
+		const tocList = document.getElementById("toc-list");
+		const sidebar = document.getElementById("docs-sidebar");
+		const sidebarToggleBtn = document.getElementById("sidebar-toggle");
+		const mobileDocTitle = document.querySelector(".mobile-doc-title");
+
+		// --- 1. Navigation / Tab Switching ---
+		function showDoc(docId) {
+			// Remove active class from buttons & sections
+			navItems.forEach(item => {
+				if (item.getAttribute("data-doc") === docId) {
+					item.classList.add("active");
+					// Update mobile title
+					if (mobileDocTitle) {
+						mobileDocTitle.textContent = item.textContent;
+					}
+				} else {
+					item.classList.remove("active");
+				}
+			});
+
+			docSections.forEach(section => {
+				if (section.id === `doc-${docId}`) {
+					section.classList.add("active");
+					// Regenerate Table of Contents
+					generateTOC(section);
+				} else {
+					section.classList.remove("active");
+				}
+			});
+
+			// On mobile, close sidebar automatically
+			if (sidebar && sidebar.classList.contains("open")) {
+				sidebar.classList.remove("open");
+			}
+
+			// Scroll back to top of document content
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		}
+
+		// Initial document load by Hash or default to introduction
+		function loadInitialDoc() {
+			const hash = window.location.hash.substring(1);
+			const validDocs = Array.from(navItems).map(item => item.getAttribute("data-doc"));
+			if (hash && validDocs.includes(hash)) {
+				showDoc(hash);
+			} else {
+				showDoc("introduction");
+			}
+		}
+
+		// Setup event listeners for sidebar click
+		navItems.forEach(item => {
+			item.addEventListener("click", () => {
+				const docId = item.getAttribute("data-doc");
+				if (docId) {
+					window.location.hash = docId;
+					showDoc(docId);
+				}
+			});
+		});
+
+		// Listen to hash change
+		window.addEventListener("hashchange", () => {
+			const hash = window.location.hash.substring(1);
+			if (hash) {
+				const docButton = document.querySelector(`.nav-item[data-doc="${hash}"]`);
+				if (docButton) {
+					showDoc(hash);
+				}
+			}
+		});
+
+		// --- 2. Dynamic Table of Contents (ToC) ---
+		function generateTOC(activeSection) {
+			if (!tocList) return;
+			tocList.innerHTML = "";
+
+			const headings = activeSection.querySelectorAll("h2, h3");
+			if (headings.length === 0) {
+				const emptyLi = document.createElement("li");
+				emptyLi.className = "outline-link text-muted";
+				emptyLi.style.fontSize = "0.8rem";
+				emptyLi.textContent = "No sections on this page";
+				tocList.appendChild(emptyLi);
+				return;
+			}
+
+			headings.forEach((heading, index) => {
+				const text = heading.textContent || "";
+				// Ensure heading has an ID
+				let id = heading.id;
+				if (!id) {
+					id = text.toLowerCase()
+						.replace(/[^a-z0-9]+/g, "-")
+						.replace(/(^-|-$)/g, "");
+					heading.id = `${activeSection.id}-${id}-${index}`;
+				}
+
+				const li = document.createElement("li");
+				const button = document.createElement("button");
+				button.className = `outline-link ${heading.tagName.toLowerCase() === "h3" ? "indent-3" : ""}`;
+				button.style.background = "none";
+				button.style.border = "none";
+				button.style.textAlign = "left";
+				button.style.fontFamily = "inherit";
+				button.textContent = text;
+				
+				button.addEventListener("click", () => {
+					const el = document.getElementById(heading.id);
+					if (el) {
+						const offset = 140; // Space for floating headers
+						const elementPosition = el.getBoundingClientRect().top;
+						const offsetPosition = elementPosition + window.pageYOffset - offset;
+						window.scrollTo({
+							top: offsetPosition,
+							behavior: "smooth"
+						});
+					}
+				});
+
+				li.appendChild(button);
+				tocList.appendChild(li);
+			});
+		}
+
+		// --- 3. Mobile Sidebar Toggle ---
+		if (sidebarToggleBtn && sidebar) {
+			sidebarToggleBtn.addEventListener("click", (e) => {
+				e.stopPropagation();
+				sidebar.classList.toggle("open");
+			});
+
+			// Close sidebar when clicking outside
+			document.addEventListener("click", (e) => {
+				if (sidebar.classList.contains("open") && !sidebar.contains(e.target as Node) && e.target !== sidebarToggleBtn) {
+					sidebar.classList.remove("open");
+				}
+			});
+		}
+
+		// --- 4. Sidebar Search Filter ---
+		const searchInput = document.getElementById("docs-search") as HTMLInputElement;
+		const searchClearBtn = document.getElementById("search-clear");
+		const navGroups = document.querySelectorAll(".nav-group");
+
+		if (searchInput) {
+			searchInput.addEventListener("input", (e) => {
+				const query = (e.target as HTMLInputElement).value.toLowerCase().trim();
+
+				if (query) {
+					searchClearBtn?.classList.add("visible");
+				} else {
+					searchClearBtn?.classList.remove("visible");
+				}
+
+				navGroups.forEach(group => {
+					let visibleInGroup = 0;
+					const groupItems = group.querySelectorAll(".nav-item");
+
+					groupItems.forEach(item => {
+						const text = item.textContent?.toLowerCase() || "";
+						if (text.includes(query)) {
+							item.classList.remove("hide");
+							visibleInGroup++;
+						} else {
+							item.classList.add("hide");
+						}
+					});
+
+					if (visibleInGroup > 0) {
+						group.classList.remove("hide");
+					} else {
+						group.classList.add("hide");
+					}
+				});
+			});
+
+			searchClearBtn?.addEventListener("click", () => {
+				searchInput.value = "";
+				searchClearBtn.classList.remove("visible");
+				searchInput.dispatchEvent(new Event("input"));
+				searchInput.focus();
+			});
+		}
+
+		// --- 5. Code Enhancements (Copy Buttons, Window Frames, Alert Formatting) ---
+		function enhanceCodeBlocks() {
+			const preElements = document.querySelectorAll(".markdown-content pre");
+
+			preElements.forEach(pre => {
+				// Prevent double wrapping
+				if (pre.parentElement?.classList.contains("terminal-wrapper")) return;
+
+				// Create terminal container
+				const wrapper = document.createElement("div");
+				wrapper.className = "terminal-wrapper";
+
+				// Create terminal header bar
+				const header = document.createElement("div");
+				header.className = "terminal-decor-header";
+				header.innerHTML = `
+					<div class="terminal-decor-dots">
+						<span class="terminal-decor-dot red"></span>
+						<span class="terminal-decor-dot yellow"></span>
+						<span class="terminal-decor-dot green"></span>
+					</div>
+					<div class="terminal-decor-title">${pre.getAttribute("data-lang") || "terminal"}</div>
+					<button class="terminal-copy-btn">Copy</button>
+				`;
+
+				// Put pre inside wrapper
+				pre.parentNode?.insertBefore(wrapper, pre);
+				wrapper.appendChild(header);
+				wrapper.appendChild(pre);
+
+				// Copy logic
+				const copyBtn = header.querySelector(".terminal-copy-btn");
+				copyBtn?.addEventListener("click", () => {
+					const codeContent = pre.querySelector("code")?.textContent || "";
+					navigator.clipboard.writeText(codeContent).then(() => {
+						copyBtn.textContent = "Copied!";
+						copyBtn.style.color = "var(--success)";
+						setTimeout(() => {
+							copyBtn.textContent = "Copy";
+							copyBtn.style.color = "";
+						}, 2000);
+					}).catch(err => {
+						console.error("Could not copy text: ", err);
+					});
+				});
+			});
+		}
+
+		// Convert GitHub style blockquote alerts to beautiful custom Callout divs
+		function enhanceAlerts() {
+			const blockquotes = document.querySelectorAll(".markdown-content blockquote");
+
+			blockquotes.forEach(bq => {
+				const paragraph = bq.querySelector("p");
+				if (!paragraph) return;
+
+				const text = paragraph.innerHTML || "";
+				let type = "";
+				let titleText = "";
+				let cleanedText = text;
+
+				if (text.startsWith("[!IMPORTANT]") || text.startsWith("[!WARNING]")) {
+					type = "important";
+					titleText = "Important";
+					cleanedText = text.replace(/^\[!(IMPORTANT|WARNING)\]\s*(<br>)?\s*/i, "");
+				} else if (text.startsWith("[!NOTE]")) {
+					type = "note";
+					titleText = "Note";
+					cleanedText = text.replace(/^\[!NOTE\]\s*(<br>)?\s*/i, "");
+				} else if (text.startsWith("[!TIP]")) {
+					type = "tip";
+					titleText = "Pro-Tip";
+					cleanedText = text.replace(/^\[!TIP\]\s*(<br>)?\s*/i, "");
+				}
+
+				if (type) {
+					const callout = document.createElement("div");
+					callout.className = `callout ${type}`;
+					callout.innerHTML = `<strong>${titleText}:</strong> ${cleanedText}`;
+					bq.parentNode?.replaceChild(callout, bq);
+				}
+			});
+		}
+
+		// --- 6. Scroll-To-Top Control ---
+		const backToTopBtn = document.getElementById("back-to-top");
+		window.addEventListener("scroll", () => {
+			if (window.scrollY > 400) {
+				backToTopBtn?.classList.add("visible");
+			} else {
+				backToTopBtn?.classList.remove("visible");
+			}
+		});
+
+		backToTopBtn?.addEventListener("click", () => {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		});
+
+		// Trigger enhancements & initial loading
+		enhanceCodeBlocks();
+		enhanceAlerts();
+		loadInitialDoc();
+	});
+</script>
