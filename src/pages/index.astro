@@ -90,6 +90,139 @@ import ScreenshotCarousel from '../components/ScreenshotCarousel.astro';
 
 
 
+		<!-- Interactive TUI Demo Section -->
+		<section id="tui-demo" class="tui-demo-section">
+			<div class="container">
+				<div class="section-header">
+					<div class="section-tag">Live Demo</div>
+					<h2 class="section-title">Try the TUI</h2>
+					<p class="section-subtitle">A faithful replica of the postctl terminal UI. Click the window to focus, then use <kbd class="kbd">Tab</kbd> to switch tabs and <kbd class="kbd">↑↓</kbd> to navigate.</p>
+				</div>
+
+				<div class="tui-window" id="tui-window" tabindex="0" aria-label="Interactive TUI demo">
+					<div class="tui-chrome">
+						<div class="tui-dots"><span class="tui-dot tui-dot-red"></span><span class="tui-dot tui-dot-yellow"></span><span class="tui-dot tui-dot-green"></span></div>
+						<div class="tui-chrome-title">postctl — Social Media CLI</div>
+						<div></div>
+					</div>
+					<div class="tui-tabbar">
+						<button class="tui-tab-btn active" data-tab="dashboard"><span class="tui-tab-dot tui-tab-dot--active">●</span> DASHBOARD</button>
+						<button class="tui-tab-btn" data-tab="posts"><span class="tui-tab-dot">○</span> POSTS</button>
+						<button class="tui-tab-btn" data-tab="schedule"><span class="tui-tab-dot">↺</span> SCHEDULE</button>
+						<button class="tui-tab-btn" data-tab="history"><span class="tui-tab-dot">▓</span> HISTORY</button>
+						<button class="tui-tab-btn" data-tab="settings"><span class="tui-tab-dot">⚙</span> SETTINGS</button>
+					</div>
+					<div class="tui-body">
+						<!-- DASHBOARD -->
+						<div class="tui-panel active" id="panel-dashboard">
+							<div class="tui-two-col">
+								<div class="tui-col">
+									<div class="tui-label">CAMPAIGNS</div>
+									<div class="tui-campaign-item tui-row-sel"><span class="tui-arr">&#62;</span><span class="dot-active tui-sdot">●</span><span class="tui-rtitle">orbiter-0.3.65</span></div>
+									<div class="tui-meta">  1 posts (1 posted, 0 scheduled)</div>
+									<div class="tui-campaign-item"><span class="tui-arr tui-arr-h">&#62;</span><span class="dot-active tui-sdot">●</span><span class="tui-rtitle">postctl-launch</span></div>
+									<div class="tui-meta">  1 posts (1 posted, 0 scheduled)</div>
+									<div class="tui-campaign-item"><span class="tui-arr tui-arr-h">&#62;</span><span class="dot-draft tui-sdot">●</span><span class="tui-rtitle">q2-newsletter</span></div>
+									<div class="tui-meta">  3 posts (0 posted, 3 scheduled)</div>
+									<div class="tui-gap"></div>
+									<div class="tui-label">NEXT UP</div>
+									<div class="tui-muted">No scheduled posts.</div>
+								</div>
+								<div class="tui-col tui-col-sep">
+									<div class="tui-label">STATS</div>
+									<div class="tui-stat-r"><span class="tui-muted">stats_posted</span><span class="tui-val">2</span></div>
+									<div class="tui-stat-r"><span class="tui-muted">stats_scheduled</span><span class="tui-val tui-warn">3</span></div>
+									<div class="tui-stat-r"><span class="tui-muted">stats_drafts</span><span class="tui-val">1</span></div>
+									<div class="tui-stat-r"><span class="tui-muted">stats_failed</span><span class="tui-val tui-ok">0</span></div>
+									<div class="tui-gap"></div>
+									<div class="tui-label">PLATFORMS</div>
+									<div class="tui-plat-r"><span class="tui-muted">Twitter/X:</span><span class="tui-connected">Connected ✓</span></div>
+									<div class="tui-plat-r"><span class="tui-muted">LinkedIn:</span><span class="tui-connected">Connected ✓</span></div>
+									<div class="tui-plat-r"><span class="tui-muted">Threads:</span><span class="tui-connected">Connected ✓</span></div>
+									<div class="tui-plat-r"><span class="tui-muted">Mastodon:</span><span class="tui-connected">Connected ✓</span></div>
+									<div class="tui-plat-r"><span class="tui-muted">Bluesky:</span><span class="tui-connected">Connected ✓</span></div>
+									<div class="tui-plat-r"><span class="tui-muted">Facebook:</span><span class="tui-connected">Connected ✓</span></div>
+								</div>
+							</div>
+						</div>
+						<!-- POSTS -->
+						<div class="tui-panel" id="panel-posts">
+							<div class="tui-label">POSTS</div>
+							<div class="tui-post-item tui-row-sel">
+								<div class="tui-post-head"><span class="tui-arr">&#62;</span><span class="tui-ptag ptag-threads">THREADS / DE</span><span class="tui-badge badge-posted">POSTED 25.06. 14:15</span></div>
+								<div class="tui-post-body">  "Your CMS is a single file."</div>
+								<div class="tui-muted tui-pmeta">  single · 📎 1 images · 📁 orbiter-0.3.65</div>
+							</div>
+							<div class="tui-post-item">
+								<div class="tui-post-head"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-ptag ptag-mastodon">MASTODON / DE</span><span class="tui-badge badge-posted">POSTED 25.06. 16:11</span></div>
+								<div class="tui-post-body">  "🚀 I just built a terminal-native s..."</div>
+								<div class="tui-muted tui-pmeta">  thread · 3 tweets · 📎 1 · 📁 postctl-launch</div>
+							</div>
+							<div class="tui-post-item">
+								<div class="tui-post-head"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-ptag ptag-twitter">TWITTER / EN</span><span class="tui-badge badge-scheduled">SCHED 27.06. 09:00</span></div>
+								<div class="tui-post-body">  "Announcing postctl v0.4 — now with..."</div>
+								<div class="tui-muted tui-pmeta">  thread · 5 tweets · 📁 q2-newsletter</div>
+							</div>
+							<div class="tui-post-item">
+								<div class="tui-post-head"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-ptag ptag-linkedin">LINKEDIN / EN</span><span class="tui-badge badge-draft">DRAFT</span></div>
+								<div class="tui-post-body">  "Why I manage my entire social prese..."</div>
+								<div class="tui-muted tui-pmeta">  single · 📁 q2-newsletter</div>
+							</div>
+						</div>
+						<!-- SCHEDULE -->
+						<div class="tui-panel" id="panel-schedule">
+							<div class="tui-label">SCHEDULED POSTS</div>
+							<div class="tui-sch-item"><span class="tui-sch-time">27.06. 09:00</span><span class="tui-ptag ptag-twitter">twitter</span><span class="tui-sch-title">Announcing postctl v0.4 — now with daemon mode and history...</span></div>
+							<div class="tui-sch-item"><span class="tui-sch-time">27.06. 09:05</span><span class="tui-ptag ptag-linkedin">linkedin</span><span class="tui-sch-title">Announcing postctl v0.4 — now with daemon mode and history...</span></div>
+							<div class="tui-sch-item"><span class="tui-sch-time">28.06. 14:00</span><span class="tui-ptag ptag-threads">threads</span><span class="tui-sch-title">Why I manage my entire social presence from a terminal.</span></div>
+							<div class="tui-gap"></div>
+							<div class="tui-muted" style="font-size:0.72rem"><span class="dot-active tui-sdot" style="font-size:0.55rem">●</span> Daemon running · next check in <span id="daemon-counter">28</span>s · postctl daemon --interval 30 --background</div>
+						</div>
+						<!-- HISTORY -->
+						<div class="tui-panel" id="panel-history">
+							<div class="tui-label">POST HISTORY</div>
+							<div class="tui-hist-head"><span>DATE</span><span>PLATFORM</span><span>CAMPAIGN</span><span>STATUS</span></div>
+							<div class="tui-hist-row"><span>25.06. 14:15</span><span class="ptag-threads">Threads</span><span>orbiter-0.3.65</span><span class="tui-ok">● posted</span></div>
+							<div class="tui-hist-row"><span>25.06. 16:11</span><span class="ptag-mastodon">Mastodon</span><span>postctl-launch</span><span class="tui-ok">● posted</span></div>
+							<div class="tui-hist-row tui-row-sel"><span>24.06. 10:00</span><span class="ptag-twitter">Twitter/X</span><span>orbiter-0.3.60</span><span class="tui-ok">● posted</span></div>
+							<div class="tui-hist-row"><span>23.06. 09:30</span><span class="ptag-linkedin">LinkedIn</span><span>orbiter-0.3.60</span><span class="tui-ok">● posted</span></div>
+							<div class="tui-hist-row"><span>20.06. 17:00</span><span class="ptag-bluesky">Bluesky</span><span>q1-recap</span><span class="tui-ok">● posted</span></div>
+						</div>
+						<!-- SETTINGS -->
+						<div class="tui-panel" id="panel-settings">
+							<div class="tui-label">SETTINGS &amp; CONNECTIONS</div>
+							<div class="tui-set-row tui-row-sel" id="set-ai-provider"><span class="tui-arr">&#62;</span><span class="tui-skey tui-accent">AI Provider:</span><span class="tui-sval tui-accent">claude</span></div>
+							<div class="tui-set-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  AI Model</span><span class="tui-sval tui-accent">claude-3-5-sonnet-latest</span></div>
+							<div class="tui-set-row" id="dryrun-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  Dry Run</span><span class="tui-sval tui-warn" id="dryrun-val">false</span></div>
+							<div class="tui-set-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  Language</span><span class="tui-sval">en</span></div>
+							<div class="tui-set-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  License Type</span><span class="tui-sval tui-muted">Core (Free)</span></div>
+							<div class="tui-gap"></div>
+							<div class="tui-label">PLATFORM ACCOUNTS</div>
+							<div class="tui-set-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  Twitter/X</span><span class="tui-sval tui-connected">Connected ✓</span></div>
+							<div class="tui-set-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  LinkedIn</span><span class="tui-sval tui-connected">Connected ✓</span></div>
+							<div class="tui-set-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  Threads</span><span class="tui-sval tui-connected">Connected ✓</span></div>
+							<div class="tui-set-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  Mastodon</span><span class="tui-sval tui-connected">Connected ✓</span></div>
+							<div class="tui-set-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  Bluesky</span><span class="tui-sval tui-connected">Connected ✓</span></div>
+							<div class="tui-set-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  Facebook</span><span class="tui-sval tui-connected">Connected ✓</span></div>
+							<div class="tui-gap"></div>
+							<div class="tui-label">BACKUP &amp; SYNC</div>
+							<div class="tui-set-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  Backup Exp.</span><span class="tui-sval tui-error">Execute (Press Enter)</span></div>
+							<div class="tui-set-row"><span class="tui-arr tui-arr-h">&#62;</span><span class="tui-skey">  Backup Imp.</span><span class="tui-sval tui-error">Execute (Press Enter)</span></div>
+							<div class="tui-gap"></div>
+							<div class="tui-muted" style="font-size:0.7rem;font-style:italic">←/→ / enter: Change / Connect · d: Reset/Disconnect · Saved instantly.</div>
+							<div class="tui-muted" style="font-size:0.7rem;font-style:italic">Activate Pro license via CLI: postctl config set license_key &lt;key&gt;</div>
+						</div>
+					</div>
+					<div class="tui-statusbar">tab: next tab · ↑↓: navigate · enter: select · n: new · e: edit · i: import · d: delete · r: repurpose · q: quit</div>
+					<div class="tui-statusbar tui-statusbar-2">f1/R: readme · ?: quick help</div>
+				</div>
+
+				<div class="tui-demo-hint">
+					Click the window to focus · <kbd class="kbd">Tab</kbd> switches tabs · <kbd class="kbd">↑↓</kbd> navigates · <kbd class="kbd">Enter</kbd> to interact
+				</div>
+			</div>
+		</section>
+
 		<!-- Features Grid Section -->
 		<section id="features" class="features-section">
 			<div class="container">
@@ -1409,6 +1542,196 @@ Campaign successfully posted!
 	}
 
 	/* Screenshot section improvements */
+
+	/* ── TUI Demo ──────────────────────────────────────────── */
+	.tui-demo-section {
+		padding: 5rem 0 6rem;
+	}
+	.tui-window {
+		width: 100%;
+		max-width: 900px;
+		margin: 0 auto;
+		background: #12131a;
+		border: 1px solid rgba(139,124,248,0.2);
+		border-radius: 10px;
+		overflow: hidden;
+		font-family: var(--font-mono);
+		font-size: 0.82rem;
+		box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px rgba(0,0,0,0.7), 0 0 60px rgba(139,124,248,0.06);
+		outline: none;
+		transition: box-shadow 0.2s ease;
+	}
+	.tui-window:focus {
+		box-shadow: 0 0 0 2px rgba(139,124,248,0.4), 0 32px 80px rgba(0,0,0,0.7), 0 0 60px rgba(139,124,248,0.12);
+	}
+	/* Chrome bar */
+	.tui-chrome {
+		background: #0d0e14;
+		border-bottom: 1px solid rgba(255,255,255,0.07);
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+		padding: 0.55rem 1rem;
+		gap: 1rem;
+	}
+	.tui-dots { display: flex; gap: 0.4rem; align-items: center; }
+	.tui-dot { width: 12px; height: 12px; border-radius: 50%; }
+	.tui-dot-red    { background: #ff5f57; }
+	.tui-dot-yellow { background: #ffbd2e; }
+	.tui-dot-green  { background: #28c840; }
+	.tui-chrome-title {
+		text-align: center;
+		color: rgba(255,255,255,0.4);
+		font-size: 0.75rem;
+		letter-spacing: 0.04em;
+	}
+	/* Tab bar */
+	.tui-tabbar {
+		display: flex;
+		background: #0d0e14;
+		border-bottom: 1px solid rgba(255,255,255,0.07);
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+	.tui-tabbar::-webkit-scrollbar { display: none; }
+	.tui-tab-btn {
+		background: transparent;
+		border: none;
+		border-bottom: 2px solid transparent;
+		color: rgba(255,255,255,0.35);
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.06em;
+		font-weight: 600;
+		padding: 0.6rem 1.1rem;
+		cursor: pointer;
+		white-space: nowrap;
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		transition: all 0.15s ease;
+	}
+	.tui-tab-btn:hover { color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.03); }
+	.tui-tab-btn.active {
+		color: #8b7cf8;
+		border-bottom-color: #8b7cf8;
+		background: rgba(139,124,248,0.05);
+	}
+	.tui-tab-dot { font-size: 0.7rem; color: rgba(255,255,255,0.25); }
+	.tui-tab-dot--active { color: #28c840; }
+	/* Panel body */
+	.tui-body { padding: 1rem 1.25rem 0.75rem; min-height: 280px; }
+	.tui-panel { display: none; }
+	.tui-panel.active { display: block; }
+	/* Two-column layout */
+	.tui-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+	@media (max-width: 600px) { .tui-two-col { grid-template-columns: 1fr; gap: 1rem; } }
+	.tui-col-sep { border-left: 1px dashed rgba(255,255,255,0.08); padding-left: 1.5rem; }
+	/* Typography helpers */
+	.tui-label { color: #8b7cf8; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+	.tui-muted  { color: rgba(255,255,255,0.35); }
+	.tui-val    { color: rgba(255,255,255,0.85); }
+	.tui-ok     { color: #28c840; }
+	.tui-warn   { color: #ffbd2e; }
+	.tui-error  { color: #ff5f57; }
+	.tui-accent { color: #8b7cf8; }
+	.tui-connected { color: #28c840; }
+	.tui-gap    { height: 0.85rem; }
+	.tui-arr    { color: #8b7cf8; font-weight: bold; width: 1rem; display: inline-block; }
+	.tui-arr-h  { visibility: hidden; }
+	.tui-sdot   { font-size: 0.65rem; margin: 0 0.3rem; }
+	.dot-active { color: #ffbd2e; }
+	.dot-draft  { color: rgba(255,255,255,0.3); }
+	/* Row selection highlight */
+	.tui-row-sel {
+		background: rgba(139,124,248,0.1);
+		border-left: 2px solid #8b7cf8;
+		margin-left: -2px;
+	}
+	/* Campaign rows */
+	.tui-campaign-item { display: flex; align-items: center; gap: 0.3rem; padding: 0.1rem 0; }
+	.tui-rtitle { color: rgba(255,255,255,0.8); }
+	.tui-meta   { color: rgba(255,255,255,0.3); font-size: 0.72rem; padding-left: 0.1rem; }
+	/* Stats */
+	.tui-stat-r { display: flex; justify-content: space-between; margin-bottom: 0.25rem; max-width: 280px; }
+	/* Platforms */
+	.tui-plat-r { display: flex; gap: 0.75rem; margin-bottom: 0.2rem; }
+	/* Posts */
+	.tui-post-item { margin-bottom: 0.9rem; padding: 0.4rem 0.5rem; border-radius: 4px; }
+	.tui-post-item.tui-row-sel { background: rgba(139,124,248,0.08); border-left: 2px solid #8b7cf8; margin-left: -2px; }
+	.tui-post-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem; }
+	.tui-post-body { color: rgba(255,255,255,0.8); margin-bottom: 0.1rem; }
+	.tui-pmeta { font-size: 0.7rem; }
+	/* Platform tags */
+	.tui-ptag {
+		font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em;
+		padding: 0.1rem 0.4rem; border-radius: 2px;
+	}
+	.ptag-threads  { background: rgba(255,255,255,0.12); color: #fff; }
+	.ptag-mastodon { background: rgba(99,100,255,0.2); color: #8b8cff; }
+	.ptag-twitter  { background: rgba(29,161,242,0.15); color: #1da1f2; }
+	.ptag-linkedin { background: rgba(0,119,181,0.2); color: #0a7fff; }
+	.ptag-bluesky  { background: rgba(0,133,255,0.15); color: #0085ff; }
+	/* Badges */
+	.tui-badge { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; padding: 0.15rem 0.5rem; border-radius: 3px; }
+	.badge-posted    { background: rgba(40,200,64,0.2); color: #28c840; }
+	.badge-scheduled { background: rgba(255,189,46,0.15); color: #ffbd2e; }
+	.badge-draft     { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.45); }
+	/* Schedule */
+	.tui-sch-item { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.6rem; }
+	.tui-sch-time { color: rgba(255,255,255,0.45); min-width: 90px; font-size: 0.75rem; }
+	.tui-sch-title { color: rgba(255,255,255,0.7); }
+	/* History */
+	.tui-hist-head {
+		display: grid; grid-template-columns: 110px 1fr 1fr 90px;
+		color: #8b7cf8; font-size: 0.7rem; font-weight: 700;
+		letter-spacing: 0.06em; border-bottom: 1px solid rgba(255,255,255,0.08);
+		padding-bottom: 0.4rem; margin-bottom: 0.4rem;
+	}
+	.tui-hist-row {
+		display: grid; grid-template-columns: 110px 1fr 1fr 90px;
+		padding: 0.3rem 0.4rem; border-radius: 3px;
+		color: rgba(255,255,255,0.6); font-size: 0.76rem;
+	}
+	.tui-hist-row.tui-row-sel { background: rgba(139,124,248,0.1); border-left: 2px solid #8b7cf8; margin-left: -4px; }
+	/* Settings */
+	.tui-set-row { display: flex; align-items: baseline; gap: 0.75rem; padding: 0.2rem 0.4rem; border-radius: 3px; }
+	.tui-set-row.tui-row-sel { background: rgba(139,124,248,0.1); border-left: 2px solid #8b7cf8; margin-left: -4px; }
+	.tui-skey { color: rgba(255,255,255,0.5); min-width: 160px; }
+	.tui-sval { color: rgba(255,255,255,0.8); }
+	/* Status bars */
+	.tui-statusbar {
+		background: #0d0e14;
+		border-top: 1px solid rgba(255,255,255,0.07);
+		padding: 0.3rem 1rem;
+		color: rgba(255,255,255,0.3);
+		font-size: 0.68rem;
+		letter-spacing: 0.03em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.tui-statusbar-2 { padding-top: 0; }
+	/* Kbd hints */
+	.kbd {
+		display: inline-block;
+		background: rgba(255,255,255,0.08);
+		border: 1px solid rgba(255,255,255,0.15);
+		border-radius: 4px;
+		padding: 0.1rem 0.35rem;
+		font-family: var(--font-mono);
+		font-size: 0.78em;
+		color: rgba(255,255,255,0.7);
+	}
+	.tui-demo-hint {
+		text-align: center;
+		margin-top: 1rem;
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		color: rgba(255,255,255,0.25);
+		letter-spacing: 0.04em;
+	}
+
 	.screenshot-section {
 		padding: 6rem 0;
 	}
@@ -1536,27 +1859,109 @@ Campaign successfully posted!
 		}
 	}
 
-	// Interactive TUI simulator tabs
-	const tabs = document.querySelectorAll(".tui-tab");
-	const tabContents = document.querySelectorAll(".tui-tab-content");
+	// ── Interactive TUI Demo ──────────────────────────────────
+	const tuiWindow = document.getElementById('tui-window');
+	const tuiTabBtns = document.querySelectorAll('.tui-tab-btn');
+	const tuiPanels = document.querySelectorAll('.tui-panel');
 
-	tabs.forEach(tab => {
-		tab.addEventListener("click", () => {
-			const targetIndex = tab.getAttribute("data-tab");
+	const tabOrder = ['dashboard', 'posts', 'schedule', 'history', 'settings'];
+	let currentTab = 0;
 
-			// Remove active class from all tabs
-			tabs.forEach(t => t.classList.remove("active"));
-			// Hide all contents
-			tabContents.forEach(c => c.classList.remove("active"));
+	function switchTab(idx: number) {
+		currentTab = (idx + tabOrder.length) % tabOrder.length;
+		const tabName = tabOrder[currentTab];
+		tuiTabBtns.forEach((b, i) => b.classList.toggle('active', i === currentTab));
+		tuiPanels.forEach(p => p.classList.toggle('active', p.id === `panel-${tabName}`));
+	}
 
-			// Activate current tab & content
-			tab.classList.add("active");
-			const targetContent = document.getElementById(`tui-tab-${targetIndex}`);
-			if (targetContent) {
-				targetContent.classList.add("active");
-			}
-		});
+	tuiTabBtns.forEach((btn, i) => {
+		btn.addEventListener('click', () => switchTab(i));
 	});
+
+	// Keyboard navigation when window is focused
+	tuiWindow?.addEventListener('keydown', (e) => {
+		const key = (e as KeyboardEvent).key;
+		if (key === 'Tab') {
+			e.preventDefault();
+			switchTab(currentTab + ((e as KeyboardEvent).shiftKey ? -1 : 1));
+		} else if (key === 'ArrowLeft') {
+			e.preventDefault(); switchTab(currentTab - 1);
+		} else if (key === 'ArrowRight') {
+			e.preventDefault(); switchTab(currentTab + 1);
+		} else if (key === 'ArrowUp' || key === 'ArrowDown') {
+			e.preventDefault();
+			moveRowCursor(key === 'ArrowDown' ? 1 : -1);
+		} else if (key === 'Enter') {
+			e.preventDefault();
+			handleEnter();
+		}
+	});
+
+	// Click the window to focus it
+	tuiWindow?.addEventListener('click', () => tuiWindow.focus());
+
+	// Row cursor movement per panel
+	const panelCursors: Record<string, number> = {
+		dashboard: 0, posts: 0, schedule: 0, history: 2, settings: 0
+	};
+
+	function getSelectableRows(panelId: string): NodeListOf<Element> {
+		const panel = document.getElementById(`panel-${panelId}`);
+		return panel?.querySelectorAll('.tui-campaign-item[class*="tui-row-sel"], .tui-post-item, .tui-hist-row, .tui-set-row') 
+			?? document.querySelectorAll('.__none__');
+	}
+
+	function moveRowCursor(delta: number) {
+		const tab = tabOrder[currentTab];
+		const panel = document.getElementById(`panel-${tab}`);
+		if (!panel) return;
+
+		// Get navigable items
+		let items: NodeListOf<Element> | null = null;
+		if (tab === 'dashboard') items = panel.querySelectorAll('.tui-campaign-item');
+		else if (tab === 'posts') items = panel.querySelectorAll('.tui-post-item');
+		else if (tab === 'history') items = panel.querySelectorAll('.tui-hist-row');
+		else if (tab === 'settings') items = panel.querySelectorAll('.tui-set-row');
+		else return;
+
+		if (!items || items.length === 0) return;
+
+		// Remove current selection
+		items.forEach(item => {
+			item.classList.remove('tui-row-sel');
+			const arr = item.querySelector('.tui-arr');
+			if (arr) arr.classList.add('tui-arr-h');
+		});
+
+		panelCursors[tab] = Math.max(0, Math.min(items.length - 1, panelCursors[tab] + delta));
+		const selected = items[panelCursors[tab]];
+		selected.classList.add('tui-row-sel');
+		const arr = selected.querySelector('.tui-arr');
+		if (arr) arr.classList.remove('tui-arr-h');
+	}
+
+	function handleEnter() {
+		const tab = tabOrder[currentTab];
+		if (tab === 'settings' && panelCursors.settings === 2) {
+			// Toggle dry run
+			const dryrunVal = document.getElementById('dryrun-val');
+			if (dryrunVal) {
+				const isDry = dryrunVal.textContent === 'true';
+				dryrunVal.textContent = isDry ? 'false' : 'true';
+				dryrunVal.className = isDry ? 'tui-sval tui-warn' : 'tui-sval tui-ok';
+			}
+		}
+	}
+
+	// Daemon counter countdown on schedule tab
+	let daemonCount = 28;
+	setInterval(() => {
+		const el = document.getElementById('daemon-counter');
+		if (el) {
+			daemonCount = daemonCount <= 1 ? 30 : daemonCount - 1;
+			el.textContent = String(daemonCount);
+		}
+	}, 1000);
 
 	// ── Back to top ──────────────────────────────────────────
 	const backToTopBtn = document.getElementById('back-to-top');
@@ -1567,7 +1972,6 @@ Campaign successfully posted!
 		let startTime: number | null = null;
 
 		function ease(t: number) {
-			// cubic ease-in-out
 			return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 		}
 
@@ -1591,7 +1995,6 @@ Campaign successfully posted!
 	}, { passive: true });
 
 	backToTopBtn?.addEventListener('click', () => {
-		// Visual feedback — brief scale pulse
 		backToTopBtn.style.transform = 'scale(0.92)';
 		setTimeout(() => { backToTopBtn.style.transform = ''; }, 150);
 		smoothScrollTo(0, 700);
@@ -1632,7 +2035,7 @@ Campaign successfully posted!
 
 	// ── Scroll reveal ─────────────────────────────────────────
 	const revealTargets = document.querySelectorAll(
-		'.feature-card, .how-step-card, .ai-workflow-card, .pricing-card, .section-header, .tui-emulator, .donate-banner, .carousel-root, .screenshot-hint'
+		'.feature-card, .how-step-card, .ai-workflow-card, .pricing-card, .section-header, .tui-window, .donate-banner, .carousel-root, .screenshot-hint, .tui-demo-hint'
 	);
 
 	const revealObserver = new IntersectionObserver((entries, observer) => {
