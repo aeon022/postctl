@@ -281,9 +281,30 @@ func (f *FacebookPlatform) Post(ctx context.Context, post *models.Post) (string,
 		return "", err
 	}
 
-	// Falls Bilder vorhanden sind, laden wir das erste Bild als Foto mit Bildunterschrift hoch
+	postBody := post.Body
+	if postBody == "" && len(post.Tweets) > 0 {
+		var contents []string
+		for _, tw := range post.Tweets {
+			contents = append(contents, tw.Content)
+		}
+		postBody = strings.Join(contents, "\n\n")
+	}
+
+	// Erstes verfügbares Bild ermitteln
+	var imgPath string
 	if len(post.Images) > 0 {
-		imgPath := post.Images[0]
+		imgPath = post.Images[0]
+	} else {
+		for _, tw := range post.Tweets {
+			if tw.Image != "" {
+				imgPath = tw.Image
+				break
+			}
+		}
+	}
+
+	// Falls Bilder vorhanden sind, laden wir das erste Bild als Foto mit Bildunterschrift hoch
+	if imgPath != "" {
 		file, err := os.Open(imgPath)
 		if err != nil {
 			return "", fmt.Errorf("open image file: %w", err)
@@ -303,7 +324,7 @@ func (f *FacebookPlatform) Post(ctx context.Context, post *models.Post) (string,
 			return "", err
 		}
 
-		_ = writer.WriteField("caption", post.Body)
+		_ = writer.WriteField("caption", postBody)
 		_ = writer.WriteField("access_token", token)
 		writer.Close()
 
@@ -342,7 +363,7 @@ func (f *FacebookPlatform) Post(ctx context.Context, post *models.Post) (string,
 	// Standard-Textpost
 	feedURL := fmt.Sprintf("https://graph.facebook.com/v19.0/%s/feed", f.pageID)
 	data := url.Values{}
-	data.Set("message", post.Body)
+	data.Set("message", postBody)
 	data.Set("access_token", token)
 
 	req, err := http.NewRequestWithContext(ctx, "POST", feedURL, strings.NewReader(data.Encode()))

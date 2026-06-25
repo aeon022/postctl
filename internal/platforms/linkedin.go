@@ -279,8 +279,19 @@ func (l *LinkedInPlatform) Post(ctx context.Context, post *models.Post) (string,
 
 	// Bilder hochladen, falls vorhanden
 	var mediaEntities []map[string]interface{}
+	var imagesToUpload []string
 	if len(post.Images) > 0 {
-		for _, imgPath := range post.Images {
+		imagesToUpload = post.Images
+	} else {
+		for _, tw := range post.Tweets {
+			if tw.Image != "" {
+				imagesToUpload = append(imagesToUpload, tw.Image)
+			}
+		}
+	}
+
+	if len(imagesToUpload) > 0 {
+		for _, imgPath := range imagesToUpload {
 			assetURN, err := l.UploadImage(ctx, imgPath)
 			if err != nil {
 				return "", fmt.Errorf("upload image to linkedin %s: %w", imgPath, err)

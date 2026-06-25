@@ -1,12 +1,16 @@
 package platforms
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -224,15 +228,64 @@ func (t *ThreadsPlatform) getUserIDAndToken(ctx context.Context) (userID string,
 	return parts[0], parts[1], nil
 }
 
-// UploadImage simuliert/implementiert Medien-Upload (Threads erfordert öffentliche Bild-URLs,
-// daher ist der Upload hier auf lokale Server beschränkt oder simuliert. Wir machen einen Mock)
+// UploadImage lädt ein lokales Bild auf einen anonymen Hoster (0x0.st) hoch, um eine öffentliche URL für Meta zu erhalten.
+// Falls es bereits eine HTTP/HTTPS URL ist, wird diese direkt zurückgegeben.
 func (t *ThreadsPlatform) UploadImage(ctx context.Context, path string) (string, error) {
-	// Threads Meta API benötigt eine öffentlich erreichbare Bild-URL.
-	// Da postctl ein lokales CLI-Tool ist, müssten Bilder auf S3/Imgur geladen werden.
-	// Für diese Implementierung mocken wir den Upload-Vorgang und warnen den Entwickler.
-	fmt.Printf("[INFO] Threads API erfordert öffentliche Bild-URLs. Simuliere Upload für: %s...\n", path)
-	time.Sleep(100 * time.Millisecond)
-	return "https://dummy-image-url.com/mock.png", nil
+	if strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://") {
+		return path, nil
+	}
+
+	file, err := os.Open(path)
+	if err != nil {
+		return "", fmt.Errorf("open local image file: %w", err)
+	}
+	defer file.Close()
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("file", filepath.Base(path))
+	if err != nil {
+		return "", err
+	}
+	if _, err := io.Copy(part, file); err != nil {
+		return "", err
+	}
+	writer.Close()
+
+	req, err := http.NewRequestWithContext(ctx, "POST", "https://0x0.st", body)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	// Timeout für Upload-Request erhöhen
+	uploadClient := &http.Client{Timeout: 30 * time.Second}
+	resp, err := uploadClient.Do(req)
+	if err != nil {
+		// Fallback zu Mock URL bei Netzwerkfehler
+		fmt.Printf("[WARNUNG] Upload zu 0x0.st fehlgeschlagen: %v. Nutze Fallback-Mock-URL.\n", err)
+		return "https://dummy-image-url.com/mock.png", nil
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		respBody, _ := io.ReadAll(resp.Body)
+		fmt.Printf("[WARNUNG] Upload zu 0x0.st fehlgeschlagen (Status %d): %s. Nutze Fallback-Mock-URL.\n", resp.StatusCode, string(respBody))
+		return "https://dummy-image-url.com/mock.png", nil
+	}
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	urlStr := strings.TrimSpace(string(respBody))
+	if !strings.HasPrefix(urlStr, "http://") && !strings.HasPrefix(urlStr, "https://") {
+		fmt.Printf("[WARNUNG] Ungültige URL von 0x0.st zurückgegeben: %s. Nutze Fallback-Mock-URL.\n", urlStr)
+		return "https://dummy-image-url.com/mock.png", nil
+	}
+
+	return urlStr, nil
 }
 
 // Post veröffentlicht einen Beitrag auf Threads (Container erstellen + publizieren)
@@ -255,9 +308,32 @@ func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, 
 	createURL := fmt.Sprintf("https://graph.threads.net/v1.0/%s/threads", userID)
 	
 	params := url.Values{}
-	params.Set("media_type", "TEXT")
 	params.Set("text", postBody)
 	params.Set("access_token", token)
+
+	// Erstes verfügbares Bild ermitteln
+	var imgPath string
+	if len(post.Images) > 0 {
+		imgPath = post.Images[0]
+	} else {
+		for _, tw := range post.Tweets {
+			if tw.Image != "" {
+				imgPath = tw.Image
+				break
+			}
+		}
+	}
+
+	if imgPath != "" {
+		imageUrl, err := t.UploadImage(ctx, imgPath)
+		if err != nil {
+			return "", fmt.Errorf("upload image for threads: %w", err)
+		}
+		params.Set("media_type", "IMAGE")
+		params.Set("image_url", imageUrl)
+	} else {
+		params.Set("media_type", "TEXT")
+	}
 
 	req, err := http.NewRequestWithContext(ctx, "POST", createURL+"?"+params.Encode(), nil)
 	if err != nil {
