@@ -1,0 +1,1363 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="generator" content="Astro v7.0.0"><!-- SEO Best Practices --><title>postctl Docs — Terminal-Native Social Media Management</title><meta name="description" content="A terminal-native, Markdown-first social media scheduler and publisher. Manage Twitter, LinkedIn, and Threads directly from the CLI or TUI."><!-- Google Fonts --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"><style>:root{--bg-primary:#08090b;--bg-secondary:#111318;--bg-tertiary:#1b1e26;--text-primary:#f3f4f6;--text-secondary:#9ca3af;--text-muted:#6b7280;--accent:#8b7cf8;--accent-glow:#8b7cf826;--accent-hover:#a195f9;--success:#10b981;--error:#ef4444;--border:#ffffff14;--border-hover:#ffffff26;--font-heading:"Space Grotesk", sans-serif;--font-body:"Inter", sans-serif;--font-mono:"Fira Code", monospace;--transition:all .25s cubic-bezier(.4, 0, .2, 1);--shadow-sm:0 2px 8px #00000080;--shadow-md:0 8px 30px #000000b3;--shadow-lg:0 12px 50px #000000e6}*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth;background-color:var(--bg-primary);color:var(--text-primary);font-family:var(--font-body);-webkit-font-smoothing:antialiased;line-height:1.6}body{background:radial-gradient(circle at 50% 0%, var(--bg-secondary) 0%, var(--bg-primary) 70%);min-height:100vh;overflow-x:hidden}a{color:inherit;transition:var(--transition);text-decoration:none}h1,h2,h3,h4,h5,h6{font-family:var(--font-heading);letter-spacing:-.02em;font-weight:700}code,pre{font-family:var(--font-mono)}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:var(--bg-primary)}::-webkit-scrollbar-thumb{background:var(--bg-tertiary);border-radius:4px}::-webkit-scrollbar-thumb:hover{background:var(--accent)}.container{width:100%;max-width:1200px;margin:0 auto;padding:0 2rem}.text-gradient{background:linear-gradient(135deg, #fff 0%, var(--accent) 100%);-webkit-text-fill-color:transparent;-webkit-background-clip:text}
+</style><link rel="stylesheet" href="/_astro/docs.BrLje7NO.css"></head><body>
+	
+	<div class="bg-glow bg-glow-1"></div>
+	<div class="bg-glow bg-glow-2"></div>
+	<div class="grid-overlay"></div>
+
+	
+	<header class="header"><div class="header-capsule"><div class="logo"><a href="/" class="logo-link"><span class="logo-icon">&gt;_</span><span class="logo-text">postctl<span class="logo-blink">_</span></span></a><span class="system-status"><span class="status-dot"></span>DOCS_ONLINE</span></div><nav class="nav"><a href="/" class="nav-link">Home</a><a href="/#features" class="nav-link">Features</a><a href="/#tui-demo" class="nav-link">TUI Demo</a><a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="nav-link github-link"><svg height="14" viewBox="0 0 16 16" width="14" class="github-icon"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg><span>src_code</span></a></nav></div></header>
+
+	
+	<div class="docs-wrapper"><!-- Mobile Toggle Header --><div class="mobile-docs-bar"><button class="menu-toggle-btn" id="sidebar-toggle" aria-label="Toggle Navigation"><svg class="menu-icon" viewBox="0 0 24 24" width="20" height="20"><line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line><line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line><line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line></svg><span>Table of Contents</span></button><div class="mobile-doc-title">Introduction</div></div><div class="container docs-layout"><!-- Left Sidebar: Menu Navigation --><aside class="docs-sidebar" id="docs-sidebar"><div class="sidebar-search"><div class="search-input-wrapper"><span class="search-icon">🔍</span><input type="text" id="docs-search" placeholder="Filter documentation..." autocomplete="off"><button id="search-clear" class="search-clear-btn" aria-label="Clear Filter">×</button></div></div><nav class="sidebar-nav"><div class="nav-group" data-group="getting-started"><h4 class="group-title">Getting Started</h4><ul class="group-list"><li><button class="nav-item active" data-doc="introduction">Introduction</button></li><li><button class="nav-item" data-doc="installation">Installation & Setup</button></li></ul></div><div class="nav-group" data-group="user-guides"><h4 class="group-title">User Guides</h4><ul class="group-list"><li><button class="nav-item" data-doc="vim-flow">Vim / Neovim Editor</button></li><li><button class="nav-item" data-doc="image-resolution">Image Path Resolution</button></li></ul></div><div class="nav-group" data-group="api-integrations"><h4 class="group-title">API Integrations</h4><ul class="group-list"><li><button class="nav-item" data-doc="api-twitter">Twitter / X</button></li><li><button class="nav-item" data-doc="api-linkedin">LinkedIn (OIDC)</button></li><li><button class="nav-item" data-doc="api-threads">Threads (Meta)</button></li><li><button class="nav-item" data-doc="api-bluesky-mastodon">Bluesky & Mastodon</button></li><li><button class="nav-item" data-doc="api-reddit-facebook">Reddit & Facebook</button></li></ul></div><div class="nav-group" data-group="technical-specs"><h4 class="group-title">Architecture & Code</h4><ul class="group-list"><li><button class="nav-item" data-doc="system-spec">System Specification</button></li><li><button class="nav-item" data-doc="go-tutorial">Go Tutorial Guide</button></li></ul></div></nav></aside><!-- Center Pane: Rendered Documentation --><main class="docs-content"><!-- Tab 1: Introduction --><section class="doc-section active" id="doc-introduction"><div class="doc-body markdown-content"><h1 id="postctl--social-media-management-from-your-terminal">postctl — Social Media Management from your Terminal</h1>
+<p><code>postctl</code> is a lightweight, offline-first CLI and TUI tool written in Go to manage and schedule social media posts directly from Markdown files. It is built for developer workflows, Git versioning, and AI-assisted post conversion.</p>
+<p><em>Scrollen Sie nach unten für die deutsche Version.</em></p>
+<hr>
+<h2 id="english-version">English Version</h2>
+<h3 id="-features-2026-standards">🚀 Features (2026 Standards)</h3>
+<ol>
+<li><strong>Markdown-First Workflow</strong>: Write your posts as Markdown. Frontmatter fields define platforms, campaigns, schedule times, and image paths.</li>
+<li><strong>Terminal User Interface (TUI)</strong>: Interactive Bubble Tea-based dashboard to manage campaigns, posts, history, and settings.</li>
+<li><strong>Modern API Integrations</strong>:
+<ul>
+<li><strong>Twitter/X</strong>: Post tweets and threads via OAuth 2.0 PKCE (requires a paid API tier / Prepaid credits in 2026).</li>
+<li><strong>LinkedIn</strong>: Authenticate via modern <strong>OpenID Connect (OIDC)</strong> (Scopes: <code>openid</code>, <code>profile</code>, <code>w_member_social</code>).</li>
+<li><strong>Threads (Meta)</strong>: Official Threads API integration with secure HTTPS callbacks (<code>https://localhost:8753/callback</code>).</li>
+</ul>
+</li>
+<li><strong>Encrypted Backup &amp; Multi-Device Sync (AES-256-GCM)</strong>: Synchronize your database (tokens, history, drafts) across devices securely and for free.</li>
+</ol>
+<hr>
+<h3 id="-posting--image-importexport-deep-dive">💾 Posting &amp; Image Import/Export (Deep Dive)</h3>
+<h4 id="1-importing-posts-postctl-import-path">1. Importing Posts (<code>postctl import &lt;path&gt;</code>)</h4>
+<p>When you run <code>./postctl import [file.md or directory]</code>, the CLI performs the following steps:</p>
+<ul>
+<li><strong>Scan &amp; Parse:</strong> It parses all <code>.md</code> and <code>.markdown</code> files. The frontmatter properties are converted into SQLite database models.</li>
+<li><strong>Validation:</strong> Before saving, <code>postctl</code> validates:
+<ul>
+<li><strong>Char Limits:</strong> Twitter/X tweets are verified to be under 280 characters.</li>
+<li><strong>Image Existence:</strong> Every referenced image path is checked on your local disk. If any validation fails, the entire import is aborted.</li>
+</ul>
+</li>
+<li><strong>Save:</strong> Validated posts are saved to the local SQLite database (<code>postctl.db</code>) as <code>draft</code> or <code>scheduled</code>.</li>
+</ul>
+<h4 id="2-image-path-resolution">2. Image Path Resolution</h4>
+<p>When you reference an image in your frontmatter (e.g., <code>images: ["logo.png"]</code>), <code>postctl</code> searches for it in this exact order:</p>
+<ol>
+<li><strong>Absolute Path:</strong> Check the literal absolute path (e.g., <code>/Users/gweiher/Images/logo.png</code>).</li>
+<li><strong>Relative to Markdown File:</strong> Check the directory containing the imported Markdown file (best practice for Git repositories).</li>
+<li><strong>Relative to Working Directory (CWD):</strong> Check the directory where you executed the command.</li>
+<li><strong>Relative to configured Image Dir:</strong> Check the path configured under <code>defaults.image_dir</code> in <code>config.yaml</code>.</li>
+</ol>
+<h4 id="3-image-exporting-publishing-to-platforms">3. Image Exporting (Publishing to Platforms)</h4>
+<p>When a post containing images is published, <code>postctl</code> uploads the local images first:</p>
+<ul>
+<li><strong>LinkedIn (Native Host):</strong> <code>postctl</code> registers the upload, performs a binary <code>PUT</code> request to LinkedIn’s media servers, and attaches the resulting URN (e.g., <code>urn:li:digitalmediaAsset:...</code>) to the post.</li>
+<li><strong>Twitter/X (Native Host):</strong> Uploads the image using the Twitter v1.1 Media Upload API to receive a <code>media_id</code>, which is then attached to the v2 tweet.</li>
+<li><strong>Threads (Meta HTTPS Requirement):</strong> The Threads API <em>does not</em> allow binary uploads from local machines. It requires a <strong>publicly accessible HTTPS URL</strong> from which Meta downloads the image.
+<ul>
+<li><em>Production Tip:</em> For Threads, host your images on a public cloud storage (e.g., AWS S3, Cloudflare R2, Imgur) and use these URLs directly in the Markdown frontmatter.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="️-installation--setup">🛠️ Installation &amp; Setup</h3>
+<p>Run the interactive setup script:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">chmod</span><span style="color:#9ECBFF"> +x</span><span style="color:#9ECBFF"> setup.sh</span></span>
+<span class="line"><span style="color:#B392F0">./setup.sh</span></span></code></pre>
+<hr>
+<h3 id="️-settings--auth-in-tui">⚙️ Settings &amp; Auth in TUI</h3>
+<p>Run <code>./postctl tui</code> and navigate to the <strong>Settings</strong> tab:</p>
+<ul>
+<li><strong>Account Auth:</strong> Highlight an account under <strong>PLATFORM ACCOUNTS</strong> and press <strong>Enter</strong> to start the OAuth login. The TUI pauses, opens your standard browser, and displays a status message upon completion.</li>
+<li><strong>Interactive Post Import:</strong> In any main tab (Dashboard, Posts, Schedule, History), you can press <strong><code>i</code></strong> to trigger an interactive post import. The TUI will temporarily pause, clear the terminal, and prompt you for the Markdown file/directory path. <strong>Tip: You can simply drag and drop the file or folder directly from your Finder into the terminal window.</strong> The tool automatically cleans quote characters, validates the posts/images, imports them, and returns to the TUI.</li>
+<li><strong>Backup &amp; Sync:</strong> Go to <strong>BACKUP &amp; SYNC</strong> at the bottom, select <code>Backup Exp.</code> (Export) or <code>Backup Imp.</code> (Import), and press <strong>Enter</strong> to enter your master password.
+<ul>
+<li>CLI Commands: <code>./postctl config export -o backup.bin</code> and <code>./postctl config import -f backup.bin</code>.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="-vim--neovim-external-editor-flow-step-by-step">📝 Vim / Neovim External Editor Flow (Step-by-Step)</h3>
+<p>When editing or creating a post within the TUI, you can spawn your favorite terminal text editor (like Vim or Neovim) for a rich, distraction-free editing environment.</p>
+<h4 id="step-1-open-the-external-editor">Step 1: Open the External Editor</h4>
+<ol>
+<li>In the TUI, highlight or select a post and press <strong><code>e</code></strong> to open the built-in edit form.</li>
+<li>Press <strong><code>ctrl+v</code></strong> from any focused form field.</li>
+<li>The TUI will suspend itself and open Neovim/Vim (it uses your <code>$EDITOR</code> environment variable, falling back to <code>nvim</code> or <code>vim</code>).</li>
+</ol>
+<h4 id="step-2-understand-the-template-structure">Step 2: Understand the Template Structure</h4>
+<p>The temporary file opened in Vim contains three main parts:</p>
+<ol>
+<li><strong>Interactive Helper Block (<code>&lt;!-- ... --&gt;</code>)</strong>:
+<ul>
+<li>Contains a character ruler showing the maximum length for the current platform (e.g., 280 for Twitter, 300 for Bluesky, 500 for Mastodon).</li>
+<li>Shows live counts (at the time of launch) for single posts or thread segments (delimited by <code>---</code>).</li>
+<li><em>Note:</em> This entire HTML comment block is automatically removed upon saving.</li>
+</ul>
+</li>
+<li><strong>YAML Frontmatter Block</strong>:
+<ul>
+<li>Defined between the <code>---</code> delimiters:
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#B392F0">---</span></span>
+<span class="line"><span style="color:#85E89D">platform</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">twitter</span></span>
+<span class="line"><span style="color:#85E89D">campaign</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">launch-2026</span></span>
+<span class="line"><span style="color:#85E89D">schedule</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">2026-06-25 15:00:00</span></span>
+<span class="line"><span style="color:#85E89D">images</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"logo.png"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#B392F0">---</span></span></code></pre>
+</li>
+<li><strong>Bidirectional Sync:</strong> You can edit these metadata values directly inside Vim! When you exit, <code>postctl</code> parses this YAML header and automatically updates the corresponding input fields back in the TUI form.</li>
+</ul>
+</li>
+<li><strong>Post Body Content</strong>:
+<ul>
+<li>The actual content of your post starts directly below the closing <code>---</code> frontmatter delimiter.</li>
+</ul>
+</li>
+</ol>
+<h4 id="step-3-write-your-post--thread">Step 3: Write Your Post / Thread</h4>
+<ul>
+<li>Write your post content.</li>
+<li>If you are writing a thread (supported on platforms like Twitter/X), separate each post using a single line with <code>---</code>.</li>
+<li><em>Example:</em>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>This is the first tweet of my thread.</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>This is the second tweet of my thread.</span></span></code></pre>
+</li>
+</ul>
+<h4 id="step-4-save--sync-back">Step 4: Save &amp; Sync Back</h4>
+<ol>
+<li>Save and exit the editor by typing <strong><code>:wq</code></strong> or <strong><code>:x</code></strong> (or press <strong><code>ZZ</code></strong> in normal mode).</li>
+<li>The TUI will resume instantly. The body text is updated, the helper comments are stripped, and the edited frontmatter values are synced back into the TUI fields.</li>
+<li>Review your changes in the TUI and navigate to the <strong><code>Save</code></strong> button (or press <code>Enter</code> when focused) to write the changes to the database.</li>
+</ol>
+<hr>
+<hr>
+<h2 id="deutsche-version">Deutsche Version</h2>
+<h3 id="-features-stand-2026">🚀 Features (Stand 2026)</h3>
+<ol>
+<li><strong>Markdown-First Workflow</strong>: Schreibe Beiträge als Markdown. Frontmatter-Felder definieren Plattformen, Kampagnen, Zeiten und Bildpfade.</li>
+<li><strong>Terminal User Interface (TUI)</strong>: Interaktives Bubble-Tea-Dashboard zur Verwaltung von Kampagnen, Beiträgen, Historie und Einstellungen.</li>
+<li><strong>Moderne API-Integrationen</strong>:
+<ul>
+<li><strong>Twitter/X</strong>: Veröffentliche Tweets/Threads über OAuth 2.0 PKCE (erfordert im Jahr 2026 ein kostenpflichtiges API-Tier oder Prepaid-Credits).</li>
+<li><strong>LinkedIn</strong>: Authentifizierung über den modernen <strong>OpenID Connect (OIDC)</strong>-Standard (Scopes: <code>openid</code>, <code>profile</code>, <code>w_member_social</code>).</li>
+<li><strong>Threads (Meta)</strong>: Offizielle Threads API mit sicherem HTTPS-Callback (<code>https://localhost:8753/callback</code>).</li>
+</ul>
+</li>
+<li><strong>Backup &amp; Multi-Device Sync (AES-256-GCM)</strong>: Synchronisiere deine Datenbank (Tokens, Historie, Entwürfe) sicher und kostenlos zwischen Geräten.</li>
+</ol>
+<hr>
+<h3 id="-importexport-von-beiträgen--bildern-detailerklärung">💾 Import/Export von Beiträgen &amp; Bildern (Detailerklärung)</h3>
+<h4 id="1-importieren-von-beiträgen-postctl-import-pfad">1. Importieren von Beiträgen (<code>postctl import &lt;pfad&gt;</code>)</h4>
+<p>Wenn du <code>./postctl import [datei.md oder ordner/]</code> ausführst, führt das CLI folgende Schritte aus:</p>
+<ul>
+<li><strong>Scan &amp; Parse:</strong> Alle <code>.md</code> und <code>.markdown</code>-Dateien werden analysiert. Die Frontmatter-Eigenschaften werden in SQLite-Datenbankmodelle umgewandelt.</li>
+<li><strong>Validierung:</strong> Vor dem Speichern prüft <code>postctl</code>:
+<ul>
+<li><strong>Zeichenlimits:</strong> Twitter/X-Tweets werden auf die Grenze von 280 Zeichen validiert.</li>
+<li><strong>Bild-Existenz:</strong> Jeder verlinkte Bildpfad wird auf der lokalen Festplatte geprüft. Schlägt die Validierung auch nur einer Datei fehl, wird der gesamte Import abgebrochen.</li>
+</ul>
+</li>
+<li><strong>Speichern:</strong> Validierte Beiträge werden in der lokalen SQLite-Datenbank (<code>postctl.db</code>) als <code>draft</code> (Entwurf) oder <code>scheduled</code> (Geplant) abgelegt.</li>
+</ul>
+<h4 id="2-auflösung-von-bildpfaden">2. Auflösung von Bildpfaden</h4>
+<p>Wenn du ein Bild im Frontmatter angibst (z. B. <code>images: ["logo.png"]</code>), sucht <code>postctl</code> dieses in folgender Reihenfolge:</p>
+<ol>
+<li><strong>Absoluter Pfad:</strong> Direkte Prüfung des absoluten Pfads (z. B. <code>/Users/gweiher/Bilder/logo.png</code>).</li>
+<li><strong>Relativ zur Markdown-Datei:</strong> Prüfung im Ordner der importierten Markdown-Datei (Best Practice für Git-Repositories).</li>
+<li><strong>Relativ zum Arbeitsverzeichnis (CWD):</strong> Prüfung im aktuellen Ordner, in dem der Befehl ausgeführt wird.</li>
+<li><strong>Relativ zum Standard-Bildordner:</strong> Prüfung im unter <code>defaults.image_dir</code> in der <code>config.yaml</code> definierten Pfad.</li>
+</ol>
+<h4 id="3-bild-export-veröffentlichung-auf-den-plattformen">3. Bild-Export (Veröffentlichung auf den Plattformen)</h4>
+<p>Wird ein Beitrag mit Bildern veröffentlicht, lädt <code>postctl</code> die lokalen Bilder zuerst hoch:</p>
+<ul>
+<li><strong>LinkedIn (Nativer Upload):</strong> <code>postctl</code> registriert den Upload, führt einen binären <code>PUT</code>-Request auf die LinkedIn-Server aus und hängt den erhaltenen URN (z. B. <code>urn:li:digitalmediaAsset:...</code>) an das Posting an.</li>
+<li><strong>Twitter/X (Nativer Upload):</strong> Das Bild wird über die v1.1 Media Upload API von X hochgeladen, um eine <code>media_id</code> zu erhalten. Diese wird an den v2-Tweet angehängt.</li>
+<li><strong>Threads (Meta HTTPS-Pflicht):</strong> Die Threads API erlaubt <em>keine</em> binären Uploads von lokalen Rechnern. Sie erfordert eine <strong>öffentlich erreichbare HTTPS-URL</strong>, von der Meta das Bild herunterlädt.
+<ul>
+<li><em>Praxis-Tipp:</em> Hoste deine Bilder für Threads auf einem öffentlichen Cloud-Speicher (z. B. AWS S3, Cloudflare R2, Imgur) und verwende diese URLs direkt im Markdown-Frontmatter.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="️-installation--setup-1">🛠️ Installation &amp; Setup</h3>
+<p>Starte das interaktive Setup-Skript:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">chmod</span><span style="color:#9ECBFF"> +x</span><span style="color:#9ECBFF"> setup.sh</span></span>
+<span class="line"><span style="color:#B392F0">./setup.sh</span></span></code></pre>
+<hr>
+<h3 id="️-einstellungen--auth-in-der-tui">⚙️ Einstellungen &amp; Auth in der TUI</h3>
+<p>Führe <code>./postctl tui</code> aus und wechsle in den <strong>Settings</strong>-Tab:</p>
+<ul>
+<li><strong>Account Auth:</strong> Wähle einen Account unter <strong>PLATFORM ACCOUNTS</strong> und drücke <strong>Enter</strong>. Die TUI pausiert, öffnet deinen Browser und aktualisiert den Status nach erfolgreichem Login.</li>
+<li><strong>Interaktiver Beitrags-Import:</strong> In jedem Haupt-Tab (Dashboard, Posts, Schedule, History) kannst du die Taste <strong><code>i</code></strong> drücken, um einen interaktiven Import zu starten. Die TUI pausiert kurz, leert das Terminal und bittet dich um den Pfad zur Markdown-Datei oder zum Ordner. <strong>Tipp: Du kannst die Datei oder den Ordner einfach per Drag &amp; Drop aus dem Finder direkt in das Terminalfenster ziehen.</strong> Das Tool entfernt automatisch störende Anführungszeichen, validiert die Beiträge/Bilder und kehrt direkt wieder zur TUI zurück.</li>
+<li><strong>Backup &amp; Sync:</strong> Wähle unten im Bereich <strong>BACKUP &amp; SYNC</strong> entweder <code>Backup Exp.</code> (Export) oder <code>Backup Imp.</code> (Import) und drücke <strong>Enter</strong>, um dein Master-Passwort einzugeben.
+<ul>
+<li>CLI-Befehle: <code>./postctl config export -o backup.bin</code> und <code>./postctl config import -f backup.bin</code>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="-vim---neovim-bearbeitungsflow-schritt-für-schritt">📝 Vim- / Neovim-Bearbeitungsflow (Schritt für Schritt)</h3>
+<p>Beim Bearbeiten oder Erstellen eines Beitrags in der TUI kannst du deinen bevorzugten Terminal-Texteditor (wie Vim oder Neovim) starten, um eine ablenkungsfreie und flexible Schreibumgebung zu nutzen.</p>
+<h4 id="schritt-1-externen-editor-öffnen">Schritt 1: Externen Editor öffnen</h4>
+<ol>
+<li>Wähle in der TUI einen Beitrag aus und drücke <strong><code>e</code></strong>, um das Bearbeitungsformular zu öffnen.</li>
+<li>Drücke die Tastenkombination <strong><code>ctrl+v</code></strong> in einem beliebigen Eingabefeld.</li>
+<li>Die TUI pausiert und öffnet Neovim/Vim (das Tool nutzt die Umgebungsvariable <code>$EDITOR</code> und weicht bei Bedarf auf <code>nvim</code> oder <code>vim</code> aus).</li>
+</ol>
+<h4 id="schritt-2-aufbau-der-vorlage-verstehen">Schritt 2: Aufbau der Vorlage verstehen</h4>
+<p>Die in Vim geöffnete temporäre Datei besteht aus drei Abschnitten:</p>
+<ol>
+<li><strong>Interaktiver Hilfeblock (<code>&lt;!-- ... --&gt;</code>)</strong>:
+<ul>
+<li>Zeigt ein Zeichenlineal passend zur aktuellen Plattform (z. B. 280 Zeichen für Twitter, 300 für Bluesky, 500 für Mastodon).</li>
+<li>Zeigt die Zeichenanzahl zum Zeitpunkt des Aufrufs für Einzelbeiträge oder Threads (getrennt durch <code>---</code>).</li>
+<li><em>Hinweis:</em> Dieser HTML-Kommentarblock wird beim Speichern automatisch entfernt.</li>
+</ul>
+</li>
+<li><strong>YAML-Frontmatter-Block</strong>:
+<ul>
+<li>Eingegrenzt durch die <code>---</code> Linien:
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#B392F0">---</span></span>
+<span class="line"><span style="color:#85E89D">platform</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">twitter</span></span>
+<span class="line"><span style="color:#85E89D">campaign</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">launch-2026</span></span>
+<span class="line"><span style="color:#85E89D">schedule</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">2026-06-25 15:00:00</span></span>
+<span class="line"><span style="color:#85E89D">images</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"logo.png"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#B392F0">---</span></span></code></pre>
+</li>
+<li><strong>Bidirektionale Synchronisierung:</strong> Du kannst diese Metadaten direkt in Vim ändern! Nach dem Schließen parst <code>postctl</code> diesen YAML-Header und aktualisiert automatisch die Eingabefelder in der TUI.</li>
+</ul>
+</li>
+<li><strong>Beitragsinhalt (Body)</strong>:
+<ul>
+<li>Der eigentliche Inhalt deines Beitrags beginnt direkt unter der schließenden <code>---</code>-Linie des Frontmatter-Blocks.</li>
+</ul>
+</li>
+</ol>
+<h4 id="schritt-3-beitrag-oder-thread-schreiben">Schritt 3: Beitrag oder Thread schreiben</h4>
+<ul>
+<li>Schreibe deinen gewünschten Text.</li>
+<li>Wenn du einen mehrteiligen Thread verfasst (z. B. für Twitter/X), trenne die einzelnen Beiträge mit einer Zeile, die nur aus <strong><code>---</code></strong> besteht.</li>
+<li><em>Beispiel:</em>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>Das ist der erste Tweet meines Threads.</span></span>
+<span class="line"><span>---</span></span>
+<span class="line"><span>Das ist der zweite Tweet meines Threads.</span></span></code></pre>
+</li>
+</ul>
+<h4 id="schritt-4-speichern--zurückkehren">Schritt 4: Speichern &amp; Zurückkehren</h4>
+<ol>
+<li>Speichere und schließe den Editor mit <strong><code>:wq</code></strong> oder <strong><code>:x</code></strong> (oder drücke <strong><code>ZZ</code></strong> im Normal-Modus).</li>
+<li>Die TUI wird sofort fortgesetzt. Der Textinhalt wird aktualisiert, die Hilfskommentare entfernt und die editierten Frontmatter-Metadaten werden direkt in die TUI-Formularfelder übernommen.</li>
+<li>Überprüfe die Änderungen in der TUI, navigiere auf den <strong><code>Save</code></strong>-Button und bestätige mit <strong><code>Enter</code></strong>, um den Beitrag in der Datenbank zu speichern.</li>
+</ol>
+</div></section><!-- Tab 2: Installation --><section class="doc-section" id="doc-installation"><div class="doc-body markdown-content"><h1>Installation & Setup Guide</h1><p>Get started with <code>postctl</code> by building the binary and initializing your local developer workspace.</p><h2>System Requirements</h2><ul><li><strong>Operating System:</strong> macOS, Linux, or Windows (WSL recommended).</li><li><strong>Go Toolchain:</strong> Go 1.22 or higher installed on your system.</li><li><strong>SQLite:</strong> Local SQLite client library (CGO-free driver is compiled directly inside).</li></ul><h2>One-Step Automatic setup</h2><p>The easiest way to initialize the application, databases, and dependencies is to run the interactive setup script:</p><pre class="code-block" data-lang="bash"><code>chmod +x setup.sh
+./setup.sh</code></pre><p>The setup script will:</p><ol><li>Verify your local Go environment.</li><li>Download required packages (including Bubble Tea, Cobra, and SQLite).</li><li>Build the production binary <code>postctl</code>.</li><li>Create the configuration directory at <code>~/.config/postctl/</code>.</li><li>Generate a default <code>config.yaml</code> and empty SQLite database.</li></ol><h2>Manual Compilation</h2><p>If you prefer to compile the application manually, run:</p><pre class="code-block" data-lang="bash"><code># Download dependencies
+go mod download
+
+# Build binary with embedded assets
+go build -o postctl main.go
+
+# Run help command to verify
+./postctl --help</code></pre><h2>Configuration Directory</h2><p>The application creates and expects files in the user config directory: <code>~/.config/postctl/</code></p><ul><li><code>config.yaml</code>: Holds all your global default preferences, AI configurations, and platform API credentials.</li><li><code>postctl.db</code>: The local SQLite database housing campaigns, post statuses, histories, and encrypted credentials.</li></ul></div></section><!-- Tab 3: Vim Flow --><section class="doc-section" id="doc-vim-flow"><div class="doc-body markdown-content"><h1>📝 Vim / Neovim External Editor Flow</h1><p>Inside the interactive Terminal UI, you can spawn your terminal-native text editor (like Neovim or Vim) to edit post text, adjust templates, or modify metadata on the fly.</p><div class="callout tip"><strong>Did you know?</strong> Any changes to metadata inside the YAML block in Vim will sync back into your TUI fields automatically.</div><h2>How to trigger the Editor</h2><ol><li>Start the TUI dashboard: <code>./postctl tui</code></li><li>Navigate to a post or campaign and press <strong><code>e</code></strong> to open the edit form.</li><li>While focused on the body or any text input field, press <strong><code>ctrl+v</code></strong>.</li><li>The TUI process suspends, and your terminal launches your configured editor (reads <code>$EDITOR</code>, falling back to <code>nvim</code> or <code>vim</code>).</li></ol><h2>The Template File Structure</h2><p>Vim opens a temporary file formatted as Markdown. It contains three distinct blocks:</p><h3>1. Interactive Helper Block (HTML Comments)</h3><pre class="code-block" data-lang="markdown"><code>&lt;!--
+ postctl Editor Help (TWITTER)
+ ==================================
+ [Character Ruler (Max 280 characters per tweet)]
+ 000      030      060      090      120      150      180      210      240      270 280!
+ |--------|--------|--------|--------|--------|--------|--------|--------|--------|-|
+ 
+ Current Thread Status:
+   Tweet 1: 220 chars (60 remaining) [✓]
+   Tweet 2: 110 chars (170 remaining) [✓]
+
+ NOTE: This helper block will be stripped out automatically upon save.
+ Write your post content below this comment:
+--&gt;</code></pre><p>This block updates dynamically according to your target platform limits (280 for Twitter, 300 for Bluesky, 500 for Mastodon). It is stripped out automatically when saving.</p><h3>2. YAML Frontmatter Block</h3><pre class="code-block" data-lang="yaml"><code>---
+platform: twitter
+campaign: launch-2026
+schedule: 2026-06-25 15:00:00
+images: ["logo.png"]
+---</code></pre><p><strong>Bidirectional Syncing:</strong> You can edit these values inside Vim. Changing the campaign name, target platform, schedule timestamp, or image list updates the TUI form fields immediately upon return.</p><h3>3. Content Body</h3><p>The post body begins after the closing <code>---</code> frontmatter delimiter. Write your post in standard Markdown.</p><p>For multi-post threads, separate each section using a line containing only <code>---</code>.</p></div></section><!-- Tab 4: Image Resolution --><section class="doc-section" id="doc-image-resolution"><div class="doc-body markdown-content"><h1>🖼️ Image Path Resolution & Platform Uploads</h1><p>Manage and attach media assets seamlessly using local file references.</p><h2>How Image Paths Are Resolved</h2><p>When you reference a file name or path in your post frontmatter (e.g. <code>images: ["dashboard-screenshot.png"]</code>), <code>postctl</code> executes a fallback search in the following sequence:</p><ol><li><strong>Absolute Path Check:</strong> Is it a literal path on your system? (e.g. <code>/Users/user/Pictures/screenshot.png</code>)</li><li><strong>Relative to Markdown Document:</strong> If you imported a file from <code>/code/posts/announcement.md</code>, it checks <code>/code/posts/dashboard-screenshot.png</code>.</li><li><strong>Current Working Directory (CWD):</strong> Checks the folder where you launched the <code>postctl</code> command.</li><li><strong>Global Default Image Directory:</strong> Checks the directory specified by <code>defaults.image_dir</code> in your <code>~/.config/postctl/config.yaml</code> file.</li></ol><h2>Platform-Specific Upload Behavior</h2><p>Each platform API handles media uploads differently, which is automatically abstracted by the driver layers:</p><ul><li><strong>LinkedIn (Native Hosting):</strong> Images are uploaded as raw binary assets to LinkedIn. The API registers the upload, performs a <code>PUT</code>, and links the resulting URN (e.g., <code>urn:li:digitalmediaAsset:...</code>) to your post.</li><li><strong>Twitter / X (Native Hosting):</strong> Images are uploaded to the Twitter v1.1 Media Upload endpoint to obtain a <code>media_id</code>, which is attached to the v2 tweet.</li><li><strong>Mastodon / Bluesky (Native):</strong> Media files are uploaded to platform attachment endpoints (or blob records for Bluesky AT Protocol) and linked to the status.</li><li><strong>Threads (Meta HTTPS Requirement):</strong> The Threads API does not allow binary local uploads. Instead, it expects a public HTTPS URL (e.g. <code>https://yourdomain.com/assets/screenshot.png</code>) from which the Meta crawler fetches the image. If publishing to Threads, host your images on an external cloud (S3, R2, Imgur) and reference that HTTPS URL in the frontmatter.</li></ul></div></section><!-- Tab 5: Twitter / X Setup --><section class="doc-section" id="doc-api-twitter"><div class="doc-body markdown-content"><h1 id="twitterx-api-setup-guide-für-postctl">Twitter/X API Setup Guide für postctl</h1>
+<p>Dieses Dokument beschreibt Schritt für Schritt, wie du deine eigenen API-Anmeldedaten für Twitter/X erstellst und in <code>postctl</code> einrichtest.</p>
+<hr>
+<h2 id="1-twitter-developer-account--kostenpflichtiges-api-tier-einrichten">1. Twitter Developer Account &amp; Kostenpflichtiges API-Tier einrichten</h2>
+<blockquote>
+<p>[!IMPORTANT]
+<strong>Wichtiger Hinweis zum Preismodell (Stand 2026):</strong>
+Twitter/X hat alle kostenlosen Tarife („Free Tier“) für den Schreibzugriff (Veröffentlichen von Tweets) vollständig eingestellt.
+Um Beiträge über <code>postctl</code> posten zu können, benötigst du einen kostenpflichtigen Zugang:</p>
+<ul>
+<li><strong>Prepaid / Pay-Per-Use (Pay-as-you-go):</strong> Abrechnung nach tatsächlicher Nutzung.</li>
+<li><strong>Basic Tier (ca. $100/Monat):</strong> Ermöglicht das automatisierte Veröffentlichen von Beiträgen sowie grundlegende Lesezugriffe über die v2 API.</li>
+</ul>
+<p>Ohne ein aktives, bezahltes Abonnement oder aufgeladenes Prepaid-Guthaben im Twitter Developer Portal wird jeder Versuch, einen Beitrag zu posten, mit einem API-Fehler (<code>403 Forbidden</code>) abgebrochen.</p>
+</blockquote>
+<ol>
+<li>Gehe auf das <a href="https://developer.twitter.com">Twitter Developer Portal</a>.</li>
+<li>Melde dich mit deinem Twitter/X-Konto an.</li>
+<li>Richte dein API-Abonnement (Basic Tier oder Prepaid API Credits) ein, um Schreibrechte zu erhalten.</li>
+</ol>
+<hr>
+<h2 id="2-app-im-developer-portal-konfigurieren">2. App im Developer Portal konfigurieren</h2>
+<ol>
+<li>Erstelle ein neues <strong>Projekt</strong> und eine neue <strong>App</strong> in deinem Portal-Dashboard.</li>
+<li>Navigiere in den <strong>App Settings</strong> zum Bereich <strong>User authentication settings</strong> und klicke auf <strong>Set up</strong> oder <strong>Edit</strong>:
+<ul>
+<li><strong>App Type</strong>: Wähle <strong>Web App, Automated App or Bot</strong>.</li>
+<li><strong>App Permissions</strong>: Wähle <strong>Read and Write</strong> (wichtig, damit <code>postctl</code> Tweets veröffentlichen kann).</li>
+<li><strong>Type of App</strong>: Wähle <strong>Native App</strong> oder <strong>Single Page App</strong> (damit der OAuth 2.0 PKCE Flow unterstützt wird).</li>
+<li><strong>Callback Image / Redirect URI</strong>: Trage exakt <code>http://localhost:8753/callback</code> ein. (Das CLI startet einen lokalen Webserver unter diesem Port, um den Autorisierungscode abzufangen).</li>
+<li><strong>Website URL</strong>: Trage deine eigene Website oder <code>https://github.com/aeon022/postctl</code> ein.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="3-client-id--client-secret-erhalten">3. Client ID &amp; Client Secret erhalten</h2>
+<p>Nach dem Speichern der Authentifizierungseinstellungen zeigt dir das Developer Portal deine <strong>OAuth 2.0 Client ID</strong> und dein <strong>Client Secret</strong> an.</p>
+<blockquote>
+<p>[!IMPORTANT]
+Sichere diese Werte sofort. Das Client Secret wird nur einmalig angezeigt.</p>
+</blockquote>
+<hr>
+<h2 id="4-in-postctl-eintragen">4. In <code>postctl</code> eintragen</h2>
+<p>Verwende das <code>postctl config set</code> Kommando, um deine Schlüssel zu speichern (nutze das lokale Binary <code>./postctl</code>):</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># Client ID eintragen</span></span>
+<span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> set</span><span style="color:#9ECBFF"> twitter.client_id</span><span style="color:#9ECBFF"> "DEINE_CLIENT_ID"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># Client Secret eintragen</span></span>
+<span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> set</span><span style="color:#9ECBFF"> twitter.client_secret</span><span style="color:#9ECBFF"> "DEIN_CLIENT_SECRET"</span></span></code></pre>
+<p>Du kannst die Konfiguration mit folgendem Befehl überprüfen:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> show</span></span></code></pre>
+<hr>
+<h2 id="5-authentifizierung-starten">5. Authentifizierung starten</h2>
+<p>Führe danach den OAuth-Flow aus:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> auth</span><span style="color:#9ECBFF"> twitter</span></span></code></pre>
+<ol>
+<li>Es öffnet sich automatisch ein Browserfenster mit dem Twitter-Autorisierungsdialog.</li>
+<li>Bestätige den Zugriff.</li>
+<li>Nach erfolgreicher Bestätigung speichert <code>postctl</code> dein verschlüsseltes Access- und Refresh-Token in der SQLite-Datenbank.</li>
+<li>Du bist nun bereit, Tweets mit <code>./postctl post</code> oder <code>./postctl campaign post</code> zu veröffentlichen (sofern ein bezahltes API-Tier aktiv ist).</li>
+</ol>
+</div></section><!-- Tab 6: LinkedIn Setup --><section class="doc-section" id="doc-api-linkedin"><div class="doc-body markdown-content"><h1 id="linkedin-api-setup-guide-für-postctl">LinkedIn API Setup Guide für postctl</h1>
+<p>Dieses Dokument beschreibt Schritt für Schritt, wie du eine LinkedIn-Entwickler-App erstellst, diese auf das moderne OpenID Connect (OIDC) migrierst und deine Zugangsdaten für <code>postctl</code> einrichtest.</p>
+<hr>
+<h2 id="1-entwickler-app-auf-linkedin-erstellen">1. Entwickler-App auf LinkedIn erstellen</h2>
+<ol>
+<li>Gehe zum <a href="https://linkedin.com/developers">LinkedIn Developer Portal</a>.</li>
+<li>Melde dich mit deinem persönlichen LinkedIn-Konto an.</li>
+<li>Klicke auf <strong>Create App</strong>:
+<ul>
+<li><strong>App Name</strong>: Gib deiner App einen Namen (z. B. <code>postctl-publisher</code>).</li>
+<li><strong>LinkedIn Page</strong>: Verknüpfe die App mit deiner LinkedIn-Unternehmensseite oder erstelle eine temporäre Seite (Pflichtfeld).</li>
+<li><strong>App Logo</strong>: Lade das generierte Logo aus <code>postctl/icons</code> (oder ein anderes quadratisches Bild) hoch.</li>
+<li><strong>Legal Terms</strong>: Stimme den Bedingungen zu und klicke auf <strong>Create app</strong>.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="2-produkte-hinzufügen-sehr-wichtig">2. Produkte hinzufügen (Sehr wichtig!)</h2>
+<p>Standardmäßig hat eine neue LinkedIn-App keine Berechtigungen für Beitrags-Postings. Seit August 2023 hat LinkedIn die alten Berechtigungen (<code>r_liteprofile</code>) abgelöst. Du musst die folgenden Produkte aktivieren:</p>
+<ol>
+<li>Gehe in deiner App zum Reiter <strong>Products</strong>.</li>
+<li>Suche nach <strong>Share on LinkedIn</strong> und klicke auf <strong>Request access</strong> (dies wird in der Regel sofort genehmigt).</li>
+<li>Suche nach <strong>Sign In with LinkedIn using OpenID Connect</strong> (nicht das veraltete <em>Sign In with LinkedIn</em>) und aktiviere dieses, um den modernen OIDC-Login freizuschalten.</li>
+</ol>
+<hr>
+<h2 id="3-authentifizierungs-einstellungen-konfigurieren">3. Authentifizierungs-Einstellungen konfigurieren</h2>
+<ol>
+<li>Gehe zum Reiter <strong>Auth</strong>.</li>
+<li>Scrolle zum Bereich <strong>OAuth 2.0 settings</strong>:
+<ul>
+<li>Füge unter <strong>Authorized Redirect URLs</strong> folgenden Callback hinzu:
+<code>http://localhost:8753/callback</code></li>
+<li>Klicke auf <strong>Update</strong>.</li>
+</ul>
+</li>
+<li>Überprüfe im Bereich <strong>OAuth 2.0 scopes</strong>, ob dir nun folgende Scopes angezeigt werden:
+<ul>
+<li><code>openid</code>, <code>profile</code>, <code>w_member_social</code>, <code>email</code>.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="4-client-id--client-secret-kopieren">4. Client ID &amp; Client Secret kopieren</h2>
+<ol>
+<li>Bleibe im Reiter <strong>Auth</strong>.</li>
+<li>Kopiere im Bereich <strong>Application credentials</strong> die <strong>Client ID</strong> und das <strong>Client Secret</strong>.</li>
+</ol>
+<hr>
+<h2 id="5-in-postctl-konfigurieren">5. In <code>postctl</code> konfigurieren</h2>
+<p>Nutze das CLI, um die Zugangsdaten in deiner <code>config.yaml</code> zu speichern (nutze das lokale Binary <code>./postctl</code>):</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># Client ID konfigurieren</span></span>
+<span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> set</span><span style="color:#9ECBFF"> linkedin.client_id</span><span style="color:#9ECBFF"> "DEINE_CLIENT_ID"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># Client Secret konfigurieren</span></span>
+<span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> set</span><span style="color:#9ECBFF"> linkedin.client_secret</span><span style="color:#9ECBFF"> "DEIN_CLIENT_SECRET"</span></span></code></pre>
+<p>Überprüfe die Einstellungen:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> show</span></span></code></pre>
+<hr>
+<h2 id="6-verbindung-herstellen-auth-flow">6. Verbindung herstellen (Auth Flow)</h2>
+<p>Starte den Authentifizierungs-Flow:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> auth</span><span style="color:#9ECBFF"> linkedin</span></span></code></pre>
+<ol>
+<li>Es öffnet sich automatisch ein Browserfenster, das dich auffordert, deiner App den Zugriff auf dein LinkedIn-Profil zu erlauben.</li>
+<li>Nach Klick auf <strong>Zulassen/Allow</strong> wirst du zum lokalen Webserver weitergeleitet.</li>
+<li>Das CLI fängt das Token über den OIDC-Flow ab, ermittelt die Benutzer-ID (über <code>/v2/userinfo</code>), verschlüsselt das Access Token und speichert es in der lokalen SQLite-Datenbank.</li>
+<li>Du bist nun bereit, Beiträge auf LinkedIn zu veröffentlichen!</li>
+</ol>
+</div></section><!-- Tab 7: Threads Setup --><section class="doc-section" id="doc-api-threads"><div class="doc-body markdown-content"><h1 id="threads-meta-api-setup-guide-für-postctl">Threads (Meta) API Setup Guide für postctl</h1>
+<p>Dieses Dokument beschreibt detailliert, wie du Zugriff auf die offizielle Threads API erhältst, deine App im Meta Developer Portal konfigurierst und die Authentifizierung für <code>postctl</code> einrichtest.</p>
+<hr>
+<h2 id="1-meta-developer-app-erstellen">1. Meta Developer App erstellen</h2>
+<ol>
+<li>Gehe zum <a href="https://developers.facebook.com">Meta Developer Portal</a> und melde dich an.</li>
+<li>Klicke oben rechts auf <strong>Meine Apps</strong> und dann auf <strong>App erstellen</strong> (Create App):
+<ul>
+<li>Wähle als App-Typ <strong>Anderes</strong> (Other) und klicke auf <em>Weiter</em>.</li>
+<li>Wähle als App-Typ <strong>Verbraucher</strong> (Consumer) oder einen Typ, der dir Zugriff auf die Threads/Instagram API ermöglicht.</li>
+<li>Vergib einen Namen für deine Anwendung (z. B. <code>postctl-threads-app</code>).</li>
+<li>Klicke auf <strong>App erstellen</strong> (Ggf. musst du dein Facebook-Passwort eingeben).</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="2-threads-api-hinzufügen">2. Threads API hinzufügen</h2>
+<ol>
+<li>Scrolle im Dashboard deiner erstellten App nach unten zu <strong>Produkt hinzufügen</strong> (Add Products to Your App).</li>
+<li>Suche nach <strong>Threads API</strong> und klicke auf <strong>Einrichten</strong> (Set Up).</li>
+<li>Die App befindet sich nun im <strong>Entwicklungsmodus</strong> (In Development) – das ist perfekt und wichtig für die lokale Entwicklung.</li>
+</ol>
+<hr>
+<h2 id="3-callback-urls-konfigurieren-wichtig-pflichtfelder--https">3. Callback-URLs konfigurieren (Wichtig: Pflichtfelder &amp; HTTPS!)</h2>
+<p>Meta erzwingt für die Threads API eine sichere HTTPS-Verbindung. Gleichzeitig weigert sich das Dashboard, Änderungen zu speichern, wenn Deinstallations- oder Lösch-URLs fehlen.</p>
+<ol>
+<li>Klicke in der linken Navigationsleiste unter <strong>Threads API</strong> auf <strong>Threads-Einstellungen</strong> (Threads Settings) oder gehe zu <strong>Anwendungsfälle</strong> (Use Cases) ➔ <strong>Auf Threads API zugreifen</strong> ➔ <strong>Anpassen / Einstellungen</strong>.</li>
+<li>Konfiguriere dort die folgenden drei Felder:
+<ul>
+<li><strong>Callback-URLs umleiten</strong> (Valid OAuth Redirect URIs):
+<code>https://localhost:8753/callback</code> (Wichtig: <strong>https</strong> statt http!)</li>
+<li><strong>Callback-URL deinstallieren</strong> (Uninstall Callback URL):
+<code>https://localhost:8753/uninstall</code> (oder <code>https://example.com/uninstall</code> als Platzhalter)</li>
+<li><strong>Callback-URL löschen</strong> (Delete Callback URL):
+<code>https://localhost:8753/delete</code> (oder <code>https://example.com/delete</code> als Platzhalter)</li>
+</ul>
+</li>
+<li>Klicke unten rechts auf <strong>Speichern</strong> (Save).</li>
+</ol>
+<hr>
+<h2 id="4-app-rollen--tester-einladung-einrichten-wichtig">4. App-Rollen &amp; Tester-Einladung einrichten (Wichtig!)</h2>
+<p>Da sich deine App im Entwicklungsmodus befindet, kann sie nur von Benutzern authentifiziert werden, die explizit als Tester registriert sind.</p>
+<h3 id="schritt-a-tester-im-meta-dashboard-hinzufügen">Schritt A: Tester im Meta-Dashboard hinzufügen</h3>
+<ol>
+<li>Klicke in der linken Navigationsleiste auf <strong>App-Rollen</strong> (App Roles / das Personen-Symbol) ➔ <strong>Rollen</strong> (Roles).</li>
+<li>Scrolle ganz nach unten zum Bereich <strong>Threads-Tester</strong> (Threads Testers).</li>
+<li>Klicke auf <strong>Threads-Tester hinzufügen</strong> (Add Threads Testers).</li>
+<li>Gib den exakten Instagram/Threads-Benutzernamen des Kontos ein, mit dem du später posten willst, und klicke auf <strong>Bestätigen</strong>.</li>
+</ol>
+<h3 id="schritt-b-einladung-in-instagram-annehmen">Schritt B: Einladung in Instagram annehmen</h3>
+<p>Die Einladung muss von deinem Threads-Konto manuell bestätigt werden:</p>
+<ol>
+<li>Logge dich im Desktop-Browser auf <strong><a href="https://www.instagram.com/">Instagram.com</a></strong> mit dem entsprechenden Account ein.</li>
+<li>Gehe auf dein Profil ➔ Klicke auf das <strong>Zahnrad-Symbol</strong> (Einstellungen).</li>
+<li>Navigiere in der linken Leiste zu <strong>Apps und Websites</strong> (Apps and Websites).</li>
+<li>Klicke oben auf den Reiter <strong>Tester-Einladungen</strong> (Tester Invites).</li>
+<li>Dort wird dir die Einladung deiner App (z. B. <code>postctl-threads-app</code>) angezeigt. Klicke auf <strong>Akzeptieren</strong> (Accept).</li>
+</ol>
+<hr>
+<h2 id="5-app-id--app-secret-abrufen">5. App ID &amp; App Secret abrufen</h2>
+<ol>
+<li>Gehe in der linken Navigationsleiste auf <strong>App-Einstellungen</strong> (App Settings) ➔ <strong>Standard</strong> (Basic).</li>
+<li>Kopiere die <strong>App-ID</strong> (App ID).</li>
+<li>Kopiere den <strong>App-Geheimschlüssel</strong> (App Secret / erfordert Klick auf <em>Anzeigen</em> und Passworteingabe).</li>
+</ol>
+<hr>
+<h2 id="6-in-postctl-konfigurieren">6. In <code>postctl</code> konfigurieren</h2>
+<p>Speichere deine Threads-Zugangsdaten über dein Terminal ab (verwende <code>./postctl</code> für das lokale Binary):</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># App-ID eintragen</span></span>
+<span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> set</span><span style="color:#9ECBFF"> threads.app_id</span><span style="color:#9ECBFF"> "DEINE_APP_ID"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># App Secret eintragen</span></span>
+<span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> set</span><span style="color:#9ECBFF"> threads.app_secret</span><span style="color:#9ECBFF"> "DEIN_APP_SECRET"</span></span></code></pre>
+<p>Überprüfe deine Konfiguration:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> show</span></span></code></pre>
+<hr>
+<h2 id="7-verbindung-herstellen-auth-flow">7. Verbindung herstellen (Auth Flow)</h2>
+<p>Führe den Auth-Flow aus:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> auth</span><span style="color:#9ECBFF"> threads</span></span></code></pre>
+<ol>
+<li>Dein Standardbrowser öffnet sich und leitet dich zum Threads-Anmeldedialog weiter.</li>
+<li>Melde dich mit deinem Threads-Account an und erlaube den Zugriff auf deine Profildaten und Medien (<code>threads_basic</code> und <code>threads_content_publish</code>).</li>
+<li>Nach dem Login leitet dich Meta zurück zu <code>https://localhost:8753/callback</code>.</li>
+<li><strong>Umgang mit der SSL-Warnung im Browser:</strong>
+<ul>
+<li>Da der lokale Server von <code>postctl</code> zur Verschlüsselung ein temporäres, selbstsigniertes SSL-Zertifikat nutzt, wird dein Browser die Warnung <strong>„Dies ist keine sichere Verbindung“</strong> (oder <code>NET::ERR_CERT_AUTHORITY_INVALID</code>) anzeigen.</li>
+<li>Das ist völlig normal und sicher, da die Kommunikation nur lokal auf deinem Mac stattfindet.</li>
+<li>Klicke im Browser-Fenster auf <strong>„Erweitert“</strong> (oder <em>Details anzeigen</em>) und wähle <strong>„Weiter zu localhost (unsicher)“</strong>.</li>
+</ul>
+</li>
+<li>Sobald du darauf klickst, empfängt <code>postctl</code> das Zugriffstoken, tauscht es im Hintergrund in ein 60 Tage gültiges Long-Lived Token um und speichert es verschlüsselt in der SQLite-Datenbank.</li>
+<li>Im Terminal erscheint die Erfolgsmeldung! Du bist nun bereit, Beiträge auf Threads zu posten.</li>
+</ol>
+</div></section><!-- Tab 8: Bluesky & Mastodon Setup --><section class="doc-section" id="doc-api-bluesky-mastodon"><div class="doc-body markdown-content"><h1>🦋 Bluesky & Mastodon Setup Guide</h1><p>Learn how to connect <code>postctl</code> to Bluesky (via the AT Protocol) and Mastodon instances.</p><h2>1. Bluesky Integration</h2><p>Bluesky uses the decentralized AT Protocol. Instead of complex OAuth, it uses secure App Passwords.</p><h3>Step A: Create an App Password</h3><ol><li>Log in to your Bluesky account in your browser.</li><li>Go to <strong>Settings</strong> ➔ <strong>App Passwords</strong>.</li><li>Click <strong>Create App Password</strong>, give it a name (e.g. <code>postctl-cli</code>), and copy the generated password (usually looks like <code>xxxx-xxxx-xxxx-xxxx</code>).</li></ol><h3>Step B: Configure postctl</h3><p>Configure your handle and app password:</p><pre class="code-block" data-lang="bash"><code># Configure handle
+./postctl config set bluesky.handle "yourname.bsky.social"
+
+# Configure app password
+./postctl config set bluesky.app_password "xxxx-xxxx-xxxx-xxxx"</code></pre><h3>Step C: Authenticate</h3><pre class="code-block" data-lang="bash"><code>./postctl auth bluesky</code></pre><p>The CLI will test the connection, fetch your profile, and save the session tokens in your SQLite database. Bluesky posts support up to <strong>300 characters</strong>.</p><hr><h2>2. Mastodon Integration</h2><p>Mastodon supports federated instances and uses client credentials registration per instance.</p><h3>Step A: Configure Instance URL</h3><p>By default, <code>postctl</code> connects to <code>https://mastodon.social</code>. If you are on a different instance, configure it first:</p><pre class="code-block" data-lang="bash"><code>./postctl config set mastodon.instance_url "https://fosstodon.org"</code></pre><h3>Step B: Authenticate</h3><p>Run the login workflow:</p><pre class="code-block" data-lang="bash"><code>./postctl auth mastodon</code></pre><ol><li>The CLI checks if a client application exists on that instance. If not, it registers a new app named <code>postctl</code> on your instance automatically.</li><li>A browser window will open, prompting you to authorize the app.</li><li>Log in and click <strong>Authorize</strong>.</li><li>The tokens are retrieved and securely stored in your local DB. Mastodon posts support up to <strong>500 characters</strong>.</li></ol></div></section><!-- Tab 9: Reddit & Facebook Setup --><section class="doc-section" id="doc-api-reddit-facebook"><div class="doc-body markdown-content"><h1>🤖 Reddit & Facebook Setup Guide</h1><p>Configure automated publication to Reddit subreddits and Facebook business/creator Pages.</p><h2>1. Reddit Integration</h2><p>Reddit postings require creating an OAuth application in your account preferences.</p><h3>Step A: Create Reddit Script App</h3><ol><li>Go to <a href="https://www.reddit.com/prefs/apps" target="_blank" rel="noopener noreferrer">Reddit App Preferences</a>.</li><li>Scroll to the bottom and click <strong>Create Another App...</strong>.</li><li>Fill in the fields:<ul><li><strong>Name:</strong> <code>postctl-publisher</code></li><li><strong>App Type:</strong> Select the radio button for <strong>personal use script</strong>.</li><li><strong>Description:</strong> Terminal publisher CLI.</li><li><strong>Redirect URI:</strong> <code>http://localhost:8753/callback</code></li></ul></li><li>Click <strong>Create App</strong>.</li><li>Copy the Client ID (shown in bold text under the app title "personal use script") and the Client Secret (listed as "secret").</li></ol><h3>Step B: Save Preferences</h3><pre class="code-block" data-lang="bash"><code>./postctl config set reddit.client_id "YOUR_REDDIT_CLIENT_ID"
+./postctl config set reddit.client_secret "YOUR_REDDIT_CLIENT_SECRET"</code></pre><h3>Step C: Connect</h3><pre class="code-block" data-lang="bash"><code>./postctl auth reddit</code></pre><p>A browser window will open. Click <strong>Allow</strong>. In your frontmatter, map campaigns to specific subreddits using the <code>campaign</code> key or custom fields.</p><hr><h2>2. Facebook Integration</h2><p>Facebook posts are pushed directly to Business/Creator Pages using Meta Graph API tokens.</p><h3>Step A: Create App on Meta Portal</h3><ol><li>Go to the <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer">Meta Developer Portal</a>.</li><li>Create an app of type <strong>Business</strong> or <strong>Other</strong>.</li><li>Configure the OAuth Redirect URL: <code>http://localhost:8753/callback</code></li><li>Go to Settings ➔ Basic and copy your <strong>App ID</strong> and <strong>App Secret</strong>.</li><li>Identify the target Facebook Page ID (found in your Facebook Page "About" info).</li></ol><h3>Step B: Save to Configuration</h3><pre class="code-block" data-lang="bash"><code>./postctl config set facebook.app_id "YOUR_FB_APP_ID"
+./postctl config set facebook.app_secret "YOUR_FB_APP_SECRET"
+./postctl config set facebook.page_id "YOUR_FB_PAGE_ID"</code></pre><h3>Step C: Run Authentication</h3><pre class="code-block" data-lang="bash"><code>./postctl auth facebook</code></pre><p>Accept the prompt to authorize managing and publishing pages. The access token is exchanged for a permanent page access token and saved securely.</p></div></section><!-- Tab 10: System Spec --><section class="doc-section" id="doc-system-spec"><div class="doc-body markdown-content"><h1 id="postctl--specification">postctl — Specification</h1>
+<h2 id="overview">Overview</h2>
+<p><strong>postctl</strong> is a TUI CLI tool written in Go that manages social media postings across Twitter/X, LinkedIn, and Threads. Posts are authored as Markdown files, imported into a local SQLite database, previewed in a terminal UI, and published via platform APIs — immediately or on a schedule.</p>
+<h2 id="user-stories">User Stories</h2>
+<h3 id="as-a-solo-developer--indie-hacker">As a solo developer / indie hacker:</h3>
+<ul>
+<li>I want to write posts as Markdown files in my repo</li>
+<li>I want to preview how a Twitter thread will look before posting</li>
+<li>I want to schedule posts for optimal timing across time zones</li>
+<li>I want to post the same content to multiple platforms with one command</li>
+<li>I want to see what I’ve posted and when</li>
+<li>I want character count validation before posting (280 chars per tweet)</li>
+</ul>
+<h3 id="as-an-ai-assistant-claude-gpt-antigravity">As an AI assistant (Claude, GPT, Antigravity):</h3>
+<ul>
+<li>I want to create properly formatted Markdown posts</li>
+<li>I want to trigger posting via CLI commands</li>
+<li>I want to check post status and history</li>
+<li>I want to run the full workflow end-to-end without human intervention (except approval)</li>
+<li>I want structured JSON output for all commands so I can parse results</li>
+<li>I want dry-run mode to preview everything before committing</li>
+</ul>
+<h2 id="ai-as-operator-principle">AI-as-Operator Principle</h2>
+<p><strong>postctl is designed for AI to operate, not just to generate text.</strong></p>
+<p>Most social media tools treat AI as a copywriting feature — “AI writes your caption.” postctl treats AI as the operator of the entire tool. The human sets the strategy and approves; the AI executes.</p>
+<h3 id="workflow-ai-operates-human-approves">Workflow: AI operates, human approves</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Human: "Post the new Orbiter v0.3.66 release"</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>AI (Claude/GPT):</span></span>
+<span class="line"><span>   1. Writes posts as Markdown files (all platforms, EN+DE)</span></span>
+<span class="line"><span>   2. postctl import ./posts/</span></span>
+<span class="line"><span>   3. postctl list --format json          → shows draft posts</span></span>
+<span class="line"><span>   4. "Here are 8 posts ready. Review?"</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>Human: "LinkedIn DE ändern, sonst passt"</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>AI:</span></span>
+<span class="line"><span>   5. Edits the file, re-imports</span></span>
+<span class="line"><span>   6. postctl campaign post orbiter-v0366 --dry-run</span></span>
+<span class="line"><span>   7. "Dry run passed. Post?"</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>Human: "go"</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>AI:</span></span>
+<span class="line"><span>   8. postctl campaign post orbiter-v0366</span></span>
+<span class="line"><span>   9. "Posted. 4/4 Twitter, 2/2 LinkedIn, 2/2 Threads. IDs: ..."</span></span></code></pre>
+<h3 id="design-requirements-for-ai-operation">Design requirements for AI operation</h3>
+<ol>
+<li><strong>All commands must work non-interactively</strong> — no prompts, no “are you sure?”, no interactive menus. Flags control everything.</li>
+<li><strong><code>--format json</code></strong> on all commands — structured output that AI can parse. Default is human-readable, <code>--format json</code> returns machine-readable.</li>
+<li><strong><code>--dry-run</code></strong> on all mutation commands — AI can preview without side effects. Human approves, then AI runs without <code>--dry-run</code>.</li>
+<li><strong>Exit codes</strong> — 0 = success, 1 = validation error, 2 = API error, 3 = auth error. AI reads exit codes, not just output.</li>
+<li><strong>Idempotent imports</strong> — running <code>postctl import</code> twice doesn’t duplicate posts. AI can re-import after edits without cleanup.</li>
+<li><strong>Partial failure recovery</strong> — if tweet 3/5 fails, <code>postctl post &lt;id&gt; --resume</code> continues from where it stopped. AI doesn’t need to track state manually.</li>
+<li><strong>No browser required</strong> — OAuth flow uses localhost callback, but once authenticated, everything is CLI-only. AI never needs to open a browser.</li>
+<li><strong>Batch operations</strong> — <code>postctl campaign post &lt;name&gt;</code> posts all posts in a campaign. AI doesn’t need to loop over individual posts.</li>
+</ol>
+<h3 id="json-output-example">JSON output example</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> postctl</span><span style="color:#9ECBFF"> list</span><span style="color:#79B8FF"> --format</span><span style="color:#9ECBFF"> json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">  "posts"</span><span style="color:#79B8FF">:</span><span style="color:#E1E4E8"> [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">      "id"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "orbiter-v0366-twitter-en",</span></span>
+<span class="line"><span style="color:#B392F0">      "platform"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "twitter",</span></span>
+<span class="line"><span style="color:#B392F0">      "type"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "thread",</span></span>
+<span class="line"><span style="color:#B392F0">      "status"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "draft",</span></span>
+<span class="line"><span style="color:#B392F0">      "tweets"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> 5,</span></span>
+<span class="line"><span style="color:#B392F0">      "images"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> 2,</span></span>
+<span class="line"><span style="color:#B392F0">      "chars"</span><span style="color:#79B8FF">:</span><span style="color:#E1E4E8"> [245, </span><span style="color:#9ECBFF">220,</span><span style="color:#9ECBFF"> 180,</span><span style="color:#9ECBFF"> 260,</span><span style="color:#9ECBFF"> 190],</span></span>
+<span class="line"><span style="color:#B392F0">      "valid"</span><span style="color:#79B8FF">:</span><span style="color:#79B8FF"> true</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  ],</span></span>
+<span class="line"><span style="color:#B392F0">  "total"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> 8,</span></span>
+<span class="line"><span style="color:#B392F0">  "by_status"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> {"draft":</span><span style="color:#9ECBFF"> 8,</span><span style="color:#9ECBFF"> "posted":</span><span style="color:#9ECBFF"> 0,</span><span style="color:#9ECBFF"> "scheduled":</span><span style="color:#79B8FF"> 0</span><span style="color:#9ECBFF">}</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> postctl</span><span style="color:#9ECBFF"> post</span><span style="color:#9ECBFF"> orbiter-v0366-twitter-en</span><span style="color:#79B8FF"> --format</span><span style="color:#9ECBFF"> json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">  "ok"</span><span style="color:#79B8FF">:</span><span style="color:#79B8FF"> true</span><span style="color:#9ECBFF">,</span></span>
+<span class="line"><span style="color:#B392F0">  "platform"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "twitter",</span></span>
+<span class="line"><span style="color:#B392F0">  "tweets_posted"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> 5,</span></span>
+<span class="line"><span style="color:#B392F0">  "thread_id"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "1234567890",</span></span>
+<span class="line"><span style="color:#B392F0">  "urls"</span><span style="color:#79B8FF">:</span><span style="color:#E1E4E8"> [</span><span style="color:#9ECBFF">"https://x.com/gerwinweiher/status/1234567890"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="core-workflows">Core Workflows</h2>
+<h3 id="1-import-workflow">1. Import Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Markdown files → postctl import → SQLite DB</span></span>
+<span class="line"><span>                                    ↓</span></span>
+<span class="line"><span>                              Posts with status "draft"</span></span></code></pre>
+<p><strong>Input</strong>: Directory of <code>.md</code> files with YAML frontmatter
+<strong>Processing</strong>:</p>
+<ul>
+<li>Parse frontmatter (platform, type, language, campaign, schedule, images)</li>
+<li>Parse body into tweets (split on <code>## Tweet N</code> headers)</li>
+<li>Detect reply section (<code>## Reply</code>)</li>
+<li>Validate: character count per tweet (≤280), image paths exist</li>
+<li>Generate deterministic ID from filename + platform</li>
+<li>Insert/update in SQLite (upsert on ID)</li>
+</ul>
+<p><strong>Output</strong>: Posts in DB with status <code>draft</code> or <code>scheduled</code> (if <code>schedule:</code> frontmatter present)</p>
+<h3 id="2-preview-workflow">2. Preview Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl (no args) → TUI</span></span>
+<span class="line"><span>                      ↓</span></span>
+<span class="line"><span>              Dashboard → Post list → Detail view</span></span>
+<span class="line"><span>                                        ↓</span></span>
+<span class="line"><span>                                   Tweet-by-tweet preview</span></span>
+<span class="line"><span>                                   with char count + image indicators</span></span></code></pre>
+<h3 id="3-post-workflow">3. Post Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl post &#x3C;id> → Load from DB → Validate → API Call → Update status</span></span>
+<span class="line"><span>                                                ↓</span></span>
+<span class="line"><span>                                          Upload images first</span></span>
+<span class="line"><span>                                          Then post text with media IDs</span></span>
+<span class="line"><span>                                          For threads: post sequentially,</span></span>
+<span class="line"><span>                                          reply to previous tweet ID</span></span></code></pre>
+<p><strong>Thread posting sequence</strong>:</p>
+<ol>
+<li>Upload all images → get media IDs</li>
+<li>Post Tweet 1 → get tweet ID</li>
+<li>Post Tweet 2 as reply to Tweet 1 → get tweet ID</li>
+<li>Post Tweet 3 as reply to Tweet 2 → …</li>
+<li>Post Reply tweet as reply to last tweet</li>
+<li>Update DB: status = “posted”, platform_id = first tweet ID</li>
+</ol>
+<p><strong>Error handling</strong>:</p>
+<ul>
+<li>If tweet N fails: mark post as “partial”, store last successful tweet ID</li>
+<li>Retry: resume from the failed tweet (don’t re-post successful ones)</li>
+<li>Rate limit hit: wait and retry with exponential backoff</li>
+</ul>
+<h3 id="4-schedule-workflow">4. Schedule Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl schedule &#x3C;id> "2026-06-23 09:00"</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Update DB: status = "scheduled", scheduled_at = datetime</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Scheduler daemon picks it up at the right time</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Same as Post Workflow</span></span></code></pre>
+<p><strong>Scheduler</strong>:</p>
+<ul>
+<li>Runs as background goroutine when TUI is open</li>
+<li>Also runs as <code>postctl daemon</code> for headless mode</li>
+<li>Checks every 30 seconds for due posts</li>
+<li>Posts in order of scheduled_at</li>
+</ul>
+<h3 id="5-auth-workflow">5. Auth Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl auth twitter</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Open browser → Twitter OAuth consent page</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Local HTTP server on :8753 catches callback</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Exchange code for token</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Store encrypted token in SQLite</span></span></code></pre>
+<h2 id="markdown-format-spec">Markdown Format Spec</h2>
+<h3 id="frontmatter-fields">Frontmatter Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required</th>
+<th>Type</th>
+<th>Values</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>platform</code></td>
+<td>yes</td>
+<td>string</td>
+<td><code>twitter</code>, <code>linkedin</code>, <code>threads</code>, <code>all</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>yes</td>
+<td>string</td>
+<td><code>thread</code>, <code>single</code>, <code>article</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>language</code></td>
+<td>no</td>
+<td>string</td>
+<td>ISO 639-1 (<code>en</code>, <code>de</code>)</td>
+<td><code>en</code></td>
+</tr>
+<tr>
+<td><code>campaign</code></td>
+<td>no</td>
+<td>string</td>
+<td>freeform slug</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>schedule</code></td>
+<td>no</td>
+<td>datetime</td>
+<td>ISO 8601 local</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>images</code></td>
+<td>no</td>
+<td>list</td>
+<td>relative file paths</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>no</td>
+<td>list</td>
+<td>hashtags without #</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="body-format">Body Format</h3>
+<p><strong>Single post</strong> (LinkedIn, Threads):</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="color:#E1E4E8">---</span></span>
+<span class="line"><span style="color:#85E89D">platform</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">linkedin</span></span>
+<span class="line"><span style="color:#85E89D">type</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">single</span></span>
+<span class="line"><span style="color:#E1E4E8">---</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">The entire post body goes here.</span></span>
+<span class="line"><span style="color:#E1E4E8">Multiple paragraphs supported.</span></span></code></pre>
+<p><strong>Thread</strong> (Twitter):</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="color:#E1E4E8">---</span></span>
+<span class="line"><span style="color:#85E89D">platform</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">twitter</span></span>
+<span class="line"><span style="color:#85E89D">type</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">thread</span></span>
+<span class="line"><span style="color:#85E89D">images</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">  - </span><span style="color:#9ECBFF">screenshots/01-dashboard.png</span></span>
+<span class="line"><span style="color:#E1E4E8">---</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF;font-weight:bold">## Tweet 1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">First tweet content. No links here for algorithmic reach.</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF;font-weight:bold">## Tweet 2</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">Second tweet. Attach image: screenshots/01-dashboard.png</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF;font-weight:bold">## Tweet 3</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">Third tweet content.</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF;font-weight:bold">## Reply</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">Links and hashtags go in the self-reply.</span></span>
+<span class="line"><span style="color:#E1E4E8">github.com/aeon022/orbiter</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">#opensource #webdev</span></span></code></pre>
+<p><strong>Rules</strong>:</p>
+<ul>
+<li><code>## Tweet N</code> splits into individual tweets</li>
+<li><code>## Reply</code> is posted as a reply to the last tweet</li>
+<li>Image assignment: first image in <code>images:</code> list goes to Tweet 2, second to Tweet 3, etc. Or use <code>&lt;!-- image: filename.png --&gt;</code> inline</li>
+<li>Character count: ≤280 per tweet (URLs count as 23 chars per Twitter’s t.co)</li>
+<li>Empty tweets are skipped</li>
+</ul>
+<h2 id="platform-api-details">Platform API Details</h2>
+<h3 id="twitterx-v2">Twitter/X v2</h3>
+<p><strong>Auth</strong>: OAuth 2.0 with PKCE</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>GET https://twitter.com/i/oauth2/authorize</span></span>
+<span class="line"><span>  ?client_id=...</span></span>
+<span class="line"><span>  &#x26;redirect_uri=http://localhost:8753/callback</span></span>
+<span class="line"><span>  &#x26;scope=tweet.read+tweet.write+users.read+offline.access</span></span>
+<span class="line"><span>  &#x26;response_type=code</span></span>
+<span class="line"><span>  &#x26;code_challenge=...</span></span>
+<span class="line"><span>  &#x26;code_challenge_method=S256</span></span>
+<span class="line"><span>  &#x26;state=...</span></span></code></pre>
+<p><strong>Post tweet</strong>:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://api.twitter.com/2/tweets</span></span>
+<span class="line"><span>Authorization: Bearer &#x3C;token></span></span>
+<span class="line"><span>Content-Type: application/json</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>{"text": "...", "media": {"media_ids": ["..."]}, "reply": {"in_reply_to_tweet_id": "..."}}</span></span></code></pre>
+<p><strong>Upload media</strong> (v1.1 — still required):</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://upload.twitter.com/1.1/media/upload.json</span></span>
+<span class="line"><span>Content-Type: multipart/form-data</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>media_data=&#x3C;base64></span></span></code></pre>
+<h3 id="linkedin-v2">LinkedIn v2</h3>
+<p><strong>Post</strong>:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://api.linkedin.com/v2/ugcPosts</span></span>
+<span class="line"><span>Authorization: Bearer &#x3C;token></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>  "author": "urn:li:person:&#x3C;id>",</span></span>
+<span class="line"><span>  "lifecycleState": "PUBLISHED",</span></span>
+<span class="line"><span>  "specificContent": {</span></span>
+<span class="line"><span>    "com.linkedin.ugc.ShareContent": {</span></span>
+<span class="line"><span>      "shareCommentary": {"text": "..."},</span></span>
+<span class="line"><span>      "shareMediaCategory": "IMAGE",</span></span>
+<span class="line"><span>      "media": [{"status": "READY", "media": "&#x3C;asset-urn>"}]</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>  },</span></span>
+<span class="line"><span>  "visibility": {"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"}</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p><strong>Image upload</strong> (2-step):</p>
+<ol>
+<li>Register: <code>POST /v2/assets?action=registerUpload</code> → get upload URL + asset URN</li>
+<li>Upload: <code>PUT &lt;upload-url&gt;</code> with binary image data</li>
+</ol>
+<h3 id="threads-meta-graph-api">Threads (Meta Graph API)</h3>
+<p><strong>Create container</strong>:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://graph.threads.net/v1.0/&#x3C;user_id>/threads</span></span>
+<span class="line"><span>  ?media_type=TEXT</span></span>
+<span class="line"><span>  &#x26;text=...</span></span>
+<span class="line"><span>  &#x26;access_token=...</span></span></code></pre>
+<p><strong>Publish</strong>:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://graph.threads.net/v1.0/&#x3C;user_id>/threads_publish</span></span>
+<span class="line"><span>  ?creation_id=&#x3C;container_id></span></span>
+<span class="line"><span>  &#x26;access_token=...</span></span></code></pre>
+<h2 id="error-handling-strategy">Error Handling Strategy</h2>
+<table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rate limit (429)</td>
+<td>Wait <code>retry-after</code> header, then retry</td>
+</tr>
+<tr>
+<td>Auth expired (401)</td>
+<td>Attempt token refresh, if fails prompt re-auth</td>
+</tr>
+<tr>
+<td>Network error</td>
+<td>Retry 3x with exponential backoff (1s, 4s, 16s)</td>
+</tr>
+<tr>
+<td>Partial thread</td>
+<td>Mark as “partial”, store progress, allow resume</td>
+</tr>
+<tr>
+<td>Invalid content</td>
+<td>Validation error before API call, show in TUI</td>
+</tr>
+<tr>
+<td>Image too large</td>
+<td>Resize with Go image library before upload</td>
+</tr>
+</tbody>
+</table>
+<h2 id="non-goals-v1">Non-Goals (v1)</h2>
+<ul>
+<li>No web dashboard</li>
+<li>No multi-user / team features</li>
+<li>No built-in image generation</li>
+<li>No automatic cross-posting (explicit per platform)</li>
+</ul>
+<h2 id="success-metrics">Success Metrics</h2>
+<ul>
+<li>Import 20 Markdown posts in &lt;1 second</li>
+<li>Post a 6-tweet thread with 2 images in &lt;10 seconds</li>
+<li>TUI renders at 60fps on standard terminal</li>
+<li>Single binary, &lt;20MB, no runtime dependencies</li>
+<li>Works on macOS, Linux, Windows</li>
+</ul>
+<hr>
+<h2 id="future-features-v2">Future Features (v2+)</h2>
+<h3 id="postctl-generate"><code>postctl generate</code></h3>
+<p>AI generiert Posts aus einer URL oder einem Markdown-Artikel.</p>
+<ul>
+<li>Input: URL, Markdown-Datei, oder freier Text</li>
+<li>Output: Thread-Draft + LinkedIn-Post + Threads-Post als Markdown</li>
+<li>Nutzt Claude API, OpenAI API, oder Ollama (lokal)</li>
+<li>User reviewt und editiert vor dem Posten</li>
+</ul>
+<h3 id="postctl-repurpose"><code>postctl repurpose</code></h3>
+<p>Nimmt einen bestehenden Post und konvertiert ihn für andere Plattformen.</p>
+<ul>
+<li>Dev.to Artikel → Twitter Thread + LinkedIn + Threads</li>
+<li>Twitter Thread → LinkedIn Langpost</li>
+<li>Passt Länge, Ton, Hashtags automatisch an</li>
+</ul>
+<h3 id="postctl-analytics"><code>postctl analytics</code></h3>
+<p>Engagement-Daten von den APIs nach dem Posten holen.</p>
+<ul>
+<li>Likes, Retweets, Impressions (Twitter)</li>
+<li>Reactions, Comments (LinkedIn)</li>
+<li>Beste Posting-Zeiten ermitteln</li>
+<li>Terminal-Dashboard mit Sparklines</li>
+</ul>
+<h3 id="postctl-template"><code>postctl template</code></h3>
+<p>Vorgefertigte Post-Strukturen.</p>
+<ul>
+<li><code>postctl template launch</code> — Product Launch Announcement</li>
+<li><code>postctl template feature</code> — Feature Update Thread</li>
+<li><code>postctl template thought</code> — Thought Leadership Post</li>
+<li>Generiert Markdown-Datei mit Platzhaltern</li>
+</ul>
+<hr>
+<h2 id="monetarisierung">Monetarisierung</h2>
+<h3 id="postctl-open-source-gratis">postctl (Open Source, gratis)</h3>
+<p>Das CLI-Tool ist MIT-lizenziert. Baut Reputation und Community.</p>
+<h3 id="postctl-pro-9monat-oder-79jahr">postctl pro ($9/Monat oder $79/Jahr)</h3>
+<p>Premium-Features als bezahlte Erweiterung:</p>
+<ul>
+<li><strong>Analytics-Dashboard</strong> — Engagement pro Post, beste Posting-Zeiten, Wachstum über Zeit</li>
+<li><strong>AI-Optimierung</strong> — Claude/GPT rewritet Posts für maximale Reichweite (A/B-Vorschläge)</li>
+<li><strong>Team-Mode</strong> — mehrere Leute posten unter einem Account, Approval-Workflow</li>
+<li><strong>Priority Support</strong> — GitHub Issues mit SLA</li>
+<li>Implementierung: License Key in <code>~/.config/postctl/config.yaml</code>, Feature-Gates im Code</li>
+</ul>
+<h3 id="postctl-cloud-future--19monat">postctl cloud (Future — $19/Monat)</h3>
+<p>Gehostete Version für Nicht-Entwickler.</p>
+<ul>
+<li>Web-UI statt Terminal</li>
+<li>Managed Scheduling (kein eigener Rechner muss laufen)</li>
+<li>Status: niedrige Priorität, nur wenn Nachfrage da ist</li>
+</ul>
+<h3 id="go-tutorial-als-kurs-49-79-einmalig">Go Tutorial als Kurs ($49-79 einmalig)</h3>
+<p>Das Tutorial das wir parallel schreiben wird zum bezahlten Produkt:</p>
+<ul>
+<li>“Build a real CLI tool in Go” — Video-Serie</li>
+<li>postctl als Projekt-Basis, 7 Phasen</li>
+<li>Plattform: eigene Seite, Udemy, oder Lemon Squeezy</li>
+<li>Gratis-Teaser: erste 2 Phasen als Blog-Posts auf Dev.to</li>
+</ul>
+<hr>
+<h2 id="ökosystem-vision">Ökosystem-Vision</h2>
+<p>postctl ist Teil eines Content-Loops:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Orbiter (Create) → postctl (Distribute) → Analytics (Learn) → Orbiter (Improve)</span></span></code></pre>
+<ol>
+<li>Content in Orbiter schreiben (Blog Posts, Pages)</li>
+<li>Posts als Markdown exportieren / generieren</li>
+<li>postctl verteilt auf Twitter, LinkedIn, Threads</li>
+<li>Analytics zeigt was funktioniert</li>
+<li>Insights fließen in nächsten Content-Zyklus</li>
+</ol>
+<p>Langfristig: <code>orbiter export --to-postctl</code> als Integration.</p>
+<hr>
+<h2 id="projekt-setup">Projekt-Setup</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Repository: ~/Developing/Projects/postctl</span></span>
+<span class="line"><span>Module:     github.com/aeon022/postctl</span></span>
+<span class="line"><span>License:    MIT</span></span></code></pre>
+</div></section><!-- Tab 11: Go Tutorial --><section class="doc-section" id="doc-go-tutorial"><div class="doc-body markdown-content"><h1 id="go-tutorial--postctl">Go Tutorial — postctl</h1>
+<p>Dieses Tutorial führt dich durch Go anhand des postctl-Projekts. Jede Phase baut ein Feature und lehrt neue Go-Konzepte.</p>
+<h2 id="kurs-konzept">Kurs-Konzept</h2>
+<p>Dieses Tutorial wird parallel zum Projekt geschrieben und kann als bezahlter Kurs veröffentlicht werden:</p>
+<ul>
+<li><strong>Format</strong>: Video-Serie (Screen Recording + Voiceover) + geschriebenes Tutorial</li>
+<li><strong>Titel</strong>: “Build a real CLI tool in Go — from zero to production”</li>
+<li><strong>Zielgruppe</strong>: Entwickler die Go lernen wollen anhand eines echten Projekts</li>
+<li><strong>Teaser</strong>: Phase 1 + 2 gratis als Blog-Posts auf Dev.to (Traffic + Leads)</li>
+<li><strong>Vollversion</strong>: Phase 3-7 als bezahlter Kurs ($49-79)</li>
+<li><strong>Plattform</strong>: eigene Seite (Lemon Squeezy) oder Udemy</li>
+<li><strong>Sprachen</strong>: Deutsch (primär) + Englisch</li>
+</ul>
+<p>Jede Phase endet mit einer <strong>Challenge</strong> — einer Aufgabe die der Lerner selbst löst bevor er die Lösung sieht.</p>
+<hr>
+<h2 id="voraussetzungen">Voraussetzungen</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># Go installieren</span></span>
+<span class="line"><span style="color:#B392F0">brew</span><span style="color:#9ECBFF"> install</span><span style="color:#9ECBFF"> go</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># Version prüfen (1.22+)</span></span>
+<span class="line"><span style="color:#B392F0">go</span><span style="color:#9ECBFF"> version</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># Editor: VS Code + Go Extension (gopls)</span></span>
+<span class="line"><span style="color:#B392F0">code</span><span style="color:#79B8FF"> --install-extension</span><span style="color:#9ECBFF"> golang.go</span></span></code></pre>
+<h2 id="phase-1-hello-go--projekt-setup">Phase 1: Hello Go — Projekt Setup</h2>
+<h3 id="was-wir-bauen">Was wir bauen</h3>
+<p>Grundgerüst mit Cobra CLI: <code>postctl version</code>, <code>postctl help</code></p>
+<h3 id="go-konzepte">Go-Konzepte</h3>
+<ul>
+<li><strong>Go Modules</strong>: Dependency Management (<code>go.mod</code>)</li>
+<li><strong>Packages</strong>: Code-Organisation in Ordnern</li>
+<li><strong><code>func main()</code></strong>: Entry Point</li>
+<li><strong><code>fmt.Println</code></strong>: Output</li>
+<li><strong>Strings</strong>: String Formatting mit <code>fmt.Sprintf</code></li>
+</ul>
+<h3 id="schritte">Schritte</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># 1. Projekt erstellen</span></span>
+<span class="line"><span style="color:#B392F0">mkdir</span><span style="color:#9ECBFF"> postctl</span><span style="color:#E1E4E8"> &#x26;&#x26; </span><span style="color:#79B8FF">cd</span><span style="color:#9ECBFF"> postctl</span></span>
+<span class="line"><span style="color:#B392F0">go</span><span style="color:#9ECBFF"> mod</span><span style="color:#9ECBFF"> init</span><span style="color:#9ECBFF"> github.com/aeon022/postctl</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 2. Cobra installieren</span></span>
+<span class="line"><span style="color:#B392F0">go</span><span style="color:#9ECBFF"> get</span><span style="color:#9ECBFF"> github.com/spf13/cobra@latest</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 3. Datei erstellen</span></span>
+<span class="line"><span style="color:#B392F0">mkdir</span><span style="color:#79B8FF"> -p</span><span style="color:#9ECBFF"> cmd</span></span></code></pre>
+<p><strong><code>main.go</code></strong> — Entry Point:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="go"><code><span class="line"><span style="color:#F97583">package</span><span style="color:#B392F0"> main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#9ECBFF"> "</span><span style="color:#B392F0">github.com/aeon022/postctl/cmd</span><span style="color:#9ECBFF">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">func</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#E1E4E8">    cmd.</span><span style="color:#B392F0">Execute</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><strong><code>cmd/root.go</code></strong> — Root Command:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="go"><code><span class="line"><span style="color:#F97583">package</span><span style="color:#B392F0"> cmd</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#9ECBFF">    "</span><span style="color:#B392F0">fmt</span><span style="color:#9ECBFF">"</span></span>
+<span class="line"><span style="color:#9ECBFF">    "</span><span style="color:#B392F0">os</span><span style="color:#9ECBFF">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#9ECBFF">    "</span><span style="color:#B392F0">github.com/spf13/cobra</span><span style="color:#9ECBFF">"</span></span>
+<span class="line"><span style="color:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Version — wird beim Build gesetzt</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> Version </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> "dev"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> rootCmd </span><span style="color:#F97583">=</span><span style="color:#F97583"> &#x26;</span><span style="color:#B392F0">cobra</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Command</span><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#E1E4E8">    Use:   </span><span style="color:#9ECBFF">"postctl"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    Short: </span><span style="color:#9ECBFF">"Social media posting from the terminal"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">    Long:  </span><span style="color:#9ECBFF">"postctl manages social media posts from Markdown files.</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">Twitter/X, LinkedIn, and Threads — from one CLI."</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Execute — wird von main() aufgerufen</span></span>
+<span class="line"><span style="color:#F97583">func</span><span style="color:#B392F0"> Execute</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> err </span><span style="color:#F97583">:=</span><span style="color:#E1E4E8"> rootCmd.</span><span style="color:#B392F0">Execute</span><span style="color:#E1E4E8">(); err </span><span style="color:#F97583">!=</span><span style="color:#79B8FF"> nil</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        fmt.</span><span style="color:#B392F0">Fprintln</span><span style="color:#E1E4E8">(os.Stderr, err)</span></span>
+<span class="line"><span style="color:#E1E4E8">        os.</span><span style="color:#B392F0">Exit</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">func</span><span style="color:#B392F0"> init</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#6A737D">    // Version subcommand</span></span>
+<span class="line"><span style="color:#E1E4E8">    rootCmd.</span><span style="color:#B392F0">AddCommand</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">&#x26;</span><span style="color:#B392F0">cobra</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Command</span><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#E1E4E8">        Use:   </span><span style="color:#9ECBFF">"version"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        Short: </span><span style="color:#9ECBFF">"Print version"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">        Run: </span><span style="color:#F97583">func</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">cmd</span><span style="color:#F97583"> *</span><span style="color:#B392F0">cobra</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Command</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8"> []</span><span style="color:#F97583">string</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            fmt.</span><span style="color:#B392F0">Printf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"postctl </span><span style="color:#79B8FF">%s\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, Version)</span></span>
+<span class="line"><span style="color:#E1E4E8">        },</span></span>
+<span class="line"><span style="color:#E1E4E8">    })</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># Testen</span></span>
+<span class="line"><span style="color:#B392F0">go</span><span style="color:#9ECBFF"> run</span><span style="color:#9ECBFF"> .</span><span style="color:#9ECBFF"> version</span></span>
+<span class="line"><span style="color:#6A737D"># → postctl dev</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># Binary bauen</span></span>
+<span class="line"><span style="color:#B392F0">go</span><span style="color:#9ECBFF"> build</span><span style="color:#79B8FF"> -o</span><span style="color:#9ECBFF"> postctl</span><span style="color:#9ECBFF"> .</span></span>
+<span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> version</span></span></code></pre>
+<h3 id="-gelernt">🎓 Gelernt</h3>
+<ul>
+<li><code>go mod init</code> erstellt ein Modul</li>
+<li><code>go get</code> installiert Dependencies</li>
+<li><code>package main</code> + <code>func main()</code> = Programm-Start</li>
+<li>Cobra strukturiert CLI Commands als Baumstruktur</li>
+<li><code>&amp;cobra.Command{}</code> = Pointer zu einem Struct</li>
+</ul>
+<hr>
+<h2 id="phase-2-structs--models--datenstruktur">Phase 2: Structs &amp; Models — Datenstruktur</h2>
+<h3 id="was-wir-bauen-1">Was wir bauen</h3>
+<p>Post-Datenmodell: <code>Post</code>, <code>Tweet</code>, <code>Campaign</code> Structs</p>
+<h3 id="go-konzepte-1">Go-Konzepte</h3>
+<ul>
+<li><strong>Structs</strong>: Custom Types</li>
+<li><strong>Felder + Tags</strong>: JSON/YAML Tags für Serialisierung</li>
+<li><strong>Methoden</strong>: Funktionen auf Structs</li>
+<li><strong>Slices</strong>: Dynamische Arrays</li>
+<li><strong>Enums via Konstanten</strong>: <code>const StatusDraft = "draft"</code></li>
+</ul>
+<h3 id="code">Code</h3>
+<p><strong><code>internal/models/post.go</code></strong>:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="go"><code><span class="line"><span style="color:#F97583">package</span><span style="color:#B392F0"> models</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#9ECBFF"> "</span><span style="color:#B392F0">time</span><span style="color:#9ECBFF">"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Status-Konstanten</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#79B8FF">    StatusDraft</span><span style="color:#F97583">     =</span><span style="color:#9ECBFF"> "draft"</span></span>
+<span class="line"><span style="color:#79B8FF">    StatusScheduled</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> "scheduled"</span></span>
+<span class="line"><span style="color:#79B8FF">    StatusPosted</span><span style="color:#F97583">    =</span><span style="color:#9ECBFF"> "posted"</span></span>
+<span class="line"><span style="color:#79B8FF">    StatusFailed</span><span style="color:#F97583">    =</span><span style="color:#9ECBFF"> "failed"</span></span>
+<span class="line"><span style="color:#79B8FF">    StatusPartial</span><span style="color:#F97583">   =</span><span style="color:#9ECBFF"> "partial"</span></span>
+<span class="line"><span style="color:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Platform-Konstanten</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#79B8FF">    PlatformTwitter</span><span style="color:#F97583">  =</span><span style="color:#9ECBFF"> "twitter"</span></span>
+<span class="line"><span style="color:#79B8FF">    PlatformLinkedIn</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> "linkedin"</span></span>
+<span class="line"><span style="color:#79B8FF">    PlatformThreads</span><span style="color:#F97583">  =</span><span style="color:#9ECBFF"> "threads"</span></span>
+<span class="line"><span style="color:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Post repräsentiert einen Social-Media-Post</span></span>
+<span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> Post</span><span style="color:#F97583"> struct</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    ID          </span><span style="color:#F97583">string</span><span style="color:#9ECBFF">    `json:"id" yaml:"id"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    Platform    </span><span style="color:#F97583">string</span><span style="color:#9ECBFF">    `json:"platform" yaml:"platform"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    Type        </span><span style="color:#F97583">string</span><span style="color:#9ECBFF">    `json:"type" yaml:"type"`</span><span style="color:#6A737D">           // thread, single, article</span></span>
+<span class="line"><span style="color:#E1E4E8">    Language    </span><span style="color:#F97583">string</span><span style="color:#9ECBFF">    `json:"language" yaml:"language"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    Campaign    </span><span style="color:#F97583">string</span><span style="color:#9ECBFF">    `json:"campaign" yaml:"campaign"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    Title       </span><span style="color:#F97583">string</span><span style="color:#9ECBFF">    `json:"title" yaml:"title"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    Tweets      []</span><span style="color:#B392F0">Tweet</span><span style="color:#9ECBFF">   `json:"tweets" yaml:"tweets"`</span><span style="color:#6A737D">       // Für Threads</span></span>
+<span class="line"><span style="color:#E1E4E8">    Body        </span><span style="color:#F97583">string</span><span style="color:#9ECBFF">    `json:"body" yaml:"body"`</span><span style="color:#6A737D">            // Für Singles</span></span>
+<span class="line"><span style="color:#E1E4E8">    Images      []</span><span style="color:#F97583">string</span><span style="color:#9ECBFF">  `json:"images" yaml:"images"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    Tags        []</span><span style="color:#F97583">string</span><span style="color:#9ECBFF">  `json:"tags" yaml:"tags"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    Status      </span><span style="color:#F97583">string</span><span style="color:#9ECBFF">    `json:"status" yaml:"status"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    ScheduledAt </span><span style="color:#F97583">*</span><span style="color:#B392F0">time</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Time</span><span style="color:#9ECBFF"> `json:"scheduled_at" yaml:"schedule"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    PostedAt    </span><span style="color:#F97583">*</span><span style="color:#B392F0">time</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Time</span><span style="color:#9ECBFF"> `json:"posted_at" yaml:"posted_at"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    PlatformID  </span><span style="color:#F97583">string</span><span style="color:#9ECBFF">    `json:"platform_id" yaml:"platform_id"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    Error       </span><span style="color:#F97583">string</span><span style="color:#9ECBFF">    `json:"error" yaml:"error"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    SourceFile  </span><span style="color:#F97583">string</span><span style="color:#9ECBFF">    `json:"source_file" yaml:"source_file"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    CreatedAt   </span><span style="color:#B392F0">time</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Time</span><span style="color:#9ECBFF"> `json:"created_at" yaml:"created_at"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    UpdatedAt   </span><span style="color:#B392F0">time</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Time</span><span style="color:#9ECBFF"> `json:"updated_at" yaml:"updated_at"`</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Tweet ist ein einzelner Tweet in einem Thread</span></span>
+<span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> Tweet</span><span style="color:#F97583"> struct</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    Index   </span><span style="color:#F97583">int</span><span style="color:#9ECBFF">    `json:"index"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    Content </span><span style="color:#F97583">string</span><span style="color:#9ECBFF"> `json:"content"`</span></span>
+<span class="line"><span style="color:#E1E4E8">    Image   </span><span style="color:#F97583">string</span><span style="color:#9ECBFF"> `json:"image"`</span><span style="color:#6A737D">   // Optionaler Bild-Pfad</span></span>
+<span class="line"><span style="color:#E1E4E8">    IsReply </span><span style="color:#F97583">bool</span><span style="color:#9ECBFF">   `json:"is_reply"`</span><span style="color:#6A737D"> // Letzter Tweet = Reply mit Links</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// CharCount gibt die Zeichenanzahl zurück (URLs = 23 Zeichen)</span></span>
+<span class="line"><span style="color:#F97583">func</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">t </span><span style="color:#B392F0">Tweet</span><span style="color:#E1E4E8">) </span><span style="color:#B392F0">CharCount</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // Vereinfacht — Twitter zählt URLs als 23 Zeichen</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> len</span><span style="color:#E1E4E8">([]</span><span style="color:#F97583">rune</span><span style="color:#E1E4E8">(t.Content))</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// IsValid prüft ob der Tweet innerhalb des Limits ist</span></span>
+<span class="line"><span style="color:#F97583">func</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">t </span><span style="color:#B392F0">Tweet</span><span style="color:#E1E4E8">) </span><span style="color:#B392F0">IsValid</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">bool</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> t.</span><span style="color:#B392F0">CharCount</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">&#x3C;=</span><span style="color:#79B8FF"> 280</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Campaign gruppiert Posts</span></span>
+<span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> Campaign</span><span style="color:#F97583"> struct</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    Slug     </span><span style="color:#F97583">string</span></span>
+<span class="line"><span style="color:#E1E4E8">    Posts    []</span><span style="color:#B392F0">Post</span></span>
+<span class="line"><span style="color:#E1E4E8">    Posted   </span><span style="color:#F97583">int</span></span>
+<span class="line"><span style="color:#E1E4E8">    Drafts   </span><span style="color:#F97583">int</span></span>
+<span class="line"><span style="color:#E1E4E8">    Scheduled </span><span style="color:#F97583">int</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># Kompiliert? </span></span>
+<span class="line"><span style="color:#B392F0">go</span><span style="color:#9ECBFF"> build</span><span style="color:#9ECBFF"> ./internal/models/</span></span></code></pre>
+<h3 id="-gelernt-1">🎓 Gelernt</h3>
+<ul>
+<li>Structs sind Go’s “Klassen” (ohne Vererbung)</li>
+<li><code>json:"name"</code> Tags steuern JSON-Serialisierung</li>
+<li><code>*time.Time</code> = Pointer, kann <code>nil</code> sein (= optional)</li>
+<li><code>[]Tweet</code> = Slice von Tweets (dynamisches Array)</li>
+<li>Methoden: <code>func (t Tweet) CharCount() int</code> — Methode auf Tweet</li>
+<li><code>[]rune(s)</code> konvertiert String zu Unicode-Zeichen (für korrekte Länge)</li>
+</ul>
+<hr>
+<h2 id="phase-3-markdown-parser--dateien-einlesen">Phase 3: Markdown Parser — Dateien einlesen</h2>
+<h3 id="was-wir-bauen-2">Was wir bauen</h3>
+<p><code>postctl import ./posts/</code> — liest Markdown-Dateien und erstellt Posts</p>
+<h3 id="go-konzepte-2">Go-Konzepte</h3>
+<ul>
+<li><strong>File I/O</strong>: <code>os.ReadFile</code>, <code>filepath.Walk</code></li>
+<li><strong>String-Manipulation</strong>: <code>strings.Split</code>, <code>strings.TrimSpace</code></li>
+<li><strong>Regular Expressions</strong>: <code>regexp.MustCompile</code></li>
+<li><strong>Error Handling</strong>: <code>if err != nil { return err }</code></li>
+<li><strong>YAML Parsing</strong>: External Package</li>
+<li><strong>Unit Tests</strong>: <code>func TestParseTweets(t *testing.T)</code></li>
+</ul>
+<h3 id="-gelernt-2">🎓 Gelernt</h3>
+<ul>
+<li><code>os.ReadFile</code> liest eine ganze Datei</li>
+<li><code>filepath.Walk</code> iteriert über Verzeichnisse</li>
+<li><code>strings.SplitN(s, "---", 3)</code> splittet Frontmatter</li>
+<li><code>regexp.MustCompile</code> für Pattern Matching</li>
+<li><code>t.Run("name", func(t *testing.T) { ... })</code> für Sub-Tests</li>
+<li>Error Handling ist explizit — kein try/catch</li>
+</ul>
+<hr>
+<h2 id="phase-4-sqlite-store--daten-speichern">Phase 4: SQLite Store — Daten speichern</h2>
+<h3 id="go-konzepte-3">Go-Konzepte</h3>
+<ul>
+<li><strong>Interfaces</strong>: <code>Store</code> Interface definieren</li>
+<li><strong>SQL</strong>: <code>database/sql</code> Standard-Paket</li>
+<li><strong>Prepared Statements</strong>: SQL Injection verhindern</li>
+<li><strong>Migrations</strong>: Schema-Versionierung</li>
+<li><strong><code>defer</code></strong>: Resource Cleanup (<code>defer db.Close()</code>)</li>
+</ul>
+<h3 id="-gelernt-3">🎓 Gelernt</h3>
+<ul>
+<li><code>interface{}</code> definiert Verhalten, nicht Struktur</li>
+<li><code>defer</code> führt Code am Funktions-Ende aus (wie <code>finally</code>)</li>
+<li><code>db.QueryRow().Scan(&amp;var)</code> liest Werte direkt in Variablen</li>
+<li><code>_</code> ignoriert Return-Werte die du nicht brauchst</li>
+</ul>
+<hr>
+<h2 id="phase-5-tui--terminal-interface">Phase 5: TUI — Terminal Interface</h2>
+<h3 id="go-konzepte-4">Go-Konzepte</h3>
+<ul>
+<li><strong>Bubbletea Elm-Architektur</strong>: Model → Update → View</li>
+<li><strong>tea.Msg</strong>: Message-basierte Kommunikation</li>
+<li><strong>tea.Cmd</strong>: Async Side-Effects</li>
+<li><strong>Lipgloss</strong>: Styling mit Methoden-Chaining</li>
+<li><strong>Composition</strong>: Kleine Komponenten zusammenbauen</li>
+</ul>
+<h3 id="bubbletea-grundprinzip">Bubbletea Grundprinzip</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="go"><code><span class="line"><span style="color:#6A737D">// Model hält den State</span></span>
+<span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> model</span><span style="color:#F97583"> struct</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    posts    []</span><span style="color:#B392F0">models</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Post</span></span>
+<span class="line"><span style="color:#E1E4E8">    cursor   </span><span style="color:#F97583">int</span></span>
+<span class="line"><span style="color:#E1E4E8">    selected </span><span style="color:#F97583">string</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Init — wird einmal aufgerufen</span></span>
+<span class="line"><span style="color:#F97583">func</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">m </span><span style="color:#B392F0">model</span><span style="color:#E1E4E8">) </span><span style="color:#B392F0">Init</span><span style="color:#E1E4E8">() </span><span style="color:#B392F0">tea</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Cmd</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> nil</span><span style="color:#6A737D"> // Keine initiale Aktion</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// Update — reagiert auf Events</span></span>
+<span class="line"><span style="color:#F97583">func</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">m </span><span style="color:#B392F0">model</span><span style="color:#E1E4E8">) </span><span style="color:#B392F0">Update</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">msg</span><span style="color:#B392F0"> tea</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Msg</span><span style="color:#E1E4E8">) (</span><span style="color:#B392F0">tea</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Model</span><span style="color:#E1E4E8">, </span><span style="color:#B392F0">tea</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Cmd</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    switch</span><span style="color:#E1E4E8"> msg </span><span style="color:#F97583">:=</span><span style="color:#E1E4E8"> msg.(</span><span style="color:#F97583">type</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">    case</span><span style="color:#B392F0"> tea</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">KeyMsg</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#F97583">        switch</span><span style="color:#E1E4E8"> msg.</span><span style="color:#B392F0">String</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        case</span><span style="color:#9ECBFF"> "q"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"ctrl+c"</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#E1E4E8"> m, tea.Quit</span></span>
+<span class="line"><span style="color:#F97583">        case</span><span style="color:#9ECBFF"> "up"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"k"</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#F97583">            if</span><span style="color:#E1E4E8"> m.cursor </span><span style="color:#F97583">></span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8"> { m.cursor</span><span style="color:#F97583">--</span><span style="color:#E1E4E8"> }</span></span>
+<span class="line"><span style="color:#F97583">        case</span><span style="color:#9ECBFF"> "down"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"j"</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#F97583">            if</span><span style="color:#E1E4E8"> m.cursor </span><span style="color:#F97583">&#x3C;</span><span style="color:#B392F0"> len</span><span style="color:#E1E4E8">(m.posts)</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8"> { m.cursor</span><span style="color:#F97583">++</span><span style="color:#E1E4E8"> }</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> m, </span><span style="color:#79B8FF">nil</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">// View — rendert den Screen (wird bei jedem Update aufgerufen)</span></span>
+<span class="line"><span style="color:#F97583">func</span><span style="color:#E1E4E8"> (</span><span style="color:#FFAB70">m </span><span style="color:#B392F0">model</span><span style="color:#E1E4E8">) </span><span style="color:#B392F0">View</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">string</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    s </span><span style="color:#F97583">:=</span><span style="color:#9ECBFF"> "Posts:</span><span style="color:#79B8FF">\n\n</span><span style="color:#9ECBFF">"</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> i, p </span><span style="color:#F97583">:=</span><span style="color:#F97583"> range</span><span style="color:#E1E4E8"> m.posts {</span></span>
+<span class="line"><span style="color:#E1E4E8">        cursor </span><span style="color:#F97583">:=</span><span style="color:#9ECBFF"> " "</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">==</span><span style="color:#E1E4E8"> m.cursor { cursor </span><span style="color:#F97583">=</span><span style="color:#9ECBFF"> ">"</span><span style="color:#E1E4E8"> }</span></span>
+<span class="line"><span style="color:#E1E4E8">        s </span><span style="color:#F97583">+=</span><span style="color:#E1E4E8"> fmt.</span><span style="color:#B392F0">Sprintf</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"</span><span style="color:#79B8FF">%s</span><span style="color:#79B8FF"> %s</span><span style="color:#9ECBFF"> [</span><span style="color:#79B8FF">%s</span><span style="color:#9ECBFF">]</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">, cursor, p.Title, p.Status)</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">    s </span><span style="color:#F97583">+=</span><span style="color:#9ECBFF"> "</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">↑↓ navigate · q quit"</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> s</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="-gelernt-4">🎓 Gelernt</h3>
+<ul>
+<li>Elm-Architektur: unidirektionaler Datenfluss</li>
+<li><code>switch msg := msg.(type)</code> = Type Switch (Go’s Pattern Matching)</li>
+<li><code>tea.Cmd</code> für async Operationen (API Calls etc.)</li>
+<li>Lipgloss: <code>lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#8b7cf8"))</code></li>
+</ul>
+<hr>
+<h2 id="phase-6-apis--twitter-linkedin-threads">Phase 6: APIs — Twitter, LinkedIn, Threads</h2>
+<h3 id="go-konzepte-5">Go-Konzepte</h3>
+<ul>
+<li><strong>HTTP Client</strong>: <code>http.NewRequest</code>, <code>http.Client.Do</code></li>
+<li><strong>OAuth 2.0</strong>: Authorization Code Flow mit PKCE</li>
+<li><strong>Goroutines</strong>: <code>go func() { ... }()</code></li>
+<li><strong>Channels</strong>: <code>ch := make(chan Result)</code></li>
+<li><strong>Context</strong>: <code>ctx, cancel := context.WithTimeout(ctx, 10*time.Second)</code></li>
+<li><strong><code>encoding/json</code></strong>: Request/Response Bodies</li>
+<li><strong>Interfaces</strong>: <code>Platform</code> Interface für alle Plattformen</li>
+</ul>
+<h3 id="platform-interface">Platform Interface</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="go"><code><span class="line"><span style="color:#F97583">type</span><span style="color:#B392F0"> Platform</span><span style="color:#F97583"> interface</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#B392F0">    Name</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">string</span></span>
+<span class="line"><span style="color:#B392F0">    Auth</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">ctx</span><span style="color:#B392F0"> context</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Context</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">error</span></span>
+<span class="line"><span style="color:#B392F0">    Post</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">ctx</span><span style="color:#B392F0"> context</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Context</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">post</span><span style="color:#F97583"> *</span><span style="color:#B392F0">models</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Post</span><span style="color:#E1E4E8">) (</span><span style="color:#F97583">string</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">error</span><span style="color:#E1E4E8">)  </span><span style="color:#6A737D">// returns platform ID</span></span>
+<span class="line"><span style="color:#B392F0">    UploadImage</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">ctx</span><span style="color:#B392F0"> context</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">Context</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">path</span><span style="color:#F97583"> string</span><span style="color:#E1E4E8">) (</span><span style="color:#F97583">string</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">error</span><span style="color:#E1E4E8">) </span><span style="color:#6A737D">// returns media ID</span></span>
+<span class="line"><span style="color:#B392F0">    IsAuthenticated</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">bool</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="-gelernt-5">🎓 Gelernt</h3>
+<ul>
+<li>Interfaces in Go sind implizit — kein <code>implements</code></li>
+<li>Goroutines sind leichtgewichtig (~8KB Stack)</li>
+<li>Channels synchronisieren Goroutines</li>
+<li><code>context.Context</code> für Timeouts und Cancellation</li>
+<li><code>json.NewDecoder(resp.Body).Decode(&amp;result)</code> parsed HTTP Response</li>
+</ul>
+<hr>
+<h2 id="phase-7-scheduler--polish">Phase 7: Scheduler &amp; Polish</h2>
+<h3 id="go-konzepte-6">Go-Konzepte</h3>
+<ul>
+<li><strong>Ticker</strong>: <code>time.NewTicker(30 * time.Second)</code></li>
+<li><strong>Select</strong>: <code>select { case &lt;-ticker.C: ... case &lt;-quit: return }</code></li>
+<li><strong>Graceful Shutdown</strong>: <code>signal.Notify(quit, os.Interrupt)</code></li>
+<li><strong>Build Tags</strong>: <code>go build -ldflags "-X cmd.Version=1.0.0"</code></li>
+<li><strong>Cross-Compilation</strong>: <code>GOOS=linux GOARCH=amd64 go build</code></li>
+</ul>
+<h3 id="-gelernt-6">🎓 Gelernt</h3>
+<ul>
+<li><code>select</code> wartet auf mehrere Channels gleichzeitig</li>
+<li><code>signal.Notify</code> fängt Ctrl+C ab</li>
+<li>Go cross-compiled ohne Extra-Tools</li>
+<li>Ein Binary für alles — keine Runtime-Dependencies</li>
+</ul>
+<hr>
+<h2 id="zusammenfassung-go-vs-javascripttypescript">Zusammenfassung: Go vs. JavaScript/TypeScript</h2>
+<table>
+<thead>
+<tr>
+<th>Konzept</th>
+<th>JavaScript</th>
+<th>Go</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Package Manager</td>
+<td>npm</td>
+<td><code>go mod</code> (built-in)</td>
+</tr>
+<tr>
+<td>Types</td>
+<td>TypeScript (optional)</td>
+<td>Statisch (required)</td>
+</tr>
+<tr>
+<td>Error Handling</td>
+<td>try/catch</td>
+<td><code>if err != nil</code></td>
+</tr>
+<tr>
+<td>Async</td>
+<td>Promise/async-await</td>
+<td>Goroutines + Channels</td>
+</tr>
+<tr>
+<td>Classes</td>
+<td>class + prototype</td>
+<td>Structs + Methoden</td>
+</tr>
+<tr>
+<td>Interfaces</td>
+<td>TypeScript interface</td>
+<td>Implizit (duck typing)</td>
+</tr>
+<tr>
+<td>Null</td>
+<td>null/undefined</td>
+<td>nil (nur für Pointer, Slices, Maps)</td>
+</tr>
+<tr>
+<td>Build</td>
+<td>webpack/esbuild</td>
+<td><code>go build</code> (built-in)</td>
+</tr>
+<tr>
+<td>Output</td>
+<td>node_modules + runtime</td>
+<td>Single Binary</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="ressourcen">Ressourcen</h2>
+<ul>
+<li><a href="https://go.dev/tour/">Go Tour</a> — interaktives Tutorial</li>
+<li><a href="https://gobyexample.com/">Go by Example</a> — Snippets für jedes Konzept</li>
+<li><a href="https://go.dev/doc/effective_go">Effective Go</a> — Idiomatisches Go</li>
+<li><a href="https://github.com/charmbracelet/bubbletea">Bubbletea Docs</a> — TUI Framework</li>
+<li><a href="https://github.com/charmbracelet/bubbletea/tree/master/examples">Charm Examples</a> — TUI Beispiele</li>
+</ul>
+</div></section></main><!-- Right Sidebar: On This Page --><aside class="docs-outline" id="docs-outline"><div class="outline-container"><h4 class="outline-title">On this page</h4><ul class="outline-list" id="toc-list"><!-- Populated via Javascript --></ul></div></aside></div></div>
+
+	
+	<button id="back-to-top" class="back-to-top" aria-label="Scroll back to top">↑</button>
+
+	
+	<footer class="footer"><div class="container footer-container"><div class="footer-left"><span class="footer-logo">&gt;_ postctl</span><span class="footer-copyright">© 2026 gerwinweiher. Built for developer workflows.</span></div><div class="footer-right"><a href="/" class="footer-link">Home</a><a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a><a href="https://polar.sh/aeon022/donate" target="_blank" rel="noopener noreferrer" class="footer-link">Donate</a></div></div></footer>
+</body></html><script type="module" src="/_astro/docs.astro_astro_type_script_index_0_lang.DuRQjpHz.js"></script>

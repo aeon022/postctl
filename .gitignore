@@ -1,10 +1,6 @@
-# build output
-dist/
 
-# generated types
+# Astro / Frontend build directories
 .astro/
-
-# dependencies
 node_modules/
 
 # logs
