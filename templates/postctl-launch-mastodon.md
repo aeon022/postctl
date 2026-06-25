@@ -2,6 +2,7 @@
 platform: mastodon
 type: single
 campaign: postctl-launch
+images: screenshots/postctl_tui_dashboard.jpg
 ---
 🚀 I just built a terminal-native social media scheduler and publisher: postctl!
 
