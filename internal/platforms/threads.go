@@ -228,7 +228,7 @@ func (t *ThreadsPlatform) getUserIDAndToken(ctx context.Context) (userID string,
 	return parts[0], parts[1], nil
 }
 
-// UploadImage lädt ein lokales Bild auf einen anonymen Hoster (0x0.st) hoch, um eine öffentliche URL für Meta zu erhalten.
+// UploadImage lädt ein lokales Bild auf einen anonymen Hoster (tmpfiles.org) hoch, um eine öffentliche URL für Meta zu erhalten.
 // Falls es bereits eine HTTP/HTTPS URL ist, wird diese direkt zurückgegeben.
 func (t *ThreadsPlatform) UploadImage(ctx context.Context, path string) (string, error) {
 	if strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://") {
@@ -252,7 +252,7 @@ func (t *ThreadsPlatform) UploadImage(ctx context.Context, path string) (string,
 	}
 	writer.Close()
 
-	req, err := http.NewRequestWithContext(ctx, "POST", "https://0x0.st", body)
+	req, err := http.NewRequestWithContext(ctx, "POST", "https://tmpfiles.org/api/v1/upload", body)
 	if err != nil {
 		return "", err
 	}
@@ -262,30 +262,37 @@ func (t *ThreadsPlatform) UploadImage(ctx context.Context, path string) (string,
 	uploadClient := &http.Client{Timeout: 30 * time.Second}
 	resp, err := uploadClient.Do(req)
 	if err != nil {
-		// Fallback zu Mock URL bei Netzwerkfehler
-		fmt.Printf("[WARNUNG] Upload zu 0x0.st fehlgeschlagen: %v. Nutze Fallback-Mock-URL.\n", err)
+		fmt.Printf("[WARNUNG] Upload zu tmpfiles.org fehlgeschlagen: %v. Nutze Fallback-Mock-URL.\n", err)
 		return "https://dummy-image-url.com/mock.png", nil
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		respBody, _ := io.ReadAll(resp.Body)
-		fmt.Printf("[WARNUNG] Upload zu 0x0.st fehlgeschlagen (Status %d): %s. Nutze Fallback-Mock-URL.\n", resp.StatusCode, string(respBody))
+		fmt.Printf("[WARNUNG] Upload zu tmpfiles.org fehlgeschlagen (Status %d): %s. Nutze Fallback-Mock-URL.\n", resp.StatusCode, string(respBody))
 		return "https://dummy-image-url.com/mock.png", nil
 	}
 
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
+	var uploadResp struct {
+		Status string `json:"status"`
+		Data   struct {
+			URL string `json:"url"`
+		} `json:"data"`
 	}
 
-	urlStr := strings.TrimSpace(string(respBody))
-	if !strings.HasPrefix(urlStr, "http://") && !strings.HasPrefix(urlStr, "https://") {
-		fmt.Printf("[WARNUNG] Ungültige URL von 0x0.st zurückgegeben: %s. Nutze Fallback-Mock-URL.\n", urlStr)
+	if err := json.NewDecoder(resp.Body).Decode(&uploadResp); err != nil {
+		fmt.Printf("[WARNUNG] Dekodieren des tmpfiles.org Upload-Ergebnisses fehlgeschlagen: %v. Nutze Fallback-Mock-URL.\n", err)
 		return "https://dummy-image-url.com/mock.png", nil
 	}
 
-	return urlStr, nil
+	if uploadResp.Status != "success" || uploadResp.Data.URL == "" {
+		fmt.Printf("[WARNUNG] tmpfiles.org Upload-Status nicht erfolgreich: %s. Nutze Fallback-Mock-URL.\n", uploadResp.Status)
+		return "https://dummy-image-url.com/mock.png", nil
+	}
+
+	// Direct link URL erhalten, indem wir "https://tmpfiles.org/" durch "https://tmpfiles.org/dl/" ersetzen
+	directURL := strings.Replace(uploadResp.Data.URL, "https://tmpfiles.org/", "https://tmpfiles.org/dl/", 1)
+	return directURL, nil
 }
 
 // Post veröffentlicht einen Beitrag auf Threads (Container erstellen + publizieren)
