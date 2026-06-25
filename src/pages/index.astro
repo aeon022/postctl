@@ -1,5 +1,22 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { 
+  FileText, 
+  Terminal, 
+  Bot, 
+  Zap, 
+  BookOpen, 
+  Lock, 
+  Database, 
+  ShieldCheck, 
+  UserCheck, 
+  LayoutDashboard, 
+  MessageSquare, 
+  Calendar, 
+  Settings, 
+  Edit,
+  Heart
+} from '@lucide/astro';
 ---
 
 <Layout>
@@ -46,7 +63,7 @@ import Layout from '../layouts/Layout.astro';
 						<a href="#tui-demo" class="btn btn-primary">Try Interactive TUI</a>
 						<a href="#pricing" class="btn btn-secondary">Get Pro License</a>
 						<a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="btn btn-tertiary">
-							<span class="heart-icon">♥</span> Support postctl
+							<Heart class="heart-icon" size={14} /> Support postctl
 						</a>
 					</div>
 				</div>
@@ -80,37 +97,37 @@ import Layout from '../layouts/Layout.astro';
 				<div class="features-grid">
 					<!-- Feature 1 -->
 					<div class="feature-card">
-						<div class="feature-icon">📝</div>
+						<div class="feature-icon"><FileText size={40} /></div>
 						<h3 class="feature-title">Markdown-First</h3>
 						<p class="feature-desc">Write your posts inside your favorite editor. Frontmatter fields handle platform targets, scheduling, and image paths. Perfectly Git-versionable and reviewable in PRs.</p>
 					</div>
 					<!-- Feature 2 -->
 					<div class="feature-card">
-						<div class="feature-icon">🖥️</div>
+						<div class="feature-icon"><Terminal size={40} /></div>
 						<h3 class="feature-title">Interactive TUI Editor</h3>
 						<p class="feature-desc">Draft and edit posts directly inside the terminal. Form validations catch platform errors, automatic splitting parses Twitter threads, and `ctrl+v` opens Neovim/Vim instantly.</p>
 					</div>
 					<!-- Feature 3 -->
 					<div class="feature-card">
-						<div class="feature-icon">🤖</div>
+						<div class="feature-icon"><Bot size={40} /></div>
 						<h3 class="feature-title">AI-as-Operator</h3>
 						<p class="feature-desc">Engineered for AI assistants. Claude/GPT can generate Markdown draft files, test publication flows with `--dry-run`, and receive machine-readable outcomes using `--format json`.</p>
 					</div>
 					<!-- Feature 4 -->
 					<div class="feature-card">
-						<div class="feature-icon">⚡</div>
+						<div class="feature-icon"><Zap size={40} /></div>
 						<h3 class="feature-title">Zero Infrastructure</h3>
 						<p class="feature-desc">Built in Go with a CGO-free SQLite storage engine. Packaged as a single offline-first binary. Copy the database file to backup all your posts and schedules.</p>
 					</div>
 					<!-- Feature 5 -->
 					<div class="feature-card">
-						<div class="feature-icon">📖</div>
+						<div class="feature-icon"><BookOpen size={40} /></div>
 						<h3 class="feature-title">Offline Documentation</h3>
 						<p class="feature-desc">Access the full README directly inside the app with a split-pane layout, interactive table of contents, and responsive terminal scrolling—no browser required.</p>
 					</div>
 					<!-- Feature 6 -->
 					<div class="feature-card">
-						<div class="feature-icon">🔒</div>
+						<div class="feature-icon"><Lock size={40} /></div>
 						<h3 class="feature-title">AES-256 Encrypted Sync</h3>
 						<p class="feature-desc">Securely sync your local database and config files. Backups are encrypted using AES-256-GCM and key-stretched (PBKDF2) for safe storage in public Git repos.</p>
 					</div>
@@ -217,12 +234,24 @@ Campaign successfully posted!
 						
 						<!-- Tabs Navigation -->
 						<div class="tui-tabs">
-							<button class="tui-tab active" data-tab="0">● Dashboard</button>
-							<button class="tui-tab" data-tab="1">◷ Posts</button>
-							<button class="tui-tab" data-tab="2">↺ Schedule</button>
-							<button class="tui-tab" data-tab="3">⚙ Settings</button>
-							<button class="tui-tab" data-tab="4">✏ Editor</button>
-							<button class="tui-tab" data-tab="5">📖 README</button>
+							<button class="tui-tab active" data-tab="0">
+								<LayoutDashboard size={14} class="tab-icon" /> Dashboard
+							</button>
+							<button class="tui-tab" data-tab="1">
+								<MessageSquare size={14} class="tab-icon" /> Posts
+							</button>
+							<button class="tui-tab" data-tab="2">
+								<Calendar size={14} class="tab-icon" /> Schedule
+							</button>
+							<button class="tui-tab" data-tab="3">
+								<Settings size={14} class="tab-icon" /> Settings
+							</button>
+							<button class="tui-tab" data-tab="4">
+								<Edit size={14} class="tab-icon" /> Editor
+							</button>
+							<button class="tui-tab" data-tab="5">
+								<BookOpen size={14} class="tab-icon" /> README
+							</button>
 						</div>
 						
 						<!-- TUI Tab Contents -->
@@ -417,28 +446,28 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 				<div class="ai-workflow-grid">
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
-							<span class="w-icon">🤖</span>
+							<span class="w-icon"><Bot size={40} /></span>
 							<h4>1. AI Generates Drafts</h4>
 							<p>Your coding agent reads web contents or release files and generates formatted Markdown draft files into a directory.</p>
 						</div>
 					</div>
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
-							<span class="w-icon">💾</span>
+							<span class="w-icon"><Database size={40} /></span>
 							<h4>2. AI Imports & Checks</h4>
 							<p>AI runs `postctl import` and checks results using `postctl list --format json`. Validation catches lengths and files.</p>
 						</div>
 					</div>
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
-							<span class="w-icon">🛡️</span>
+							<span class="w-icon"><ShieldCheck size={40} /></span>
 							<h4>3. Dry-Run Validation</h4>
 							<p>AI executes `postctl campaign post launch-v1 --dry-run` to query APIs and verify integrity without causing live posts.</p>
 						</div>
 					</div>
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
-							<span class="w-icon">👤</span>
+							<span class="w-icon"><UserCheck size={40} /></span>
 							<h4>4. Human Approves & Posts</h4>
 							<p>You review the simulated outcome in chat. Give the agent approval, and it triggers the final publish command.</p>
 						</div>
@@ -504,7 +533,7 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 					</div>
 					<div class="donate-actions">
 						<a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-							<span class="heart-icon">♥</span> Support on Polar
+							<Heart class="heart-icon" size={14} /> Support on Polar
 						</a>
 					</div>
 				</div>
@@ -597,6 +626,18 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 			inset 0 1px 0 rgba(255, 255, 255, 0.05);
 		transition: var(--transition);
 	}
+	@media (max-width: 1024px) {
+		.header-capsule {
+			padding: 0 1rem;
+		}
+		.logo {
+			font-size: 1.1rem !important;
+			gap: 0.35rem !important;
+		}
+		.system-status {
+			display: none !important;
+		}
+	}
 	.header-capsule:hover {
 		border-color: rgba(139, 124, 248, 0.2);
 		box-shadow: 
@@ -662,6 +703,24 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 		display: flex;
 		align-items: center;
 		gap: 1rem;
+	}
+	@media (max-width: 1024px) {
+		.nav {
+			gap: 0.4rem;
+		}
+		.nav-link {
+			font-size: 0.78rem;
+			padding: 0.3rem 0.5rem;
+		}
+		.github-link {
+			padding: 0.3rem 0.6rem;
+		}
+	}
+	@media (max-width: 880px) {
+		.nav-link[href="#ai-operator"],
+		.nav-link[href="#how-it-works"] {
+			display: none;
+		}
 	}
 	@media (max-width: 768px) {
 		.nav {
@@ -803,7 +862,12 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 		width: 100%;
 	}
 	.heart-icon {
-		color: var(--error);
+		color: #ff4a5a;
+		fill: #ff4a5a;
+		display: inline-block;
+		vertical-align: middle;
+		margin-right: 0.35rem;
+		margin-top: -2px;
 	}
 
 	/* Interactive Terminal Emulator */
@@ -910,7 +974,8 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 		box-shadow: 0 0 30px rgba(139, 124, 248, 0.05);
 	}
 	.feature-icon {
-		font-size: 2.5rem;
+		display: inline-block;
+		color: var(--accent);
 		margin-bottom: 1.5rem;
 	}
 	.feature-title {
@@ -1031,6 +1096,13 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 		display: flex;
 		background: #272930;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		overflow-x: auto;
+		white-space: nowrap;
+		scrollbar-width: none; /* Hide scrollbar for clean UI on Firefox */
+		-webkit-overflow-scrolling: touch;
+	}
+	.tui-tabs::-webkit-scrollbar {
+		display: none; /* Hide scrollbar for Chrome/Safari */
 	}
 	.tui-tab {
 		background: transparent;
@@ -1042,15 +1114,29 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 		font-size: inherit;
 		cursor: pointer;
 		transition: var(--transition);
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+	.tab-icon {
+		color: var(--text-muted);
+		transition: var(--transition);
 	}
 	.tui-tab:hover {
 		color: var(--text-primary);
 		background: rgba(255,255,255,0.03);
 	}
+	.tui-tab:hover .tab-icon {
+		color: var(--text-primary);
+	}
 	.tui-tab.active {
 		background: #1c1d22;
 		color: var(--accent);
 		font-weight: bold;
+	}
+	.tui-tab.active .tab-icon {
+		color: var(--accent);
 	}
 	.tui-content-area {
 		padding: 1.5rem;
@@ -1280,8 +1366,8 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 		border-color: rgba(255,255,255,0.12);
 	}
 	.w-icon {
-		font-size: 2.5rem;
 		display: inline-block;
+		color: var(--accent);
 		margin-bottom: 1rem;
 	}
 	.workflow-step h4 {

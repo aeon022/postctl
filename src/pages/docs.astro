@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import * as ReadmeDoc from '../../README.md';
+import { Search } from '@lucide/astro';
 import * as TwitterDoc from '../../docs/api-twitter.md';
 import * as LinkedinDoc from '../../docs/api-linkedin.md';
 import * as ThreadsDoc from '../../docs/api-threads.md';
@@ -57,7 +58,7 @@ import * as TutorialDoc from '../../documents/TUTORIAL.md';
 			<aside class="docs-sidebar" id="docs-sidebar">
 				<div class="sidebar-search">
 					<div class="search-input-wrapper">
-						<span class="search-icon">🔍</span>
+						<Search size={14} class="search-icon" />
 						<input type="text" id="docs-search" placeholder="Filter documentation..." autocomplete="off" />
 						<button id="search-clear" class="search-clear-btn" aria-label="Clear Filter">×</button>
 					</div>
@@ -440,6 +441,18 @@ images: ["logo.png"]
 			inset 0 1px 0 rgba(255, 255, 255, 0.05);
 		transition: var(--transition);
 	}
+	@media (max-width: 1024px) {
+		.header-capsule {
+			padding: 0 1rem;
+		}
+		.logo {
+			font-size: 1.1rem !important;
+			gap: 0.35rem !important;
+		}
+		.system-status {
+			display: none !important;
+		}
+	}
 	.header-capsule:hover {
 		border-color: rgba(139, 124, 248, 0.2);
 		box-shadow: 
@@ -516,6 +529,18 @@ images: ["logo.png"]
 		display: flex;
 		align-items: center;
 		gap: 1rem;
+	}
+	@media (max-width: 1024px) {
+		.nav {
+			gap: 0.4rem;
+		}
+		.nav-link {
+			font-size: 0.78rem;
+			padding: 0.3rem 0.5rem;
+		}
+		.github-link {
+			padding: 0.3rem 0.6rem;
+		}
 	}
 	@media (max-width: 768px) {
 		.nav {
@@ -596,8 +621,11 @@ images: ["logo.png"]
 	.search-icon {
 		position: absolute;
 		left: 12px;
-		font-size: 0.9rem;
 		color: var(--text-muted);
+		width: 14px;
+		height: 14px;
+		display: inline-block;
+		pointer-events: none;
 	}
 
 	#docs-search {
