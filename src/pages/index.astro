@@ -219,13 +219,20 @@ Campaign successfully posted!
 
 
 		<section id="screenshots" class="screenshot-section">
-  <div class="container">
-    <h2 class="section-title">Screenshots</h2>
-    <p class="section-subtitle">Explore the app UI via screenshots</p>
-      
-      <ScreenshotCarousel client:load />
-    </div>
-</section>
+			<div class="container">
+				<div class="section-header">
+					<div class="section-tag">Visual Tour</div>
+					<h2 class="section-title">See it in Action</h2>
+					<p class="section-subtitle">A full terminal-native TUI — from draft scheduling to live posting, entirely in your terminal.</p>
+				</div>
+				<ScreenshotCarousel />
+				<div class="screenshot-hint">
+					<span>← → arrow keys to navigate</span>
+					<span class="hint-dot"></span>
+					<span>click thumbnails to jump</span>
+				</div>
+			</div>
+		</section>
 <!-- AI Operator workflow section (NEW) -->
 		<section id="ai-operator" class="ai-operator-section">
 			<div class="container">
@@ -295,9 +302,15 @@ Campaign successfully posted!
 						</div>
 					</div>
 
-					<!-- Pro Plan (Polar.sh One-time Purchase) -->
-					<div class="pricing-card featured">
+					<!-- Pro Plan (Coming Soon) -->
+					<div class="pricing-card featured pricing-card--coming-soon">
 						<div class="pricing-badge">Lifetime Access</div>
+						<div class="coming-soon-overlay">
+							<div class="coming-soon-tag">
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+								Coming Soon
+							</div>
+						</div>
 						<div class="plan-header">
 							<h3 class="plan-name">Pro License</h3>
 							<div class="plan-price">$29<span class="price-period">/ one-time</span></div>
@@ -312,7 +325,7 @@ Campaign successfully posted!
 							<li><span class="check-icon">✓</span> <span>Automated license key issuance via Polar.sh</span></li>
 						</ul>
 						<div class="plan-cta">
-							<a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full">Get Lifetime Pro License</a>
+							<button class="btn btn-primary btn-full" disabled>Coming Soon</button>
 						</div>
 					</div>
 				</div>
@@ -1375,12 +1388,111 @@ Campaign successfully posted!
 	/* Scroll Reveal Animations */
 	.reveal {
 		opacity: 0;
-		transform: translateY(30px);
-		transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+		transform: translateY(36px);
+		transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 	.reveal.active {
 		opacity: 1;
 		transform: translateY(0);
+	}
+	.reveal-delay-1 { transition-delay: 0.1s; }
+	.reveal-delay-2 { transition-delay: 0.2s; }
+	.reveal-delay-3 { transition-delay: 0.3s; }
+
+	/* Page transition */
+	@keyframes page-fade-in {
+		from { opacity: 0; transform: translateY(12px); }
+		to   { opacity: 1; transform: translateY(0); }
+	}
+	main {
+		animation: page-fade-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+	}
+
+	/* Screenshot section improvements */
+	.screenshot-section {
+		padding: 6rem 0;
+	}
+	.section-tag {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent);
+		background: rgba(139,124,248,0.08);
+		border: 1px solid rgba(139,124,248,0.2);
+		padding: 0.3rem 0.8rem;
+		border-radius: 100px;
+		margin-bottom: 1rem;
+	}
+	.screenshot-hint {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		margin-top: 1.25rem;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		color: rgba(255,255,255,0.25);
+		letter-spacing: 0.06em;
+	}
+	.hint-dot {
+		width: 3px;
+		height: 3px;
+		border-radius: 50%;
+		background: rgba(255,255,255,0.2);
+	}
+
+	/* Pro license coming soon */
+	.pricing-card--coming-soon {
+		position: relative;
+		overflow: hidden;
+		filter: brightness(0.55) saturate(0.5);
+		pointer-events: none;
+		transition: filter 0.3s ease;
+	}
+	.coming-soon-overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 10;
+		display: flex;
+		align-items: flex-start;
+		justify-content: flex-end;
+		padding: 1rem;
+		pointer-events: none;
+	}
+	.coming-soon-tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		background: rgba(139,124,248,0.15);
+		border: 1px solid rgba(139,124,248,0.35);
+		color: #a99ef8;
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		padding: 0.3rem 0.75rem;
+		border-radius: 100px;
+		font-weight: 600;
+		backdrop-filter: blur(8px);
+	}
+
+	/* Nav active state */
+	.nav-link.nav-active {
+		color: var(--text-primary);
+		background: rgba(139,124,248,0.08);
+	}
+
+	/* Enhanced back-to-top */
+	.back-to-top:hover {
+		color: var(--accent);
+		border-color: rgba(139,124,248,0.5);
+		box-shadow: 0 0 20px rgba(139,124,248,0.2), 0 8px 24px rgba(0,0,0,0.4);
+		transform: translateY(-4px) scale(1.05);
+	}
+	.back-to-top:active {
+		transform: translateY(-1px) scale(1.02);
 	}
 </style>
 
@@ -1446,85 +1558,101 @@ Campaign successfully posted!
 		});
 	});
 
-	// Back to Top button scroll check
-	const backToTopBtn = document.getElementById("back-to-top");
-	window.addEventListener("scroll", () => {
-		if (window.scrollY > 300) {
-			backToTopBtn?.classList.add("visible");
+	// ── Back to top ──────────────────────────────────────────
+	const backToTopBtn = document.getElementById('back-to-top');
+
+	function smoothScrollTo(targetY: number, duration: number = 600) {
+		const startY = window.scrollY;
+		const diff = targetY - startY;
+		let startTime: number | null = null;
+
+		function ease(t: number) {
+			// cubic ease-in-out
+			return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+		}
+
+		function step(now: number) {
+			if (!startTime) startTime = now;
+			const elapsed = now - startTime;
+			const progress = Math.min(elapsed / duration, 1);
+			window.scrollTo(0, startY + diff * ease(progress));
+			if (progress < 1) requestAnimationFrame(step);
+		}
+		requestAnimationFrame(step);
+	}
+
+	window.addEventListener('scroll', () => {
+		if (window.scrollY > 400) {
+			backToTopBtn?.classList.add('visible');
 		} else {
-			backToTopBtn?.classList.remove("visible");
+			backToTopBtn?.classList.remove('visible');
 		}
+		updateActiveNav();
+	}, { passive: true });
+
+	backToTopBtn?.addEventListener('click', () => {
+		// Visual feedback — brief scale pulse
+		backToTopBtn.style.transform = 'scale(0.92)';
+		setTimeout(() => { backToTopBtn.style.transform = ''; }, 150);
+		smoothScrollTo(0, 700);
 	});
 
-	backToTopBtn?.addEventListener("click", () => {
-		const start = window.scrollY || document.documentElement.scrollTop;
-		const duration = 500; // ms
-		let startTime = null;
-
-		function animation(currentTime) {
-			if (startTime === null) startTime = currentTime;
-			const timeElapsed = currentTime - startTime;
-			const run = easeInOutQuad(timeElapsed, start, -start, duration);
-			window.scrollTo(0, run);
-			if (timeElapsed < duration) {
-				requestAnimationFrame(animation);
-			} else {
-				window.scrollTo(0, 0); // ensure it lands exactly at 0
-			}
-		}
-
-		function easeInOutQuad(t, b, c, d) {
-			t /= d / 2;
-			if (t < 1) return c / 2 * t * t + b;
-			t--;
-			return -c / 2 * (t * (t - 2) - 1) + b;
-		}
-
-		requestAnimationFrame(animation);
-	});
-
-	// Smooth scroll for anchor links with header offset
+	// ── Smooth anchor scroll ──────────────────────────────────
 	document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 		anchor.addEventListener('click', function (e) {
 			e.preventDefault();
-			const targetId = this.getAttribute('href');
-			if (targetId === '#') return;
-			const targetElement = document.querySelector(targetId);
-			if (targetElement) {
-				const headerOffset = 90; // offset for the floating header
-				const elementPosition = targetElement.getBoundingClientRect().top;
-				const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-				
-				window.scrollTo({
-					top: offsetPosition,
-					behavior: 'smooth'
-				});
-			}
+			const href = (this as HTMLAnchorElement).getAttribute('href');
+			if (!href || href === '#') return;
+			const target = document.querySelector(href) as HTMLElement;
+			if (!target) return;
+			const headerOffset = 90;
+			const targetY = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+			smoothScrollTo(targetY, 800);
 		});
 	});
 
-	// Intersection Observer for scroll reveal animations
-	const revealElements = document.querySelectorAll(".feature-card, .how-step-card, .ai-workflow-card, .pricing-card, .section-header, .tui-emulator, .donate-banner");
-	
+	// ── Nav active state on scroll ────────────────────────────
+	const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+	const sections = Array.from(navLinks).map(l => {
+		const id = (l as HTMLAnchorElement).getAttribute('href')?.slice(1);
+		return id ? document.getElementById(id) : null;
+	});
+
+	function updateActiveNav() {
+		const scrollMid = window.scrollY + window.innerHeight * 0.4;
+		let active = -1;
+		sections.forEach((sec, i) => {
+			if (sec && sec.offsetTop <= scrollMid) active = i;
+		});
+		navLinks.forEach((l, i) => {
+			l.classList.toggle('nav-active', i === active);
+		});
+	}
+	updateActiveNav();
+
+	// ── Scroll reveal ─────────────────────────────────────────
+	const revealTargets = document.querySelectorAll(
+		'.feature-card, .how-step-card, .ai-workflow-card, .pricing-card, .section-header, .tui-emulator, .donate-banner, .carousel-root, .screenshot-hint'
+	);
+
 	const revealObserver = new IntersectionObserver((entries, observer) => {
-		entries.forEach(entry => {
+		entries.forEach((entry, idx) => {
 			if (entry.isIntersecting) {
-				entry.target.classList.add("active");
-				observer.unobserve(entry.target);
+				const el = entry.target as HTMLElement;
+				el.style.transitionDelay = `${Math.min(idx * 0.04, 0.25)}s`;
+				el.classList.add('active');
+				observer.unobserve(el);
 			}
 		});
-	}, {
-		threshold: 0.1,
-		rootMargin: "0px 0px -50px 0px"
-	});
+	}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
 
-	revealElements.forEach(el => {
-		el.classList.add("reveal");
+	revealTargets.forEach(el => {
+		el.classList.add('reveal');
 		revealObserver.observe(el);
 	});
 
-	// Start typing simulator on load
-	window.addEventListener("DOMContentLoaded", () => {
+	// ── Start typing simulator ────────────────────────────────
+	window.addEventListener('DOMContentLoaded', () => {
 		setTimeout(typeCommand, 1000);
 	});
 </script>

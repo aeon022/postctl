@@ -1,45 +1,363 @@
 <!-- src/components/ScreenshotCarousel.astro -->
+<div class="carousel-root">
 
-<div class="screenshot-section" id="screenshots">
-  <h2 class="section-title">Screenshots</h2>
-  <div class="screenshot-main">
-    <img id="ss-main-img" src="/screenshots/01-dashboard.png" alt="Main screenshot" loading="lazy" />
-    <div class="caption" id="ss-caption">Dashboard</div>
+  <!-- Main Viewer -->
+  <div class="carousel-stage">
+    <!-- Prev / Next -->
+    <button class="carousel-arrow carousel-arrow--prev" id="carousel-prev" aria-label="Previous screenshot">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+
+    <div class="carousel-frame" id="carousel-frame">
+      <img class="carousel-main-img" id="carousel-img" src="/screenshots/01-dashboard.png" alt="Dashboard" />
+      <!-- Scan-line overlay for terminal feel -->
+      <div class="scanlines"></div>
+      <!-- Caption bar -->
+      <div class="carousel-caption-bar">
+        <span class="carousel-caption-icon">▸</span>
+        <span class="carousel-caption-text" id="carousel-caption">Dashboard</span>
+        <span class="carousel-counter" id="carousel-counter">01 / 04</span>
+      </div>
+    </div>
+
+    <button class="carousel-arrow carousel-arrow--next" id="carousel-next" aria-label="Next screenshot">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
   </div>
-  <div class="screenshot-thumbs">
-    <button class="thumb active" data-src="/screenshots/01-dashboard.png" data-caption="Dashboard" aria-label="Dashboard">
-      <img src="/screenshots/01-dashboard.png" alt="Dashboard thumbnail" loading="lazy" />
+
+  <!-- Dot indicators -->
+  <div class="carousel-dots" id="carousel-dots">
+    <button class="carousel-dot active" data-index="0" aria-label="Screenshot 1"></button>
+    <button class="carousel-dot" data-index="1" aria-label="Screenshot 2"></button>
+    <button class="carousel-dot" data-index="2" aria-label="Screenshot 3"></button>
+    <button class="carousel-dot" data-index="3" aria-label="Screenshot 4"></button>
+  </div>
+
+  <!-- Thumbnail strip -->
+  <div class="carousel-thumbs" id="carousel-thumbs">
+    <button class="carousel-thumb active" data-index="0" aria-label="Dashboard">
+      <img src="/screenshots/01-dashboard.png" alt="Dashboard" loading="lazy" />
+      <span class="thumb-label">Dashboard</span>
     </button>
-    <button class="thumb" data-src="/screenshots/02-posts.png" data-caption="Posts" aria-label="Posts">
-      <img src="/screenshots/02-posts.png" alt="Posts thumbnail" loading="lazy" />
+    <button class="carousel-thumb" data-index="1" aria-label="Posts">
+      <img src="/screenshots/02-posts.png" alt="Posts" loading="lazy" />
+      <span class="thumb-label">Posts</span>
     </button>
-    <button class="thumb" data-src="/screenshots/03-schedule.png" data-caption="Schedule" aria-label="Schedule">
-      <img src="/screenshots/03-schedule.png" alt="Schedule thumbnail" loading="lazy" />
+    <button class="carousel-thumb" data-index="2" aria-label="Schedule">
+      <img src="/screenshots/03-schedule.png" alt="Schedule" loading="lazy" />
+      <span class="thumb-label">Schedule</span>
+    </button>
+    <button class="carousel-thumb" data-index="3" aria-label="Settings">
+      <img src="/screenshots/04-settings.png" alt="Settings" loading="lazy" />
+      <span class="thumb-label">Settings</span>
     </button>
   </div>
 </div>
+
 <style>
-  .screenshot-section { padding: 4rem 0; text-align: center; }
-  .screenshot-main { position: relative; display: inline-block; max-width: 90%; margin: 0 auto; }
-  .screenshot-main img { width: 100%; max-height: 400px; object-fit: contain; border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-  .caption { margin-top: 0.5rem; font-size: 0.9rem; color: var(--c-text-muted); }
-  .screenshot-thumbs { margin-top: 1rem; display: flex; justify-content: center; gap: 0.5rem; }
-  .thumb { border: none; background: transparent; padding: 0; cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
-  .thumb.active, .thumb:hover { opacity: 1; }
-  .thumb img { width: 200px; height: auto; border-radius: 0.5rem; }
+  .carousel-root {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0 0 1rem;
+    user-select: none;
+  }
+
+  /* Stage */
+  .carousel-stage {
+    width: 100%;
+    max-width: 860px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  /* Frame */
+  .carousel-frame {
+    flex: 1;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0a0b0e;
+    border: 1px solid rgba(139, 124, 248, 0.18);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.04),
+      0 24px 60px rgba(0,0,0,0.5),
+      0 0 40px rgba(139,124,248,0.08);
+    aspect-ratio: 16 / 10;
+    cursor: zoom-in;
+  }
+
+  .carousel-main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .carousel-main-img.transitioning {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  /* Scan-line effect for terminal vibes */
+  .scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0,0,0,0.06) 3px,
+      rgba(0,0,0,0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Caption bar */
+  .carousel-caption-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(8,9,12,0.92) 0%, transparent 100%);
+    padding: 1.5rem 1.25rem 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 2;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.78rem;
+  }
+
+  .carousel-caption-icon {
+    color: #8b7cf8;
+    font-size: 0.7rem;
+  }
+
+  .carousel-caption-text {
+    color: rgba(255,255,255,0.85);
+    flex: 1;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  .carousel-counter {
+    color: rgba(255,255,255,0.35);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* Arrows */
+  .carousel-arrow {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(13,14,18,0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 3;
+  }
+
+  .carousel-arrow:hover {
+    background: rgba(139,124,248,0.12);
+    border-color: rgba(139,124,248,0.4);
+    color: #8b7cf8;
+    box-shadow: 0 0 12px rgba(139,124,248,0.2);
+    transform: scale(1.08);
+  }
+
+  /* Dot indicators */
+  .carousel-dots {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .carousel-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+
+  .carousel-dot.active {
+    width: 22px;
+    border-radius: 3px;
+    background: #8b7cf8;
+    box-shadow: 0 0 8px rgba(139,124,248,0.5);
+  }
+
+  /* Thumbnail strip */
+  .carousel-thumbs {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 860px;
+    width: 100%;
+  }
+
+  .carousel-thumb {
+    flex: 1;
+    min-width: 140px;
+    max-width: 200px;
+    border: none;
+    background: rgba(13,14,18,0.6);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.25s ease;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .carousel-thumb img {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.2s ease;
+    opacity: 0.55;
+  }
+
+  .thumb-label {
+    display: block;
+    padding: 0.35rem 0.6rem;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: left;
+    transition: color 0.2s ease;
+  }
+
+  .carousel-thumb:hover {
+    border-color: rgba(139,124,248,0.25);
+  }
+
+  .carousel-thumb:hover img {
+    opacity: 0.8;
+  }
+
+  .carousel-thumb.active {
+    border-color: rgba(139,124,248,0.5);
+    box-shadow: 0 0 0 1px rgba(139,124,248,0.2), 0 4px 16px rgba(0,0,0,0.3);
+  }
+
+  .carousel-thumb.active img {
+    opacity: 1;
+  }
+
+  .carousel-thumb.active .thumb-label {
+    color: #8b7cf8;
+  }
+
+  @media (max-width: 640px) {
+    .carousel-arrow {
+      width: 34px;
+      height: 34px;
+    }
+    .carousel-thumb {
+      min-width: 100px;
+    }
+  }
 </style>
+
 <script>
-  const mainImg = document.getElementById('ss-main-img');
-  const captionEl = document.getElementById('ss-caption');
-  const thumbs = document.querySelectorAll('.thumb');
-  thumbs.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const src = btn.getAttribute('data-src');
-      const cap = btn.getAttribute('data-caption');
-      mainImg.src = src;
-      captionEl.textContent = cap;
-      thumbs.forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
+  const slides = [
+    { src: '/screenshots/01-dashboard.png', caption: 'Dashboard', alt: 'Dashboard' },
+    { src: '/screenshots/02-posts.png', caption: 'Posts', alt: 'Posts' },
+    { src: '/screenshots/03-schedule.png', caption: 'Schedule', alt: 'Schedule' },
+    { src: '/screenshots/04-settings.png', caption: 'Settings', alt: 'Settings' },
+  ];
+
+  let current = 0;
+
+  const img = document.getElementById('carousel-img') as HTMLImageElement;
+  const caption = document.getElementById('carousel-caption');
+  const counter = document.getElementById('carousel-counter');
+  const dots = document.querySelectorAll('.carousel-dot');
+  const thumbs = document.querySelectorAll('.carousel-thumb');
+
+  function pad(n: number) { return String(n).padStart(2, '0'); }
+
+  function goTo(index: number) {
+    if (index === current) return;
+    current = (index + slides.length) % slides.length;
+
+    // Animate out
+    img?.classList.add('transitioning');
+
+    setTimeout(() => {
+      if (img) {
+        img.src = slides[current].src;
+        img.alt = slides[current].alt;
+      }
+      if (caption) caption.textContent = slides[current].caption;
+      if (counter) counter.textContent = `${pad(current + 1)} / ${pad(slides.length)}`;
+
+      // Update dots
+      dots.forEach((d, i) => d.classList.toggle('active', i === current));
+      // Update thumbs
+      thumbs.forEach((t, i) => t.classList.toggle('active', i === current));
+
+      img?.classList.remove('transitioning');
+    }, 200);
+  }
+
+  // Arrow buttons
+  document.getElementById('carousel-prev')?.addEventListener('click', () => goTo(current - 1));
+  document.getElementById('carousel-next')?.addEventListener('click', () => goTo(current + 1));
+
+  // Dots
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const idx = parseInt(dot.getAttribute('data-index') || '0');
+      goTo(idx);
     });
   });
+
+  // Thumbs
+  thumbs.forEach(thumb => {
+    thumb.addEventListener('click', () => {
+      const idx = parseInt(thumb.getAttribute('data-index') || '0');
+      goTo(idx);
+    });
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') goTo(current - 1);
+    if (e.key === 'ArrowRight') goTo(current + 1);
+  });
+
+  // Touch swipe support
+  let touchStartX = 0;
+  const frame = document.getElementById('carousel-frame');
+  frame?.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  frame?.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 40) goTo(dx < 0 ? current + 1 : current - 1);
+  }, { passive: true });
 </script>
