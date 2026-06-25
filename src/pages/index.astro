@@ -17,7 +17,9 @@ import {
   Edit,
   Heart
 } from '@lucide/astro';
+import ScreenshotCarousel from '../components/ScreenshotCarousel.astro';
 ---
+
 
 <Layout>
 	<!-- Decorative Grid & Glow Background -->
@@ -36,9 +38,9 @@ import {
 			<nav class="nav">
 				<a href="#features" class="nav-link">Features</a>
 				<a href="#how-it-works" class="nav-link">How it Works</a>
-				<a href="#tui-demo" class="nav-link">TUI Demo</a>
+				<a href="#screenshots" class="nav-link">Screenshots</a>
 				<a href="/docs" class="nav-link">Docs</a>
-				<a href="#ai-operator" class="nav-link">AI-Ready</a>
+				<a href="#ai-operator" class="nav-link">AI Ready</a>
 				<a href="#pricing" class="nav-link">Pricing</a>
 				<a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="nav-link">Support</a>
 				<a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="nav-link github-link">
@@ -85,6 +87,8 @@ import {
 				</div>
 			</div>
 		</section>
+
+
 
 		<!-- Features Grid Section -->
 		<section id="features" class="features-section">
@@ -213,237 +217,16 @@ Campaign successfully posted!
 			</div>
 		</section>
 
-		<!-- TUI Interactive Simulator Section -->
-		<section id="tui-demo" class="tui-section">
-			<div class="container">
-				<div class="section-header">
-					<h2 class="section-title">Explore the Terminal UI</h2>
-					<p class="section-subtitle">Click the tabs on the interactive terminal mockup below to preview the actual app dashboards.</p>
-				</div>
 
-				<!-- Real Screenshots Carousel -->
-				<div class="screenshot-carousel" data-astro-cid-lcdefpme><!-- refreshed -->
-					<img src="/screenshots/01-dashboard.png" alt="Dashboard screenshot" class="screenshot" />
-					<img src="/screenshots/02-posts.png" alt="Posts screenshot" class="screenshot" />
-					<img src="/screenshots/03-schedule.png" alt="Schedule screenshot" class="screenshot" />
-					<img src="/screenshots/04-settings.png" alt="Settings screenshot" class="screenshot" />
-				</div>
-				<!-- End of Screenshots Carousel -->
-
-				<!-- TUI Mockup Container -->
-				<div class="tui-emulator">
-					<div class="tui-emulator-header">
-						<span class="tui-emulator-title">postctl — Terminal User Interface</span>
-					</div>
-					
-					<!-- Interactive TUI Application -->
-					<div class="tui-app">
-						<!-- Title Bar -->
-						<div class="tui-title-bar">postctl — Social Media CLI</div>
-						
-						<!-- Tabs Navigation -->
-						<div class="tui-tabs">
-							<button class="tui-tab active" data-tab="0">
-								<LayoutDashboard size={14} class="tab-icon" /> Dashboard
-							</button>
-							<button class="tui-tab" data-tab="1">
-								<MessageSquare size={14} class="tab-icon" /> Posts
-							</button>
-							<button class="tui-tab" data-tab="2">
-								<Calendar size={14} class="tab-icon" /> Schedule
-							</button>
-							<button class="tui-tab" data-tab="3">
-								<Settings size={14} class="tab-icon" /> Settings
-							</button>
-							<button class="tui-tab" data-tab="4">
-								<Edit size={14} class="tab-icon" /> Editor
-							</button>
-							<button class="tui-tab" data-tab="5">
-								<BookOpen size={14} class="tab-icon" /> README
-							</button>
-						</div>
-						
-						<!-- TUI Tab Contents -->
-						<div class="tui-content-area">
-							<!-- Tab 0: Dashboard -->
-							<div class="tui-tab-content active" id="tui-tab-0">
-								<div class="dashboard-grid">
-									<div class="dashboard-col">
-										<div class="tui-sub-header">CAMPAIGNS</div>
-										<ul class="tui-list">
-											<li><span class="color-accent">●</span> orbiter-v0365 <span class="tui-muted">(5 posts, 2 posted)</span></li>
-											<li><span class="color-accent">●</span> dual-render <span class="tui-muted">(9 posts, 0 posted)</span></li>
-										</ul>
-										
-										<div class="tui-sub-header" style="margin-top: 1.5rem;">NEXT UP</div>
-										<ul class="tui-list">
-											<li><span class="color-posted">◷</span> Mon 09:00 - Twitter EN</li>
-											<li><span class="color-posted">◷</span> Mon 14:00 - Threads EN</li>
-											<li><span class="color-posted">◷</span> Tue 09:00 - LinkedIn DE</li>
-										</ul>
-									</div>
-									<div class="dashboard-col border-left">
-										<div class="tui-sub-header">STATS</div>
-										<table class="stats-table">
-											<tr><td>Posted:</td><td class="color-posted align-right">12</td></tr>
-											<tr><td>Scheduled:</td><td class="color-accent align-right">8</td></tr>
-											<tr><td>Drafts:</td><td class="color-muted align-right">5</td></tr>
-											<tr><td>Failed:</td><td class="color-failed align-right">0</td></tr>
-										</table>
-										
-										<div class="tui-sub-header" style="margin-top: 1.5rem;">PLATFORMS</div>
-										<ul class="tui-list platform-status">
-											<li><span class="status-indicator active">✓</span> Twitter/X <span class="tui-muted">(connected)</span></li>
-											<li><span class="status-indicator active">✓</span> LinkedIn <span class="tui-muted">(connected)</span></li>
-											<li><span class="status-indicator inactive">○</span> Threads <span class="tui-muted">(not auth'd)</span></li>
-											<li><span class="status-indicator active">✓</span> Mastodon <span class="tui-muted">(connected)</span></li>
-											<li><span class="status-indicator active">✓</span> Bluesky <span class="tui-muted">(connected)</span></li>
-											<li><span class="status-indicator inactive">○</span> Facebook <span class="tui-muted">(not auth'd)</span></li>
-										</ul>
-									</div>
-								</div>
-							</div>
-							
-							<!-- Tab 1: Posts -->
-							<div class="tui-tab-content" id="tui-tab-1">
-								<div class="tui-sub-header">IMPORTED POSTS (FILTER: ALL)</div>
-								<div class="posts-list">
-									<div class="post-item selected">
-										<div class="post-header">
-											<span class="post-campaign">orbiter-v0365 / Twitter EN</span>
-											<span class="post-date color-accent">◷ Mon 09:00</span>
-										</div>
-										<div class="post-snippet">"Your CMS is a single file. No database server. No Docker..."</div>
-										<div class="post-meta tui-muted">thread · 5 tweets · 📎 2 images</div>
-									</div>
-									<div class="post-item">
-										<div class="post-header">
-											<span class="post-campaign">orbiter-v0365 / LinkedIn EN</span>
-											<span class="post-date color-accent">◷ Wed 09:00</span>
-										</div>
-										<div class="post-snippet">"Shipped: Calendar view, cross-pod posting, analytics..."</div>
-										<div class="post-meta tui-muted">single · 📎 1 image</div>
-									</div>
-									<div class="post-item">
-										<div class="post-header">
-											<span class="post-campaign">dual-render / Twitter EN</span>
-											<span class="post-date color-muted">draft</span>
-										</div>
-										<div class="post-snippet">"Half your website visitors leave if the page takes..."</div>
-										<div class="post-meta tui-muted">thread · 6 tweets · 📎 1 image</div>
-									</div>
-								</div>
-							</div>
-							
-							<!-- Tab 2: Schedule -->
-							<div class="tui-tab-content" id="tui-tab-2">
-								<div class="tui-sub-header">PUBLICATION TIMELINE (NEXT UP)</div>
-								<div class="schedule-timeline">
-									<div class="timeline-event">
-										<div class="time-badge">Mon 09:00</div>
-										<div class="event-details">
-											<strong>orbiter-v0365 [Twitter EN]</strong>
-											<p class="tui-muted">"Your CMS is a single file..." (thread · 5 tweets)</p>
-										</div>
-									</div>
-									<div class="timeline-event">
-										<div class="time-badge">Mon 14:00</div>
-										<div class="event-details">
-											<strong>orbiter-v0365 [Threads EN]</strong>
-											<p class="tui-muted">"Your CMS is a single file..." (single · 📎 1 image)</p>
-										</div>
-									</div>
-									<div class="timeline-event">
-										<div class="time-badge">Tue 09:00</div>
-										<div class="event-details">
-											<strong>dual-render [LinkedIn DE]</strong>
-											<p class="tui-muted">"Die Hälfte eurer Webseiten-Besucher geht..." (single)</p>
-										</div>
-									</div>
-								</div>
-							</div>
-							
-							<!-- Tab 3: Settings -->
-							<div class="tui-tab-content" id="tui-tab-3">
-								<div class="tui-sub-header">SYSTEM CONFIGURATION</div>
-								<div class="settings-list">
-									<div class="setting-row cursor-pointing">
-										<span class="setting-label">AI Provider:</span>
-										<span class="setting-value color-accent">openai</span>
-									</div>
-									<div class="setting-row">
-										<span class="setting-label">AI Model:</span>
-										<span class="setting-value color-accent">gpt-4o-mini</span>
-									</div>
-									<div class="setting-row">
-										<span class="setting-label">Dry Run:</span>
-										<span class="setting-value color-failed">false</span>
-									</div>
-									<div class="setting-row">
-										<span class="setting-label">License Type:</span>
-										<span class="setting-value color-posted">Pro (Active ✅)</span>
-									</div>
-								</div>
-								<div class="tui-footer-tip" style="margin-top: 1.5rem;">
-									<span class="tui-muted">Tip: Activate your Pro key via command line anytime:</span><br/>
-									<code>postctl config set license_key PCTL-PRO-XXXX...</code>
-								</div>
-							</div>
-
-							<!-- Tab 4: Editor -->
-							<div class="tui-tab-content" id="tui-tab-4">
-								<div class="tui-sub-header">BEITRAG BEARBEITEN (NEOVIM-READY)</div>
-								<div class="editor-mock">
-									<div class="editor-row"><span class="color-accent">➔</span> Plattform:  <span class="color-accent">[TWITTER]</span>   LINKEDIN   THREADS   MASTODON   BLUESKY   FACEBOOK</div>
-									<div class="editor-row">  Kampagne:   <span class="editor-input-mock">launch-v1</span></div>
-									<div class="editor-row">  Geplant am: <span class="editor-input-mock">25.06.2026 09:00</span></div>
-									<div class="editor-row">  Bilder:     <span class="editor-input-mock">img/dashboard.png</span></div>
-									<div class="editor-row">  Beitrag / Inhalt: <span class="tui-muted">(Nutze '---' für Thread-Tweets)</span></div>
-									<div class="editor-textarea-mock">This is a live preview of the post.
-We support multi-line text and Twitter thread-splitting by adding '---' dividers!</div>
-									<div class="editor-actions">
-										<span class="btn-mock color-posted">[ SPEICHERN ]</span> &nbsp; 
-										<span class="btn-mock color-failed">[ ABBRECHEN ]</span> &nbsp;
-										<span class="btn-mock color-accent">[ ctrl+v: Neovim ]</span>
-									</div>
-								</div>
-							</div>
-
-							<!-- Tab 5: README -->
-							<div class="tui-tab-content" id="tui-tab-5">
-								<div class="readme-split-mock">
-									<div class="readme-toc-mock">
-										<div class="tui-sub-header">INHALTSVERZEICHNIS</div>
-										<ul class="tui-list">
-											<li class="selected">&gt; Einleitung</li>
-											<li>  Installation</li>
-											<li>  Konfiguration</li>
-											<li>  TUI Editor</li>
-											<li>  AES-Sync</li>
-										</ul>
-									</div>
-									<div class="readme-body-mock">
-										<div class="tui-sub-header">README.md Browser</div>
-										<div class="readme-text-mock"># postctl Social Media CLI
-
-Willkommen bei postctl, deinem terminal-nativen Social-Media-Manager. 
-Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit offline in der TUI zur Verfügung!</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						
-						<!-- Help Bar -->
-						<div class="tui-help-bar">
-							<span>Click tabs above to navigate</span>
-							<span class="align-right">q Quit</span>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- AI Operator workflow section (NEW) -->
+		<section id="screenshots" class="screenshot-section">
+  <div class="container">
+    <h2 class="section-title">Screenshots</h2>
+    <p class="section-subtitle">Explore the app UI via screenshots</p>
+      
+      <ScreenshotCarousel client:load />
+    </div>
+</section>
+<!-- AI Operator workflow section (NEW) -->
 		<section id="ai-operator" class="ai-operator-section">
 			<div class="container">
 				<div class="section-header">

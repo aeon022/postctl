@@ -1,0 +1,45 @@
+<!-- src/components/ScreenshotCarousel.astro -->
+
+<div class="screenshot-section" id="screenshots">
+  <h2 class="section-title">Screenshots</h2>
+  <div class="screenshot-main">
+    <img id="ss-main-img" src="/screenshots/01-dashboard.png" alt="Main screenshot" loading="lazy" />
+    <div class="caption" id="ss-caption">Dashboard</div>
+  </div>
+  <div class="screenshot-thumbs">
+    <button class="thumb active" data-src="/screenshots/01-dashboard.png" data-caption="Dashboard" aria-label="Dashboard">
+      <img src="/screenshots/01-dashboard.png" alt="Dashboard thumbnail" loading="lazy" />
+    </button>
+    <button class="thumb" data-src="/screenshots/02-posts.png" data-caption="Posts" aria-label="Posts">
+      <img src="/screenshots/02-posts.png" alt="Posts thumbnail" loading="lazy" />
+    </button>
+    <button class="thumb" data-src="/screenshots/03-schedule.png" data-caption="Schedule" aria-label="Schedule">
+      <img src="/screenshots/03-schedule.png" alt="Schedule thumbnail" loading="lazy" />
+    </button>
+  </div>
+</div>
+<style>
+  .screenshot-section { padding: 4rem 0; text-align: center; }
+  .screenshot-main { position: relative; display: inline-block; max-width: 90%; margin: 0 auto; }
+  .screenshot-main img { width: 100%; max-height: 400px; object-fit: contain; border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+  .caption { margin-top: 0.5rem; font-size: 0.9rem; color: var(--c-text-muted); }
+  .screenshot-thumbs { margin-top: 1rem; display: flex; justify-content: center; gap: 0.5rem; }
+  .thumb { border: none; background: transparent; padding: 0; cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
+  .thumb.active, .thumb:hover { opacity: 1; }
+  .thumb img { width: 200px; height: auto; border-radius: 0.5rem; }
+</style>
+<script>
+  const mainImg = document.getElementById('ss-main-img');
+  const captionEl = document.getElementById('ss-caption');
+  const thumbs = document.querySelectorAll('.thumb');
+  thumbs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const src = btn.getAttribute('data-src');
+      const cap = btn.getAttribute('data-caption');
+      mainImg.src = src;
+      captionEl.textContent = cap;
+      thumbs.forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
