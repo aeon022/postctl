@@ -88,7 +88,7 @@ import * as TutorialDoc from '../../documents/TUTORIAL.md';
 							<li><button class="nav-item" data-doc="api-linkedin">LinkedIn (OIDC)</button></li>
 							<li><button class="nav-item" data-doc="api-threads">Threads (Meta)</button></li>
 							<li><button class="nav-item" data-doc="api-bluesky-mastodon">Bluesky & Mastodon</button></li>
-							<li><button class="nav-item" data-doc="api-reddit-facebook">Reddit & Facebook</button></li>
+							<li><button class="nav-item" data-doc="api-facebook">Facebook Setup</button></li>
 						</ul>
 					</div>
 
@@ -306,42 +306,13 @@ images: ["logo.png"]
 					</div>
 				</section>
 
-				<!-- Tab 9: Reddit & Facebook Setup -->
-				<section class="doc-section" id="doc-api-reddit-facebook">
+				<!-- Tab 9: Facebook Setup -->
+				<section class="doc-section" id="doc-api-facebook">
 					<div class="doc-body markdown-content">
-						<h1>🤖 Reddit & Facebook Setup Guide</h1>
-						<p>Configure automated publication to Reddit subreddits and Facebook business/creator Pages.</p>
+						<h1>🤖 Facebook Setup Guide</h1>
+						<p>Configure automated publication to Facebook business/creator Pages using Meta Graph API tokens.</p>
 
-						<h2>1. Reddit Integration</h2>
-						<p>Reddit postings require creating an OAuth application in your account preferences.</p>
-
-						<h3>Step A: Create Reddit Script App</h3>
-						<ol>
-							<li>Go to <a href="https://www.reddit.com/prefs/apps" target="_blank" rel="noopener noreferrer">Reddit App Preferences</a>.</li>
-							<li>Scroll to the bottom and click <strong>Create Another App...</strong>.</li>
-							<li>Fill in the fields:
-								<ul>
-									<li><strong>Name:</strong> <code>postctl-publisher</code></li>
-									<li><strong>App Type:</strong> Select the radio button for <strong>personal use script</strong>.</li>
-									<li><strong>Description:</strong> Terminal publisher CLI.</li>
-									<li><strong>Redirect URI:</strong> <code>http://localhost:8753/callback</code></li>
-								</ul>
-							</li>
-							<li>Click <strong>Create App</strong>.</li>
-							<li>Copy the Client ID (shown in bold text under the app title "personal use script") and the Client Secret (listed as "secret").</li>
-						</ol>
-
-						<h3>Step B: Save Preferences</h3>
-						<pre class="code-block" data-lang="bash"><code>./postctl config set reddit.client_id "YOUR_REDDIT_CLIENT_ID"
-./postctl config set reddit.client_secret "YOUR_REDDIT_CLIENT_SECRET"</code></pre>
-
-						<h3>Step C: Connect</h3>
-						<pre class="code-block" data-lang="bash"><code>./postctl auth reddit</code></pre>
-						<p>A browser window will open. Click <strong>Allow</strong>. In your frontmatter, map campaigns to specific subreddits using the <code>campaign</code> key or custom fields.</p>
-
-						<hr />
-
-						<h2>2. Facebook Integration</h2>
+						<h2>Facebook Integration</h2>
 						<p>Facebook posts are pushed directly to Business/Creator Pages using Meta Graph API tokens.</p>
 
 						<h3>Step A: Create App on Meta Portal</h3>
