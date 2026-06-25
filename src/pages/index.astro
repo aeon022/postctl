@@ -492,11 +492,11 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 							<p class="plan-desc">For developers looking to version and post files to their personal networks.</p>
 						</div>
 						<ul class="plan-features">
-							<li><span class="check-icon">✓</span> Connect up to 2 social networks</li>
-							<li><span class="check-icon">✓</span> Unlimited drafts & publication</li>
-							<li><span class="check-icon">✓</span> Full Bubbletea TUI & Cobra CLI</li>
-							<li><span class="check-icon">✓</span> In-process daemon background scheduler</li>
-							<li><span class="check-icon">✓</span> 100% Open Source (MIT Licensed)</li>
+							<li><span class="check-icon">✓</span> <span>Connect up to 2 social networks</span></li>
+							<li><span class="check-icon">✓</span> <span>Unlimited drafts & publication</span></li>
+							<li><span class="check-icon">✓</span> <span>Full Bubbletea TUI & Cobra CLI</span></li>
+							<li><span class="check-icon">✓</span> <span>In-process daemon background scheduler</span></li>
+							<li><span class="check-icon">✓</span> <span>100% Open Source (MIT Licensed)</span></li>
 						</ul>
 						<div class="plan-cta">
 							<a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-full">View Repository on GitHub</a>
@@ -512,12 +512,12 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 							<p class="plan-desc">Unlock all 6 platforms, stats dashboard, and support open-source development.</p>
 						</div>
 						<ul class="plan-features">
-							<li><span class="check-icon">✓</span> <strong>Connect all 6 supported platforms</strong></li>
-							<li><span class="check-icon">✓</span> <strong>Analytics Dashboard</strong>: Live engagement tracking</li>
-							<li><span class="check-icon">✓</span> <strong>Unlimited analytics history</strong> (Core limits to 3 days)</li>
-							<li><span class="check-icon">✓</span> <strong>Interactive ASCII Barcharts</strong> directly in terminal</li>
-							<li><span class="check-icon">✓</span> <strong>Priority GitHub Support</strong> SLA</li>
-							<li><span class="check-icon">✓</span> Automated license key issuance via Polar.sh</li>
+							<li><span class="check-icon">✓</span> <span><strong>Connect all 6 supported platforms</strong></span></li>
+							<li><span class="check-icon">✓</span> <span><strong>Analytics Dashboard</strong>: Live engagement tracking</span></li>
+							<li><span class="check-icon">✓</span> <span><strong>Unlimited analytics history</strong> (Core limits to 3 days)</span></li>
+							<li><span class="check-icon">✓</span> <span><strong>Interactive ASCII Barcharts</strong> directly in terminal</span></li>
+							<li><span class="check-icon">✓</span> <span><strong>Priority GitHub Support</strong> SLA</span></li>
+							<li><span class="check-icon">✓</span> <span>Automated license key issuance via Polar.sh</span></li>
 						</ul>
 						<div class="plan-cta">
 							<a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full">Get Lifetime Pro License</a>
@@ -1464,14 +1464,18 @@ Dieses Handbuch wird direkt mit in das Binary kompiliert und steht dir jederzeit
 	}
 	.plan-features li {
 		display: flex;
+		align-items: flex-start;
 		gap: 0.75rem;
 		margin-bottom: 0.85rem;
 		font-size: 0.9rem;
 		color: var(--text-secondary);
+		line-height: 1.5;
 	}
 	.check-icon {
 		color: var(--success);
 		font-weight: bold;
+		flex-shrink: 0;
+		margin-top: 0.15rem;
 	}
 	
 	/* Donate Banner */
