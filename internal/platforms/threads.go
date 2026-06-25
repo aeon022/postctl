@@ -46,27 +46,31 @@ func (t *ThreadsPlatform) Auth(ctx context.Context) error {
 		if config.ActiveConfig.Defaults.Language == "de" {
 			return fmt.Errorf("Threads-Konfiguration fehlt! Bitte folge diesen Schritten:\n" +
 				"  1. Gehe zum Meta Developer Portal unter https://developers.facebook.com\n" +
-				"  2. Erstelle eine App vom Typ Consumer und füge \"Threads API\" hinzu.\n" +
-				"  3. Setze die Redirect URIs in den Einstellungen auf:\n" +
-				"     - Valid OAuth Redirect: https://localhost:8753/callback\n" +
-				"     - Deinstallations-URL: https://localhost:8753/uninstall\n" +
-				"     - Datenlöschungs-URL:  https://localhost:8753/delete\n" +
-				"  4. Trage deine Zugangsdaten im Terminal ein:\n" +
-				"     postctl config set threads.app_id \"DEINE_APP_ID\"\n" +
-				"     postctl config set threads.app_secret \"DEIN_APP_SECRET\"\n" +
-				"  5. Führe danach die Authentifizierung erneut aus.")
+				"  2. Erstelle eine App: Wähle \"Anderes\" -> Typ \"Consumer\" (Verbraucher).\n" +
+				"  3. Gehe im App-Dashboard links auf \"Anwendungsfälle\" (Use Cases) -> wähle \"Threads API\" -> klicke auf \"Anpassen\" oder \"Einrichten\".\n" +
+				"  4. Klicke links unter Anwendungsfälle auf \"Threads API\" -> \"Einstellungen\" (Settings).\n" +
+				"     -> Trage bei \"Redirect URIs\" die Adresse \"https://localhost:8753/callback\" ein und speichere die Änderungen!\n" +
+				"  5. Gehe links auf \"App-Einstellungen\" -> \"Allgemeines\" (App settings -> Basic) und scrolle ganz nach unten zum Bereich \"Threads\":\n" +
+				"     -> WICHTIG: Kopiere die \"App-ID von Threads\" (nicht die App-ID ganz oben auf der Seite!)\n" +
+				"     -> Klicke neben \"App-Geheimcode von Threads\" auf \"Anzeigen\" und kopiere das Passwort.\n" +
+				"  6. Trage diese Threads-spezifischen Daten im Terminal ein:\n" +
+				"     postctl config set threads.app_id \"DEINE_THREADS_APP_ID\"\n" +
+				"     postctl config set threads.app_secret \"DEIN_THREADS_APP_SECRET\"\n" +
+				"  7. Führe danach die Authentifizierung erneut aus.")
 		}
 		return fmt.Errorf("Threads configuration is missing! Please follow these steps:\n" +
 			"  1. Go to Meta Developer Portal at https://developers.facebook.com\n" +
-			"  2. Create a consumer app and add \"Threads API\".\n" +
-			"  3. Configure your Redirect URIs in settings as follows:\n" +
-			"     - Valid OAuth Redirect: https://localhost:8753/callback\n" +
-			"     - Uninstall Callback:  https://localhost:8753/uninstall\n" +
-			"     - Data Delete Callback: https://localhost:8753/delete\n" +
-			"  4. Configure postctl in your terminal:\n" +
-			"     postctl config set threads.app_id \"YOUR_APP_ID\"\n" +
-			"     postctl config set threads.app_secret \"YOUR_APP_SECRET\"\n" +
-			"  5. Run the authentication command again.")
+			"  2. Create an app: Select \"Other\" -> Type \"Consumer\".\n" +
+			"  3. Go to the App Dashboard, click \"Use Cases\" in the left sidebar, select \"Threads API\", and click \"Set up\" or \"Customize\".\n" +
+			"  4. Under Use Cases in the left sidebar, click \"Threads API\" -> \"Settings\".\n" +
+			"     -> Add \"https://localhost:8753/callback\" to \"Redirect URIs\" and save the changes!\n" +
+			"  5. Go to \"App settings\" -> \"Basic\" in the left sidebar and scroll to the bottom to the \"Threads\" section:\n" +
+			"     -> IMPORTANT: Copy the \"App ID from Threads\" (do not use the App ID at the top of the page!)\n" +
+			"     -> Click \"Show\" next to \"App Secret from Threads\" and copy the secret.\n" +
+			"  6. Configure postctl in your terminal:\n" +
+			"     postctl config set threads.app_id \"YOUR_THREADS_APP_ID\"\n" +
+			"     postctl config set threads.app_secret \"YOUR_THREADS_APP_SECRET\"\n" +
+			"  7. Run the authentication command again.")
 	}
 
 	state := fmt.Sprintf("state-%d", time.Now().UnixNano())
@@ -82,6 +86,30 @@ func (t *ThreadsPlatform) Auth(ctx context.Context) error {
 		url.QueryEscape(scopes),
 		url.QueryEscape(state),
 	)
+
+	if config.ActiveConfig.Defaults.Language == "de" {
+		fmt.Println()
+		fmt.Println("--------------------------------------------------------------------------------")
+		fmt.Println("WICHTIG VOR DEM LOGIN:")
+		fmt.Println("Stelle sicher, dass du unter 'Anwendungsfälle' -> 'Threads API' -> 'Einstellungen' (Settings)")
+		fmt.Println("die folgende Weiterleitungs-URL eingetragen und gespeichert hast:")
+		fmt.Println("  -> https://localhost:8753/callback")
+		fmt.Println("Stelle zudem sicher, dass du die 'App-ID von Threads' (ganz unten auf der Basic-Settings-Seite)")
+		fmt.Println("in postctl konfiguriert hast, nicht die übergeordnete Facebook-App-ID!")
+		fmt.Println("--------------------------------------------------------------------------------")
+		fmt.Println()
+	} else {
+		fmt.Println()
+		fmt.Println("--------------------------------------------------------------------------------")
+		fmt.Println("IMPORTANT BEFORE LOGGING IN:")
+		fmt.Println("Make sure you have added the following Redirect URI under")
+		fmt.Println("'Use Cases' -> 'Threads API' -> 'Settings' and saved the changes:")
+		fmt.Println("  -> https://localhost:8753/callback")
+		fmt.Println("Also ensure you configured the 'App ID from Threads' (found at the bottom of the Basic Settings page)")
+		fmt.Println("in postctl, not the main Facebook App ID!")
+		fmt.Println("--------------------------------------------------------------------------------")
+		fmt.Println()
+	}
 
 	fmt.Println("Öffne den Browser für die Threads-Authentifizierung...")
 	fmt.Printf("Falls der Browser sich nicht öffnet, klicke auf diesen Link:\n\n%s\n\n", authURL)
