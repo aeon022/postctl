@@ -510,16 +510,16 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 				contentStr = strings.TrimLeft(contentStr, "\r\n")
 
 				var fm struct {
-					Platform string `yaml:"platform"`
-					Campaign string `yaml:"campaign"`
-					Schedule string `yaml:"schedule"`
-					Images   string `yaml:"images"`
+					Platform string        `yaml:"platform"`
+					Campaign string        `yaml:"campaign"`
+					Schedule string        `yaml:"schedule"`
+					Images   StringOrSlice `yaml:"images"`
 				}
 				if err := yaml.Unmarshal([]byte(yamlPart), &fm); err == nil {
 					platform = strings.TrimSpace(strings.ToLower(fm.Platform))
 					campaign = strings.TrimSpace(fm.Campaign)
 					schedule = strings.TrimSpace(fm.Schedule)
-					images = strings.TrimSpace(fm.Images)
+					images = strings.Join(fm.Images, ", ")
 				}
 			}
 		}
@@ -1300,4 +1300,23 @@ func (m Model) getReadmeViewportHeight() int {
 	innerHeight := outerHeight - 4
 	return innerHeight - 2
 }
+
+type StringOrSlice []string
+
+func (s *StringOrSlice) UnmarshalYAML(value *yaml.Node) error {
+	var str string
+	if err := value.Decode(&str); err == nil {
+		*s = []string{str}
+		return nil
+	}
+
+	var slice []string
+	if err := value.Decode(&slice); err == nil {
+		*s = slice
+		return nil
+	}
+
+	return nil
+}
+
 

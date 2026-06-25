@@ -117,6 +117,31 @@ It can have multiple paragraphs.
 	}
 }
 
+func TestParseContentSingleImageAsString(t *testing.T) {
+	content := `---
+platform: linkedin
+type: single
+campaign: launch-2026
+schedule: 2026-06-23T09:00
+images: screenshots/dashboard.png
+---
+This is a single LinkedIn post body.
+`
+	posts, err := ParseContent(content, "test-post-str.md")
+	if err != nil {
+		t.Fatalf("ParseContent failed with single image string: %v", err)
+	}
+
+	if len(posts) != 1 {
+		t.Fatalf("expected 1 post, got %d", len(posts))
+	}
+
+	post := posts[0]
+	if len(post.Images) != 1 || post.Images[0] != "screenshots/dashboard.png" {
+		t.Errorf("unexpected images: %v", post.Images)
+	}
+}
+
 func TestParseContentThread(t *testing.T) {
 	content := `---
 platform: twitter

@@ -12,16 +12,35 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// StringOrSlice repräsentiert entweder einen einzelnen String oder eine Liste von Strings in YAML
+type StringOrSlice []string
+
+func (s *StringOrSlice) UnmarshalYAML(value *yaml.Node) error {
+	var str string
+	if err := value.Decode(&str); err == nil {
+		*s = []string{str}
+		return nil
+	}
+
+	var slice []string
+	if err := value.Decode(&slice); err == nil {
+		*s = slice
+		return nil
+	}
+
+	return nil
+}
+
 // Frontmatter entspricht der YAML-Struktur am Anfang der Datei
 type Frontmatter struct {
-	Platform string    `yaml:"platform"` // twitter | linkedin | threads | all
-	Type     string    `yaml:"type"`     // thread | single | article
-	Language string    `yaml:"language"`
-	Campaign string    `yaml:"campaign"`
-	Schedule string    `yaml:"schedule"` // ISO 8601 oder YYYY-MM-DD HH:MM
-	Images   []string  `yaml:"images"`
-	Tags     []string  `yaml:"tags"`
-	Title    string    `yaml:"title"`
+	Platform string        `yaml:"platform"` // twitter | linkedin | threads | all
+	Type     string        `yaml:"type"`     // thread | single | article
+	Language string        `yaml:"language"`
+	Campaign string        `yaml:"campaign"`
+	Schedule string        `yaml:"schedule"` // ISO 8601 oder YYYY-MM-DD HH:MM
+	Images   StringOrSlice `yaml:"images"`
+	Tags     []string      `yaml:"tags"`
+	Title    string        `yaml:"title"`
 }
 
 var (
@@ -117,7 +136,7 @@ func ParseContent(content, sourcePath string) ([]models.Post, error) {
 			Language:    fm.Language,
 			Campaign:    fm.Campaign,
 			Title:       title,
-			Images:      fm.Images,
+			Images:      []string(fm.Images),
 			Tags:        fm.Tags,
 			ScheduledAt: scheduledAt,
 			SourceFile:  sourcePath,
@@ -136,7 +155,7 @@ func ParseContent(content, sourcePath string) ([]models.Post, error) {
 		// Inhalt parsen
 		if fm.Type == "thread" || platform == models.PlatformTwitter || platform == models.PlatformMastodon || platform == models.PlatformBluesky {
 			// Für Twitter/Mastodon/Bluesky oder explizite Threads teilen wir in Tweets auf
-			post.Tweets = parseTweets(bodyStr, fm.Images)
+			post.Tweets = parseTweets(bodyStr, []string(fm.Images))
 			
 			// Titel aus erstem Tweet generieren, falls leer
 			if post.Title == "" && len(post.Tweets) > 0 {
