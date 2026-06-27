@@ -583,7 +583,7 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 			"fieldToggles": map[string]interface{}{
 				"withArticleRelationships": false,
 			},
-			"queryId": "SiM_cAu83R0wnrpmKQQSEw",
+			"queryId": "nmdAQXJDxw6-0KKF2on7eA",
 		}
 
 		bodyBytes, err := json.Marshal(payload)
@@ -591,7 +591,7 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 			return "", err
 		}
 
-		reqURL := "https://x.com/i/api/graphql/SiM_cAu83R0wnrpmKQQSEw/CreateTweet"
+		reqURL := "https://x.com/i/api/graphql/nmdAQXJDxw6-0KKF2on7eA/CreateTweet"
 		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
 		if err != nil {
 			return "", err
