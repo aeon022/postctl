@@ -20,6 +20,7 @@ type KeyMap struct {
 	Repurpose key.Binding
 	Import    key.Binding
 	Readme    key.Binding
+	Export    key.Binding
 	Quit      key.Binding
 	Help      key.Binding
 }
@@ -97,5 +98,9 @@ var Keys = KeyMap{
 	Help: key.NewBinding(
 		key.WithKeys("?"),
 		key.WithHelp("?", "toggle quick help"),
+	),
+	Export: key.NewBinding(
+		key.WithKeys("x"),
+		key.WithHelp("x", "export history"),
 	),
 }

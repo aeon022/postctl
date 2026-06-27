@@ -313,6 +313,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Anwendung beenden",
 		"en": "Quit application",
 	},
+	"help_export": {
+		"de": "History exportieren (x)",
+		"en": "Export history as JSON (x)",
+	},
 
 	// Editor helper comments
 	"editor_helper_title_twitter": {

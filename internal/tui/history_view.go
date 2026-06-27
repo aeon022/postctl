@@ -119,6 +119,8 @@ func (m Model) renderHelp() string {
 			line1 = "tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Wählen  ·  n: Neu  ·  e: Bearbeiten  ·  i: Import  ·  d: Löschen  ·  r: Umschreiben  ·  q: Beenden"
 			if m.activeTab == 1 && m.filterCampaign != "" {
 				line1 = "esc: Filter löschen  ·  " + line1
+			} else if m.activeTab == 3 {
+				line1 = "tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Details öffnen  ·  x: Exportieren  ·  q: Beenden"
 			}
 			helpText := line1 + "\n" + "f1/R: Handbuch  ·  ?: Schnellhilfe"
 			sb.WriteString(StyleHelp.Render(helpText))
@@ -126,6 +128,8 @@ func (m Model) renderHelp() string {
 			line1 = "tab: next tab  ·  ↑↓: navigate  ·  enter: select  ·  n: new  ·  e: edit  ·  i: import  ·  d: delete  ·  r: repurpose  ·  q: quit"
 			if m.activeTab == 1 && m.filterCampaign != "" {
 				line1 = "esc: clear filter  ·  " + line1
+			} else if m.activeTab == 3 {
+				line1 = "tab: next tab  ·  ↑↓: navigate  ·  enter: view details  ·  x: export  ·  q: quit"
 			}
 			helpText := line1 + "\n" + "f1/R: readme  ·  ?: quick help"
 			sb.WriteString(StyleHelp.Render(helpText))

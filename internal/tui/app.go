@@ -2,6 +2,7 @@ package tui
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -45,14 +46,15 @@ type Model struct {
 	nextUp    []models.Post
 	
 	// UI Zustand
-	selectedPost   *models.Post
-	filterCampaign string
-	isEditing      bool
-	showHelp       bool
-	err            error
-	loading        bool
-	repurposing    bool
-	statusMessage  string
+	selectedPost     *models.Post
+	selectedHistory  *models.HistoryEntry
+	filterCampaign   string
+	isEditing        bool
+	showHelp         bool
+	err              error
+	loading          bool
+	repurposing      bool
+	statusMessage    string
 	
 	// Editor Zustand
 	editorPostID      string
@@ -90,6 +92,11 @@ type dataLoadedMsg struct {
 
 type errorMsg struct {
 	err error
+}
+
+type exportFinishedMsg struct {
+	err      error
+	filename string
 }
 
 type postDeletedMsg struct {
@@ -753,6 +760,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, m.loadDataCmd
 
+	case exportFinishedMsg:
+		if msg.err != nil {
+			m.err = fmt.Errorf("Fehler beim Exportieren: %w", msg.err)
+		} else {
+			m.statusMessage = fmt.Sprintf("Erfolgreich exportiert nach %s!", msg.filename)
+		}
+		return m, nil
+
 	case externalEditorFinishedMsg:
 		if msg.err != nil {
 			m.err = fmt.Errorf("Fehler beim Bearbeiten mit externem Editor: %w", msg.err)
@@ -877,6 +892,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.activeTab == 1 && m.selectedPost == nil && m.filterCampaign != "" && key.Matches(msg, Keys.Esc) {
 			m.filterCampaign = ""
 			m.cursor = 0
+			return m, nil
+		}
+
+		// History-Detailansicht-Steuerung
+		if m.selectedHistory != nil {
+			m.statusMessage = ""
+			switch {
+			case key.Matches(msg, Keys.Esc):
+				m.selectedHistory = nil
+				return m, nil
+			case key.Matches(msg, Keys.Export):
+				return m, m.exportHistoryEntryCmd(m.selectedHistory)
+			}
 			return m, nil
 		}
 
@@ -1009,6 +1037,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.selectedPost = &filtered[m.cursor]
 				}
 			}
+			if m.activeTab == 3 {
+				if len(m.history) > 0 && m.cursor < len(m.history) {
+					m.selectedHistory = &m.history[m.cursor]
+				}
+			}
 			return m, nil
 
 		case key.Matches(msg, Keys.Delete):
@@ -1038,6 +1071,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.loading = true
 					m.statusMessage = fmt.Sprintf("Setze %s zurück...", platName)
 					return m, m.clearPlatformCmd(platName)
+				}
+			}
+			return m, nil
+
+		case key.Matches(msg, Keys.Export):
+			if m.selectedPost == nil && !m.showReadme {
+				if m.activeTab == 3 {
+					return m, m.exportHistoryCmd(m.history)
 				}
 			}
 			return m, nil
@@ -1143,6 +1184,11 @@ func (m Model) View() string {
 	// Detailansicht anzeigen, falls ein Post ausgewählt ist
 	if m.selectedPost != nil {
 		return m.renderDetailView()
+	}
+
+	// History-Detailansicht anzeigen, falls ausgewählt
+	if m.selectedHistory != nil {
+		return m.renderHistoryDetailView()
 	}
 
 	// README / System-Dokumentation anzeigen, falls geöffnet
@@ -1322,5 +1368,48 @@ func (s *StringOrSlice) UnmarshalYAML(value *yaml.Node) error {
 
 	return nil
 }
+
+func (m Model) exportHistoryCmd(history []models.HistoryEntry) tea.Cmd {
+	return func() tea.Msg {
+		if len(history) == 0 {
+			return exportFinishedMsg{err: fmt.Errorf("keine History-Einträge vorhanden")}
+		}
+
+		b, err := json.MarshalIndent(history, "", "  ")
+		if err != nil {
+			return exportFinishedMsg{err: fmt.Errorf("marshal history: %w", err)}
+		}
+
+		filename := "history_export.json"
+		err = os.WriteFile(filename, b, 0644)
+		if err != nil {
+			return exportFinishedMsg{err: fmt.Errorf("write file: %w", err)}
+		}
+
+		return exportFinishedMsg{filename: filename}
+	}
+}
+
+func (m Model) exportHistoryEntryCmd(entry *models.HistoryEntry) tea.Cmd {
+	return func() tea.Msg {
+		if entry == nil {
+			return exportFinishedMsg{err: fmt.Errorf("kein Eintrag ausgewählt")}
+		}
+
+		b, err := json.MarshalIndent(entry, "", "  ")
+		if err != nil {
+			return exportFinishedMsg{err: fmt.Errorf("marshal entry: %w", err)}
+		}
+
+		filename := fmt.Sprintf("history_entry_%s.json", entry.ID)
+		err = os.WriteFile(filename, b, 0644)
+		if err != nil {
+			return exportFinishedMsg{err: fmt.Errorf("write file: %w", err)}
+		}
+
+		return exportFinishedMsg{filename: filename}
+	}
+}
+
 
 
