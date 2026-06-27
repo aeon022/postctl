@@ -623,118 +623,47 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 		req.Header.Set("Sec-Fetch-Site", "same-origin")
 
 		resp, err := t.client.Do(req)
-		var gqlErr error
-		var tweetID string
-
 		if err != nil {
-			gqlErr = fmt.Errorf("cookie post http request: %w", err)
-		} else {
-			defer resp.Body.Close()
-			respBody, err := io.ReadAll(resp.Body)
-			if err != nil {
-				gqlErr = fmt.Errorf("read gql response: %w", err)
-			} else if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-				gqlErr = fmt.Errorf("cookie post failed (status %d): %s", resp.StatusCode, string(respBody))
-			} else {
-				var gqlResp struct {
-					Errors []struct {
-						Message string `json:"message"`
-					} `json:"errors"`
-					Data struct {
-						CreateTweet struct {
-							TweetResults struct {
-								Result struct {
-									RestID string `json:"rest_id"`
-								} `json:"result"`
-							} `json:"tweet_results"`
-						} `json:"create_tweet"`
-					} `json:"data"`
-				}
-				if err := json.Unmarshal(respBody, &gqlResp); err != nil {
-					gqlErr = fmt.Errorf("decode gql response: %w (body: %s)", err, string(respBody))
-				} else if len(gqlResp.Errors) > 0 {
-					gqlErr = fmt.Errorf("twitter error: %s (body: %s)", gqlResp.Errors[0].Message, string(respBody))
-				} else {
-					tweetID = gqlResp.Data.CreateTweet.TweetResults.Result.RestID
-					if tweetID == "" {
-						gqlErr = fmt.Errorf("empty tweet ID returned in cookie mode (body: %s)", string(respBody))
-					}
-				}
-			}
+			return "", fmt.Errorf("cookie post http request: %w", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+			respBody, _ := io.ReadAll(resp.Body)
+			return "", fmt.Errorf("cookie post failed (status %d): %s", resp.StatusCode, string(respBody))
 		}
 
-		if gqlErr != nil {
-			// Falls GraphQL fehlschlägt, Fallback auf Legacy REST API
-			formData := url.Values{}
-			formData.Set("status", tweet.Content)
-			formData.Set("batch_mode", "off")
-			formData.Set("exclude_reply_user_ids", "")
-			formData.Set("cards_platform", "Web-12")
-			formData.Set("include_cards", "1")
-			formData.Set("include_ext_alt_text", "true")
+		var gqlResp struct {
+			Errors []struct {
+				Message string `json:"message"`
+			} `json:"errors"`
+			Data struct {
+				CreateTweet struct {
+					TweetResults struct {
+						Result struct {
+							RestID string `json:"rest_id"`
+						} `json:"result"`
+					} `json:"tweet_results"`
+				} `json:"create_tweet"`
+			} `json:"data"`
+		}
 
-			var mediaIDs []string
-			for _, m := range mediaEntities {
-				if mObj, ok := m.(map[string]interface{}); ok {
-					if id, ok := mObj["media_id"].(string); ok {
-						mediaIDs = append(mediaIDs, id)
-					}
-				}
-			}
-			if len(mediaIDs) > 0 {
-				formData.Set("media_ids", strings.Join(mediaIDs, ","))
-			}
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return "", fmt.Errorf("read gql response: %w", err)
+		}
 
-			if i > 0 && lastTweetID != "" {
-				formData.Set("in_reply_to_status_id", lastTweetID)
-				formData.Set("auto_populate_reply_metadata", "true")
-			}
+		if err := json.Unmarshal(respBody, &gqlResp); err != nil {
+			return "", fmt.Errorf("decode gql response: %w (body: %s)", err, string(respBody))
+		}
 
-			fallbackReq, err := http.NewRequestWithContext(ctx, "POST", "https://x.com/i/api/1.1/statuses/update.json", strings.NewReader(formData.Encode()))
-			if err != nil {
-				return "", fmt.Errorf("GraphQL error: %v. Failed to create legacy fallback request: %w", gqlErr, err)
-			}
+		if len(gqlResp.Errors) > 0 {
+			return "", fmt.Errorf("twitter error: %s (body: %s)", gqlResp.Errors[0].Message, string(respBody))
+		}
 
-			fallbackReq.Header.Set("Authorization", twitterStaticBearer)
-			fallbackReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-			fallbackReq.Header.Set("X-Twitter-Auth-Type", "OAuth2Session")
-			fallbackReq.Header.Set("X-Twitter-Active-User", "yes")
-			fallbackReq.Header.Set("X-Csrf-Token", csrfToken)
-			fallbackReq.Header.Set("Cookie", cookieStr)
-			fallbackReq.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
-			fallbackReq.Header.Set("Referer", "https://x.com/home")
-			fallbackReq.Header.Set("X-Twitter-Client-Language", "en")
-			fallbackReq.Header.Set("Accept", "*/*")
-			fallbackReq.Header.Set("Accept-Language", "en-US,en;q=0.9")
-
-			fallbackResp, err := t.client.Do(fallbackReq)
-			if err != nil {
-				return "", fmt.Errorf("GraphQL error: %v. Legacy fallback HTTP request failed: %w", gqlErr, err)
-			}
-			defer fallbackResp.Body.Close()
-
-			fallbackBody, err := io.ReadAll(fallbackResp.Body)
-			if err != nil {
-				return "", fmt.Errorf("GraphQL error: %v. Failed to read legacy fallback response: %w", gqlErr, err)
-			}
-
-			if fallbackResp.StatusCode != http.StatusOK && fallbackResp.StatusCode != http.StatusCreated {
-				return "", fmt.Errorf("GraphQL error: %v. Legacy fallback failed (status %d): %s", gqlErr, fallbackResp.StatusCode, string(fallbackBody))
-			}
-
-			type legacyTweet struct {
-				IDStr string `json:"id_str"`
-			}
-			var lt legacyTweet
-			if err := json.Unmarshal(fallbackBody, &lt); err != nil {
-				return "", fmt.Errorf("GraphQL error: %v. Decode legacy response failed: %w (body: %s)", gqlErr, err, string(fallbackBody))
-			}
-
-			if lt.IDStr == "" {
-				return "", fmt.Errorf("GraphQL error: %v. Empty legacy tweet ID returned (body: %s)", gqlErr, string(fallbackBody))
-			}
-
-			tweetID = lt.IDStr
+		tweetID := gqlResp.Data.CreateTweet.TweetResults.Result.RestID
+		if tweetID == "" {
+			return "", fmt.Errorf("empty tweet ID returned in cookie mode (body: %s)", string(respBody))
 		}
 
 		lastTweetID = tweetID
