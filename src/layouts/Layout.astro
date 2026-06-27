@@ -8,6 +8,9 @@ const {
 	title = "postctl — Social Media Management from your Terminal", 
 	description = "A terminal-native, Markdown-first social media scheduler and publisher. Manage Twitter, LinkedIn, and Threads directly from the CLI or TUI." 
 } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin).href;
+const ogImageURL = new URL('/screenshots/01-dashboard.png', Astro.site || Astro.url.origin).href;
 ---
 
 <!doctype html>
@@ -21,7 +24,43 @@ const {
 		<!-- SEO Best Practices -->
 		<title>{title}</title>
 		<meta name="description" content={description} />
+		<link rel="canonical" href={canonicalURL} />
+		<meta name="robots" content="index, follow" />
 		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={ogImageURL} />
+		<meta property="og:site_name" content="postctl" />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={canonicalURL} />
+		<meta property="twitter:title" content={title} />
+		<meta property="twitter:description" content={description} />
+		<meta property="twitter:image" content={ogImageURL} />
+		
+		<!-- JSON-LD Structured Data for Search Engines -->
+		<script type="application/ld+json" is:inline set:html={JSON.stringify({
+			"@context": "https://schema.org",
+			"@type": "SoftwareApplication",
+			"name": "postctl",
+			"operatingSystem": "Linux, macOS, Windows",
+			"applicationCategory": "BusinessApplication",
+			"offers": {
+				"@type": "Offer",
+				"price": "0",
+				"priceCurrency": "USD"
+			},
+			"description": "A terminal-native, Markdown-first social media scheduler and publisher. Manage Twitter, LinkedIn, Threads, Mastodon, Bluesky, and Facebook directly from the CLI or TUI.",
+			"developer": {
+				"@type": "Person",
+				"name": "aeon022"
+			}
+		})} />
+
 		<!-- Google Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
