@@ -57,7 +57,17 @@ func (m Model) renderHistory() string {
 			infoText += fmt.Sprintf(" (ID: %s)", entry.PlatformID)
 		}
 		if entry.Error != "" {
-			infoText += fmt.Sprintf(" - Error: %s", entry.Error)
+			errText := entry.Error
+			if idx := strings.Index(errText, "\n"); idx != -1 {
+				errText = errText[:idx]
+			}
+			infoText += fmt.Sprintf(" - Error: %s", errText)
+		}
+
+		// Truncate infoText so the entire entry fits on a single line
+		maxInfoLen := 38
+		if len(infoText) > maxInfoLen {
+			infoText = infoText[:maxInfoLen-3] + "..."
 		}
 
 		itemStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
