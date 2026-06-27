@@ -458,7 +458,15 @@ func (t *TwitterPlatform) uploadImageCookieBased(ctx context.Context, path strin
 	req.Header.Set("X-Csrf-Token", csrfToken)
 	req.Header.Set("Cookie", fmt.Sprintf("auth_token=%s; ct0=%s", authToken, csrfToken))
 	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+	req.Header.Set("Referer", "https://x.com/home")
+	req.Header.Set("X-Twitter-Auth-Type", "OAuth2Session")
+	req.Header.Set("X-Twitter-Active-User", "yes")
+	req.Header.Set("Accept", "*/*")
+	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
+	req.Header.Set("Sec-Fetch-Dest", "empty")
+	req.Header.Set("Sec-Fetch-Mode", "cors")
+	req.Header.Set("Sec-Fetch-Site", "same-origin")
 
 	resp, err := t.client.Do(req)
 	if err != nil {
@@ -583,7 +591,7 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 			return "", err
 		}
 
-		reqURL := "https://twitter.com/i/api/graphql/SiM_cAu83R0wnrpmKQQSEw/CreateTweet"
+		reqURL := "https://x.com/i/api/graphql/SiM_cAu83R0wnrpmKQQSEw/CreateTweet"
 		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
 		if err != nil {
 			return "", err
@@ -595,7 +603,14 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 		req.Header.Set("X-Twitter-Active-User", "yes")
 		req.Header.Set("X-Csrf-Token", csrfToken)
 		req.Header.Set("Cookie", fmt.Sprintf("auth_token=%s; ct0=%s", authToken, csrfToken))
-		req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+		req.Header.Set("Referer", "https://x.com/home")
+		req.Header.Set("X-Twitter-Client-Language", "en")
+		req.Header.Set("Accept", "*/*")
+		req.Header.Set("Accept-Language", "en-US,en;q=0.9")
+		req.Header.Set("Sec-Fetch-Dest", "empty")
+		req.Header.Set("Sec-Fetch-Mode", "cors")
+		req.Header.Set("Sec-Fetch-Site", "same-origin")
 
 		resp, err := t.client.Do(req)
 		if err != nil {
