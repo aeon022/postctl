@@ -456,7 +456,12 @@ func (t *TwitterPlatform) uploadImageCookieBased(ctx context.Context, path strin
 
 	req.Header.Set("Authorization", twitterStaticBearer)
 	req.Header.Set("X-Csrf-Token", csrfToken)
-	req.Header.Set("Cookie", fmt.Sprintf("auth_token=%s; ct0=%s", authToken, csrfToken))
+	
+	cookieStr := fmt.Sprintf("auth_token=%s; ct0=%s", authToken, csrfToken)
+	if strings.Contains(authToken, "=") || strings.Contains(authToken, ";") {
+		cookieStr = authToken
+	}
+	req.Header.Set("Cookie", cookieStr)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
 	req.Header.Set("Referer", "https://x.com/home")
@@ -602,7 +607,12 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 		req.Header.Set("X-Twitter-Auth-Type", "OAuth2Session")
 		req.Header.Set("X-Twitter-Active-User", "yes")
 		req.Header.Set("X-Csrf-Token", csrfToken)
-		req.Header.Set("Cookie", fmt.Sprintf("auth_token=%s; ct0=%s", authToken, csrfToken))
+		
+		cookieStr := fmt.Sprintf("auth_token=%s; ct0=%s", authToken, csrfToken)
+		if strings.Contains(authToken, "=") || strings.Contains(authToken, ";") {
+			cookieStr = authToken
+		}
+		req.Header.Set("Cookie", cookieStr)
 		req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
 		req.Header.Set("Referer", "https://x.com/home")
 		req.Header.Set("X-Twitter-Client-Language", "en")
