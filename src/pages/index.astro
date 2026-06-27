@@ -609,7 +609,12 @@ Campaign successfully posted!
 						</div>
 						<div class="plan-header">
 							<h3 class="plan-name">Pro License</h3>
-							<div class="plan-price">$15<span class="price-period">/ one-time</span></div>
+							<div class="plan-price">
+								<span class="price-original">$29</span>
+								<span class="price-amount">$15</span>
+								<span class="price-period">/ one-time</span>
+							</div>
+							<div class="launch-special-tag">Launch Special — Save 48%</div>
 							<p class="plan-desc">Unlock all 6 platforms, stats dashboard, and support open-source development.</p>
 						</div>
 						<ul class="plan-features">
@@ -1542,9 +1547,29 @@ Campaign successfully posted!
 		font-size: 3rem;
 		font-weight: 700;
 		color: var(--text-primary);
-		margin-bottom: 1rem;
+		margin-bottom: 0.5rem;
 		display: flex;
 		align-items: baseline;
+	}
+	.price-original {
+		font-size: 1.75rem;
+		text-decoration: line-through;
+		color: var(--text-muted);
+		margin-right: 0.5rem;
+		font-weight: 500;
+	}
+	.launch-special-tag {
+		font-family: var(--font-mono, monospace);
+		font-size: 0.72rem;
+		color: var(--success);
+		background: rgba(16, 185, 129, 0.08);
+		border: 1px solid rgba(16, 185, 129, 0.2);
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		display: inline-block;
+		margin-bottom: 1rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 	.price-period {
 		font-size: 1rem;
