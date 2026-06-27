@@ -322,6 +322,7 @@ func (m Model) clearPlatformCmd(platformName string) tea.Cmd {
 		case models.PlatformTwitter:
 			config.ActiveConfig.Twitter.ClientID = ""
 			config.ActiveConfig.Twitter.ClientSecret = ""
+			config.ActiveConfig.Twitter.AuthMode = ""
 		case models.PlatformLinkedIn:
 			config.ActiveConfig.LinkedIn.ClientID = ""
 			config.ActiveConfig.LinkedIn.ClientSecret = ""
