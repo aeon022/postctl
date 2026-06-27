@@ -245,7 +245,7 @@ import Layout from '../layouts/Layout.astro';
 							<div class="tui-label">PLATFORM ACCOUNTS</div>
 							<div class="tui-set-row">
 								<span class="tui-arr tui-arr-h">&gt;</span>
-								<span class="tui-skey">Twitter/X    </span>: <span class="tui-sval val-green">Connected ✓</span>
+								<span class="tui-skey">Twitter/X    </span>: <span class="tui-sval val-green" id="twitter-val">Connected ✓</span>
 							</div>
 							<div class="tui-set-row">
 								<span class="tui-arr tui-arr-h">&gt;</span>
@@ -282,6 +282,21 @@ import Layout from '../layouts/Layout.astro';
 							<div class="tui-gap"></div>
 							<div class="tui-muted" style="font-size:0.7rem;font-style:italic">←/→ / enter: Change / Connect · d: Reset/Disconnect · Saved instantly.</div>
 							<div class="tui-muted" style="font-size:0.7rem;font-style:italic">Activate Pro license via CLI: postctl config set license_key &lt;key&gt;</div>
+
+							<!-- Twitter prompt overlay inside panel -->
+							<div class="tui-prompt-overlay" id="twitter-prompt" style="display: none; margin-top: 1rem; border: 1px solid #2d3748; border-radius: 8px; padding: 0.75rem 1rem; background: rgba(26, 32, 44, 0.95); box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+								<div class="tui-label" style="color: #8b7cf8; margin-bottom: 0.25rem;">TWITTER/X CONNECTION METHOD</div>
+								<div style="margin-bottom: 0.5rem; color: #ecc94b;">Wähle die Verbindungsmethode für Twitter/X:</div>
+								<div style="margin-left: 0.5rem; margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 0.25rem;">
+									<div class="tui-prompt-opt tui-row-sel" data-idx="0" style="color: #00f5d4; font-weight: bold; cursor: pointer;">
+										<span class="tui-arr">&gt;</span> 1) Offizielle API (mit Credits)
+									</div>
+									<div class="tui-prompt-opt" data-idx="1" style="color: #ecc94b; cursor: pointer;">
+										<span class="tui-arr tui-arr-h">&gt;</span> 2) Cookie-basiert (auth_token & ct0)
+									</div>
+								</div>
+								<div class="tui-muted" style="font-size: 0.72rem; font-style: italic;">↑↓: Wählen · enter: Bestätigen · esc: Abbrechen</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -801,9 +816,25 @@ import Layout from '../layouts/Layout.astro';
 		btn.addEventListener('click', () => switchTab(i));
 	});
 
+	let isPromptActive = false;
+	let promptCursor = 0;
+
 	// Keyboard navigation when window is focused
 	tuiWindow?.addEventListener('keydown', (e) => {
 		const key = (e as KeyboardEvent).key;
+		
+		if (isPromptActive) {
+			e.preventDefault();
+			if (key === 'Escape') {
+				closeTwitterPrompt();
+			} else if (key === 'ArrowUp' || key === 'ArrowDown') {
+				movePromptCursor(key === 'ArrowDown' ? 1 : -1);
+			} else if (key === 'Enter') {
+				confirmTwitterPrompt();
+			}
+			return;
+		}
+
 		if (key === 'Tab') {
 			e.preventDefault();
 			switchTab(currentTab + ((e as KeyboardEvent).shiftKey ? -1 : 1));
@@ -860,15 +891,72 @@ import Layout from '../layouts/Layout.astro';
 		if (arr) arr.classList.remove('tui-arr-h');
 	}
 
+	function openTwitterPrompt() {
+		const prompt = document.getElementById('twitter-prompt');
+		if (prompt) {
+			prompt.style.display = 'block';
+			isPromptActive = true;
+			promptCursor = 0;
+			updatePromptUI();
+		}
+	}
+
+	function closeTwitterPrompt() {
+		const prompt = document.getElementById('twitter-prompt');
+		if (prompt) {
+			prompt.style.display = 'none';
+			isPromptActive = false;
+		}
+	}
+
+	function movePromptCursor(delta: number) {
+		promptCursor = (promptCursor + delta + 2) % 2;
+		updatePromptUI();
+	}
+
+	function updatePromptUI() {
+		const opts = document.querySelectorAll('#twitter-prompt .tui-prompt-opt');
+		opts.forEach((opt, idx) => {
+			const arr = opt.querySelector('.tui-arr');
+			if (idx === promptCursor) {
+				opt.classList.add('tui-row-sel');
+				opt.setAttribute('style', 'color: #00f5d4; font-weight: bold; cursor: pointer; padding: 0.1rem 0.4rem; border-radius: 2px;');
+				arr?.classList.remove('tui-arr-h');
+			} else {
+				opt.classList.remove('tui-row-sel');
+				opt.setAttribute('style', 'color: #ecc94b; cursor: pointer; padding: 0.1rem 0.4rem; border-radius: 2px;');
+				arr?.classList.add('tui-arr-h');
+			}
+		});
+	}
+
+	function confirmTwitterPrompt() {
+		const twitterVal = document.getElementById('twitter-val');
+		if (twitterVal) {
+			if (promptCursor === 0) {
+				twitterVal.textContent = 'Connected (API) ✓';
+				twitterVal.className = 'tui-sval val-green';
+			} else {
+				twitterVal.textContent = 'Connected (Cookie) ✓';
+				twitterVal.className = 'tui-sval val-cyan';
+			}
+		}
+		closeTwitterPrompt();
+	}
+
 	function handleEnter() {
 		const tab = tabOrder[currentTab];
-		if (tab === 'settings' && panelCursors.settings === 2) {
-			// Toggle dry run
-			const dryrunVal = document.getElementById('dryrun-val');
-			if (dryrunVal) {
-				const isDry = dryrunVal.textContent === 'true';
-				dryrunVal.textContent = isDry ? 'false' : 'true';
-				dryrunVal.className = isDry ? 'tui-sval val-red' : 'tui-sval val-green';
+		if (tab === 'settings') {
+			if (panelCursors.settings === 2) {
+				// Toggle dry run
+				const dryrunVal = document.getElementById('dryrun-val');
+				if (dryrunVal) {
+					const isDry = dryrunVal.textContent === 'true';
+					dryrunVal.textContent = isDry ? 'false' : 'true';
+					dryrunVal.className = isDry ? 'tui-sval val-red' : 'tui-sval val-green';
+				}
+			} else if (panelCursors.settings === 5) {
+				openTwitterPrompt();
 			}
 		}
 	}
