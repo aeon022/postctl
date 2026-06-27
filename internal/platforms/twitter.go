@@ -638,17 +638,22 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 			} `json:"data"`
 		}
 
-		if err := json.NewDecoder(resp.Body).Decode(&gqlResp); err != nil {
-			return "", fmt.Errorf("decode gql response: %w", err)
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return "", fmt.Errorf("read gql response: %w", err)
+		}
+
+		if err := json.Unmarshal(respBody, &gqlResp); err != nil {
+			return "", fmt.Errorf("decode gql response: %w (body: %s)", err, string(respBody))
 		}
 
 		if len(gqlResp.Errors) > 0 {
-			return "", fmt.Errorf("twitter error: %s", gqlResp.Errors[0].Message)
+			return "", fmt.Errorf("twitter error: %s (body: %s)", gqlResp.Errors[0].Message, string(respBody))
 		}
 
 		tweetID := gqlResp.Data.CreateTweet.TweetResults.Result.RestID
 		if tweetID == "" {
-			return "", fmt.Errorf("empty tweet ID returned in cookie mode")
+			return "", fmt.Errorf("empty tweet ID returned in cookie mode (body: %s)", string(respBody))
 		}
 
 		lastTweetID = tweetID
