@@ -611,11 +611,11 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 		var gqlResp struct {
 			Data struct {
 				CreateTweet struct {
-					TweetResult struct {
+					TweetResults struct {
 						Result struct {
 							RestID string `json:"rest_id"`
 						} `json:"result"`
-					} `json:"tweet_result"`
+					} `json:"tweet_results"`
 				} `json:"create_tweet"`
 			} `json:"data"`
 		}
@@ -624,7 +624,7 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 			return "", fmt.Errorf("decode gql response: %w", err)
 		}
 
-		tweetID := gqlResp.Data.CreateTweet.TweetResult.Result.RestID
+		tweetID := gqlResp.Data.CreateTweet.TweetResults.Result.RestID
 		if tweetID == "" {
 			return "", fmt.Errorf("empty tweet ID returned in cookie mode")
 		}
