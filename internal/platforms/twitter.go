@@ -609,6 +609,9 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 		}
 
 		var gqlResp struct {
+			Errors []struct {
+				Message string `json:"message"`
+			} `json:"errors"`
 			Data struct {
 				CreateTweet struct {
 					TweetResults struct {
@@ -622,6 +625,10 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 
 		if err := json.NewDecoder(resp.Body).Decode(&gqlResp); err != nil {
 			return "", fmt.Errorf("decode gql response: %w", err)
+		}
+
+		if len(gqlResp.Errors) > 0 {
+			return "", fmt.Errorf("twitter error: %s", gqlResp.Errors[0].Message)
 		}
 
 		tweetID := gqlResp.Data.CreateTweet.TweetResults.Result.RestID
