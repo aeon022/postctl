@@ -14,6 +14,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var setupCookie string
+var setupCt0 string
+
 // configCmd repräsentiert das Hauptkommando config
 var configCmd = &cobra.Command{
 	Use:   "config",
@@ -373,6 +376,29 @@ var configSetupCmd = &cobra.Command{
 		}
 
 		platform := strings.ToLower(strings.TrimSpace(args[0]))
+
+		if platform == "twitter" && setupCookie != "" && setupCt0 != "" {
+			config.ActiveConfig.Twitter.AuthMode = "cookie"
+			dbPath := config.ActiveConfig.DBPath
+			s, err := store.NewSQLiteStore(dbPath)
+			if err != nil {
+				fmt.Printf("Fehler beim Öffnen der Datenbank: %v\n", err)
+				return
+			}
+			err = s.SaveToken(context.Background(), models.PlatformTwitter, setupCookie, setupCt0, nil)
+			if err != nil {
+				fmt.Printf("Fehler beim Speichern der Cookies: %v\n", err)
+				return
+			}
+			config.ActiveConfig.Twitter.ClientID = ""
+			config.ActiveConfig.Twitter.ClientSecret = ""
+			if err := config.SaveConfig(); err != nil {
+				fmt.Printf("\n❌ Fehler beim Speichern der Konfiguration: %v\n", err)
+				return
+			}
+			fmt.Println("✔ Twitter/X wurde erfolgreich über Flags im Cookie-Modus verbunden!")
+			return
+		}
 		
 		// Terminal komplett leeren
 		fmt.Print("\033[H\033[2J\033[3J")
@@ -630,6 +656,9 @@ func init() {
 
 	configImportCmd.Flags().StringVarP(&importPassword, "password", "p", "", "Master password for decryption")
 	configImportCmd.Flags().StringVarP(&importInputFile, "file", "f", "postctl_backup.bin", "Path to the encrypted backup file to import")
+
+	configSetupCmd.Flags().StringVar(&setupCookie, "cookie", "", "Twitter/X Cookie string (full header or auth_token)")
+	configSetupCmd.Flags().StringVar(&setupCt0, "ct0", "", "Twitter/X ct0 (CSRF token)")
 
 	configCmd.AddCommand(configShowCmd)
 	configCmd.AddCommand(configSetCmd)
