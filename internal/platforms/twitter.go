@@ -539,12 +539,6 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 			tweetMediaIDs = uploadedMediaIDs
 		}
 
-		vars := map[string]interface{}{
-			"tweet_text":              tweet.Content,
-			"dark_request":            false,
-			"semantic_annotation_ids": []interface{}{},
-		}
-
 		mediaEntities := []interface{}{}
 		for _, mid := range tweetMediaIDs {
 			mediaEntities = append(mediaEntities, map[string]interface{}{
@@ -552,43 +546,64 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 				"tagged_users": []interface{}{},
 			})
 		}
-		vars["media"] = map[string]interface{}{
-			"media_entities":     mediaEntities,
-			"possibly_sensitive": false,
+
+		vars := map[string]interface{}{
+			"tweet_text":              tweet.Content,
+			"dark_request":            false,
+			"media": map[string]interface{}{
+				"media_entities":     mediaEntities,
+				"possibly_sensitive": false,
+			},
+			"semantic_annotation_ids": []interface{}{},
 		}
 
 		if i > 0 && lastTweetID != "" {
 			vars["reply"] = map[string]interface{}{
-				"in_reply_to_tweet_id":   lastTweetID,
-				"exclude_reply_user_ids": []interface{}{},
+				"in_reply_to_tweet_id": lastTweetID,
 			}
 		}
 
 		payload := map[string]interface{}{
 			"variables": vars,
 			"features": map[string]interface{}{
-				"creator_subscriptions_tweet_preview_api_enabled":                         true,
-				"c9s_tweet_anatomy_moderator_badge_enabled":                               true,
-				"tweetypie_unmention_optimization_enabled":                                true,
-				"responsive_web_edit_tweet_api_enabled":                                   true,
+				"interactive_text_enabled":                                                 true,
+				"longform_notetweets_inline_media_enabled":                                 false,
+				"responsive_web_text_conversations_enabled":                                false,
+				"tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": false,
+				"vibe_api_enabled":                                  false,
+				"rweb_lists_timeline_redesign_enabled":              true,
+				"responsive_web_graphql_exclude_directive_enabled": true,
+				"verified_phone_label_enabled":                      false,
+				"creator_subscriptions_tweet_preview_api_enabled":   true,
+				"responsive_web_graphql_timeline_navigation_enabled": true,
+				"responsive_web_graphql_skip_user_profile_image_extensions_enabled": false,
+				"tweetypie_unmention_optimization_enabled":          true,
+				"responsive_web_edit_tweet_api_enabled":             true,
 				"graphql_is_translatable_rweb_tweet_is_translatable_enabled":              true,
 				"view_counts_everywhere_api_enabled":                                      true,
 				"longform_notetweets_consumption_enabled":                                 true,
-				"responsive_web_twitter_article_tweet_consumption_enabled":                true,
 				"tweet_awards_web_tipping_enabled":                                        false,
-				"longform_notetweets_rich_text_read_enabled":                              true,
-				"longform_notetweets_inline_media_enabled":                                true,
-				"rweb_video_timestamps_enabled":                                           true,
-				"responsive_web_graphql_exclude_directive_enabled":                        true,
-				"verified_phone_label_enabled":                                            false,
 				"freedom_of_speech_not_reach_fetch_enabled":                               true,
 				"standardized_nudges_misinfo":                                             true,
-				"tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": true,
+				"longform_notetweets_rich_text_read_enabled":                              true,
+				"responsive_web_enhance_cards_enabled":                                    false,
+				"subscriptions_verification_info_enabled":                                 true,
+				"subscriptions_verification_info_reason_enabled":                            true,
+				"subscriptions_verification_info_verified_since_enabled":                   true,
+				"super_follow_badge_privacy_enabled:                 ":                    false,
+				"super_follow_exclusive_tweet_notifications_enabled: ":                    false,
+				"super_follow_tweet_api_enabled:                     ":                    false,
+				"super_follow_user_api_enabled:                      ":                    false,
+				"android_graphql_skip_api_media_color_palette":                             false,
+				"creator_subscriptions_subscription_count_enabled":                         false,
+				"blue_business_profile_image_shape_enabled":                                false,
+				"unified_cards_ad_metadata_container_dynamic_card_content_query_enabled":  false,
+				"rweb_video_timestamps_enabled":                                           false,
+				"c9s_tweet_anatomy_moderator_badge_enabled":                                false,
+				"responsive_web_twitter_article_tweet_consumption_enabled":                false,
 			},
-			"fieldToggles": map[string]interface{}{
-				"withArticleRelationships": false,
-			},
-			"queryId": "nmdAQXJDxw6-0KKF2on7eA",
+			"fieldToggles": map[string]interface{}{},
+			"queryId":      "a1p9RWpkYKBjWv_I3WzS-A",
 		}
 
 		bodyBytes, err := json.Marshal(payload)
@@ -596,7 +611,7 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 			return "", err
 		}
 
-		reqURL := "https://x.com/i/api/graphql/nmdAQXJDxw6-0KKF2on7eA/CreateTweet"
+		reqURL := "https://x.com/i/api/graphql/a1p9RWpkYKBjWv_I3WzS-A/CreateTweet"
 		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
 		if err != nil {
 			return "", err
@@ -606,6 +621,7 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("X-Twitter-Auth-Type", "OAuth2Session")
 		req.Header.Set("X-Twitter-Active-User", "yes")
+		req.Header.Set("X-Twitter-Client-Language", "en")
 		req.Header.Set("X-Csrf-Token", csrfToken)
 		
 		cookieStr := fmt.Sprintf("auth_token=%s; ct0=%s", authToken, csrfToken)
@@ -613,7 +629,7 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 			cookieStr = authToken
 		}
 		req.Header.Set("Cookie", cookieStr)
-		req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Linux; Android 11; Nokia G20) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.88 Mobile Safari/537.36")
 		req.Header.Set("Referer", "https://x.com/home")
 		req.Header.Set("X-Twitter-Client-Language", "en")
 		req.Header.Set("Accept", "*/*")
@@ -669,6 +685,9 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 		lastTweetID = tweetID
 		if i == 0 {
 			firstTweetID = lastTweetID
+		}
+		if i < len(tweetsToPost)-1 {
+			time.Sleep(5 * time.Second)
 		}
 	}
 

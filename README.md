@@ -13,7 +13,7 @@
 1. **Markdown-First Workflow**: Write your posts as Markdown. Frontmatter fields define platforms, campaigns, schedule times, and image paths.
 2. **Terminal User Interface (TUI)**: Interactive Bubble Tea-based dashboard to manage campaigns, posts, history, and settings.
 3. **Modern API Integrations**:
-   * **Twitter/X**: Post tweets and threads via OAuth 2.0 PKCE (requires a paid API tier / Prepaid credits in 2026).
+   * **Twitter/X**: Post tweets and threads via free Cookie-based authentication (recommended) or official OAuth 2.0 API.
    * **LinkedIn**: Authenticate via modern **OpenID Connect (OIDC)** (Scopes: `openid`, `profile`, `w_member_social`).
    * **Threads (Meta)**: Official Threads API integration with secure HTTPS callbacks (`https://localhost:8753/callback`).
 4. **Encrypted Backup & Multi-Device Sync (AES-256-GCM)**: Synchronize your database (tokens, history, drafts) across devices securely and for free.
@@ -118,7 +118,7 @@ The temporary file opened in Vim contains three main parts:
 1. **Markdown-First Workflow**: Schreibe Beiträge als Markdown. Frontmatter-Felder definieren Plattformen, Kampagnen, Zeiten und Bildpfade.
 2. **Terminal User Interface (TUI)**: Interaktives Bubble-Tea-Dashboard zur Verwaltung von Kampagnen, Beiträgen, Historie und Einstellungen.
 3. **Moderne API-Integrationen**:
-   * **Twitter/X**: Veröffentliche Tweets/Threads über OAuth 2.0 PKCE (erfordert im Jahr 2026 ein kostenpflichtiges API-Tier oder Prepaid-Credits).
+    * **Twitter/X**: Veröffentliche Tweets/Threads über die kostenlose Cookie-basierte Authentifizierung (empfohlen) oder die offizielle API.
    * **LinkedIn**: Authentifizierung über den modernen **OpenID Connect (OIDC)**-Standard (Scopes: `openid`, `profile`, `w_member_social`).
    * **Threads (Meta)**: Offizielle Threads API mit sicherem HTTPS-Callback (`https://localhost:8753/callback`).
 4. **Backup & Multi-Device Sync (AES-256-GCM)**: Synchronisiere deine Datenbank (Tokens, Historie, Entwürfe) sicher und kostenlos zwischen Geräten.
