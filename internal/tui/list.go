@@ -114,7 +114,23 @@ func (m Model) renderPostList() string {
 		return StyleBox.Width(78).Height(12).Render(builder.String())
 	}
 
-	for i, p := range filtered {
+	windowSize := 3
+	startIdx := 0
+	endIdx := len(filtered)
+
+	if len(filtered) > windowSize {
+		startIdx = m.cursor - windowSize/2
+		if startIdx < 0 {
+			startIdx = 0
+		}
+		if startIdx+windowSize > len(filtered) {
+			startIdx = len(filtered) - windowSize
+		}
+		endIdx = startIdx + windowSize
+	}
+
+	for i := startIdx; i < endIdx; i++ {
+		p := filtered[i]
 		cursor := "  "
 		selected := false
 		if m.activeTab == 1 && i == m.cursor {

@@ -18,7 +18,23 @@ func (m Model) renderHistory() string {
 		return StyleBox.Width(78).Height(12).Render(builder.String())
 	}
 
-	for i, entry := range m.history {
+	windowSize := 9
+	startIdx := 0
+	endIdx := len(m.history)
+
+	if len(m.history) > windowSize {
+		startIdx = m.cursor - windowSize/2
+		if startIdx < 0 {
+			startIdx = 0
+		}
+		if startIdx+windowSize > len(m.history) {
+			startIdx = len(m.history) - windowSize
+		}
+		endIdx = startIdx + windowSize
+	}
+
+	for i := startIdx; i < endIdx; i++ {
+		entry := m.history[i]
 		cursor := "  "
 		selected := false
 		if m.activeTab == 3 && i == m.cursor {
