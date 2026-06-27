@@ -2,12 +2,15 @@ package cmd
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/aeon022/postctl/internal/config"
+	"github.com/aeon022/postctl/internal/models"
+	"github.com/aeon022/postctl/internal/store"
 	"github.com/spf13/cobra"
 )
 
@@ -385,25 +388,91 @@ var configSetupCmd = &cobra.Command{
 
 		switch platform {
 		case "twitter":
-			fmt.Println("Schritt 1: Gehe zum Twitter Developer Portal unter https://developer.twitter.com")
-			fmt.Println("Schritt 2: Erstelle ein Projekt und eine App mit OAuth 2.0 PKCE (App-Typ: Web/Native App)")
-			fmt.Println("Schritt 3: Setze die Redirect-URI auf: http://localhost:8753/callback")
-			fmt.Println("Schritt 4: Trage unten die erhaltene Client ID & Client Secret ein:")
+			fmt.Println("Wähle die Verbindungsmethode für Twitter/X:")
+			fmt.Println("  1) Offizielle API (erfordert Client ID & Client Secret)")
+			fmt.Println("  2) Cookie-basiert (ohne API-Schlüssel, erfordert auth_token & ct0)")
 			fmt.Println()
+			fmt.Print("➔ Deine Wahl (1 oder 2, Standard: 1): ")
+			choice, _ := reader.ReadString('\n')
+			choice = strings.TrimSpace(choice)
 
-			fmt.Print("➔ Client ID: ")
-			clientID, _ := reader.ReadString('\n')
-			clientID = strings.TrimSpace(clientID)
+			if choice == "2" {
+				config.ActiveConfig.Twitter.AuthMode = "cookie"
+				
+				fmt.Println()
+				fmt.Println("Anleitung zur Cookie-Extraktion:")
+				fmt.Println("  1. Öffne twitter.com im Browser und logge dich ein.")
+				fmt.Println("  2. Drücke F12, um die Entwicklertools zu öffnen.")
+				fmt.Println("  3. Gehe zu 'Application' (Chrome) oder 'Storage' (Firefox) -> 'Cookies'.")
+				fmt.Println("  4. Kopiere die Werte für 'auth_token' und 'ct0'.")
+				fmt.Println()
 
-			fmt.Print("➔ Client Secret: ")
-			clientSecret, _ := reader.ReadString('\n')
-			clientSecret = strings.TrimSpace(clientSecret)
+				fmt.Print("➔ auth_token Cookie: ")
+				authCookie, _ := reader.ReadString('\n')
+				authCookie = strings.TrimSpace(authCookie)
 
-			if clientID != "" {
-				config.ActiveConfig.Twitter.ClientID = clientID
-			}
-			if clientSecret != "" {
-				config.ActiveConfig.Twitter.ClientSecret = clientSecret
+				fmt.Print("➔ ct0 Cookie (CSRF Token): ")
+				csrfCookie, _ := reader.ReadString('\n')
+				csrfCookie = strings.TrimSpace(csrfCookie)
+
+				if authCookie == "" || csrfCookie == "" {
+					fmt.Println("Fehler: Beide Cookie-Werte müssen ausgefüllt sein!")
+					return
+				}
+
+				// DB initialisieren und Cookies speichern
+				dbPath := config.ActiveConfig.DBPath
+				s, err := store.NewSQLiteStore(dbPath)
+				if err != nil {
+					fmt.Printf("Fehler beim Öffnen der Datenbank: %v\n", err)
+					return
+				}
+
+				// auth_token im token-Feld, ct0 im refresh-Feld speichern
+				err = s.SaveToken(context.Background(), models.PlatformTwitter, authCookie, csrfCookie, nil)
+				if err != nil {
+					fmt.Printf("Fehler beim Speichern der Cookies: %v\n", err)
+					return
+				}
+
+				// ClientID/ClientSecret leeren, da Cookie-basiert
+				config.ActiveConfig.Twitter.ClientID = ""
+				config.ActiveConfig.Twitter.ClientSecret = ""
+
+				fmt.Println("\n✔ Twitter/X wurde erfolgreich im Cookie-Modus verbunden!")
+			} else {
+				config.ActiveConfig.Twitter.AuthMode = "api"
+				
+				fmt.Println()
+				fmt.Println("Schritt 1: Gehe zum Twitter Developer Portal unter https://developer.twitter.com")
+				fmt.Println("Schritt 2: Erstelle ein Projekt und eine App mit OAuth 2.0 PKCE (App-Typ: Web/Native App)")
+				fmt.Println("Schritt 3: Setze die Redirect-URI auf: http://localhost:8753/callback")
+				fmt.Println("Schritt 4: Trage unten die erhaltene Client ID & Client Secret ein:")
+				fmt.Println()
+
+				fmt.Print("➔ Client ID: ")
+				clientID, _ := reader.ReadString('\n')
+				clientID = strings.TrimSpace(clientID)
+
+				fmt.Print("➔ Client Secret: ")
+				clientSecret, _ := reader.ReadString('\n')
+				clientSecret = strings.TrimSpace(clientSecret)
+
+				if clientID != "" {
+					config.ActiveConfig.Twitter.ClientID = clientID
+				}
+				if clientSecret != "" {
+					config.ActiveConfig.Twitter.ClientSecret = clientSecret
+				}
+				
+				// Wenn API gewählt, Token löschen falls Cookie-basierte Reste vorhanden waren
+				dbPath := config.ActiveConfig.DBPath
+				s, err := store.NewSQLiteStore(dbPath)
+				if err == nil {
+					_ = s.DeleteToken(context.Background(), models.PlatformTwitter)
+				}
+
+				fmt.Println("\n✔ Client ID und Secret wurden konfiguriert. Du kannst dich jetzt im Hauptmenü verbinden!")
 			}
 
 		case "linkedin":

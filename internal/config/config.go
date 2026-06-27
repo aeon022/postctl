@@ -15,6 +15,7 @@ type Config struct {
 	Twitter struct {
 		ClientID     string `mapstructure:"client_id" yaml:"client_id"`
 		ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
+		AuthMode     string `mapstructure:"auth_mode" yaml:"auth_mode"` // "api" oder "cookie"
 	} `mapstructure:"twitter" yaml:"twitter"`
 	LinkedIn struct {
 		ClientID     string `mapstructure:"client_id" yaml:"client_id"`
@@ -218,6 +219,7 @@ func SaveConfig() error {
 	viper.Set("ai.base_url", ActiveConfig.AI.BaseURL)
 	viper.Set("twitter.client_id", ActiveConfig.Twitter.ClientID)
 	viper.Set("twitter.client_secret", ActiveConfig.Twitter.ClientSecret)
+	viper.Set("twitter.auth_mode", ActiveConfig.Twitter.AuthMode)
 	viper.Set("linkedin.client_id", ActiveConfig.LinkedIn.ClientID)
 	viper.Set("linkedin.client_secret", ActiveConfig.LinkedIn.ClientSecret)
 	viper.Set("threads.app_id", ActiveConfig.Threads.AppID)

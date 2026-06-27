@@ -224,8 +224,18 @@ func (t *TwitterPlatform) getValidToken(ctx context.Context) (string, error) {
 	return accessToken, nil
 }
 
+const twitterStaticBearer = "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+
 // UploadImage lädt ein Bild auf Twitter v1.1 hoch und gibt die Media-ID zurück
 func (t *TwitterPlatform) UploadImage(ctx context.Context, path string) (string, error) {
+	if config.ActiveConfig.Twitter.AuthMode == "cookie" {
+		authToken, csrfToken, _, err := t.store.GetToken(ctx, models.PlatformTwitter)
+		if err != nil {
+			return "", fmt.Errorf("cookie auth details not found: %w", err)
+		}
+		return t.uploadImageCookieBased(ctx, path, authToken, csrfToken)
+	}
+
 	token, err := t.getValidToken(ctx)
 	if err != nil {
 		return "", err
@@ -282,6 +292,14 @@ func (t *TwitterPlatform) UploadImage(ctx context.Context, path string) (string,
 
 // Post veröffentlicht einen Thread oder einen einzelnen Tweet auf Twitter/X
 func (t *TwitterPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
+	if config.ActiveConfig.Twitter.AuthMode == "cookie" {
+		authToken, csrfToken, _, err := t.store.GetToken(ctx, models.PlatformTwitter)
+		if err != nil {
+			return "", fmt.Errorf("cookie auth details not found: %w", err)
+		}
+		return t.postCookieBased(ctx, post, authToken, csrfToken)
+	}
+
 	token, err := t.getValidToken(ctx)
 	if err != nil {
 		return "", err
@@ -409,5 +427,219 @@ func (t *TwitterPlatform) FetchAnalytics(ctx context.Context, platformID string)
 		Impressions: 890,
 		FetchedAt:   time.Now(),
 	}, nil
+}
+
+func (t *TwitterPlatform) uploadImageCookieBased(ctx context.Context, path string, authToken, csrfToken string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", fmt.Errorf("open image file: %w", err)
+	}
+	defer file.Close()
+
+	uploadURL := "https://upload.twitter.com/1.1/media/upload.json"
+	
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("media", filepath.Base(path))
+	if err != nil {
+		return "", err
+	}
+	if _, err := io.Copy(part, file); err != nil {
+		return "", err
+	}
+	writer.Close()
+
+	req, err := http.NewRequestWithContext(ctx, "POST", uploadURL, body)
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Authorization", twitterStaticBearer)
+	req.Header.Set("X-Csrf-Token", csrfToken)
+	req.Header.Set("Cookie", fmt.Sprintf("auth_token=%s; ct0=%s", authToken, csrfToken))
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
+	resp, err := t.client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("http upload (cookie mode): %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		respBody, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("media upload (cookie mode) failed (status %d): %s", resp.StatusCode, string(respBody))
+	}
+
+	var uploadResp struct {
+		MediaIDString string `json:"media_id_string"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&uploadResp); err != nil {
+		return "", fmt.Errorf("decode upload response (cookie mode): %w", err)
+	}
+
+	return uploadResp.MediaIDString, nil
+}
+
+func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post, authToken, csrfToken string) (string, error) {
+	var tweetsToPost []models.Tweet
+
+	if post.Type == "thread" {
+		tweetsToPost = post.Tweets
+	} else {
+		tweetsToPost = []models.Tweet{
+			{Index: 1, Content: post.Body},
+		}
+	}
+
+	if len(tweetsToPost) == 0 {
+		return "", fmt.Errorf("no tweets to post")
+	}
+
+	var firstTweetID string
+	var lastTweetID string
+
+	// Upload images in cookie mode
+	var uploadedMediaIDs []string
+	if post.Type != "thread" && len(post.Images) > 0 {
+		for _, imgPath := range post.Images {
+			mediaID, err := t.uploadImageCookieBased(ctx, imgPath, authToken, csrfToken)
+			if err != nil {
+				return "", fmt.Errorf("cookie upload image %s: %w", imgPath, err)
+			}
+			uploadedMediaIDs = append(uploadedMediaIDs, mediaID)
+		}
+	}
+
+	for i, tweet := range tweetsToPost {
+		var tweetMediaIDs []string
+		if post.Type == "thread" {
+			if tweet.Image != "" {
+				mediaID, err := t.uploadImageCookieBased(ctx, tweet.Image, authToken, csrfToken)
+				if err != nil {
+					return "", fmt.Errorf("cookie upload image %s for tweet %d: %w", tweet.Image, tweet.Index, err)
+				}
+				tweetMediaIDs = []string{mediaID}
+			}
+		} else {
+			tweetMediaIDs = uploadedMediaIDs
+		}
+
+		vars := map[string]interface{}{
+			"tweet_text":              tweet.Content,
+			"dark_request":            false,
+			"semantic_annotation_ids": []interface{}{},
+		}
+
+		mediaEntities := []interface{}{}
+		for _, mid := range tweetMediaIDs {
+			mediaEntities = append(mediaEntities, map[string]interface{}{
+				"media_id":     mid,
+				"tagged_users": []interface{}{},
+			})
+		}
+		vars["media"] = map[string]interface{}{
+			"media_entities":     mediaEntities,
+			"possibly_sensitive": false,
+		}
+
+		if i > 0 && lastTweetID != "" {
+			vars["reply"] = map[string]interface{}{
+				"in_reply_to_tweet_id":   lastTweetID,
+				"exclude_reply_user_ids": []interface{}{},
+			}
+		}
+
+		payload := map[string]interface{}{
+			"variables": vars,
+			"features": map[string]interface{}{
+				"rweb_tipjar_consumption_enabled":                                         true,
+				"responsive_web_graphql_exclude_directive_enabled":                        true,
+				"verified_phone_label_enabled":                                            false,
+				"creator_subscriptions_tweet_preview_api_enabled":                         true,
+				"responsive_web_graphql_timeline_navigation_enabled":                      true,
+				"responsive_web_graphql_skip_user_profile_image_extensions_enabled":       false,
+				"communities_web_enable_dependency_on_graphql_timeline_label":             true,
+				"tweetypie_unmention_optimization_enabled":                                true,
+				"responsive_web_edit_tweet_api_enabled":                                   true,
+				"graphql_is_translatable_rweb_tweet_is_translatable_enabled":              true,
+				"view_counts_everywhere_api_enabled":                                      true,
+				"longform_notetweets_consumption_enabled":                                 true,
+				"responsive_web_twitter_article_tweet_consumption_enabled":                true,
+				"tweet_awards_web_tipping_enabled":                                        false,
+				"creator_subscriptions_quote_tweet_preview_api_enabled":                   false,
+				"freedom_of_speech_not_reach_fetch_enabled":                               true,
+				"standardized_nudges_misinfo":                                             true,
+				"tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": true,
+				"rweb_video_timestamps_enabled":                                           true,
+				"longform_notetweets_rich_text_read_enabled":                              true,
+				"longform_notetweets_inline_expand_super_expanded_timeline_read_enabled":  true,
+				"responsive_web_enhance_cards_enabled":                                    false,
+			},
+			"fieldToggles": map[string]interface{}{
+				"withArticleRelationships": false,
+			},
+			"queryId": "oB30Zs7a1q7sbIWD0g756A",
+		}
+
+		bodyBytes, err := json.Marshal(payload)
+		if err != nil {
+			return "", err
+		}
+
+		reqURL := "https://twitter.com/i/api/graphql/oB30Zs7a1q7sbIWD0g756A/CreateTweet"
+		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
+		if err != nil {
+			return "", err
+		}
+
+		req.Header.Set("Authorization", twitterStaticBearer)
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-Twitter-Auth-Type", "OAuth2Session")
+		req.Header.Set("X-Twitter-Active-User", "yes")
+		req.Header.Set("X-Csrf-Token", csrfToken)
+		req.Header.Set("Cookie", fmt.Sprintf("auth_token=%s; ct0=%s", authToken, csrfToken))
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
+		resp, err := t.client.Do(req)
+		if err != nil {
+			return "", fmt.Errorf("cookie post http request: %w", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+			respBody, _ := io.ReadAll(resp.Body)
+			return "", fmt.Errorf("cookie post failed (status %d): %s", resp.StatusCode, string(respBody))
+		}
+
+		var gqlResp struct {
+			Data struct {
+				CreateTweet struct {
+					TweetResult struct {
+						Result struct {
+							RestID string `json:"rest_id"`
+						} `json:"result"`
+					} `json:"tweet_result"`
+				} `json:"create_tweet"`
+			} `json:"data"`
+		}
+
+		if err := json.NewDecoder(resp.Body).Decode(&gqlResp); err != nil {
+			return "", fmt.Errorf("decode gql response: %w", err)
+		}
+
+		tweetID := gqlResp.Data.CreateTweet.TweetResult.Result.RestID
+		if tweetID == "" {
+			return "", fmt.Errorf("empty tweet ID returned in cookie mode")
+		}
+
+		lastTweetID = tweetID
+		if i == 0 {
+			firstTweetID = lastTweetID
+		}
+	}
+
+	return firstTweetID, nil
 }
 

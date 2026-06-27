@@ -284,6 +284,9 @@ func getExecutablePath() string {
 func platformNeedsSetup(platformName string) bool {
 	switch platformName {
 	case models.PlatformTwitter:
+		if config.ActiveConfig.Twitter.AuthMode == "cookie" {
+			return false
+		}
 		return config.ActiveConfig.Twitter.ClientID == "" || config.ActiveConfig.Twitter.ClientSecret == ""
 	case models.PlatformLinkedIn:
 		return config.ActiveConfig.LinkedIn.ClientID == "" || config.ActiveConfig.LinkedIn.ClientSecret == ""
@@ -977,7 +980,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					case 10:
 						platName = models.PlatformFacebook
 					}
-					if platformNeedsSetup(platName) {
+					if platformNeedsSetup(platName) || (platName == models.PlatformTwitter && config.ActiveConfig.Twitter.AuthMode == "cookie") {
 						return m, m.runSetupWizardCmd(platName)
 					}
 					m.loading = true
