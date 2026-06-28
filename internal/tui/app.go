@@ -584,9 +584,6 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 func (m Model) loadAnalyticsCmd() tea.Msg {
 	ctx := context.Background()
 	days := 30
-	if !config.IsPro() {
-		days = 3
-	}
 
 	posts, err := m.store.ListPosts(ctx, "all", "posted", "")
 	if err != nil {

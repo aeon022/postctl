@@ -5,7 +5,6 @@ import (
 	"math"
 	"strings"
 
-	"github.com/aeon022/postctl/internal/config"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -26,26 +25,15 @@ func (m Model) renderAnalytics() string {
 
 	var builder strings.Builder
 
-	// 1. Lizenz-Banner
-	var banner string
-	if !config.IsPro() {
-		bannerText := "⚡ " + StyleStatusScheduled.Render(" CORE TIERS ") + " Analyse auf die letzten 3 Tage beschränkt. Hol dir postctl Pro für unbegrenzte Historie!"
-		banner = lipgloss.NewStyle().
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(ColorScheduled).
-			Padding(0, 1).
-			Width(78).
-			Render(bannerText)
-	} else {
-		bannerText := "🌟 " + StyleStatusPosted.Render(" PRO ACTIVE ") + " Vollständige Social Analytics & Engagement-Statistiken freigeschaltet."
-		banner = lipgloss.NewStyle().
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(ColorSecondary).
-			Padding(0, 1).
-			Width(78).
-			Render(bannerText)
-	}
-	builder.WriteString(banner + "\n\n")
+	// 1. API-Info-Banner
+	infoText := "ℹ️  Für Twitter/X, LinkedIn und Threads sind eigene API-Zugangsdaten nötig, um echte Interaktionsdaten abzurufen. Ohne API werden diese als 0 angezeigt. Mastodon und Bluesky nutzen Live-Daten."
+	infoBox := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(ColorPrimary).
+		Padding(0, 1).
+		Width(78).
+		Render(infoText)
+	builder.WriteString(infoBox + "\n\n")
 
 	// 2. Zusammenfassung
 	var sumCol strings.Builder

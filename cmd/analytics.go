@@ -31,15 +31,9 @@ var analyticsCmd = &cobra.Command{
 		}
 		defer s.Close()
 
-		// 1. Feature Gate check
-		if !config.IsPro() {
-			if analyticsDays > 3 {
-				if FormatFlag != "json" {
-					fmt.Fprintln(os.Stderr, "💡 Pro Tip: Mit postctl Pro kannst du unbegrenzt Historie analysieren! Trage einen Lizenzschlüssel mit 'postctl config set license_key <key>' ein.")
-					fmt.Fprint(os.Stderr, "Limitiere Analyse auf die letzten 3 Tage (Core-Lizenz).\n\n")
-				}
-				analyticsDays = 3
-			}
+		// Hinweis zu API-Limits ausgeben (nur wenn Ausgabe human-readable ist)
+		if FormatFlag != "json" {
+			fmt.Fprintln(os.Stderr, "ℹ️  Für Twitter/X, LinkedIn und Threads sind eigene API-Zugangsdaten nötig, um echte Engagement-Daten abzurufen. Ohne API-Zugang werden diese als 0 angezeigt. Mastodon und Bluesky nutzen Live-Daten.")
 		}
 
 		// 2. Alle geposteten Artikel abfragen

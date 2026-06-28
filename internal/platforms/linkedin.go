@@ -377,13 +377,12 @@ func (l *LinkedInPlatform) Post(ctx context.Context, post *models.Post) (string,
 
 // FetchAnalytics retrieves public metrics from LinkedIn API
 func (l *LinkedInPlatform) FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error) {
-	// Ähnlich wie bei Twitter liefern wir robuste Fallback-Werte
 	return models.AnalyticsData{
 		PlatformID:  platformID,
-		Likes:       56,
-		Shares:      12,
-		Comments:    5,
-		Impressions: 1420,
+		Likes:       0,
+		Shares:      0,
+		Comments:    0,
+		Impressions: 0,
 		FetchedAt:   time.Now(),
 	}, nil
 }

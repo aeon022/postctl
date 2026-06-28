@@ -417,14 +417,12 @@ func (t *TwitterPlatform) Post(ctx context.Context, post *models.Post) (string, 
 
 // FetchAnalytics retrieves public metrics from Twitter API (simulated or actual)
 func (t *TwitterPlatform) FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error) {
-	// Da Twitter/X v2 Analytics-Endpoints oft kostenpflichtig/restriktiert sind,
-	// liefern wir robuste und plausible Fallback-Daten für das Terminal-Dashboard.
 	return models.AnalyticsData{
 		PlatformID:  platformID,
-		Likes:       34,
-		Shares:      8,
-		Comments:    2,
-		Impressions: 890,
+		Likes:       0,
+		Shares:      0,
+		Comments:    0,
+		Impressions: 0,
 		FetchedAt:   time.Now(),
 	}, nil
 }

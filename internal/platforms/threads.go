@@ -400,13 +400,12 @@ func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, 
 
 // FetchAnalytics retrieves public metrics from Threads API
 func (t *ThreadsPlatform) FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error) {
-	// Ähnlich wie bei Twitter und LinkedIn liefern wir plausible Mock-Daten
 	return models.AnalyticsData{
 		PlatformID:  platformID,
-		Likes:       19,
-		Shares:      3,
-		Comments:    1,
-		Impressions: 480,
+		Likes:       0,
+		Shares:      0,
+		Comments:    0,
+		Impressions: 0,
 		FetchedAt:   time.Now(),
 	}, nil
 }
