@@ -615,7 +615,7 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 			cookieStr = authToken
 		}
 		req.Header.Set("Cookie", cookieStr)
-		req.Header.Set("User-Agent", "Mozilla/5.0 (Linux; Android 11; Nokia G20) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.88 Mobile Safari/537.36")
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
 		req.Header.Set("Referer", "https://x.com/home")
 		req.Header.Set("X-Twitter-Client-Language", "en")
 		req.Header.Set("Accept", "*/*")
