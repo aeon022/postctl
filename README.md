@@ -67,6 +67,21 @@ Run `./postctl tui` and navigate to the **Settings** tab:
 
 ---
 
+### 🕒 Running the Scheduler Daemon
+Since `postctl` is a local-first application, scheduled posts are only published when the background scheduler daemon is running. 
+
+To start the daemon in your terminal:
+```bash
+./postctl daemon
+```
+
+To run the daemon silently in the background:
+```bash
+nohup ./postctl daemon > daemon.log 2>&1 &
+```
+
+---
+
 ### 📝 Vim / Neovim External Editor Flow (Step-by-Step)
 
 When editing or creating a post within the TUI, you can spawn your favorite terminal text editor (like Vim or Neovim) for a rich, distraction-free editing environment.
@@ -172,6 +187,23 @@ Führe `./postctl tui` aus und wechsle in den **Settings**-Tab:
 * **Interaktiver Beitrags-Import:** In jedem Haupt-Tab (Dashboard, Posts, Schedule, History) kannst du die Taste **`i`** drücken, um einen interaktiven Import zu starten. Die TUI pausiert kurz, leert das Terminal und bittet dich um den Pfad zur Markdown-Datei oder zum Ordner. **Tipp: Du kannst die Datei oder den Ordner einfach per Drag & Drop aus dem Finder direkt in das Terminalfenster ziehen.** Das Tool entfernt automatisch störende Anführungszeichen, validiert die Beiträge/Bilder und kehrt direkt wieder zur TUI zurück.
 * **Backup & Sync:** Wähle unten im Bereich **BACKUP & SYNC** entweder `Backup Exp.` (Export) oder `Backup Imp.` (Import) und drücke **Enter**, um dein Master-Passwort einzugeben.
   * CLI-Befehle: `./postctl config export -o backup.bin` und `./postctl config import -f backup.bin`.
+
+---
+
+### 🕒 Starten des Scheduler-Daemons
+Da `postctl` eine lokale Anwendung ist, werden geplante Beiträge nur dann veröffentlicht, wenn der Hintergrund-Scheduler-Daemon aktiv läuft.
+
+Um den Daemon im Terminal zu starten:
+```bash
+./postctl daemon
+```
+
+Um den Daemon geräuschlos im Hintergrund laufen zu lassen:
+```bash
+nohup ./postctl daemon > daemon.log 2>&1 &
+```
+
+---
 
 ### 📝 Vim- / Neovim-Bearbeitungsflow (Schritt für Schritt)
 
