@@ -20,7 +20,7 @@
 <li><strong>Terminal User Interface (TUI)</strong>: Interactive Bubble Tea-based dashboard to manage campaigns, posts, history, and settings.</li>
 <li><strong>Modern API Integrations</strong>:
 <ul>
-<li><strong>Twitter/X</strong>: Post tweets and threads via OAuth 2.0 PKCE (requires a paid API tier / Prepaid credits in 2026).</li>
+<li><strong>Twitter/X</strong>: Post tweets and threads via free Cookie-based authentication (recommended) or official OAuth 2.0 API.</li>
 <li><strong>LinkedIn</strong>: Authenticate via modern <strong>OpenID Connect (OIDC)</strong> (Scopes: <code>openid</code>, <code>profile</code>, <code>w_member_social</code>).</li>
 <li><strong>Threads (Meta)</strong>: Official Threads API integration with secure HTTPS callbacks (<code>https://localhost:8753/callback</code>).</li>
 </ul>
@@ -65,6 +65,10 @@
 <p>Run the interactive setup script:</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">chmod</span><span style="color:#9ECBFF"> +x</span><span style="color:#9ECBFF"> setup.sh</span></span>
 <span class="line"><span style="color:#B392F0">./setup.sh</span></span></code></pre>
+<p>For platform-specific setup details and authentication instructions, see the guides:</p>
+<ul>
+<li>🐦 <a href="docs/api-twitter.md">Twitter/X API &amp; Cookie Setup Guide</a> (How to use the free cookie bypass or official paid API, and fix <code>empty tweet ID</code> errors)</li>
+</ul>
 <hr>
 <h3 id="️-settings--auth-in-tui">⚙️ Settings &amp; Auth in TUI</h3>
 <p>Run <code>./postctl tui</code> and navigate to the <strong>Settings</strong> tab:</p>
@@ -77,6 +81,13 @@
 </ul>
 </li>
 </ul>
+<hr>
+<h3 id="-running-the-scheduler-daemon">🕒 Running the Scheduler Daemon</h3>
+<p>Since <code>postctl</code> is a local-first application, scheduled posts are only published when the background scheduler daemon is running.</p>
+<p>To start the daemon in your terminal:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> daemon</span></span></code></pre>
+<p>To run the daemon silently in the background:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">nohup</span><span style="color:#9ECBFF"> ./postctl</span><span style="color:#9ECBFF"> daemon</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> daemon.log</span><span style="color:#F97583"> 2>&#x26;1</span><span style="color:#E1E4E8"> &#x26;</span></span></code></pre>
 <hr>
 <h3 id="-vim--neovim-external-editor-flow-step-by-step">📝 Vim / Neovim External Editor Flow (Step-by-Step)</h3>
 <p>When editing or creating a post within the TUI, you can spawn your favorite terminal text editor (like Vim or Neovim) for a rich, distraction-free editing environment.</p>
@@ -140,7 +151,7 @@
 <li><strong>Terminal User Interface (TUI)</strong>: Interaktives Bubble-Tea-Dashboard zur Verwaltung von Kampagnen, Beiträgen, Historie und Einstellungen.</li>
 <li><strong>Moderne API-Integrationen</strong>:
 <ul>
-<li><strong>Twitter/X</strong>: Veröffentliche Tweets/Threads über OAuth 2.0 PKCE (erfordert im Jahr 2026 ein kostenpflichtiges API-Tier oder Prepaid-Credits).</li>
+<li><strong>Twitter/X</strong>: Veröffentliche Tweets/Threads über die kostenlose Cookie-basierte Authentifizierung (empfohlen) oder die offizielle API.</li>
 <li><strong>LinkedIn</strong>: Authentifizierung über den modernen <strong>OpenID Connect (OIDC)</strong>-Standard (Scopes: <code>openid</code>, <code>profile</code>, <code>w_member_social</code>).</li>
 <li><strong>Threads (Meta)</strong>: Offizielle Threads API mit sicherem HTTPS-Callback (<code>https://localhost:8753/callback</code>).</li>
 </ul>
@@ -185,6 +196,10 @@
 <p>Starte das interaktive Setup-Skript:</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">chmod</span><span style="color:#9ECBFF"> +x</span><span style="color:#9ECBFF"> setup.sh</span></span>
 <span class="line"><span style="color:#B392F0">./setup.sh</span></span></code></pre>
+<p>Für plattformspezifische Details und Zugangsdaten findest du hier die passenden Anleitungen:</p>
+<ul>
+<li>🐦 <a href="docs/api-twitter.md">Twitter/X API &amp; Cookie Setup Guide</a> (Nutzung des kostenlosen Cookie-Bypasses oder der offiziellen API, sowie Fehlerbehebung für <code>empty tweet ID</code>)</li>
+</ul>
 <hr>
 <h3 id="️-einstellungen--auth-in-der-tui">⚙️ Einstellungen &amp; Auth in der TUI</h3>
 <p>Führe <code>./postctl tui</code> aus und wechsle in den <strong>Settings</strong>-Tab:</p>
@@ -197,6 +212,14 @@
 </ul>
 </li>
 </ul>
+<hr>
+<h3 id="-starten-des-scheduler-daemons">🕒 Starten des Scheduler-Daemons</h3>
+<p>Da <code>postctl</code> eine lokale Anwendung ist, werden geplante Beiträge nur dann veröffentlicht, wenn der Hintergrund-Scheduler-Daemon aktiv läuft.</p>
+<p>Um den Daemon im Terminal zu starten:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> daemon</span></span></code></pre>
+<p>Um den Daemon geräuschlos im Hintergrund laufen zu lassen:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">nohup</span><span style="color:#9ECBFF"> ./postctl</span><span style="color:#9ECBFF"> daemon</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> daemon.log</span><span style="color:#F97583"> 2>&#x26;1</span><span style="color:#E1E4E8"> &#x26;</span></span></code></pre>
+<hr>
 <h3 id="-vim---neovim-bearbeitungsflow-schritt-für-schritt">📝 Vim- / Neovim-Bearbeitungsflow (Schritt für Schritt)</h3>
 <p>Beim Bearbeiten oder Erstellen eines Beitrags in der TUI kannst du deinen bevorzugten Terminal-Texteditor (wie Vim oder Neovim) starten, um eine ablenkungsfreie und flexible Schreibumgebung zu nutzen.</p>
 <h4 id="schritt-1-externen-editor-öffnen">Schritt 1: Externen Editor öffnen</h4>

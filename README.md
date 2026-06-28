@@ -13,7 +13,7 @@
 1. **Markdown-First Workflow**: Write your posts as Markdown. Frontmatter fields define platforms, campaigns, schedule times, and image paths.
 2. **Terminal User Interface (TUI)**: Interactive Bubble Tea-based dashboard to manage campaigns, posts, history, and settings.
 3. **Modern API Integrations**:
-   * **Twitter/X**: Post tweets and threads via OAuth 2.0 PKCE (requires a paid API tier / Prepaid credits in 2026).
+   * **Twitter/X**: Post tweets and threads via free Cookie-based authentication (recommended) or official OAuth 2.0 API.
    * **LinkedIn**: Authenticate via modern **OpenID Connect (OIDC)** (Scopes: `openid`, `profile`, `w_member_social`).
    * **Threads (Meta)**: Official Threads API integration with secure HTTPS callbacks (`https://localhost:8753/callback`).
 4. **Encrypted Backup & Multi-Device Sync (AES-256-GCM)**: Synchronize your database (tokens, history, drafts) across devices securely and for free.
@@ -53,6 +53,9 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
+For platform-specific setup details and authentication instructions, see the guides:
+* 🐦 [Twitter/X API & Cookie Setup Guide](docs/api-twitter.md) (How to use the free cookie bypass or official paid API, and fix `empty tweet ID` errors)
+
 ---
 
 ### ⚙️ Settings & Auth in TUI
@@ -61,6 +64,21 @@ Run `./postctl tui` and navigate to the **Settings** tab:
 * **Interactive Post Import:** In any main tab (Dashboard, Posts, Schedule, History), you can press **`i`** to trigger an interactive post import. The TUI will temporarily pause, clear the terminal, and prompt you for the Markdown file/directory path. **Tip: You can simply drag and drop the file or folder directly from your Finder into the terminal window.** The tool automatically cleans quote characters, validates the posts/images, imports them, and returns to the TUI.
 * **Backup & Sync:** Go to **BACKUP & SYNC** at the bottom, select `Backup Exp.` (Export) or `Backup Imp.` (Import), and press **Enter** to enter your master password.
   * CLI Commands: `./postctl config export -o backup.bin` and `./postctl config import -f backup.bin`.
+
+---
+
+### 🕒 Running the Scheduler Daemon
+Since `postctl` is a local-first application, scheduled posts are only published when the background scheduler daemon is running. 
+
+To start the daemon in your terminal:
+```bash
+./postctl daemon
+```
+
+To run the daemon silently in the background:
+```bash
+nohup ./postctl daemon > daemon.log 2>&1 &
+```
 
 ---
 
@@ -118,7 +136,7 @@ The temporary file opened in Vim contains three main parts:
 1. **Markdown-First Workflow**: Schreibe Beiträge als Markdown. Frontmatter-Felder definieren Plattformen, Kampagnen, Zeiten und Bildpfade.
 2. **Terminal User Interface (TUI)**: Interaktives Bubble-Tea-Dashboard zur Verwaltung von Kampagnen, Beiträgen, Historie und Einstellungen.
 3. **Moderne API-Integrationen**:
-   * **Twitter/X**: Veröffentliche Tweets/Threads über OAuth 2.0 PKCE (erfordert im Jahr 2026 ein kostenpflichtiges API-Tier oder Prepaid-Credits).
+    * **Twitter/X**: Veröffentliche Tweets/Threads über die kostenlose Cookie-basierte Authentifizierung (empfohlen) oder die offizielle API.
    * **LinkedIn**: Authentifizierung über den modernen **OpenID Connect (OIDC)**-Standard (Scopes: `openid`, `profile`, `w_member_social`).
    * **Threads (Meta)**: Offizielle Threads API mit sicherem HTTPS-Callback (`https://localhost:8753/callback`).
 4. **Backup & Multi-Device Sync (AES-256-GCM)**: Synchronisiere deine Datenbank (Tokens, Historie, Entwürfe) sicher und kostenlos zwischen Geräten.
@@ -158,6 +176,9 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
+Für plattformspezifische Details und Zugangsdaten findest du hier die passenden Anleitungen:
+* 🐦 [Twitter/X API & Cookie Setup Guide](docs/api-twitter.md) (Nutzung des kostenlosen Cookie-Bypasses oder der offiziellen API, sowie Fehlerbehebung für `empty tweet ID`)
+
 ---
 
 ### ⚙️ Einstellungen & Auth in der TUI
@@ -166,6 +187,23 @@ Führe `./postctl tui` aus und wechsle in den **Settings**-Tab:
 * **Interaktiver Beitrags-Import:** In jedem Haupt-Tab (Dashboard, Posts, Schedule, History) kannst du die Taste **`i`** drücken, um einen interaktiven Import zu starten. Die TUI pausiert kurz, leert das Terminal und bittet dich um den Pfad zur Markdown-Datei oder zum Ordner. **Tipp: Du kannst die Datei oder den Ordner einfach per Drag & Drop aus dem Finder direkt in das Terminalfenster ziehen.** Das Tool entfernt automatisch störende Anführungszeichen, validiert die Beiträge/Bilder und kehrt direkt wieder zur TUI zurück.
 * **Backup & Sync:** Wähle unten im Bereich **BACKUP & SYNC** entweder `Backup Exp.` (Export) oder `Backup Imp.` (Import) und drücke **Enter**, um dein Master-Passwort einzugeben.
   * CLI-Befehle: `./postctl config export -o backup.bin` und `./postctl config import -f backup.bin`.
+
+---
+
+### 🕒 Starten des Scheduler-Daemons
+Da `postctl` eine lokale Anwendung ist, werden geplante Beiträge nur dann veröffentlicht, wenn der Hintergrund-Scheduler-Daemon aktiv läuft.
+
+Um den Daemon im Terminal zu starten:
+```bash
+./postctl daemon
+```
+
+Um den Daemon geräuschlos im Hintergrund laufen zu lassen:
+```bash
+nohup ./postctl daemon > daemon.log 2>&1 &
+```
+
+---
 
 ### 📝 Vim- / Neovim-Bearbeitungsflow (Schritt für Schritt)
 
