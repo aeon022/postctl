@@ -43,6 +43,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "📊 VERLAUF",
 		"en": "📊 HISTORY",
 	},
+	"tab_analytics": {
+		"de": "📈 ANALYTICS",
+		"en": "📈 ANALYTICS",
+	},
 	"tab_settings": {
 		"de": "⚙ EINSTELLUNGEN",
 		"en": "⚙ SETTINGS",

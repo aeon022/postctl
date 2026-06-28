@@ -11,6 +11,7 @@ func RenderTabs(activeTab int) string {
 		Tr("tab_posts"),
 		Tr("tab_schedule"),
 		Tr("tab_history"),
+		Tr("tab_analytics"),
 		Tr("tab_settings"),
 	}
 	

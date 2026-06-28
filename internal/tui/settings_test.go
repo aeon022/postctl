@@ -22,7 +22,7 @@ func TestSettingsEnterKeyWithConfig(t *testing.T) {
 	config.ActiveConfig.Bluesky.AppPassword = "test-password"
 
 	m := NewModel(s)
-	m.activeTab = 4 // Settings
+	m.activeTab = 5 // Settings
 	m.loading = false
 
 	// Test case for Bluesky (cursor 9)
@@ -71,7 +71,7 @@ func TestSettingsEnterKeyNeedsSetup(t *testing.T) {
 	config.ActiveConfig.Bluesky.AppPassword = ""
 
 	m := NewModel(s)
-	m.activeTab = 4 // Settings
+	m.activeTab = 5 // Settings
 	m.loading = false
 
 	// Test case for Bluesky (cursor 9)
