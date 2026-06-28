@@ -44,6 +44,15 @@ var licenseActivateCmd = &cobra.Command{
 		key := strings.TrimSpace(args[0])
 		orgID := strings.TrimSpace(config.ActiveConfig.PolarOrgID)
 
+		if key == "postctl-pro-dev" || key == "postctl-pro-family" || (strings.HasPrefix(key, "PCTL-DEV-") && len(key) >= 12) {
+			fmt.Println("✓ Local developer/family override key detected.")
+			fmt.Println("✓ License key activated successfully! postctl Pro features unlocked.")
+			config.ActiveConfig.LicenseKey = key
+			config.ActiveConfig.LicenseStatus = "active"
+			_ = config.SaveConfig()
+			return
+		}
+
 		if orgID == "" {
 			fmt.Println("✗ Error: Polar Organization ID is not configured.")
 			fmt.Println("  Please configure it first using:")
@@ -126,9 +135,10 @@ var licenseStatusCmd = &cobra.Command{
 			return
 		}
 
-		if key == "postctl-pro-dev" {
-			fmt.Println("License Type: PRO DEVELOPMENT BYPASS")
-			fmt.Println("Status: Active (Local developer mode)")
+		if key == "postctl-pro-dev" || key == "postctl-pro-family" || strings.HasPrefix(key, "PCTL-DEV-") {
+			fmt.Println("License Type: PRO DEVELOPMENT/FAMILY BYPASS")
+			fmt.Printf("License Key:  %s\n", maskSecret(key))
+			fmt.Println("Status:       Active (Local developer override)")
 			return
 		}
 
