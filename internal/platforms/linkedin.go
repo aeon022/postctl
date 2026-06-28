@@ -205,7 +205,6 @@ func (l *LinkedInPlatform) registerUpload(ctx context.Context, token, authorURN 
 	var regResp struct {
 		Value struct {
 			Asset                      string `json:"asset"`
-			UploadMechanism            string `json:"uploadMechanism"`
 			MediaUploadHttpRequest     struct {
 				Headers    map[string]string `json:"headers"`
 				UploadUrl  string            `json:"uploadUrl"`
