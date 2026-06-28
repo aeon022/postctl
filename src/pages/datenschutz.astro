@@ -1,0 +1,71 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Datenschutzerklärung — postctl">
+  <main class="container mx-auto px-6 py-20 max-w-3xl">
+    <a href="/" class="text-accent font-mono text-sm hover:underline mb-8 inline-block">← Zurück zur Startseite</a>
+    
+    <h1 class="text-4xl font-bold mb-8 tracking-tight font-heading">Datenschutzerklärung</h1>
+    
+    <div class="prose prose-invert space-y-6 text-zinc-300 font-body">
+      <section class="space-y-2">
+        <h2 class="text-xl font-semibold text-white">1. Datenschutz auf einen Blick</h2>
+        <p>
+          Wir legen größten Wert auf den Schutz deiner Privatsphäre. postctl ist als <strong>local-first</strong> Anwendung konzipiert. 
+          Das bedeutet, dass deine Daten (wie Passwörter, API-Keys, Session-Cookies und Beitragsdaten) lokal auf deinem Rechner in einer 
+          SQLite-Datenbank verschlüsselt gespeichert werden und zu keinem Zeitpunkt an uns übertragen werden.
+        </p>
+      </section>
+
+      <section class="space-y-2">
+        <h2 class="text-xl font-semibold text-white">2. Datenerfassung in der App (Desktop-Client)</h2>
+        <p>
+          Die App speichert Anmeldedaten und Tokens für verbundene Social-Media-Accounts (z. B. LinkedIn, Threads, Twitter/X) 
+          ausschließlich lokal auf dem Gerät des Benutzers unter Verwendung von AES-256-GCM Verschlüsselung.
+        </p>
+        <p>
+          Es gibt keine zentrale Cloud-Datenbank, keine Tracker, keine Telemetrie und keine Serverprotokolle unsererseits. Deine Daten 
+          gehören ausschließlich dir.
+        </p>
+      </section>
+
+      <section class="space-y-2">
+        <h2 class="text-xl font-semibold text-white">3. Zahlungsabwicklung & Lizenzierung (Polar.sh)</h2>
+        <p>
+          Wenn du eine Pro-Lizenz von postctl erwirbst, wird die Zahlungsabwicklung und Lizenzschlüssel-Generierung über den externen Dienst 
+          <strong>Polar.sh</strong> (Polar Technologies Inc.) abgewickelt. Polar agiert als „Merchant of Record“.
+        </p>
+        <p>
+          Dabei werden personenbezogene Daten wie E-Mail-Adresse und Rechnungsdaten erfasst, um die Lizenz auszustellen und steuerliche 
+          Pflichten zu erfüllen. Weitere Informationen findest du in der Datenschutzerklärung von Polar.sh unter 
+          <a href="https://polar.sh/privacy" target="_blank" rel="noopener noreferrer" class="text-accent underline">https://polar.sh/privacy</a>.
+        </p>
+      </section>
+
+      <section class="space-y-2">
+        <h2 class="text-xl font-semibold text-white">4. Hosting der Website</h2>
+        <p>
+          Diese Website wird gehostet auf GitHub Pages / Cloudflare. Beim Aufrufen dieser Website werden standardmäßig IP-Adressen und 
+          Verbindungsprotokolle erhoben, um die Stabilität und Sicherheit der Website zu gewährleisten. Dies ist ein berechtigtes Interesse 
+          gemäß Art. 6 Abs. 1 lit. f DSGVO.
+        </p>
+      </section>
+
+      <section class="space-y-2">
+        <h2 class="text-xl font-semibold text-white">5. Deine Rechte (DSGVO)</h2>
+        <p>
+          Dir stehen bezüglich deiner bei Polar.sh oder über unsere Server erfassten Daten grundsätzlich die Rechte auf Auskunft, 
+          Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerruf und Widerspruch zu. Wende dich hierzu an die im Impressum 
+          angegebene E-Mail-Adresse.
+        </p>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .text-accent {
+    color: #8b7cf8;
+  }
+</style>
