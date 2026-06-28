@@ -665,7 +665,7 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 
 		tweetID := gqlResp.Data.CreateTweet.TweetResults.Result.RestID
 		if tweetID == "" {
-			return "", fmt.Errorf("empty tweet ID returned in cookie mode (body: %s)", string(respBody))
+			return "", fmt.Errorf("empty tweet ID returned in cookie mode (body: %s). 💡 Tip: X/Twitter might have rotated its internal GraphQL queryId, or your session cookies (auth_token/ct0) have expired. Please run 'postctl auth twitter' to refresh your session or check for postctl updates", string(respBody))
 		}
 
 		lastTweetID = tweetID

@@ -45,6 +45,12 @@ Um das Einfügen langer Strings im Terminal zu vereinfachen, kannst du die Konfi
 
 *Hinweis: Wenn du statt dem reinen `auth_token` den gesamten Cookie-String deines Browsers kopiert hast (inklusive `twid`, `kdt` etc.), kannst du diesen ebenfalls einfach bei `--cookie` einfügen. `postctl` filtert die relevanten Felder automatisch heraus.*
 
+### 🛠️ Fehlerbehebung bei Cookie-Fehlern (`empty tweet ID`)
+
+Sollte beim Veröffentlichen eines Tweets der Fehler `empty tweet ID returned in cookie mode` auftreten, liegt das an einer von zwei Ursachen:
+1. **Abgelaufene Session-Cookies:** Twitter/X beendet Browsersitzungen nach einiger Zeit. Wiederhole einfach **Schritt 1** und trage die neuen Cookies ein.
+2. **Rotierte GraphQL Query-ID:** X ändert im Web-Frontend regelmäßig die interne ID für die `CreateTweet`-Mutation. In diesem Fall passt `postctl` die IDs in einem Update an. Stelle sicher, dass du die aktuellste Version von `postctl` nutzt.
+
 ---
 
 ## Option B: Offizielle API (Kostenpflichtig)

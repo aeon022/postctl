@@ -53,6 +53,9 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
+For platform-specific setup details and authentication instructions, see the guides:
+* 🐦 [Twitter/X API & Cookie Setup Guide](docs/api-twitter.md) (How to use the free cookie bypass or official paid API, and fix `empty tweet ID` errors)
+
 ---
 
 ### ⚙️ Settings & Auth in TUI
@@ -157,6 +160,9 @@ Starte das interaktive Setup-Skript:
 chmod +x setup.sh
 ./setup.sh
 ```
+
+Für plattformspezifische Details und Zugangsdaten findest du hier die passenden Anleitungen:
+* 🐦 [Twitter/X API & Cookie Setup Guide](docs/api-twitter.md) (Nutzung des kostenlosen Cookie-Bypasses oder der offiziellen API, sowie Fehlerbehebung für `empty tweet ID`)
 
 ---
 
