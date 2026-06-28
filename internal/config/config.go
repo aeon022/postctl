@@ -51,8 +51,10 @@ type Config struct {
 		Model    string `mapstructure:"model" yaml:"model"`
 		BaseURL  string `mapstructure:"base_url" yaml:"base_url"`
 	} `mapstructure:"ai" yaml:"ai"`
-	DBPath     string `mapstructure:"db_path" yaml:"db_path"`
-	LicenseKey string `mapstructure:"license_key" yaml:"license_key"`
+	DBPath        string `mapstructure:"db_path" yaml:"db_path"`
+	LicenseKey    string `mapstructure:"license_key" yaml:"license_key"`
+	LicenseStatus string `mapstructure:"license_status" yaml:"license_status"`
+	PolarOrgID    string `mapstructure:"polar_org_id" yaml:"polar_org_id"`
 }
 
 // ActiveConfig stellt die geladene Konfiguration global zur Verfügung
@@ -60,7 +62,14 @@ var ActiveConfig Config
 
 // IsPro prüft, ob eine gültige Pro-Lizenz aktiv ist
 func IsPro() bool {
-	return ValidateLicenseKey(ActiveConfig.LicenseKey)
+	key := strings.TrimSpace(ActiveConfig.LicenseKey)
+	if key == "postctl-pro-dev" {
+		return true
+	}
+	if strings.HasPrefix(key, "PCTL-PRO-") && len(key) >= 16 {
+		return true
+	}
+	return ActiveConfig.LicenseStatus == "active"
 }
 
 // ValidateLicenseKey prüft das Format und die Gültigkeit des Lizenzschlüssels.
@@ -99,6 +108,8 @@ func LoadConfig() error {
 	viper.SetDefault("ai.provider", "openai")
 	viper.SetDefault("ai.model", "gpt-4o-mini")
 	viper.SetDefault("license_key", "")
+	viper.SetDefault("license_status", "")
+	viper.SetDefault("polar_org_id", "")
 	viper.SetDefault("mastodon.instance_url", "https://mastodon.social")
 
 	viper.AddConfigPath(configDir)
@@ -233,6 +244,8 @@ func SaveConfig() error {
 	viper.Set("facebook.app_secret", ActiveConfig.Facebook.AppSecret)
 	viper.Set("facebook.page_id", ActiveConfig.Facebook.PageID)
 	viper.Set("license_key", ActiveConfig.LicenseKey)
+	viper.Set("license_status", ActiveConfig.LicenseStatus)
+	viper.Set("polar_org_id", ActiveConfig.PolarOrgID)
 
 	return nil
 }

@@ -118,6 +118,10 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Facebook.PageID = value
 	case "license_key", "licensekey":
 		config.ActiveConfig.LicenseKey = value
+	case "license_status", "licensestatus":
+		config.ActiveConfig.LicenseStatus = value
+	case "polar_org_id", "polarorgid":
+		config.ActiveConfig.PolarOrgID = value
 	default:
 		return fmt.Errorf("unknown config key: %s", key)
 	}
@@ -197,10 +201,12 @@ func reportConfigShow(cmd *cobra.Command) {
 		fmt.Fprintf(out, "    app_secret:      %s\n", masked.Facebook.AppSecret)
 		fmt.Fprintf(out, "    page_id:         %s\n\n", masked.Facebook.PageID)
 		
-		statusStr := "CORE"
+		statusStr := "CORE (MIT)"
 		if config.IsPro() {
-			statusStr = "PRO ACTIVE"
+			statusStr = "PRO ACTIVE (Polar.sh)"
 		}
+		fmt.Fprintf(out, "  polar_org_id:      %s\n", masked.PolarOrgID)
+		fmt.Fprintf(out, "  license_status:    %s\n", masked.LicenseStatus)
 		fmt.Fprintf(out, "  license_key:       %s [%s]\n", masked.LicenseKey, statusStr)
 	}
 }
