@@ -528,6 +528,15 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 	}
 
 	for i, tweet := range tweetsToPost {
+		if i > 0 {
+			// Sachte Verzögerung, um den Antispam-Filter von Twitter/X zu umgehen
+			select {
+			case <-ctx.Done():
+				return "", ctx.Err()
+			case <-time.After(3 * time.Second):
+			}
+		}
+
 		var tweetMediaIDs []string
 		if post.Type == "thread" {
 			if tweet.Image != "" {
