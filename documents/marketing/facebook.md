@@ -1,6 +1,6 @@
 ---
 platform: facebook
-campaign: launch-2026
+campaign: postctl-launch
 schedule: 2026-06-28 15:00:00
 images: ["/Users/gweiher/Developing/Projects/# Screenshots/postctl/01-dashboard.png"]
 ---
