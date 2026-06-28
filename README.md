@@ -67,18 +67,21 @@ Run `./postctl tui` and navigate to the **Settings** tab:
 
 ---
 
-### 🕒 Running the Scheduler Daemon
-Since `postctl` is a local-first application, scheduled posts are only published when the background scheduler daemon is running. 
+### 🕒 Running the Scheduler
+Since `postctl` is a local-first application, scheduled posts are published using one of the following two modes:
 
-To start the daemon in your terminal:
-```bash
-./postctl daemon
-```
+1. **Interactive Mode (Automatic TUI Background Goroutine):**
+   When the interactive TUI is open (`./postctl tui` or just `./postctl`), a background scheduler goroutine runs automatically in the background. It polls the database every 10 seconds and publishes any due posts. No separate setup or terminal tab is needed as long as the TUI is open.
 
-To run the daemon silently in the background:
-```bash
-nohup ./postctl daemon > daemon.log 2>&1 &
-```
+2. **Headless Mode (Scheduler Daemon):**
+   If you want to run `postctl` headless (e.g., on a server or without keeping the interactive terminal TUI open), you can start the scheduler daemon:
+   ```bash
+   ./postctl daemon
+   ```
+   To run the daemon silently in the background:
+   ```bash
+   nohup ./postctl daemon > daemon.log 2>&1 &
+   ```
 
 ---
 
@@ -190,18 +193,21 @@ Führe `./postctl tui` aus und wechsle in den **Settings**-Tab:
 
 ---
 
-### 🕒 Starten des Scheduler-Daemons
-Da `postctl` eine lokale Anwendung ist, werden geplante Beiträge nur dann veröffentlicht, wenn der Hintergrund-Scheduler-Daemon aktiv läuft.
+### 🕒 Veröffentlichen geplanter Beiträge (Scheduler)
+Da `postctl` eine lokale Anwendung ist, werden geplante Beiträge über einen der folgenden zwei Modi veröffentlicht:
 
-Um den Daemon im Terminal zu starten:
-```bash
-./postctl daemon
-```
+1. **Interaktiver Modus (Automatische TUI-Hintergrund-Goroutine):**
+   Sobald die interaktive TUI geöffnet ist (`./postctl tui` oder einfach `./postctl`), läuft automatisch eine Hintergrund-Goroutine mit. Diese prüft die Datenbank alle 10 Sekunden und veröffentlicht fällige Beiträge. Solange die TUI geöffnet ist, musst du nichts weiter tun.
 
-Um den Daemon geräuschlos im Hintergrund laufen zu lassen:
-```bash
-nohup ./postctl daemon > daemon.log 2>&1 &
-```
+2. **Headless-Modus (Scheduler-Daemon):**
+   Wenn du `postctl` headless (z. B. auf einem Server oder ohne die TUI geöffnet zu lassen) betreiben möchtest, kannst du den Scheduler-Daemon starten:
+   ```bash
+   ./postctl daemon
+   ```
+   Um den Daemon geräuschlos im Hintergrund laufen zu lassen:
+   ```bash
+   nohup ./postctl daemon > daemon.log 2>&1 &
+   ```
 
 ---
 
