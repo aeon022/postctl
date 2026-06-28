@@ -216,8 +216,8 @@ var translationsMap = map[string]map[string]string{
 		"en": "Execute (Press Enter)",
 	},
 	"settings_help_footer": {
-		"de": "←/→ / enter: Ändern / Verbinden  ·  d: Reset/Disconnect  ·  Sofort gespeichert.\nPro-Lizenz über CLI aktivieren: postctl config set license_key <key>",
-		"en": "←/→ / enter: Change / Connect  ·  d: Reset/Disconnect  ·  Saved instantly.\nActivate Pro license via CLI: postctl config set license_key <key>",
+		"de": "←/→ / enter: Ändern / Verbinden  ·  d: Reset/Disconnect  ·  Sofort gespeichert.\nSupport postctl (Spenden): https://polar.sh/aeon022\nPro-Lizenz über CLI aktivieren: postctl config set license_key <key>",
+		"en": "←/→ / enter: Change / Connect  ·  d: Reset/Disconnect  ·  Saved instantly.\nSupport postctl (Donate): https://polar.sh/aeon022\nActivate Pro license via CLI: postctl config set license_key <key>",
 	},
 
 	// Posts View
