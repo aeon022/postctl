@@ -9,44 +9,193 @@ const buildDate = new Date().toLocaleDateString('de-AT', {
 });
 ---
 
-<div class="w-full bg-[#000000] py-4 border-t border-zinc-900 select-none overflow-hidden">
-  <div class="container mx-auto px-1">
-    <div class="flex flex-col items-start gap-2 text-left font-mono text-[10px] tracking-[0.1em] uppercase md:flex-row md:items-center md:justify-between md:gap-6">
-      <div class="grid w-full grid-cols-[minmax(0,1.6fr)_auto_auto] items-center gap-x-4 gap-y-1 text-zinc-700 md:flex md:w-auto md:flex-1 md:flex-wrap md:items-center md:gap-x-4 md:gap-y-1">
-        <div id="ab83-trigger" class="flex min-w-0 items-center gap-2 cursor-crosshair group">
-          <span class="text-emerald-500 font-black animate-pulse group-hover:text-white transition-colors">❯</span>
-          <span class="truncate text-zinc-600 group-hover:text-zinc-300 transition-colors">./ab83_init --status</span>
+<div class="sig-wrapper">
+  <div class="sig-container">
+    <div class="sig-flex">
+      <div class="sig-left-group">
+        <div id="ab83-trigger" class="sig-trigger">
+          <span class="pulse-arrow">❯</span>
+          <span class="trigger-text">./ab83_init --status</span>
         </div>
-        <div class="flex items-center justify-end gap-1 md:justify-start">
-          <span class="opacity-50">hash:</span>
-          <span class="text-zinc-500">{gitHash}</span>
+        <div class="sig-meta-item">
+          <span class="sig-label">hash:</span>
+          <span class="sig-value">{gitHash}</span>
         </div>
-        <div class="flex items-center justify-end gap-1 md:justify-start">
-          <span class="opacity-50">build:</span>
-          <span class="text-zinc-500">{buildDate}</span>
+        <div class="sig-meta-item">
+          <span class="sig-label">build:</span>
+          <span class="sig-value">{buildDate}</span>
         </div>
       </div>
 
-      <div class="flex w-full items-center justify-center gap-4 text-center md:w-auto md:shrink-0 md:justify-end md:text-left">
+      <div class="sig-right-group">
         <a 
           href="https://abteilung83.at" 
           target="_blank" 
           id="glitch-link"
           data-value="ABTEILUNG83"
           rel="noopener noreferrer"
-          class="text-emerald-500 font-bold tracking-widest transition-colors inline-block min-w-[11ch]"
+          class="glitch-link"
         >
           Architects
         </a>
-        <span class="text-zinc-800 -ml-3" aria-hidden="true">/</span>
-        <a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="text-zinc-500 hover:text-orange-500 transition-colors text-[9px]">
+        <span class="sig-divider" aria-hidden="true">/</span>
+        <a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="astro-link">
           ASTRO_CORE
         </a>
       </div>
-
     </div>
   </div>
 </div>
+
+<style>
+  .sig-wrapper {
+    width: 100%;
+    background-color: #000000;
+    padding: 1rem 0;
+    border-top: 1px solid #18181b;
+    user-select: none;
+    overflow: hidden;
+  }
+
+  .sig-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .sig-flex {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    text-align: left;
+    font-family: monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .sig-left-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .sig-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: crosshair;
+    text-decoration: none;
+  }
+
+  .pulse-arrow {
+    color: #10b981;
+    font-weight: 900;
+    animation: pulse-animation 2s infinite;
+    transition: color 0.2s;
+  }
+
+  .trigger-text {
+    color: #52525b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.2s;
+  }
+
+  .sig-trigger:hover .trigger-text {
+    color: #d4d4d8;
+  }
+
+  .sig-trigger:hover .pulse-arrow {
+    color: #ffffff;
+  }
+
+  .sig-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .sig-label {
+    color: #3f3f46;
+  }
+
+  .sig-value {
+    color: #71717a;
+  }
+
+  .sig-right-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .glitch-link {
+    color: #10b981;
+    font-weight: bold;
+    letter-spacing: 0.15em;
+    transition: color 0.2s;
+    display: inline-block;
+    min-width: 11ch;
+    text-decoration: none;
+  }
+
+  .glitch-link:hover {
+    color: #34d399;
+  }
+
+  .sig-divider {
+    color: #27272a;
+    margin-left: -0.75rem;
+  }
+
+  .astro-link {
+    color: #71717a;
+    text-decoration: none;
+    font-size: 9px;
+    transition: color 0.2s;
+  }
+
+  .astro-link:hover {
+    color: #f97316;
+  }
+
+  @keyframes pulse-animation {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  @media (min-width: 768px) {
+    .sig-flex {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .sig-left-group {
+      flex-direction: row;
+      align-items: center;
+      gap: 1.5rem;
+      width: auto;
+      flex: 1;
+    }
+
+    .sig-right-group {
+      width: auto;
+      flex-shrink: 0;
+      justify-content: flex-end;
+      text-align: left;
+    }
+  }
+</style>
 
 <script>
   // --- Glitch Logic ---
