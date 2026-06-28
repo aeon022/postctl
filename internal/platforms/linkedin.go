@@ -204,11 +204,13 @@ func (l *LinkedInPlatform) registerUpload(ctx context.Context, token, authorURN 
 
 	var regResp struct {
 		Value struct {
-			Asset                      string `json:"asset"`
-			MediaUploadHttpRequest     struct {
-				Headers    map[string]string `json:"headers"`
-				UploadUrl  string            `json:"uploadUrl"`
-			} `json:"mediaUploadHttpRequest"`
+			Asset           string `json:"asset"`
+			UploadMechanism struct {
+				MediaUploadHttpRequest struct {
+					Headers   map[string]string `json:"headers"`
+					UploadUrl string            `json:"uploadUrl"`
+				} `json:"com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"`
+			} `json:"uploadMechanism"`
 		} `json:"value"`
 	}
 
@@ -216,7 +218,7 @@ func (l *LinkedInPlatform) registerUpload(ctx context.Context, token, authorURN 
 		return "", "", err
 	}
 
-	return regResp.Value.MediaUploadHttpRequest.UploadUrl, regResp.Value.Asset, nil
+	return regResp.Value.UploadMechanism.MediaUploadHttpRequest.UploadUrl, regResp.Value.Asset, nil
 }
 
 // UploadImage führt den LinkedIn 2-Step Image Upload durch
