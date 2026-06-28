@@ -3,12 +3,12 @@
 Dieses Dokument beschreibt Schritt für Schritt, wie du die Authentifizierung für Twitter/X in `postctl` einrichtest.
 
 Es stehen dir zwei Optionen zur Verfügung:
-* **Option A: Cookie-basierte Authentifizierung (Kostenlos & Empfohlen)** – Nutzt deine bestehende Browsersitzung. Komplett kostenlos und ohne Entwickler-Account.
-* **Option B: Offizielle API (Kostenpflichtig)** – Nutzt die offizielle Twitter API (erfordert ein bezahltes Abonnement ab ca. $100/Monat oder prepaid API-Credits).
+* **Option A: Cookie-basierte Authentifizierung (Kostenlos, aber inoffiziell)** – Nutzt deine bestehende Browsersitzung. Kostenlos, aber fehleranfällig und mit Risiko einer Kontosperrung.
+* **Option B: Offizielle API (Kostenpflichtig & Empfohlen)** – Nutzt die offizielle Twitter API (erfordert ein bezahltes Abonnement ab ca. $100/Monat oder prepaid API-Credits). Der sichere, stabile Weg.
 
 ---
 
-## Option A: Cookie-basierte Authentifizierung (Kostenlos & Empfohlen)
+## Option A: Cookie-basierte Authentifizierung (Kostenlos, aber inoffiziell)
 
 Diese Methode simuliert eine echte Browser-Sitzung, indem sie deine Anmelde-Cookies verwendet. Sie ist vollkommen kostenlos und erfordert keine Einrichtung im Twitter Developer Portal.
 
@@ -50,7 +50,7 @@ Sollte beim Veröffentlichen eines Tweets der Fehler `empty tweet ID returned in
 
 ---
 
-## Option B: Offizielle API (Kostenpflichtig)
+## Option B: Offizielle API (Kostenpflichtig & Empfohlen)
 
 Wenn du ein offizielles Entwickler-Konto besitzt und die monatlichen API-Kosten tragen möchtest, kannst du die Standard-OAuth-Authentifizierung nutzen.
 
