@@ -14,36 +14,34 @@ Diese Methode simuliert eine echte Browser-Sitzung, indem sie deine Anmelde-Cook
 
 > [!TIP]
 > **Warum diese Methode stabil läuft:**
-> `postctl` verwendet eine optimierte Mobile-App-Imitation (Nokia G20 User-Agent & GraphQL-Schnittstelle `a1p9RWpkYKBjWv_I3WzS-A`). Dadurch entfallen zusätzliche Sicherheits-Header wie `x-client-transaction-id` und deine Beiträge werden ohne Bot-Erkennungsfehler (`226 automated request`) oder Captchas veröffentlicht. Zudem schützt eine automatische Pause von 5 Sekunden zwischen Thread-Tweets dein Konto vor Spam-Flags.
+> `postctl` verwendet eine optimierte Desktop-Web-Imitation (Google Chrome auf macOS User-Agent, passende `Sec-Ch-Ua`-Verifikations-Header & GraphQL-Schnittstelle `SiM_cAu83R0wnrpmKQQSEw`). Dadurch entfallen zusätzliche Sicherheits-Header wie `x-client-transaction-id` und deine Beiträge werden ohne Bot-Erkennungsfehler (`226 automated request`) oder Captchas veröffentlicht. Zudem schützt eine automatische Pause von 5 Sekunden zwischen Thread-Tweets dein Konto vor Spam-Flags.
 
-### Schritt 1: Cookies aus dem Browser auslesen
+> [!IMPORTANT]
+> **Kompletten Cookie-String kopieren (WICHTIG):**
+> X (Twitter) verlangt für Beitragsveröffentlichungen zwingend auch das **`twid`**-Cookie (deine User-ID) und Session-Details. Kopiere daher immer den **kompletten Cookie-String** deines Browsers und füge ihn bei `--cookie` ein, um den Spam-Erkennungsfehler `226` zu vermeiden.
 
-1. Öffne deinen Browser, gehe auf [x.com](https://x.com) und stelle sicher, dass du eingeloggt bist.
-2. Öffne die Entwicklertools des Browsers:
-   * Drücke **F12** oder **Cmd + Option + I** (Mac).
-3. Wechsle auf den Reiter für Speicherdaten:
-   * **Chrome/Edge/Brave:** Gehe auf **Application** (Anwendung) ➔ **Cookies** ➔ `https://x.com`.
-   * **Firefox:** Gehe auf **Storage** (Web-Speicher) ➔ **Cookies** ➔ `https://x.com`.
-   * **Safari:** Gehe auf **Storage** (Speicher) ➔ **Cookies** ➔ `https://x.com`.
-4. Suche und kopiere die Werte für die folgenden zwei Cookies:
-   * **`auth_token`**: Ein ca. 40-stelliger Hex-Wert (z. B. `a066c826c71d97...`).
-   * **`ct0`**: Ein ca. 160-stelliger Hex-Wert (das ist dein CSRF-Token, z. B. `9b53579534...`).
+### Schritt 1: Komplette Browser-Cookies auslesen
+
+Der einfachste Weg ist, den gesamten Cookie-Header einer beliebigen Anfrage zu kopieren:
+
+1. Öffne deinen Webbrowser, gehe auf [x.com](https://x.com) und stelle sicher, dass du eingeloggt bist. (Am besten einmal aus- und wieder einloggen, um die Sitzung frisch zu starten).
+2. Öffne die Entwicklertools (**F12** oder **Cmd + Option + I**).
+3. Wechsle auf den Reiter **Network** (Netzwerk).
+4. Lade die Seite einmal neu (**F5** oder **Cmd + R**).
+5. Klicke in der Liste der Netzwerkanfragen auf eine beliebige Anfrage zu `x.com` (z. B. `home` oder einen GraphQL-Request).
+6. Suche im rechten Bereich unter **Request Headers** (Anfrage-Header) nach der Zeile **`cookie:`**.
+7. Kopiere den **gesamten langen Wert** (er fängt meist mit `guest_id=...` oder `kdt=...` an und enthält alle Cookies).
+8. Suche zusätzlich in den Cookies den Wert für **`ct0`** (dein ca. 160-stelliger CSRF-Token) heraus und kopiere ihn ebenfalls.
 
 ### Schritt 2: In `postctl` einrichten
 
-Du kannst das Setup interaktiv starten:
-```bash
-./postctl config setup twitter
-```
-Wähle Option **`2`** (Cookie-basierte Authentifizierung) und füge nacheinander dein `auth_token` und dein `ct0` ein.
+Wir empfehlen die Schnelleinrichtung per Einzeiler im Terminal. Ersetze die Platzhalter durch deine kopierten Werte:
 
-#### Alternative: Schnelleinrichtung per Einzeiler
-Um das Einfügen langer Strings im Terminal zu vereinfachen, kannst du die Konfiguration direkt über Flags übergeben:
 ```bash
-./postctl config setup twitter --cookie "DEIN_AUTH_TOKEN" --ct0 "DEIN_CT0_WERT"
+./postctl config setup twitter --cookie "HIER_DER_GESAMTE_KOPIERTE_COOKIE_STRING" --ct0 "HIER_NUR_DER_CT0_WERT"
 ```
 
-*Hinweis: Wenn du statt dem reinen `auth_token` den gesamten Cookie-String deines Browsers kopiert hast (inklusive `twid`, `kdt` etc.), kannst du diesen ebenfalls einfach bei `--cookie` einfügen. `postctl` filtert die relevanten Felder automatisch heraus.*
+*(Hinweis: Falls du das interaktive Setup über `./postctl config setup twitter` startest und Option `2` wählst, kannst du bei der Abfrage nach dem `auth_token` ebenfalls den gesamten langen Cookie-String einfügen).*
 
 ### 🛠️ Fehlerbehebung bei Cookie-Fehlern (`empty tweet ID`)
 
