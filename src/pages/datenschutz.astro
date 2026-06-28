@@ -1,71 +1,280 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import FooterSignature from '../components/FooterSignature.astro';
 ---
 
 <Layout title="Datenschutzerklärung — postctl">
-  <main class="container mx-auto px-6 py-20 max-w-3xl">
-    <a href="/" class="text-accent font-mono text-sm hover:underline mb-8 inline-block">← Zurück zur Startseite</a>
-    
-    <h1 class="text-4xl font-bold mb-8 tracking-tight font-heading">Datenschutzerklärung</h1>
-    
-    <div class="prose prose-invert space-y-6 text-zinc-300 font-body">
-      <section class="space-y-2">
-        <h2 class="text-xl font-semibold text-white">1. Datenschutz auf einen Blick</h2>
-        <p>
+  <!-- Background Glows -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Minimal Header -->
+  <header class="tui-page-header">
+    <a href="/" class="tui-logo">
+      <span class="logo-icon">&gt;_</span>
+      <span class="logo-text">postctl<span class="logo-blink">_</span></span>
+    </a>
+    <a href="/" class="back-link">← Zurück zur Startseite</a>
+  </header>
+
+  <main class="tui-page-main">
+    <!-- Section Header -->
+    <div class="tui-page-section-header">
+      <div class="section-tag">Sicherheit</div>
+      <h1 class="section-title">Datenschutzerklärung</h1>
+      <p class="section-subtitle">Informationen über die Verarbeitung personenbezogener Daten gemäß EU-DSGVO.</p>
+    </div>
+
+    <!-- Privacy Stack Layout -->
+    <div class="privacy-stack">
+      <!-- Section 1 -->
+      <div class="privacy-card">
+        <div class="card-label">// 01_PRIVACY_OVERVIEW</div>
+        <h3 class="card-title">Datenschutz auf einen Blick</h3>
+        <p class="card-text">
           Wir legen größten Wert auf den Schutz deiner Privatsphäre. postctl ist als <strong>local-first</strong> Anwendung konzipiert. 
           Das bedeutet, dass deine Daten (wie Passwörter, API-Keys, Session-Cookies und Beitragsdaten) lokal auf deinem Rechner in einer 
           SQLite-Datenbank verschlüsselt gespeichert werden und zu keinem Zeitpunkt an uns übertragen werden.
         </p>
-      </section>
+      </div>
 
-      <section class="space-y-2">
-        <h2 class="text-xl font-semibold text-white">2. Datenerfassung in der App (Desktop-Client)</h2>
-        <p>
+      <!-- Section 2 -->
+      <div class="privacy-card">
+        <div class="card-label">// 02_DESKTOP_CLIENT_DATA</div>
+        <h3 class="card-title">Datenerfassung in der App (Desktop-Client)</h3>
+        <p class="card-text">
           Die App speichert Anmeldedaten und Tokens für verbundene Social-Media-Accounts (z. B. LinkedIn, Threads, Twitter/X) 
           ausschließlich lokal auf dem Gerät des Benutzers unter Verwendung von AES-256-GCM Verschlüsselung.
         </p>
-        <p>
+        <p class="card-text">
           Es gibt keine zentrale Cloud-Datenbank, keine Tracker, keine Telemetrie und keine Serverprotokolle unsererseits. Deine Daten 
           gehören ausschließlich dir.
         </p>
-      </section>
+      </div>
 
-      <section class="space-y-2">
-        <h2 class="text-xl font-semibold text-white">3. Zahlungsabwicklung & Lizenzierung (Polar.sh)</h2>
-        <p>
+      <!-- Section 3 -->
+      <div class="privacy-card">
+        <div class="card-label">// 03_MERCHANT_OF_RECORD</div>
+        <h3 class="card-title">Zahlungsabwicklung & Lizenzierung (Polar.sh)</h3>
+        <p class="card-text">
           Wenn du eine Pro-Lizenz von postctl erwirbst, wird die Zahlungsabwicklung und Lizenzschlüssel-Generierung über den externen Dienst 
           <strong>Polar.sh</strong> (Polar Technologies Inc.) abgewickelt. Polar agiert als „Merchant of Record“.
         </p>
-        <p>
+        <p class="card-text">
           Dabei werden personenbezogene Daten wie E-Mail-Adresse und Rechnungsdaten erfasst, um die Lizenz auszustellen und steuerliche 
           Pflichten zu erfüllen. Weitere Informationen findest du in der Datenschutzerklärung von Polar.sh unter 
-          <a href="https://polar.sh/privacy" target="_blank" rel="noopener noreferrer" class="text-accent underline">https://polar.sh/privacy</a>.
+          <a href="https://polar.sh/privacy" target="_blank" rel="noopener noreferrer" class="accent-link underline">https://polar.sh/privacy</a>.
         </p>
-      </section>
+      </div>
 
-      <section class="space-y-2">
-        <h2 class="text-xl font-semibold text-white">4. Hosting der Website</h2>
-        <p>
+      <!-- Section 4 -->
+      <div class="privacy-card">
+        <div class="card-label">// 04_WEB_HOSTING_LOGS</div>
+        <h3 class="card-title">Hosting der Website</h3>
+        <p class="card-text">
           Diese Website wird gehostet auf GitHub Pages / Cloudflare. Beim Aufrufen dieser Website werden standardmäßig IP-Adressen und 
           Verbindungsprotokolle erhoben, um die Stabilität und Sicherheit der Website zu gewährleisten. Dies ist ein berechtigtes Interesse 
           gemäß Art. 6 Abs. 1 lit. f DSGVO.
         </p>
-      </section>
+      </div>
 
-      <section class="space-y-2">
-        <h2 class="text-xl font-semibold text-white">5. Deine Rechte (DSGVO)</h2>
-        <p>
+      <!-- Section 5 -->
+      <div class="privacy-card">
+        <div class="card-label">// 05_USER_RIGHTS</div>
+        <h3 class="card-title">Deine Rechte (DSGVO)</h3>
+        <p class="card-text">
           Dir stehen bezüglich deiner bei Polar.sh oder über unsere Server erfassten Daten grundsätzlich die Rechte auf Auskunft, 
           Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerruf und Widerspruch zu. Wende dich hierzu an die im Impressum 
           angegebene E-Mail-Adresse.
         </p>
-      </section>
+      </div>
     </div>
   </main>
+
+  <FooterSignature />
 </Layout>
 
 <style>
-  .text-accent {
+  .privacy-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto 5rem;
+  }
+
+  .privacy-card {
+    background: #0d0e12b3;
+    border: 1px solid #ffffff14;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 12px 40px #00000080;
+    transition: all 0.25s;
+  }
+
+  .privacy-card:hover {
+    border-color: #8b7cf833;
+    box-shadow: 0 12px 40px rgba(139, 124, 248, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .card-label {
+    font-family: monospace;
     color: #8b7cf8;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px dashed #ffffff14;
+    padding-bottom: 0.5rem;
+  }
+
+  .card-title {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .card-text {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 1rem;
+  }
+
+  .card-text:last-child {
+    margin-bottom: 0;
+  }
+
+  .accent-link {
+    color: #8b7cf8;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .accent-link:hover {
+    color: #a99ef8;
+  }
+
+  /* Core Layout Styles override/additions */
+  .bg-glow {
+    background: radial-gradient(circle, rgba(139, 124, 248, 0.08) 0%, rgba(8, 9, 11, 0) 70%);
+    z-index: -2;
+    pointer-events: none;
+    border-radius: 50%;
+    width: 600px;
+    height: 600px;
+    position: absolute;
+  }
+  .bg-glow-1 {
+    top: -150px;
+    left: calc(50% - 300px);
+  }
+  .bg-glow-2 {
+    top: 600px;
+    right: -200px;
+  }
+  .grid-overlay {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    z-index: -1;
+    pointer-events: none;
+    background-size: 80px 80px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .tui-page-header {
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+  }
+  .tui-logo {
+    font-family: monospace;
+    align-items: center;
+    gap: .5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+  }
+  .logo-icon {
+    color: #8b7cf8;
+  }
+  .logo-text {
+    letter-spacing: -.03em;
+    background: linear-gradient(135deg, #fff 40%, #8b7cf8 100%);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+  }
+  .logo-blink {
+    color: #8b7cf8;
+    animation: 1s infinite cursor-blink;
+  }
+  @keyframes cursor-blink {
+    0%, to { opacity: 0; }
+    50% { opacity: 1; }
+  }
+
+  .back-link {
+    color: rgba(255, 255, 255, 0.5);
+    font-family: monospace;
+    border: 1px solid #ffffff14;
+    transition: all 0.2s;
+    border-radius: 6px;
+    padding: .4rem .8rem;
+    font-size: .85rem;
+    text-decoration: none;
+  }
+  .back-link:hover {
+    color: #8b7cf8;
+    border-color: #8b7cf8;
+    background: rgba(139, 124, 248, 0.05);
+  }
+
+  .tui-page-main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 4rem;
+  }
+
+  .tui-page-section-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+  }
+  .section-tag {
+    font-family: monospace;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #8b7cf8;
+    background: rgba(139, 124, 248, 0.08);
+    border: 1px solid rgba(139, 124, 248, 0.2);
+    border-radius: 100px;
+    margin-bottom: 1rem;
+    padding: .3rem .8rem;
+    font-size: .7rem;
+    display: inline-block;
+  }
+  .section-title {
+    font-family: var(--font-heading, inherit);
+    color: #ffffff;
+    letter-spacing: -.01em;
+    margin-bottom: 1rem;
+    font-size: 2.6rem;
+    font-weight: 700;
+  }
+  .section-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.1rem;
+    line-height: 1.6;
   }
 </style>

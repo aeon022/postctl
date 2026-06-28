@@ -1,75 +1,352 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import FooterSignature from '../components/FooterSignature.astro';
 ---
 
 <Layout title="Impressum — postctl">
-  <main class="container mx-auto px-6 py-20 max-w-3xl">
-    <a href="/" class="text-accent font-mono text-sm hover:underline mb-8 inline-block">← Zurück zur Startseite</a>
-    
-    <h1 class="text-4xl font-bold mb-8 tracking-tight font-heading">Impressum</h1>
-    
-    <div class="prose prose-invert space-y-6 text-zinc-300 font-body">
-      <section class="space-y-2">
-        <h2 class="text-xl font-semibold text-white">Offenlegung & Informationspflichten</h2>
-        <p class="text-sm">
-          Informationspflichten nach § 5 E-Commerce-Gesetz (ECG), § 14 Unternehmensgesetzbuch (UGB), 
-          § 63 Gewerbeordnung (GewO) und Offenlegungspflicht nach § 25 Mediengesetz (MedienG).
-        </p>
-      </section>
+  <!-- Background Glows -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="grid-overlay"></div>
 
-      <section class="space-y-1">
-        <h3 class="text-lg font-medium text-white">Diensteanbieter & Medieninhaber</h3>
-        <p class="font-semibold text-zinc-100">Abteilung83</p>
-        <p class="font-medium text-zinc-100">Gerwin Weiher</p>
-        <p>Einzelunternehmer (Gegenstand: IT-Dienstleistungen)</p>
-        <p>Steyrergasse 88/4</p>
-        <p>8010 Graz, Österreich</p>
-      </section>
+  <!-- Minimal Header -->
+  <header class="tui-page-header">
+    <a href="/" class="tui-logo">
+      <span class="logo-icon">&gt;_</span>
+      <span class="logo-text">postctl<span class="logo-blink">_</span></span>
+    </a>
+    <a href="/" class="back-link">← Zurück zur Startseite</a>
+  </header>
 
-      <section class="space-y-1">
-        <h3 class="text-lg font-medium text-white">Kontakt</h3>
-        <p>Tel: <a href="tel:+436605672361" class="text-zinc-100 hover:text-accent transition-colors">+43 660 567 23 61</a></p>
-        <p>E-Mail: <a href="mailto:post@abteilung83.com" class="text-zinc-100 hover:text-accent transition-colors">post@abteilung83.com</a></p>
-        <p>Web: <span class="text-zinc-100">www.abteilung83.at</span></p>
-      </section>
+  <main class="tui-page-main">
+    <!-- Section Header -->
+    <div class="tui-page-section-header">
+      <div class="section-tag">Rechtliches</div>
+      <h1 class="section-title">Impressum</h1>
+      <p class="section-subtitle">Offenlegung & Informationspflichten nach österreichischem ECG, UGB, GewO und MedienG.</p>
+    </div>
 
-      <section class="space-y-2">
-        <h3 class="text-lg font-medium text-white">Gewerbe- & Berufsrecht</h3>
-        <p>Aufsichtsbehörde: Magistrat der Stadt Graz</p>
-        <p>Mitgliedschaften: WKO Steiermark, Fachgruppe UBIT</p>
-        <p>
-          Anwendbare Rechtsvorschriften: Gewerbeordnung (GewO 1994) in der jeweils geltenden Fassung. 
-          Abrufbar im Rechtsinformationssystem des Bundes (RIS) unter <a href="https://www.ris.bka.gv.at" target="_blank" rel="noopener noreferrer" class="text-accent underline">www.ris.bka.gv.at</a>.
-        </p>
-      </section>
+    <!-- Legal Grid Layout -->
+    <div class="legal-grid">
+      <!-- Card 1: Entity -->
+      <div class="legal-card">
+        <div class="card-label">// 01_ENTITY_INFORMATION</div>
+        <div class="legal-row">
+          <span class="legal-key">Diensteanbieter:</span>
+          <span class="legal-val">Abteilung83</span>
+        </div>
+        <div class="legal-row">
+          <span class="legal-key">Inhaber:</span>
+          <span class="legal-val">Gerwin Weiher</span>
+        </div>
+        <div class="legal-row">
+          <span class="legal-key">Rechtsform:</span>
+          <span class="legal-val">Einzelunternehmer</span>
+        </div>
+        <div class="legal-row">
+          <span class="legal-key">Gegenstand:</span>
+          <span class="legal-val">IT-Dienstleistungen</span>
+        </div>
+        <div class="legal-row">
+          <span class="legal-key">Ort:</span>
+          <span class="legal-val">8010 Graz, Österreich</span>
+        </div>
+        <div class="legal-row">
+          <span class="legal-key">Anschrift:</span>
+          <span class="legal-val">Steyrergasse 88/4</span>
+        </div>
+      </div>
 
-      <section class="space-y-2">
-        <h3 class="text-lg font-medium text-white">Angaben zur Online-Streitbeilegung</h3>
-        <p>
+      <!-- Card 2: Comms -->
+      <div class="legal-card">
+        <div class="card-label">// 02_COMMUNICATION_UPLINK</div>
+        <div class="legal-row">
+          <span class="legal-key">Tel:</span>
+          <span class="legal-val">
+            <a href="tel:+436605672361" class="accent-link">+43 660 567 23 61</a>
+          </span>
+        </div>
+        <div class="legal-row">
+          <span class="legal-key">E-Mail:</span>
+          <span class="legal-val">
+            <a href="mailto:post@abteilung83.com" class="accent-link">post@abteilung83.com</a>
+          </span>
+        </div>
+        <div class="legal-row">
+          <span class="legal-key">Web:</span>
+          <span class="legal-val">www.abteilung83.at</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Framework -->
+      <div class="legal-card">
+        <div class="card-label">// 03_LEGAL_FRAMEWORK</div>
+        <div class="legal-row">
+          <span class="legal-key">Mitgliedschaft:</span>
+          <span class="legal-val">WKO Steiermark, Fachgruppe UBIT</span>
+        </div>
+        <div class="legal-row">
+          <span class="legal-key">Behörde:</span>
+          <span class="legal-val">Magistrat der Stadt Graz</span>
+        </div>
+        <div class="legal-row">
+          <span class="legal-key">Rechtsvorschriften:</span>
+          <span class="legal-val">
+            <a href="https://www.ris.bka.gv.at" target="_blank" rel="noopener noreferrer" class="accent-link underline">Gewerbeordnung</a>
+          </span>
+        </div>
+      </div>
+
+      <!-- Card 4: Dispute -->
+      <div class="legal-card">
+        <div class="card-label">// 04_DISPUTE_RESOLUTION</div>
+        <p class="card-text">
           Verbraucher haben die Möglichkeit, Beschwerden an die Online-Streitbeilegungsplattform der EU zu richten: 
-          <a href="http://ec.europa.eu/odr" target="_blank" rel="noopener noreferrer" class="text-accent underline">http://ec.europa.eu/odr</a>. 
-          Sie können allfällige Beschwerden auch an die oben angegebene E-Mail-Adresse richten.
+          <a href="http://ec.europa.eu/odr" target="_blank" rel="noopener noreferrer" class="accent-link underline">http://ec.europa.eu/odr</a>. 
+          Allfällige Beschwerden können auch an die oben angegebene E-Mail-Adresse gerichtet werden.
         </p>
-      </section>
+      </div>
+    </div>
 
-      <section class="space-y-2">
-        <h3 class="text-lg font-medium text-white">Haftungsausschluss (Disclaimer)</h3>
-        <p class="text-sm leading-relaxed">
-          <strong>Haftung für Inhalte:</strong> Als Diensteanbieter bin ich für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Ich bin jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.
-        </p>
-        <p class="text-sm leading-relaxed">
-          <strong>Haftung für Links:</strong> Mein Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte ich keinen Einfluss habe. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich.
-        </p>
-        <p class="text-sm leading-relaxed">
-          <strong>Urheberrecht:</strong> Die durch mich erstellten Inhalte auf diesen Seiten unterliegen dem österreichischen Urheberrecht. Beiträge Dritter sind als solche gekennzeichnet.
-        </p>
-      </section>
+    <!-- Disclaimer Panel -->
+    <div class="disclaimer-panel">
+      <div class="card-label">// 05_DISCLAIMER_PROTOCOL</div>
+      <div class="disclaimer-grid">
+        <div class="disclaimer-col">
+          <h4 class="col-title">Haftung für Inhalte</h4>
+          <p class="col-text">Als Diensteanbieter bin ich für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Ich bin jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.</p>
+        </div>
+        <div class="disclaimer-col">
+          <h4 class="col-title">Haftung für Links</h4>
+          <p class="col-text">Mein Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte ich keinen Einfluss habe. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich.</p>
+        </div>
+        <div class="disclaimer-col">
+          <h4 class="col-title">Urheberrecht</h4>
+          <p class="col-text">Die durch mich erstellten Inhalte auf diesen Seiten unterliegen dem österreichischen Urheberrecht. Beiträge Dritter sind als solche gekennzeichnet.</p>
+        </div>
+      </div>
     </div>
   </main>
+
+  <FooterSignature />
 </Layout>
 
 <style>
-  .text-accent {
+  .legal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto 3rem;
+  }
+
+  .legal-card {
+    background: #0d0e12b3;
+    border: 1px solid #ffffff14;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 12px 40px #00000080;
+    transition: all 0.25s;
+  }
+
+  .legal-card:hover {
+    border-color: #8b7cf833;
+    box-shadow: 0 12px 40px rgba(139, 124, 248, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .card-label {
+    font-family: monospace;
     color: #8b7cf8;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px dashed #ffffff14;
+    padding-bottom: 0.5rem;
+  }
+
+  .legal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: monospace;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #ffffff05;
+    padding: 0.5rem 0;
+  }
+
+  .legal-key {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .legal-val {
+    color: #ffffff;
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .accent-link {
+    color: #8b7cf8;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .accent-link:hover {
+    color: #a99ef8;
+  }
+
+  .card-text {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .disclaimer-panel {
+    background: #0d0e12b3;
+    border: 1px solid #ffffff14;
+    border-radius: 12px;
+    padding: 2.5rem;
+    max-width: 1000px;
+    margin: 0 auto 5rem;
+    box-shadow: 0 12px 40px #00000080;
+  }
+
+  .disclaimer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2.5rem;
+  }
+
+  .col-title {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .col-text {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+
+  /* Core Layout Styles override/additions */
+  .bg-glow {
+    background: radial-gradient(circle, rgba(139, 124, 248, 0.08) 0%, rgba(8, 9, 11, 0) 70%);
+    z-index: -2;
+    pointer-events: none;
+    border-radius: 50%;
+    width: 600px;
+    height: 600px;
+    position: absolute;
+  }
+  .bg-glow-1 {
+    top: -150px;
+    left: calc(50% - 300px);
+  }
+  .bg-glow-2 {
+    top: 600px;
+    right: -200px;
+  }
+  .grid-overlay {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    z-index: -1;
+    pointer-events: none;
+    background-size: 80px 80px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .tui-page-header {
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+  }
+  .tui-logo {
+    font-family: monospace;
+    align-items: center;
+    gap: .5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+  }
+  .logo-icon {
+    color: #8b7cf8;
+  }
+  .logo-text {
+    letter-spacing: -.03em;
+    background: linear-gradient(135deg, #fff 40%, #8b7cf8 100%);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+  }
+  .logo-blink {
+    color: #8b7cf8;
+    animation: 1s infinite cursor-blink;
+  }
+  @keyframes cursor-blink {
+    0%, to { opacity: 0; }
+    50% { opacity: 1; }
+  }
+
+  .back-link {
+    color: rgba(255, 255, 255, 0.5);
+    font-family: monospace;
+    border: 1px solid #ffffff14;
+    transition: all 0.2s;
+    border-radius: 6px;
+    padding: .4rem .8rem;
+    font-size: .85rem;
+    text-decoration: none;
+  }
+  .back-link:hover {
+    color: #8b7cf8;
+    border-color: #8b7cf8;
+    background: rgba(139, 124, 248, 0.05);
+  }
+
+  .tui-page-main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 4rem;
+  }
+
+  .tui-page-section-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+  }
+  .section-tag {
+    font-family: monospace;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #8b7cf8;
+    background: rgba(139, 124, 248, 0.08);
+    border: 1px solid rgba(139, 124, 248, 0.2);
+    border-radius: 100px;
+    margin-bottom: 1rem;
+    padding: .3rem .8rem;
+    font-size: .7rem;
+    display: inline-block;
+  }
+  .section-title {
+    font-family: var(--font-heading, inherit);
+    color: #ffffff;
+    letter-spacing: -.01em;
+    margin-bottom: 1rem;
+    font-size: 2.6rem;
+    font-weight: 700;
+  }
+  .section-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.1rem;
+    line-height: 1.6;
   }
 </style>
