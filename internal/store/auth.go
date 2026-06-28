@@ -13,6 +13,8 @@ import (
 	"io"
 	"os"
 	"time"
+
+	"github.com/aeon022/postctl/internal/config"
 )
 
 // Default-Key für die AES-Verschlüsselung, falls kein ENV-Key gesetzt ist
@@ -20,6 +22,25 @@ const defaultSaltKey = "postctl-system-encryption-salt-key-2026"
 
 // SaveToken verschlüsselt und speichert die OAuth-Tokens für eine Plattform
 func (s *SQLiteStore) SaveToken(ctx context.Context, platform, token, refresh string, expiresAt *time.Time) error {
+	// Pro-Feature Check: Maximale Plattform-Anzahl in Core auf 2 limitieren
+	if !config.IsPro() {
+		var exists int
+		err := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM auth_tokens WHERE platform = ?", platform).Scan(&exists)
+		if err != nil {
+			return fmt.Errorf("check platform existence: %w", err)
+		}
+		if exists == 0 {
+			var count int
+			err := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM auth_tokens").Scan(&count)
+			if err != nil {
+				return fmt.Errorf("count active platforms: %w", err)
+			}
+			if count >= 2 {
+				return fmt.Errorf("💡 Pro Feature: Mit der kostenlosen Core-Version von postctl kannst du bis zu 2 Social-Media-Accounts gleichzeitig verbinden. Um unbegrenzt viele Plattformen zu nutzen, aktiviere bitte postctl Pro mit einem Lizenzschlüssel.")
+			}
+		}
+	}
+
 	encToken, err := encrypt(token)
 	if err != nil {
 		return fmt.Errorf("encrypt token: %w", err)

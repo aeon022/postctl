@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -121,6 +122,21 @@ func TestStoreWorkflow(t *testing.T) {
 	err = s.SaveToken(ctx, models.PlatformTwitter, "secret-token-val", "refresh-token-val", &expires)
 	if err != nil {
 		t.Fatalf("failed to save token: %v", err)
+	}
+
+	// 2. Plattform hinzufügen (sollte auf Core erfolgreich sein)
+	err = s.SaveToken(ctx, models.PlatformLinkedIn, "linkedin-token-val", "", nil)
+	if err != nil {
+		t.Fatalf("failed to save 2nd platform token: %v", err)
+	}
+
+	// 3. Plattform hinzufügen (sollte auf Core fehlschlagen)
+	err = s.SaveToken(ctx, models.PlatformThreads, "threads-token-val", "", nil)
+	if err == nil {
+		t.Fatal("expected error when saving 3rd platform token in Core tier, got nil")
+	}
+	if !strings.Contains(err.Error(), "Pro Feature") {
+		t.Errorf("expected Pro limit error message, got: %v", err)
 	}
 
 	// Holen und prüfen (Entschlüsselung testen)
