@@ -109,7 +109,7 @@ func LoadConfig() error {
 	viper.SetDefault("ai.model", "gpt-4o-mini")
 	viper.SetDefault("license_key", "")
 	viper.SetDefault("license_status", "")
-	viper.SetDefault("polar_org_id", "")
+	viper.SetDefault("polar_org_id", "aa792ea4-650e-492e-a955-9b3d564e943e")
 	viper.SetDefault("mastodon.instance_url", "https://mastodon.social")
 
 	viper.AddConfigPath(configDir)
