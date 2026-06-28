@@ -117,6 +117,36 @@ var importCmd = &cobra.Command{
 					}
 				}
 
+				// Validierung: Bluesky Zeichenlänge
+				if post.Platform == models.PlatformBluesky {
+					if len([]rune(post.Body)) > 300 {
+						validationErrors = append(validationErrors, fmt.Sprintf(
+							"file %s: Bluesky post %s is too long (%d chars, max 300)",
+							file, post.ID, len([]rune(post.Body)),
+						))
+					}
+				}
+
+				// Validierung: Threads Zeichenlänge
+				if post.Platform == models.PlatformThreads {
+					if len([]rune(post.Body)) > 500 {
+						validationErrors = append(validationErrors, fmt.Sprintf(
+							"file %s: Threads post %s is too long (%d chars, max 500)",
+							file, post.ID, len([]rune(post.Body)),
+						))
+					}
+				}
+
+				// Validierung: Mastodon Zeichenlänge
+				if post.Platform == models.PlatformMastodon {
+					if len([]rune(post.Body)) > 500 {
+						validationErrors = append(validationErrors, fmt.Sprintf(
+							"file %s: Mastodon post %s is too long (%d chars, max 500)",
+							file, post.ID, len([]rune(post.Body)),
+						))
+					}
+				}
+
 				// Validierung: Bilder existieren und Pfad auflösen
 				for idx, img := range post.Images {
 					resolved, ok := resolveImagePath(postDir, img, config.ActiveConfig.Defaults.ImageDir)
