@@ -20,7 +20,7 @@
 <li><strong>Terminal User Interface (TUI)</strong>: Interactive Bubble Tea-based dashboard to manage campaigns, posts, history, and settings.</li>
 <li><strong>Modern API Integrations</strong>:
 <ul>
-<li><strong>Twitter/X</strong>: Post tweets and threads via free Cookie-based authentication (recommended) or official OAuth 2.0 API.</li>
+<li><strong>Twitter/X</strong>: Post tweets and threads via the official OAuth 2.0 API (recommended, requires paid API credits) or a free but unofficial Cookie-based bypass (risk of account suspension).</li>
 <li><strong>LinkedIn</strong>: Authenticate via modern <strong>OpenID Connect (OIDC)</strong> (Scopes: <code>openid</code>, <code>profile</code>, <code>w_member_social</code>).</li>
 <li><strong>Threads (Meta)</strong>: Official Threads API integration with secure HTTPS callbacks (<code>https://localhost:8753/callback</code>).</li>
 </ul>
@@ -67,7 +67,7 @@
 <span class="line"><span style="color:#B392F0">./setup.sh</span></span></code></pre>
 <p>For platform-specific setup details and authentication instructions, see the guides:</p>
 <ul>
-<li>🐦 <a href="docs/api-twitter.md">Twitter/X API &amp; Cookie Setup Guide</a> (How to use the free cookie bypass or official paid API, and fix <code>empty tweet ID</code> errors)</li>
+<li>🐦 <a href="docs/api-twitter.md">Twitter/X API &amp; Cookie Setup Guide</a> (Official paid API setup or free unofficial cookie bypass, troubleshooting <code>empty tweet ID</code> errors)</li>
 </ul>
 <hr>
 <h3 id="️-settings--auth-in-tui">⚙️ Settings &amp; Auth in TUI</h3>
@@ -160,7 +160,7 @@ If you want to run <code>postctl</code> headless (e.g., on a server or without k
 <li><strong>Terminal User Interface (TUI)</strong>: Interaktives Bubble-Tea-Dashboard zur Verwaltung von Kampagnen, Beiträgen, Historie und Einstellungen.</li>
 <li><strong>Moderne API-Integrationen</strong>:
 <ul>
-<li><strong>Twitter/X</strong>: Veröffentliche Tweets/Threads über die kostenlose Cookie-basierte Authentifizierung (empfohlen) oder die offizielle API.</li>
+<li><strong>Twitter/X</strong>: Veröffentliche Tweets/Threads über die offizielle API (empfohlen, erfordert kostenpflichtige API-Credits) oder einen kostenlosen, aber inoffiziellen Cookie-Bypass (Risiko von Kontosperrung).</li>
 <li><strong>LinkedIn</strong>: Authentifizierung über den modernen <strong>OpenID Connect (OIDC)</strong>-Standard (Scopes: <code>openid</code>, <code>profile</code>, <code>w_member_social</code>).</li>
 <li><strong>Threads (Meta)</strong>: Offizielle Threads API mit sicherem HTTPS-Callback (<code>https://localhost:8753/callback</code>).</li>
 </ul>
@@ -318,66 +318,78 @@ campaign: launch-2026
 schedule: 2026-06-25 15:00:00
 images: ["logo.png"]
 ---</code></pre><p><strong>Bidirectional Syncing:</strong> You can edit these values inside Vim. Changing the campaign name, target platform, schedule timestamp, or image list updates the TUI form fields immediately upon return.</p><h3>3. Content Body</h3><p>The post body begins after the closing <code>---</code> frontmatter delimiter. Write your post in standard Markdown.</p><p>For multi-post threads, separate each section using a line containing only <code>---</code>.</p></div></section><!-- Tab 4: Image Resolution --><section class="doc-section" id="doc-image-resolution"><div class="doc-body markdown-content"><h1>🖼️ Image Path Resolution & Platform Uploads</h1><p>Manage and attach media assets seamlessly using local file references.</p><h2>How Image Paths Are Resolved</h2><p>When you reference a file name or path in your post frontmatter (e.g. <code>images: ["dashboard-screenshot.png"]</code>), <code>postctl</code> executes a fallback search in the following sequence:</p><ol><li><strong>Absolute Path Check:</strong> Is it a literal path on your system? (e.g. <code>/Users/user/Pictures/screenshot.png</code>)</li><li><strong>Relative to Markdown Document:</strong> If you imported a file from <code>/code/posts/announcement.md</code>, it checks <code>/code/posts/dashboard-screenshot.png</code>.</li><li><strong>Current Working Directory (CWD):</strong> Checks the folder where you launched the <code>postctl</code> command.</li><li><strong>Global Default Image Directory:</strong> Checks the directory specified by <code>defaults.image_dir</code> in your <code>~/.config/postctl/config.yaml</code> file.</li></ol><h2>Platform-Specific Upload Behavior</h2><p>Each platform API handles media uploads differently, which is automatically abstracted by the driver layers:</p><ul><li><strong>LinkedIn (Native Hosting):</strong> Images are uploaded as raw binary assets to LinkedIn. The API registers the upload, performs a <code>PUT</code>, and links the resulting URN (e.g., <code>urn:li:digitalmediaAsset:...</code>) to your post.</li><li><strong>Twitter / X (Native Hosting):</strong> Images are uploaded to the Twitter v1.1 Media Upload endpoint to obtain a <code>media_id</code>, which is attached to the v2 tweet.</li><li><strong>Mastodon / Bluesky (Native):</strong> Media files are uploaded to platform attachment endpoints (or blob records for Bluesky AT Protocol) and linked to the status.</li><li><strong>Threads (Meta HTTPS Requirement):</strong> The Threads API does not allow binary local uploads. Instead, it expects a public HTTPS URL (e.g. <code>https://yourdomain.com/assets/screenshot.png</code>) from which the Meta crawler fetches the image. If publishing to Threads, host your images on an external cloud (S3, R2, Imgur) and reference that HTTPS URL in the frontmatter.</li></ul></div></section><!-- Tab 5: Twitter / X Setup --><section class="doc-section" id="doc-api-twitter"><div class="doc-body markdown-content"><h1 id="twitterx-api-setup-guide-für-postctl">Twitter/X API Setup Guide für postctl</h1>
-<p>Dieses Dokument beschreibt Schritt für Schritt, wie du deine eigenen API-Anmeldedaten für Twitter/X erstellst und in <code>postctl</code> einrichtest.</p>
-<hr>
-<h2 id="1-twitter-developer-account--kostenpflichtiges-api-tier-einrichten">1. Twitter Developer Account &amp; Kostenpflichtiges API-Tier einrichten</h2>
-<blockquote>
-<p>[!IMPORTANT]
-<strong>Wichtiger Hinweis zum Preismodell (Stand 2026):</strong>
-Twitter/X hat alle kostenlosen Tarife („Free Tier“) für den Schreibzugriff (Veröffentlichen von Tweets) vollständig eingestellt.
-Um Beiträge über <code>postctl</code> posten zu können, benötigst du einen kostenpflichtigen Zugang:</p>
+<p>Dieses Dokument beschreibt Schritt für Schritt, wie du die Authentifizierung für Twitter/X in <code>postctl</code> einrichtest.</p>
+<p>Es stehen dir zwei Optionen zur Verfügung:</p>
 <ul>
-<li><strong>Prepaid / Pay-Per-Use (Pay-as-you-go):</strong> Abrechnung nach tatsächlicher Nutzung.</li>
-<li><strong>Basic Tier (ca. $100/Monat):</strong> Ermöglicht das automatisierte Veröffentlichen von Beiträgen sowie grundlegende Lesezugriffe über die v2 API.</li>
+<li><strong>Option A: Cookie-basierte Authentifizierung (Kostenlos, aber inoffiziell)</strong> – Nutzt deine bestehende Browsersitzung. Kostenlos, aber fehleranfällig und mit Risiko einer Kontosperrung.</li>
+<li><strong>Option B: Offizielle API (Kostenpflichtig &amp; Empfohlen)</strong> – Nutzt die offizielle Twitter API (erfordert ein bezahltes Abonnement ab ca. $100/Monat oder prepaid API-Credits). Der sichere, stabile Weg.</li>
 </ul>
-<p>Ohne ein aktives, bezahltes Abonnement oder aufgeladenes Prepaid-Guthaben im Twitter Developer Portal wird jeder Versuch, einen Beitrag zu posten, mit einem API-Fehler (<code>403 Forbidden</code>) abgebrochen.</p>
+<hr>
+<h2 id="option-a-cookie-basierte-authentifizierung-kostenlos-aber-inoffiziell">Option A: Cookie-basierte Authentifizierung (Kostenlos, aber inoffiziell)</h2>
+<p>Diese Methode simuliert eine echte Browser-Sitzung, indem sie deine Anmelde-Cookies verwendet. Sie ist vollkommen kostenlos und erfordert keine Einrichtung im Twitter Developer Portal.</p>
+<blockquote>
+<p>[!WARNING]
+<strong>Inoffizielle Umgehungsmethode (Risiko von Kontosperrung):</strong>
+Die Cookie-basierte Authentifizierung simuliert eine Web-Sitzung. Diese Methode ist fehleranfällig, verstößt gegen die Nutzungsbedingungen (ToS) von X/Twitter und kann zur Sperrung deines Kontos führen. Der einzig offizielle und sichere Weg zum Posten ist die Verwendung der kostenpflichtigen API (Option B).</p>
+<ul>
+<li><code>postctl</code> versucht, durch Header-Imitation und künstliche Pausen (5 Sekunden zwischen Beiträgen) das Risiko zu minimieren, bietet aber keine Garantie.</li>
+<li>X verlangt zwingend auch das <strong><code>twid</code></strong>-Cookie (deine User-ID). Trage daher stets den <strong>kompletten Cookie-String</strong> oder beide Cookies (<code>auth_token</code> und <code>ct0</code>) ein.</li>
+</ul>
 </blockquote>
+<h3 id="schritt-1-komplette-browser-cookies-auslesen">Schritt 1: Komplette Browser-Cookies auslesen</h3>
+<p>Der einfachste Weg ist, den gesamten Cookie-Header einer beliebigen Anfrage zu kopieren:</p>
 <ol>
-<li>Gehe auf das <a href="https://developer.twitter.com">Twitter Developer Portal</a>.</li>
-<li>Melde dich mit deinem Twitter/X-Konto an.</li>
-<li>Richte dein API-Abonnement (Basic Tier oder Prepaid API Credits) ein, um Schreibrechte zu erhalten.</li>
+<li>Öffne deinen Webbrowser, gehe auf <a href="https://x.com">x.com</a> und stelle sicher, dass du eingeloggt bist. (Am besten einmal aus- und wieder einloggen, um die Sitzung frisch zu starten).</li>
+<li>Öffne die Entwicklertools (<strong>F12</strong> oder <strong>Cmd + Option + I</strong>).</li>
+<li>Wechsle auf den Reiter <strong>Network</strong> (Netzwerk).</li>
+<li>Lade die Seite einmal neu (<strong>F5</strong> oder <strong>Cmd + R</strong>).</li>
+<li>Klicke in der Liste der Netzwerkanfragen auf eine beliebige Anfrage zu <code>x.com</code> (z. B. <code>home</code> oder einen GraphQL-Request).</li>
+<li>Suche im rechten Bereich unter <strong>Request Headers</strong> (Anfrage-Header) nach der Zeile <strong><code>cookie:</code></strong>.</li>
+<li>Kopiere den <strong>gesamten langen Wert</strong> (er fängt meist mit <code>guest_id=...</code> oder <code>kdt=...</code> an und enthält alle Cookies).</li>
+<li>Suche zusätzlich in den Cookies den Wert für <strong><code>ct0</code></strong> (dein ca. 160-stelliger CSRF-Token) heraus und kopiere ihn ebenfalls.</li>
+</ol>
+<h3 id="schritt-2-in-postctl-einrichten">Schritt 2: In <code>postctl</code> einrichten</h3>
+<p>Wir empfehlen die Schnelleinrichtung per Einzeiler im Terminal. Ersetze die Platzhalter durch deine kopierten Werte:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> setup</span><span style="color:#9ECBFF"> twitter</span><span style="color:#79B8FF"> --cookie</span><span style="color:#9ECBFF"> "HIER_DER_GESAMTE_KOPIERTE_COOKIE_STRING"</span><span style="color:#79B8FF"> --ct0</span><span style="color:#9ECBFF"> "HIER_NUR_DER_CT0_WERT"</span></span></code></pre>
+<p><em>(Hinweis: Falls du das interaktive Setup über <code>./postctl config setup twitter</code> startest und Option <code>2</code> wählst, kannst du bei der Abfrage nach dem <code>auth_token</code> ebenfalls den gesamten langen Cookie-String einfügen).</em></p>
+<h3 id="️-fehlerbehebung-bei-cookie-fehlern-empty-tweet-id">🛠️ Fehlerbehebung bei Cookie-Fehlern (<code>empty tweet ID</code>)</h3>
+<p>Sollte beim Veröffentlichen eines Tweets der Fehler <code>empty tweet ID returned in cookie mode</code> auftreten, liegt das an einer von zwei Ursachen:</p>
+<ol>
+<li><strong>Abgelaufene Session-Cookies:</strong> Twitter/X beendet Browsersitzungen nach einiger Zeit. Wiederhole einfach <strong>Schritt 1</strong> und trage die neuen Cookies ein.</li>
+<li><strong>Rotierte GraphQL Query-ID:</strong> X ändert im Web-Frontend regelmäßig die interne ID für die <code>CreateTweet</code>-Mutation. In diesem Fall passt <code>postctl</code> die IDs in einem Update an. Stelle sicher, dass du die aktuellste Version von <code>postctl</code> nutzt.</li>
 </ol>
 <hr>
-<h2 id="2-app-im-developer-portal-konfigurieren">2. App im Developer Portal konfigurieren</h2>
+<h2 id="option-b-offizielle-api-kostenpflichtig--empfohlen">Option B: Offizielle API (Kostenpflichtig &amp; Empfohlen)</h2>
+<p>Wenn du ein offizielles Entwickler-Konto besitzt und die monatlichen API-Kosten tragen möchtest, kannst du die Standard-OAuth-Authentifizierung nutzen.</p>
+<blockquote>
+<p>[!IMPORTANT]
+<strong>Kostenhinweis (Stand 2026):</strong>
+Twitter/X bietet für neu erstellte Developer-Accounts keinen kostenlosen Schreibzugriff (Free Tier) mehr an. Um über die offizielle Schnittstelle zu posten, ist ein kostenpflichtiger API-Zugang (z. B. Basic Tier für ca. $100/Monat oder prepaid Credits) im Developer Portal erforderlich.</p>
+</blockquote>
+<h3 id="schritt-1-app-im-developer-portal-konfigurieren">Schritt 1: App im Developer Portal konfigurieren</h3>
 <ol>
+<li>Gehe auf das <a href="https://developer.twitter.com">Twitter Developer Portal</a> und melde dich an.</li>
 <li>Erstelle ein neues <strong>Projekt</strong> und eine neue <strong>App</strong> in deinem Portal-Dashboard.</li>
-<li>Navigiere in den <strong>App Settings</strong> zum Bereich <strong>User authentication settings</strong> und klicke auf <strong>Set up</strong> oder <strong>Edit</strong>:
+<li>Navigiere in den <strong>App Settings</strong> zu <strong>User authentication settings</strong> und klicke auf <strong>Set up</strong>:
 <ul>
 <li><strong>App Type</strong>: Wähle <strong>Web App, Automated App or Bot</strong>.</li>
-<li><strong>App Permissions</strong>: Wähle <strong>Read and Write</strong> (wichtig, damit <code>postctl</code> Tweets veröffentlichen kann).</li>
-<li><strong>Type of App</strong>: Wähle <strong>Native App</strong> oder <strong>Single Page App</strong> (damit der OAuth 2.0 PKCE Flow unterstützt wird).</li>
-<li><strong>Callback Image / Redirect URI</strong>: Trage exakt <code>http://localhost:8753/callback</code> ein. (Das CLI startet einen lokalen Webserver unter diesem Port, um den Autorisierungscode abzufangen).</li>
+<li><strong>App Permissions</strong>: Wähle <strong>Read and Write</strong> (wichtig für Schreibrechte).</li>
+<li><strong>Type of App</strong>: Wähle <strong>Native App</strong> oder <strong>Single Page App</strong> (für OAuth 2.0 PKCE).</li>
+<li><strong>Callback URI / Redirect URL</strong>: Trage exakt <code>http://localhost:8753/callback</code> ein.</li>
 <li><strong>Website URL</strong>: Trage deine eigene Website oder <code>https://github.com/aeon022/postctl</code> ein.</li>
 </ul>
 </li>
+<li>Speichere die Einstellungen und kopiere die angezeigte <strong>Client ID</strong> und das <strong>Client Secret</strong> an einen sicheren Ort.</li>
 </ol>
-<hr>
-<h2 id="3-client-id--client-secret-erhalten">3. Client ID &amp; Client Secret erhalten</h2>
-<p>Nach dem Speichern der Authentifizierungseinstellungen zeigt dir das Developer Portal deine <strong>OAuth 2.0 Client ID</strong> und dein <strong>Client Secret</strong> an.</p>
-<blockquote>
-<p>[!IMPORTANT]
-Sichere diese Werte sofort. Das Client Secret wird nur einmalig angezeigt.</p>
-</blockquote>
-<hr>
-<h2 id="4-in-postctl-eintragen">4. In <code>postctl</code> eintragen</h2>
-<p>Verwende das <code>postctl config set</code> Kommando, um deine Schlüssel zu speichern (nutze das lokale Binary <code>./postctl</code>):</p>
+<h3 id="schritt-2-schlüssel-hinterlegen">Schritt 2: Schlüssel hinterlegen</h3>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># Client ID eintragen</span></span>
 <span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> set</span><span style="color:#9ECBFF"> twitter.client_id</span><span style="color:#9ECBFF"> "DEINE_CLIENT_ID"</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A737D"># Client Secret eintragen</span></span>
 <span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> set</span><span style="color:#9ECBFF"> twitter.client_secret</span><span style="color:#9ECBFF"> "DEIN_CLIENT_SECRET"</span></span></code></pre>
-<p>Du kannst die Konfiguration mit folgendem Befehl überprüfen:</p>
-<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> show</span></span></code></pre>
-<hr>
-<h2 id="5-authentifizierung-starten">5. Authentifizierung starten</h2>
-<p>Führe danach den OAuth-Flow aus:</p>
+<h3 id="schritt-3-authentifizierung-durchführen">Schritt 3: Authentifizierung durchführen</h3>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> auth</span><span style="color:#9ECBFF"> twitter</span></span></code></pre>
-<ol>
-<li>Es öffnet sich automatisch ein Browserfenster mit dem Twitter-Autorisierungsdialog.</li>
-<li>Bestätige den Zugriff.</li>
-<li>Nach erfolgreicher Bestätigung speichert <code>postctl</code> dein verschlüsseltes Access- und Refresh-Token in der SQLite-Datenbank.</li>
-<li>Du bist nun bereit, Tweets mit <code>./postctl post</code> oder <code>./postctl campaign post</code> zu veröffentlichen (sofern ein bezahltes API-Tier aktiv ist).</li>
-</ol>
+<p>Es öffnet sich ein Browserfenster, in dem du der App den Zugriff erlaubst. Nach erfolgreichem Login speichert <code>postctl</code> dein verschlüsseltes Access- und Refresh-Token.</p>
 </div></section><!-- Tab 6: LinkedIn Setup --><section class="doc-section" id="doc-api-linkedin"><div class="doc-body markdown-content"><h1 id="linkedin-api-setup-guide-für-postctl">LinkedIn API Setup Guide für postctl</h1>
 <p>Dieses Dokument beschreibt Schritt für Schritt, wie du eine LinkedIn-Entwickler-App erstellst, diese auf das moderne OpenID Connect (OIDC) migrierst und deine Zugangsdaten für <code>postctl</code> einrichtest.</p>
 <hr>
