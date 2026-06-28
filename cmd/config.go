@@ -402,6 +402,7 @@ var configSetupCmd = &cobra.Command{
 				fmt.Printf("\n❌ Fehler beim Speichern der Konfiguration: %v\n", err)
 				return
 			}
+			fmt.Println("⚠️ WARNUNG: Die Cookie-basierte Methode ist inoffiziell, fehleranfällig und kann zur Sperrung deines Kontos führen.")
 			fmt.Println("✔ Twitter/X wurde erfolgreich über Flags im Cookie-Modus verbunden!")
 			return
 		}
@@ -421,8 +422,8 @@ var configSetupCmd = &cobra.Command{
 		switch platform {
 		case "twitter":
 			fmt.Println("Wähle die Verbindungsmethode für Twitter/X:")
-			fmt.Println("  1) Offizielle API (erfordert Client ID & Client Secret)")
-			fmt.Println("  2) Cookie-basiert (ohne API-Schlüssel, erfordert auth_token & ct0)")
+			fmt.Println("  1) Offizielle API (Erfordert kostenpflichtigen API-Zugang/Credits) [Empfohlen/Sicher]")
+			fmt.Println("  2) Cookie-basiert (Kostenloser inoffizieller Weg, aber fehleranfällig; Risiko von Kontosperrung!)")
 			fmt.Println()
 			fmt.Print("➔ Deine Wahl (1 oder 2, Standard: 1): ")
 			choice, _ := reader.ReadString('\n')
@@ -431,6 +432,11 @@ var configSetupCmd = &cobra.Command{
 			if choice == "2" {
 				config.ActiveConfig.Twitter.AuthMode = "cookie"
 				
+				fmt.Println()
+				fmt.Println("⚠️ WARNUNG & SICHERHEITSHINWEIS:")
+				fmt.Println("Die Cookie-basierte Methode ist ein inoffizieller Umgehungsversuch. Sie simuliert")
+				fmt.Println("eine Websitzung und kann fehlerhaft sein oder zur Sperrung deines X-Kontos führen.")
+				fmt.Println("Offiziell wird nur der API-Zugang mit kostenpflichtigen Credits unterstützt.")
 				fmt.Println()
 				fmt.Println("Anleitung zur Cookie-Extraktion:")
 				fmt.Println("  1. Öffne twitter.com im Browser und logge dich ein.")
@@ -471,7 +477,8 @@ var configSetupCmd = &cobra.Command{
 				config.ActiveConfig.Twitter.ClientID = ""
 				config.ActiveConfig.Twitter.ClientSecret = ""
 
-				fmt.Println("\n✔ Twitter/X wurde erfolgreich im Cookie-Modus verbunden!")
+				fmt.Println("\n⚠️ Die Cookie-basierte Methode ist inoffiziell, fehleranfällig und birgt Risiken.")
+				fmt.Println("✔ Twitter/X wurde erfolgreich im Cookie-Modus verbunden!")
 			} else {
 				config.ActiveConfig.Twitter.AuthMode = "api"
 				

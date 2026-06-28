@@ -12,13 +12,12 @@ Es stehen dir zwei Optionen zur Verfügung:
 
 Diese Methode simuliert eine echte Browser-Sitzung, indem sie deine Anmelde-Cookies verwendet. Sie ist vollkommen kostenlos und erfordert keine Einrichtung im Twitter Developer Portal.
 
-> [!TIP]
-> **Warum diese Methode stabil läuft:**
-> `postctl` verwendet eine optimierte Desktop-Web-Imitation (Google Chrome auf macOS User-Agent, passende `Sec-Ch-Ua`-Verifikations-Header & GraphQL-Schnittstelle `SiM_cAu83R0wnrpmKQQSEw`). Dadurch entfallen zusätzliche Sicherheits-Header wie `x-client-transaction-id` und deine Beiträge werden ohne Bot-Erkennungsfehler (`226 automated request`) oder Captchas veröffentlicht. Zudem schützt eine automatische Pause von 5 Sekunden zwischen Thread-Tweets dein Konto vor Spam-Flags.
-
-> [!IMPORTANT]
-> **Kompletten Cookie-String kopieren (WICHTIG):**
-> X (Twitter) verlangt für Beitragsveröffentlichungen zwingend auch das **`twid`**-Cookie (deine User-ID) und Session-Details. Kopiere daher immer den **kompletten Cookie-String** deines Browsers und füge ihn bei `--cookie` ein, um den Spam-Erkennungsfehler `226` zu vermeiden.
+> [!WARNING]
+> **Inoffizielle Umgehungsmethode (Risiko von Kontosperrung):**
+> Die Cookie-basierte Authentifizierung simuliert eine Web-Sitzung. Diese Methode ist fehleranfällig, verstößt gegen die Nutzungsbedingungen (ToS) von X/Twitter und kann zur Sperrung deines Kontos führen. Der einzig offizielle und sichere Weg zum Posten ist die Verwendung der kostenpflichtigen API (Option B).
+> 
+> * `postctl` versucht, durch Header-Imitation und künstliche Pausen (5 Sekunden zwischen Beiträgen) das Risiko zu minimieren, bietet aber keine Garantie.
+> * X verlangt zwingend auch das **`twid`**-Cookie (deine User-ID). Trage daher stets den **kompletten Cookie-String** oder beide Cookies (`auth_token` und `ct0`) ein.
 
 ### Schritt 1: Komplette Browser-Cookies auslesen
 

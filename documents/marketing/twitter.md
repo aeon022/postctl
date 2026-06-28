@@ -2,7 +2,7 @@
 platform: twitter
 type: thread
 campaign: postctl-launch
-schedule: 2026-06-28 15:00:00
+schedule: 2026-06-28 16:05:00
 images: ["/Users/gweiher/Developing/Projects/# Screenshots/postctl/01-dashboard.png"]
 ---
 
