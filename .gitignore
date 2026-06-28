@@ -31,3 +31,6 @@ Thumbs.db
 .astro/
 dist/
 node_modules/
+
+# Private licensing credentials
+dev-licenses.md
