@@ -54,7 +54,7 @@ chmod +x setup.sh
 ```
 
 For platform-specific setup details and authentication instructions, see the guides:
-* 🐦 [Twitter/X API & Cookie Setup Guide](docs/api-twitter.md) (Official paid API setup or free unofficial cookie bypass, troubleshooting `empty tweet ID` errors)
+* 🐦 [Twitter/X API & Cookie Setup Guide](docs/api-twitter-en.md) (Official paid API setup or free unofficial cookie bypass, troubleshooting `empty tweet ID` errors)
 
 ---
 

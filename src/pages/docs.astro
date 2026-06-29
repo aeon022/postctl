@@ -2,11 +2,15 @@
 import Layout from '../layouts/Layout.astro';
 import * as ReadmeDoc from '../../README.md';
 import { Search } from '@lucide/astro';
-import * as TwitterDoc from '../../docs/api-twitter.md';
-import * as LinkedinDoc from '../../docs/api-linkedin.md';
-import * as ThreadsDoc from '../../docs/api-threads.md';
+import * as TwitterDocDe from '../../docs/api-twitter.md';
+import * as TwitterDocEn from '../../docs/api-twitter-en.md';
+import * as LinkedinDocDe from '../../docs/api-linkedin.md';
+import * as LinkedinDocEn from '../../docs/api-linkedin-en.md';
+import * as ThreadsDocDe from '../../docs/api-threads.md';
+import * as ThreadsDocEn from '../../docs/api-threads-en.md';
 import * as SpecDoc from '../../documents/SPEC.md';
-import * as TutorialDoc from '../../documents/TUTORIAL.md';
+import * as TutorialDocDe from '../../documents/TUTORIAL.md';
+import * as TutorialDocEn from '../../documents/TUTORIAL-en.md';
 ---
 
 <Layout title="postctl Docs — Terminal-Native Social Media Management">
@@ -25,15 +29,19 @@ import * as TutorialDoc from '../../documents/TUTORIAL.md';
 				</a>
 				<span class="system-status"><span class="status-dot"></span>DOCS_ONLINE</span>
 			</div>
-			<nav class="sidebar-nav">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/#features" class="nav-link">Features</a>
-        <a href="/#screenshots" class="nav-link">Screenshots</a>
-        <a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="nav-link">Support</a>
+			<nav class="sidebar-nav" style="display: flex; align-items: center; gap: 1rem;">
+        <a href="/" class="nav-link"><span class="lang-en">Home</span><span class="lang-de">Start</span></a>
+        <a href="/#features" class="nav-link"><span class="lang-en">Features</span><span class="lang-de">Funktionen</span></a>
+        <a href="/#screenshots" class="nav-link"><span class="lang-en">Screenshots</span><span class="lang-de">Bilder</span></a>
+        <a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="lang-en">Support</span><span class="lang-de">Unterstützen</span></a>
         <a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="nav-link github-link">
             <svg height="14" viewBox="0 0 16 16" width="14" class="github-icon"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
             <span>src_code</span>
         </a>
+        <button id="lang-toggle" class="lang-toggle-btn" aria-label="Toggle Language" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+            <span class="lang-en">DE</span>
+            <span class="lang-de">EN</span>
+        </button>
 			</nav>
 		</div>
 	</header>
@@ -66,37 +74,49 @@ import * as TutorialDoc from '../../documents/TUTORIAL.md';
 
 				<div class="sidebar-nav">
 					<div class="nav-group" data-group="getting-started">
-						<h4 class="group-title">Getting Started</h4>
+						<h4 class="group-title">
+							<span class="lang-en">Getting Started</span>
+							<span class="lang-de">Erste Schritte</span>
+						</h4>
 						<ul class="group-list">
-							<li><button class="nav-item active" data-doc="introduction">Introduction</button></li>
-							<li><button class="nav-item" data-doc="installation">Installation & Setup</button></li>
+							<li><button class="nav-item active" data-doc="introduction"><span class="lang-en">Introduction</span><span class="lang-de">Einführung</span></button></li>
+							<li><button class="nav-item" data-doc="installation"><span class="lang-en">Installation & Setup</span><span class="lang-de">Installation & Setup</span></button></li>
 						</ul>
 					</div>
 
 					<div class="nav-group" data-group="user-guides">
-						<h4 class="group-title">User Guides</h4>
+						<h4 class="group-title">
+							<span class="lang-en">User Guides</span>
+							<span class="lang-de">Handbücher</span>
+						</h4>
 						<ul class="group-list">
-							<li><button class="nav-item" data-doc="vim-flow">Vim / Neovim Editor</button></li>
-							<li><button class="nav-item" data-doc="image-resolution">Image Path Resolution</button></li>
+							<li><button class="nav-item" data-doc="vim-flow"><span class="lang-en">Vim / Neovim Editor</span><span class="lang-de">Vim / Neovim Editor</span></button></li>
+							<li><button class="nav-item" data-doc="image-resolution"><span class="lang-en">Image Path Resolution</span><span class="lang-de">Bildpfad-Auflösung</span></button></li>
 						</ul>
 					</div>
 
 					<div class="nav-group" data-group="api-integrations">
-						<h4 class="group-title">API Integrations</h4>
+						<h4 class="group-title">
+							<span class="lang-en">API Integrations</span>
+							<span class="lang-de">API-Integrationen</span>
+						</h4>
 						<ul class="group-list">
-							<li><button class="nav-item" data-doc="api-twitter">Twitter / X</button></li>
-							<li><button class="nav-item" data-doc="api-linkedin">LinkedIn (OIDC)</button></li>
-							<li><button class="nav-item" data-doc="api-threads">Threads (Meta)</button></li>
-							<li><button class="nav-item" data-doc="api-bluesky-mastodon">Bluesky & Mastodon</button></li>
-							<li><button class="nav-item" data-doc="api-facebook">Facebook Setup</button></li>
+							<li><button class="nav-item" data-doc="api-twitter"><span class="lang-en">Twitter / X</span><span class="lang-de">Twitter / X</span></button></li>
+							<li><button class="nav-item" data-doc="api-linkedin"><span class="lang-en">LinkedIn (OIDC)</span><span class="lang-de">LinkedIn (OIDC)</span></button></li>
+							<li><button class="nav-item" data-doc="api-threads"><span class="lang-en">Threads (Meta)</span><span class="lang-de">Threads (Meta)</span></button></li>
+							<li><button class="nav-item" data-doc="api-bluesky-mastodon"><span class="lang-en">Bluesky & Mastodon</span><span class="lang-de">Bluesky & Mastodon</span></button></li>
+							<li><button class="nav-item" data-doc="api-facebook"><span class="lang-en">Facebook Setup</span><span class="lang-de">Facebook Setup</span></button></li>
 						</ul>
 					</div>
 
 					<div class="nav-group" data-group="technical-specs">
-						<h4 class="group-title">Architecture & Code</h4>
+						<h4 class="group-title">
+							<span class="lang-en">Architecture & Code</span>
+							<span class="lang-de">Architektur & Code</span>
+						</h4>
 						<ul class="group-list">
-							<li><button class="nav-item" data-doc="system-spec">System Specification</button></li>
-							<li><button class="nav-item" data-doc="go-tutorial">Go Tutorial Guide</button></li>
+							<li><button class="nav-item" data-doc="system-spec"><span class="lang-en">System Specification</span><span class="lang-de">System-Spezifikation</span></button></li>
+							<li><button class="nav-item" data-doc="go-tutorial"><span class="lang-en">Go Tutorial Guide</span><span class="lang-de">Go Tutorial-Handbuch</span></button></li>
 						</ul>
 					</div>
 				</div>
@@ -114,32 +134,33 @@ import * as TutorialDoc from '../../documents/TUTORIAL.md';
 				<!-- Tab 2: Installation -->
 				<section class="doc-section" id="doc-installation">
 					<div class="doc-body markdown-content">
-						<h1>Installation & Setup Guide</h1>
-						<p>Get started with <code>postctl</code> by building the binary and initializing your local developer workspace.</p>
-						
-						<h2>System Requirements</h2>
-						<ul>
-							<li><strong>Operating System:</strong> macOS, Linux, or Windows (WSL recommended).</li>
-							<li><strong>Go Toolchain:</strong> Go 1.22 or higher installed on your system.</li>
-							<li><strong>SQLite:</strong> Local SQLite client library (CGO-free driver is compiled directly inside).</li>
-						</ul>
+						<div class="lang-en">
+							<h1>Installation & Setup Guide</h1>
+							<p>Get started with <code>postctl</code> by building the binary and initializing your local developer workspace.</p>
+							
+							<h2>System Requirements</h2>
+							<ul>
+								<li><strong>Operating System:</strong> macOS, Linux, or Windows (WSL recommended).</li>
+								<li><strong>Go Toolchain:</strong> Go 1.22 or higher installed on your system.</li>
+								<li><strong>SQLite:</strong> Local SQLite client library (CGO-free driver is compiled directly inside).</li>
+							</ul>
 
-						<h2>One-Step Automatic setup</h2>
-						<p>The easiest way to initialize the application, databases, and dependencies is to run the interactive setup script:</p>
-						<pre class="code-block" data-lang="bash"><code>chmod +x setup.sh
+							<h2>One-Step Automatic Setup</h2>
+							<p>The easiest way to initialize the application, databases, and dependencies is to run the interactive setup script:</p>
+							<pre class="code-block" data-lang="bash"><code>chmod +x setup.sh
 ./setup.sh</code></pre>
-						<p>The setup script will:</p>
-						<ol>
-							<li>Verify your local Go environment.</li>
-							<li>Download required packages (including Bubble Tea, Cobra, and SQLite).</li>
-							<li>Build the production binary <code>postctl</code>.</li>
-							<li>Create the configuration directory at <code>~/.config/postctl/</code>.</li>
-							<li>Generate a default <code>config.yaml</code> and empty SQLite database.</li>
-						</ol>
+							<p>The setup script will:</p>
+							<ol>
+								<li>Verify your local Go environment.</li>
+								<li>Download required packages (including Bubble Tea, Cobra, and SQLite).</li>
+								<li>Build the production binary <code>postctl</code>.</li>
+								<li>Create the configuration directory at <code>~/.config/postctl/</code>.</li>
+								<li>Generate a default <code>config.yaml</code> and empty SQLite database.</li>
+							</ol>
 
-						<h2>Manual Compilation</h2>
-						<p>If you prefer to compile the application manually, run:</p>
-						<pre class="code-block" data-lang="bash"><code># Download dependencies
+							<h2>Manual Compilation</h2>
+							<p>If you prefer to compile the application manually, run:</p>
+							<pre class="code-block" data-lang="bash"><code># Download dependencies
 go mod download
 
 # Build binary with embedded assets
@@ -148,12 +169,55 @@ go build -o postctl main.go
 # Run help command to verify
 ./postctl --help</code></pre>
 
-						<h2>Configuration Directory</h2>
-						<p>The application creates and expects files in the user config directory: <code>~/.config/postctl/</code></p>
-						<ul>
-							<li><code>config.yaml</code>: Holds all your global default preferences, AI configurations, and platform API credentials.</li>
-							<li><code>postctl.db</code>: The local SQLite database housing campaigns, post statuses, histories, and encrypted credentials.</li>
-						</ul>
+							<h2>Configuration Directory</h2>
+							<p>The application creates and expects files in the user config directory: <code>~/.config/postctl/</code></p>
+							<ul>
+								<li><code>config.yaml</code>: Holds all your global default preferences, AI configurations, and platform API credentials.</li>
+								<li><code>postctl.db</code>: The local SQLite database housing campaigns, post statuses, histories, and encrypted credentials.</li>
+							</ul>
+						</div>
+						<div class="lang-de">
+							<h1>Installations- & Einrichtungsanleitung</h1>
+							<p>Beginne mit <code>postctl</code>, indem du das Binary kompilierst und deinen lokalen Entwickler-Arbeitsbereich initialisierst.</p>
+							
+							<h2>Systemanforderungen</h2>
+							<ul>
+								<li><strong>Betriebssystem:</strong> macOS, Linux oder Windows (WSL empfohlen).</li>
+								<li><strong>Go-Toolchain:</strong> Go 1.22 oder höher auf deinem System installiert.</li>
+								<li><strong>SQLite:</strong> Lokale SQLite-Clientbibliothek (der CGO-freie Treiber ist direkt einkompiliert).</li>
+							</ul>
+
+							<h2>Automatische Einrichtung in einem Schritt</h2>
+							<p>Der einfachste Weg, die Anwendung, Datenbanken und Abhängigkeiten zu initialisieren, ist die Ausführung des interaktiven Setup-Skripts:</p>
+							<pre class="code-block" data-lang="bash"><code>chmod +x setup.sh
+./setup.sh</code></pre>
+							<p>Das Setup-Skript führt folgende Schritte aus:</p>
+							<ol>
+								<li>Überprüfung deiner lokalen Go-Umgebung.</li>
+								<li>Herunterladen der benötigten Pakete (einschließlich Bubble Tea, Cobra und SQLite).</li>
+								<li>Kompilieren des Produktions-Binaries <code>postctl</code>.</li>
+								<li>Erstellen des Konfigurationsverzeichnisses unter <code>~/.config/postctl/</code>.</li>
+								<li>Generieren einer Standard-<code>config.yaml</code> und einer leeren SQLite-Datenbank.</li>
+							</ol>
+
+							<h2>Manuelle Kompilierung</h2>
+							<p>Wenn du die Anwendung lieber manuell kompilieren möchtest, führe folgende Befehle aus:</p>
+							<pre class="code-block" data-lang="bash"><code># Abhängigkeiten herunterladen
+go mod download
+
+# Binary mit eingebetteten Assets bauen
+go build -o postctl main.go
+
+# Hilfe-Befehl zur Überprüfung ausführen
+./postctl --help</code></pre>
+
+							<h2>Konfigurationsverzeichnis</h2>
+							<p>Die Anwendung erstellt und erwartet Dateien im Benutzerkonfigurationsverzeichnis: <code>~/.config/postctl/</code></p>
+							<ul>
+								<li><code>config.yaml</code>: Enthält alle deine globalen Standardeinstellungen, KI-Konfigurationen und Plattform-API-Zugangsdaten.</li>
+								<li><code>postctl.db</code>: Die lokale SQLite-Datenbank, die Kampagnen, Post-Status, Verläufe und verschlüsselte Zugangsdaten speichert.</li>
+							</ul>
+						</div>
 					</div>
 				</section>
 
@@ -239,21 +303,36 @@ images: ["logo.png"]
 				<!-- Tab 5: Twitter / X Setup -->
 				<section class="doc-section" id="doc-api-twitter">
 					<div class="doc-body markdown-content">
-						<TwitterDoc.Content />
+						<div class="lang-de">
+							<TwitterDocDe.Content />
+						</div>
+						<div class="lang-en">
+							<TwitterDocEn.Content />
+						</div>
 					</div>
 				</section>
 
 				<!-- Tab 6: LinkedIn Setup -->
 				<section class="doc-section" id="doc-api-linkedin">
 					<div class="doc-body markdown-content">
-						<LinkedinDoc.Content />
+						<div class="lang-de">
+							<LinkedinDocDe.Content />
+						</div>
+						<div class="lang-en">
+							<LinkedinDocEn.Content />
+						</div>
 					</div>
 				</section>
 
 				<!-- Tab 7: Threads Setup -->
 				<section class="doc-section" id="doc-api-threads">
 					<div class="doc-body markdown-content">
-						<ThreadsDoc.Content />
+						<div class="lang-de">
+							<ThreadsDocDe.Content />
+						</div>
+						<div class="lang-en">
+							<ThreadsDocEn.Content />
+						</div>
 					</div>
 				</section>
 
@@ -345,7 +424,12 @@ images: ["logo.png"]
 				<!-- Tab 11: Go Tutorial -->
 				<section class="doc-section" id="doc-go-tutorial">
 					<div class="doc-body markdown-content">
-						<TutorialDoc.Content />
+						<div class="lang-de">
+							<TutorialDocDe.Content />
+						</div>
+						<div class="lang-en">
+							<TutorialDocEn.Content />
+						</div>
 					</div>
 				</section>
 			</main>
@@ -379,9 +463,95 @@ images: ["logo.png"]
 			</div>
 		</div>
 	</footer>
+
+	<script is:inline>
+		// Language configuration
+		function updateLang(lang) {
+			document.documentElement.setAttribute('lang', lang);
+			localStorage.setItem('preferred-lang', lang);
+		}
+
+		// Detect language
+		const savedLang = localStorage.getItem('preferred-lang');
+		const browserLang = (navigator.language || navigator.userLanguage).startsWith('de') ? 'de' : 'en';
+		const initialLang = savedLang || browserLang;
+		updateLang(initialLang);
+
+		document.addEventListener('DOMContentLoaded', () => {
+			// Setup toggle button
+			const btn = document.getElementById('lang-toggle');
+			if (btn) {
+				btn.addEventListener('click', () => {
+					const current = document.documentElement.getAttribute('lang') || 'en';
+					const next = current === 'en' ? 'de' : 'en';
+					updateLang(next);
+				});
+			}
+
+			// Split README content into en/de sections dynamically
+			const introSec = document.getElementById('doc-introduction');
+			if (introSec) {
+				const contentDiv = introSec.querySelector('.markdown-content');
+				if (contentDiv) {
+					const headers = Array.from(contentDiv.querySelectorAll('h2'));
+					const enHeader = headers.find(h => h.textContent.includes('English'));
+					const deHeader = headers.find(h => h.textContent.includes('Deutsche') || h.textContent.includes('Deutsch'));
+					
+					if (enHeader && deHeader) {
+						const enWrapper = document.createElement('div');
+						enWrapper.className = 'lang-en';
+						const deWrapper = document.createElement('div');
+						deWrapper.className = 'lang-de';
+						
+						let currentWrapper = enWrapper;
+						let node = enHeader.nextSibling;
+						while (node) {
+							const nextNode = node.nextSibling;
+							if (node === deHeader) {
+								currentWrapper = deWrapper;
+								node = nextNode;
+								continue;
+							}
+							currentWrapper.appendChild(node);
+							node = nextNode;
+						}
+						
+						contentDiv.innerHTML = '';
+						contentDiv.appendChild(enWrapper);
+						contentDiv.appendChild(deWrapper);
+					}
+				}
+			}
+		});
+	</script>
 </Layout>
 
 <style is:global>
+	/* Language Switcher CSS */
+	html[lang="de"] .lang-en { display: none !important; }
+	html[lang="en"] .lang-de { display: none !important; }
+
+	.lang-toggle-btn {
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		color: #e2e8f0;
+		padding: 0.25rem 0.6rem;
+		border-radius: 6px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.lang-toggle-btn:hover {
+		background: rgba(139, 124, 248, 0.15);
+		border-color: rgba(139, 124, 248, 0.4);
+		color: #fff;
+		box-shadow: 0 0 10px rgba(139, 124, 248, 0.2);
+	}
+
 	/* Header Navigation */
 	.header {
 		position: sticky;
