@@ -3,7 +3,7 @@ id: postctl-marketing-threads
 platform: threads
 type: single
 campaign: postctl-marketing
-scheduled_at: 2026-06-30T10:00:00Z
+schedule: "2026-06-30 09:00"
 ---
 Tired of clicking through heavy web interfaces just to schedule a post? 
 
