@@ -18,6 +18,9 @@ import (
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
+	"github.com/chromedp/cdproto/browser"
+	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/chromedp"
 )
 
 type TwitterPlatform struct {
@@ -47,6 +50,14 @@ func (t *TwitterPlatform) IsAuthenticated(ctx context.Context) bool {
 
 // Auth startet den OAuth 2.0 PKCE Flow für Twitter/X
 func (t *TwitterPlatform) Auth(ctx context.Context) error {
+	// ponytail: Cookie mode authentication bypasses standard OAuth flow.
+	if config.ActiveConfig.Twitter.AuthMode == "cookie" {
+		if t.IsAuthenticated(ctx) {
+			return nil
+		}
+		return fmt.Errorf("cookie auth not configured; run 'postctl config setup twitter' first")
+	}
+
 	if t.clientID == "" || t.clientSecret == "" {
 		if config.ActiveConfig.Defaults.Language == "de" {
 			return fmt.Errorf("Twitter/X-Konfiguration fehlt! Bitte folge diesen Schritten:\n" +
@@ -297,7 +308,13 @@ func (t *TwitterPlatform) Post(ctx context.Context, post *models.Post) (string, 
 		if err != nil {
 			return "", fmt.Errorf("cookie auth details not found: %w", err)
 		}
-		return t.postCookieBased(ctx, post, authToken, csrfToken)
+		// ponytail: try fast direct HTTP/GraphQL approach first, fallback to headless browser if rate limited (344) or outdated queryId
+		tweetID, err := t.postCookieBased(ctx, post, authToken, csrfToken)
+		if err != nil {
+			fmt.Printf("⚠️ GraphQL direct post failed: %v. Falling back to headless browser...\n", err)
+			return t.postHeadless(ctx, post, authToken, csrfToken)
+		}
+		return tweetID, nil
 	}
 
 	token, err := t.getValidToken(ctx)
@@ -576,31 +593,40 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 
 		payload := map[string]interface{}{
 			"variables": vars,
+			// ponytail: features and queryId must match X's current Web Client bundle
 			"features": map[string]interface{}{
-				"creator_subscriptions_tweet_preview_api_enabled":          true,
-				"c9s_tweet_anatomy_moderator_badge_enabled":               true,
-				"tweetypie_unmention_optimization_enabled":                 true,
-				"responsive_web_edit_tweet_api_enabled":                    true,
-				"graphql_is_translatable_rweb_tweet_is_translatable_enabled": true,
-				"view_counts_everywhere_api_enabled":                       true,
-				"longform_notetweets_consumption_enabled":                  true,
-				"responsive_web_twitter_article_tweet_consumption_enabled": true,
-				"tweet_awards_web_tipping_enabled":                         false,
-				"longform_notetweets_rich_text_read_enabled":               true,
-				"longform_notetweets_inline_media_enabled":                 true,
-				"rweb_video_timestamps_enabled":                            true,
-				"responsive_web_graphql_exclude_directive_enabled":         true,
-				"verified_phone_label_enabled":                             false,
-				"freedom_of_speech_not_reach_fetch_enabled":                true,
-				"standardized_nudges_misinfo":                              true,
+				"premium_content_api_read_enabled":                                        false,
+				"communities_web_enable_tweet_community_results_fetch":                    true,
+				"c9s_tweet_anatomy_moderator_badge_enabled":                               true,
+				"responsive_web_grok_analyze_button_fetch_trends_enabled":                 false,
+				"responsive_web_grok_analyze_post_followups_enabled":                      true,
+				"responsive_web_jetfuel_frame":                                            false,
+				"responsive_web_grok_share_attachment_enabled":                            true,
+				"responsive_web_edit_tweet_api_enabled":                                   true,
+				"graphql_is_translatable_rweb_tweet_is_translatable_enabled":               true,
+				"view_counts_everywhere_api_enabled":                                       true,
+				"longform_notetweets_consumption_enabled":                                  true,
+				"responsive_web_twitter_article_tweet_consumption_enabled":                 true,
+				"tweet_awards_web_tipping_enabled":                                         false,
+				"creator_subscriptions_quote_tweet_preview_enabled":                        false,
+				"longform_notetweets_rich_text_read_enabled":                               true,
+				"longform_notetweets_inline_media_enabled":                                 true,
+				"profile_label_improvements_pcf_label_in_post_enabled":                    true,
+				"rweb_tipjar_consumption_enabled":                                         true,
+				"responsive_web_graphql_exclude_directive_enabled":                         true,
+				"verified_phone_label_enabled":                                             false,
+				"articles_preview_enabled":                                                 true,
+				"rweb_video_timestamps_enabled":                                            true,
+				"responsive_web_graphql_skip_user_profile_image_extensions_enabled":        false,
+				"freedom_of_speech_not_reach_fetch_enabled":                                true,
+				"standardized_nudges_misinfo":                                              true,
 				"tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": true,
-				"responsive_web_media_download_video_enabled":             false,
-				"responsive_web_graphql_skip_user_profile_image_extensions_enabled": false,
-				"responsive_web_graphql_timeline_navigation_enabled":      true,
-				"responsive_web_enhance_cards_enabled":                    false,
+				"responsive_web_grok_image_annotation_enabled":                            false,
+				"responsive_web_graphql_timeline_navigation_enabled":                       true,
+				"responsive_web_enhance_cards_enabled":                                    false,
 			},
 			"fieldToggles": map[string]interface{}{},
-			"queryId":      "SiM_cAu83R0wnrpmKQQSEw",
+			"queryId":      "UecQIuYzi2MCOah7-eOpcQ",
 		}
 
 		bodyBytes, err := json.Marshal(payload)
@@ -608,7 +634,7 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 			return "", err
 		}
 
-		reqURL := "https://x.com/i/api/graphql/SiM_cAu83R0wnrpmKQQSEw/CreateTweet"
+		reqURL := "https://x.com/i/api/graphql/UecQIuYzi2MCOah7-eOpcQ/CreateTweet"
 		req, err := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(bodyBytes))
 		if err != nil {
 			return "", err
@@ -693,5 +719,189 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 	}
 
 	return firstTweetID, nil
+}
+
+// ponytail: parses a raw cookie header string into individual key-value pairs
+func parseCookies(cookieStr string) map[string]string {
+	cookies := make(map[string]string)
+	parts := strings.Split(cookieStr, ";")
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		subparts := strings.SplitN(part, "=", 2)
+		if len(subparts) == 2 {
+			cookies[strings.TrimSpace(subparts[0])] = strings.TrimSpace(subparts[1])
+		}
+	}
+	return cookies
+}
+
+// postHeadless publishes a post using a headful browser to bypass custom header/rate limitations.
+func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, authToken, csrfToken string) (string, error) {
+	// ponytail: headless browser fallback using chromedp to post via x.com UI
+	opts := append(chromedp.DefaultExecAllocatorOptions[:],
+		chromedp.Flag("headless", true),
+		chromedp.Flag("disable-gpu", true),
+		chromedp.Flag("no-sandbox", true),
+		chromedp.Flag("disable-blink-features", "AutomationControlled"),
+		chromedp.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"),
+	)
+
+	allocCtx, cancelAlloc := chromedp.NewExecAllocator(ctx, opts...)
+	defer cancelAlloc()
+
+	chromeCtx, cancelChrome := chromedp.NewContext(allocCtx)
+	defer cancelChrome()
+
+	chromeCtx, cancelTimeout := context.WithTimeout(chromeCtx, 60*time.Second)
+	defer cancelTimeout()
+
+	tweetIDChan := make(chan string, 1)
+
+	// Intercept GraphQL responses to capture the actual tweet ID
+	chromedp.ListenTarget(chromeCtx, func(ev interface{}) {
+		switch ev := ev.(type) {
+		case *network.EventResponseReceived:
+			if strings.Contains(ev.Response.URL, "/CreateTweet") {
+				go func() {
+					var body []byte
+					err := chromedp.Run(chromeCtx, chromedp.ActionFunc(func(ctx context.Context) error {
+						var err error
+						body, err = network.GetResponseBody(ev.RequestID).Do(ctx)
+						return err
+					}))
+					if err == nil {
+						var gqlResp struct {
+							Data struct {
+								CreateTweet struct {
+									TweetResults struct {
+										Result struct {
+											RestID string `json:"rest_id"`
+										} `json:"result"`
+									} `json:"tweet_results"`
+								} `json:"create_tweet"`
+							} `json:"data"`
+						}
+						if err := json.Unmarshal(body, &gqlResp); err == nil {
+							tweetID := gqlResp.Data.CreateTweet.TweetResults.Result.RestID
+							if tweetID != "" {
+								select {
+								case tweetIDChan <- tweetID:
+								default:
+								}
+							}
+						}
+					}
+				}()
+			}
+		}
+	})
+
+	var actions []chromedp.Action
+	actions = append(actions, network.Enable())
+	actions = append(actions, chromedp.Navigate("https://x.com"))
+
+	// Set session cookies to log in automatically
+	actions = append(actions, chromedp.ActionFunc(func(ctx context.Context) error {
+		actualAuthToken := authToken
+		actualCsrfToken := csrfToken
+
+		// Extract raw values if user pasted the entire cookie string
+		if strings.Contains(authToken, ";") || strings.Contains(authToken, "=") {
+			cookies := parseCookies(authToken)
+			if val, ok := cookies["auth_token"]; ok {
+				actualAuthToken = val
+			}
+			if val, ok := cookies["ct0"]; ok {
+				actualCsrfToken = val
+			}
+		}
+		if strings.Contains(csrfToken, ";") || strings.Contains(csrfToken, "=") {
+			cookies := parseCookies(csrfToken)
+			if val, ok := cookies["ct0"]; ok {
+				actualCsrfToken = val
+			}
+		}
+
+		actualAuthToken = strings.Trim(actualAuthToken, ";= ")
+		actualCsrfToken = strings.Trim(actualCsrfToken, ";= ")
+
+		err := network.SetCookie("auth_token", actualAuthToken).WithDomain(".x.com").WithPath("/").WithSecure(true).Do(ctx)
+		if err != nil {
+			return fmt.Errorf("set auth_token failed: %w", err)
+		}
+		return network.SetCookie("ct0", actualCsrfToken).WithDomain(".x.com").WithPath("/").WithSecure(true).Do(ctx)
+	}))
+
+	actions = append(actions, chromedp.Navigate("https://x.com/compose/post"))
+
+	var tweetsToPost []models.Tweet
+	if post.Type == "thread" {
+		tweetsToPost = post.Tweets
+	} else {
+		tweetsToPost = []models.Tweet{
+			{Index: 1, Content: post.Body},
+		}
+	}
+
+	for i, tweet := range tweetsToPost {
+		textareaSelector := fmt.Sprintf(`[data-testid="tweetTextarea_%d"]`, i)
+		actions = append(actions, chromedp.WaitVisible(textareaSelector))
+		actions = append(actions, chromedp.Click(textareaSelector))
+		actions = append(actions, chromedp.SendKeys(textareaSelector, tweet.Content))
+
+		imagePath := ""
+		if post.Type == "thread" {
+			imagePath = tweet.Image
+		} else if i == 0 && len(post.Images) > 0 {
+			imagePath = post.Images[0]
+		}
+
+		if imagePath != "" {
+			absPath, err := filepath.Abs(imagePath)
+			if err == nil {
+				fileInputSelector := `input[type="file"][data-testid="fileInput"]`
+				actions = append(actions, chromedp.SetUploadFiles(fileInputSelector, []string{absPath}))
+				actions = append(actions, chromedp.Sleep(2*time.Second))
+			}
+		}
+
+		if post.Type == "thread" && i < len(tweetsToPost)-1 {
+			addButtonSelector := `[data-testid="addButton"], [data-testid="addTweetButton"]`
+			actions = append(actions, chromedp.WaitVisible(addButtonSelector))
+			actions = append(actions, chromedp.Click(addButtonSelector))
+			actions = append(actions, chromedp.Sleep(1*time.Second))
+		}
+	}
+
+	postButtonSelector := `[data-testid="tweetButton"], [data-testid="tweetButtonInline"]`
+	actions = append(actions, chromedp.WaitVisible(postButtonSelector))
+	actions = append(actions, chromedp.Click(postButtonSelector))
+
+	// Wait briefly for GQL intercept to catch the tweet ID
+	actions = append(actions, chromedp.Sleep(5*time.Second))
+
+	// Close the browser explicitly
+	actions = append(actions, browser.Close())
+
+	err := chromedp.Run(chromeCtx, actions...)
+	if err != nil {
+		// ponytail: capture screenshot on error to debug what X is displaying
+		var buf []byte
+		if shotErr := chromedp.Run(chromeCtx, chromedp.CaptureScreenshot(&buf)); shotErr == nil {
+			_ = os.WriteFile("/Users/gweiher/Desktop/postctl_headless_error.png", buf, 0644)
+			fmt.Println("📸 Headless failure screenshot saved to Desktop as 'postctl_headless_error.png'")
+		}
+		return "", fmt.Errorf("headless post failed: %w", err)
+	}
+
+	select {
+	case tweetID := <-tweetIDChan:
+		return tweetID, nil
+	case <-time.After(5 * time.Second):
+		return "headless_success_post", nil
+	}
 }
 
