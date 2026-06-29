@@ -66,7 +66,7 @@ func IsPro() bool {
 	if key == "postctl-pro-dev" || key == "postctl-pro-family" {
 		return true
 	}
-	if (strings.HasPrefix(key, "PCTL-PRO-") && len(key) >= 16) || (strings.HasPrefix(key, "PCTL-DEV-") && len(key) >= 12) {
+	if (strings.HasPrefix(key, "PCTL-PRO-") && len(key) >= 16) || (strings.HasPrefix(key, "PCTL-DEV-") && len(key) >= 12) || (strings.HasPrefix(key, "a83-postctl") && len(key) >= 15) {
 		return true
 	}
 	return ActiveConfig.LicenseStatus == "active"
@@ -81,7 +81,7 @@ func ValidateLicenseKey(key string) bool {
 	if key == "postctl-pro-dev" || key == "postctl-pro-family" {
 		return true
 	}
-	if (strings.HasPrefix(key, "PCTL-PRO-") && len(key) >= 16) || (strings.HasPrefix(key, "PCTL-DEV-") && len(key) >= 12) {
+	if (strings.HasPrefix(key, "PCTL-PRO-") && len(key) >= 16) || (strings.HasPrefix(key, "PCTL-DEV-") && len(key) >= 12) || (strings.HasPrefix(key, "a83-postctl") && len(key) >= 15) {
 		return true
 	}
 	return false
