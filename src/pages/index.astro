@@ -550,39 +550,90 @@ Campaign successfully posted!
 		<section id="ai-operator" class="ai-operator-section">
 			<div class="container">
 				<div class="section-header">
-					<h2 class="section-title">Designed for AI Operators</h2>
-					<p class="section-subtitle">Let your AI assistant handle social media distribution while you retain total approval control.</p>
+					<h2 class="section-title">
+						<span class="lang-en">Designed for AI Operators</span>
+						<span class="lang-de">Entwickelt für KI-Operatoren</span>
+					</h2>
+					<p class="section-subtitle">
+						<span class="lang-en">Let your AI assistant handle social media distribution while you retain total approval control.</span>
+						<span class="lang-de">Lass deinen KI-Assistenten die Social-Media-Veröffentlichung übernehmen, während du die volle Freigabe-Kontrolle behältst.</span>
+					</p>
 				</div>
 
 				<div class="ai-workflow-grid">
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
 							<span class="w-icon"><Bot size={40} /></span>
-							<h4>1. AI Generates Drafts</h4>
-							<p>Your coding agent reads web contents or release files and generates formatted Markdown draft files into a directory.</p>
+							<h4>
+								<span class="lang-en">1. AI Generates Drafts</span>
+								<span class="lang-de">1. KI erstellt Entwürfe</span>
+							</h4>
+							<p>
+								<span class="lang-en">Your coding agent reads web contents or release files and generates formatted Markdown draft files into a directory.</span>
+								<span class="lang-de">Dein Coding-Agent liest Webinhalte oder Release-Dateien und erstellt formatierte Markdown-Entwürfe in einem Ordner.</span>
+							</p>
 						</div>
 					</div>
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
 							<span class="w-icon"><Database size={40} /></span>
-							<h4>2. AI Imports & Checks</h4>
-							<p>AI runs `postctl import` and checks results using `postctl list --format json`. Validation catches lengths and files.</p>
+							<h4>
+								<span class="lang-en">2. AI Imports & Checks</span>
+								<span class="lang-de">2. KI importiert & prüft</span>
+							</h4>
+							<p>
+								<span class="lang-en">AI runs `postctl import` and checks results using `postctl list --format json`. Validation catches lengths and files.</span>
+								<span class="lang-de">Die KI führt `postctl import` aus und prüft Ergebnisse mit `postctl list --format json`. Die Validierung prüft Längen & Bilder.</span>
+							</p>
 						</div>
 					</div>
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
 							<span class="w-icon"><ShieldCheck size={40} /></span>
-							<h4>3. Dry-Run Validation</h4>
-							<p>AI executes `postctl campaign post launch-v1 --dry-run` to query APIs and verify integrity without causing live posts.</p>
+							<h4>
+								<span class="lang-en">3. Dry-Run Validation</span>
+								<span class="lang-de">3. Dry-Run Validierung</span>
+							</h4>
+							<p>
+								<span class="lang-en">AI executes `postctl campaign post launch-v1 --dry-run` to query APIs and verify integrity without causing live posts.</span>
+								<span class="lang-de">Die KI führt `postctl campaign post launch-v1 --dry-run` aus, um APIs zu testen und die Integrität ohne Live-Posts zu prüfen.</span>
+							</p>
 						</div>
 					</div>
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
 							<span class="w-icon"><UserCheck size={40} /></span>
-							<h4>4. Human Approves & Posts</h4>
-							<p>You review the simulated outcome in chat. Give the agent approval, and it triggers the final publish command.</p>
+							<h4>
+								<span class="lang-en">4. Human Approves & Posts</span>
+								<span class="lang-de">4. Mensch prüft & postet</span>
+							</h4>
+							<p>
+								<span class="lang-en">You review the simulated outcome in chat. Give the agent approval, and it triggers the final publish command.</span>
+								<span class="lang-de">Du prüfst das simulierte Ergebnis im Chat. Gib dem Agenten die Freigabe und er stößt den finalen Veröffentlichungs-Befehl an.</span>
+							</p>
 						</div>
 					</div>
+				</div>
+
+				<!-- AI Operator Commands Showcase -->
+				<div class="ai-commands-showcase" style="margin-top: 3rem; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 2rem;">
+					<h3 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 1rem; color: #fff;">
+						<span class="lang-en">🤖 Try the AI Operator Workflow</span>
+						<span class="lang-de">🤖 Teste den KI-Operator-Ablauf</span>
+					</h3>
+					<p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem; line-height: 1.6;">
+						<span class="lang-en">Any LLM or command-line agent (like Antigravity, Claude Engineer, or Aider) can interface directly with <code>postctl</code>. Use these commands to let your agent manage your campaign pipeline:</span>
+						<span class="lang-de">Jedes LLM oder Terminal-Agent (wie Antigravity, Claude Engineer oder Aider) kann direkt mit <code>postctl</code> interagieren. Nutze diese Befehle, damit dein Agent deine Kampagnen verwaltet:</span>
+					</p>
+					
+					<pre class="code-block" data-lang="bash" style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.85rem; color: #e2e8f0; overflow-x: auto; line-height: 1.5;"><code><span style="color: #637381;"># 1. Let the AI import all drafts (idempotent, safe to repeat)</span>
+./postctl import ./posts/marketing-plan/
+
+<span style="color: #637381;"># 2. Let the AI run a dry-run validation with JSON output to inspect formatting</span>
+./postctl campaign post postctl-marketing --dry-run --format json
+
+<span style="color: #637381;"># 3. Once validated and human-approved, let the AI trigger the publish command</span>
+./postctl campaign post postctl-marketing --format json</code></pre>
 				</div>
 			</div>
 		</section>
