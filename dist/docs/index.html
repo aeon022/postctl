@@ -352,11 +352,12 @@ Die Cookie-basierte Authentifizierung simuliert eine Web-Sitzung. Diese Methode 
 <p>Wir empfehlen die Schnelleinrichtung per Einzeiler im Terminal. Ersetze die Platzhalter durch deine kopierten Werte:</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> setup</span><span style="color:#9ECBFF"> twitter</span><span style="color:#79B8FF"> --cookie</span><span style="color:#9ECBFF"> "HIER_DER_GESAMTE_KOPIERTE_COOKIE_STRING"</span><span style="color:#79B8FF"> --ct0</span><span style="color:#9ECBFF"> "HIER_NUR_DER_CT0_WERT"</span></span></code></pre>
 <p><em>(Hinweis: Falls du das interaktive Setup über <code>./postctl config setup twitter</code> startest und Option <code>2</code> wählst, kannst du bei der Abfrage nach dem <code>auth_token</code> ebenfalls den gesamten langen Cookie-String einfügen).</em></p>
-<h3 id="️-fehlerbehebung-bei-cookie-fehlern-empty-tweet-id">🛠️ Fehlerbehebung bei Cookie-Fehlern (<code>empty tweet ID</code>)</h3>
-<p>Sollte beim Veröffentlichen eines Tweets der Fehler <code>empty tweet ID returned in cookie mode</code> auftreten, liegt das an einer von zwei Ursachen:</p>
+<h3 id="️-fehlerbehebung-bei-cookie-fehlern--automatisierungswarnungen">🛠️ Fehlerbehebung bei Cookie-Fehlern / Automatisierungswarnungen</h3>
+<p>Sollte beim Veröffentlichen eines Tweets ein GraphQL-Fehler wie <code>empty tweet ID returned...</code> oder der Fehler <strong>226</strong> (<code>This request looks like it might be automated...</code>) auftreten, greift <code>postctl</code> automatisch auf einen <strong>Headless-Browser-Fallback</strong> zurück:</p>
 <ol>
-<li><strong>Abgelaufene Session-Cookies:</strong> Twitter/X beendet Browsersitzungen nach einiger Zeit. Wiederhole einfach <strong>Schritt 1</strong> und trage die neuen Cookies ein.</li>
-<li><strong>Rotierte GraphQL Query-ID:</strong> X ändert im Web-Frontend regelmäßig die interne ID für die <code>CreateTweet</code>-Mutation. In diesem Fall passt <code>postctl</code> die IDs in einem Update an. Stelle sicher, dass du die aktuellste Version von <code>postctl</code> nutzt.</li>
+<li><strong>Automatischer Browser-Start</strong>: <code>postctl</code> startet im Hintergrund unsichtbar Google Chrome (mittels <code>chromedp</code>), lädt deine Cookies (<code>auth_token</code> &amp; <code>ct0</code>), navigiert zur Web-Oberfläche von X, befüllt den Composer (inklusive Threads und Medien-Uploads) und klickt auf “Posten”.</li>
+<li><strong>Voraussetzung</strong>: Google Chrome muss auf deinem System installiert sein (wird auf macOS standardmäßig in <code>/Applications</code> gesucht).</li>
+<li><strong>Abgelaufene Session-Cookies</strong>: Wenn auch der Headless-Browser scheitert, sind in der Regel deine Cookies abgelaufen. Wiederhole einfach <strong>Schritt 1</strong> und trage die neuen Cookies ein.</li>
 </ol>
 <hr>
 <h2 id="option-b-offizielle-api-kostenpflichtig--empfohlen">Option B: Offizielle API (Kostenpflichtig &amp; Empfohlen)</h2>

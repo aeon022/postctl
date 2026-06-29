@@ -42,11 +42,12 @@ Wir empfehlen die Schnelleinrichtung per Einzeiler im Terminal. Ersetze die Plat
 
 *(Hinweis: Falls du das interaktive Setup über `./postctl config setup twitter` startest und Option `2` wählst, kannst du bei der Abfrage nach dem `auth_token` ebenfalls den gesamten langen Cookie-String einfügen).*
 
-### 🛠️ Fehlerbehebung bei Cookie-Fehlern (`empty tweet ID`)
+### 🛠️ Fehlerbehebung bei Cookie-Fehlern / Automatisierungswarnungen
 
-Sollte beim Veröffentlichen eines Tweets der Fehler `empty tweet ID returned in cookie mode` auftreten, liegt das an einer von zwei Ursachen:
-1. **Abgelaufene Session-Cookies:** Twitter/X beendet Browsersitzungen nach einiger Zeit. Wiederhole einfach **Schritt 1** und trage die neuen Cookies ein.
-2. **Rotierte GraphQL Query-ID:** X ändert im Web-Frontend regelmäßig die interne ID für die `CreateTweet`-Mutation. In diesem Fall passt `postctl` die IDs in einem Update an. Stelle sicher, dass du die aktuellste Version von `postctl` nutzt.
+Sollte beim Veröffentlichen eines Tweets ein GraphQL-Fehler wie `empty tweet ID returned...` oder der Fehler **226** (`This request looks like it might be automated...`) auftreten, greift `postctl` automatisch auf einen **Headless-Browser-Fallback** zurück:
+1. **Automatischer Browser-Start**: `postctl` startet im Hintergrund unsichtbar Google Chrome (mittels `chromedp`), lädt deine Cookies (`auth_token` & `ct0`), navigiert zur Web-Oberfläche von X, befüllt den Composer (inklusive Threads und Medien-Uploads) und klickt auf "Posten".
+2. **Voraussetzung**: Google Chrome muss auf deinem System installiert sein (wird auf macOS standardmäßig in `/Applications` gesucht).
+3. **Abgelaufene Session-Cookies**: Wenn auch der Headless-Browser scheitert, sind in der Regel deine Cookies abgelaufen. Wiederhole einfach **Schritt 1** und trage die neuen Cookies ein.
 
 ---
 
