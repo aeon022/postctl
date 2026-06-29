@@ -97,6 +97,23 @@ If you want to run <code>postctl</code> headless (e.g., on a server or without k
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">nohup</span><span style="color:#9ECBFF"> ./postctl</span><span style="color:#9ECBFF"> daemon</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> daemon.log</span><span style="color:#F97583"> 2>&#x26;1</span><span style="color:#E1E4E8"> &#x26;</span></span></code></pre>
 </li>
 </ol>
+<h3 id="️-going-offline--cloud-deployment-vps--raspberry-pi">☁️ Going Offline &amp; Cloud Deployment (VPS / Raspberry Pi)</h3>
+<p>Since <code>postctl</code> is a local-first application, it runs on your local machine. If your computer is turned off or asleep during a scheduled post time, the daemon cannot run.</p>
+<p><code>postctl</code> handles this gracefully:</p>
+<ol>
+<li><strong>Auto-Catchup (Local Fallback):</strong> When you boot your machine and open the TUI or start the daemon, it immediately checks for any missed posts in the past and publishes them instantly.</li>
+<li><strong>Cloud Deployment (24/7 Online):</strong> Because <code>postctl</code> is written in Go, it compiles to a single static binary and uses a self-contained SQLite file. You can easily deploy it on a $4 VPS or a Raspberry Pi:
+<ul>
+<li><strong>Cross-compile for Linux VPS:</strong>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#E1E4E8">GOOS</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">linux</span><span style="color:#E1E4E8"> GOARCH</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">amd64</span><span style="color:#B392F0"> go</span><span style="color:#9ECBFF"> build</span><span style="color:#79B8FF"> -o</span><span style="color:#9ECBFF"> postctl-linux</span><span style="color:#9ECBFF"> main.go</span></span></code></pre>
+</li>
+<li><strong>Copy Configuration &amp; DB:</strong> Transfer your <code>~/.config/postctl/</code> configuration and database files to the server.</li>
+<li><strong>Run Headless Daemon:</strong> Start the daemon in the background on your server:
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">nohup</span><span style="color:#9ECBFF"> ./postctl-linux</span><span style="color:#9ECBFF"> daemon</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> daemon.log</span><span style="color:#F97583"> 2>&#x26;1</span><span style="color:#E1E4E8"> &#x26;</span></span></code></pre>
+</li>
+</ul>
+</li>
+</ol>
 <hr>
 <h3 id="-vim--neovim-external-editor-flow-step-by-step">📝 Vim / Neovim External Editor Flow (Step-by-Step)</h3>
 <p>When editing or creating a post within the TUI, you can spawn your favorite terminal text editor (like Vim or Neovim) for a rich, distraction-free editing environment.</p>
@@ -235,6 +252,23 @@ Wenn du <code>postctl</code> headless (z. B. auf einem Server oder ohne die TUI 
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> daemon</span></span></code></pre>
 <p>Um den Daemon geräuschlos im Hintergrund laufen zu lassen:</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">nohup</span><span style="color:#9ECBFF"> ./postctl</span><span style="color:#9ECBFF"> daemon</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> daemon.log</span><span style="color:#F97583"> 2>&#x26;1</span><span style="color:#E1E4E8"> &#x26;</span></span></code></pre>
+</li>
+</ol>
+<h3 id="️-offline-verhalten--cloud-deployment-vps--raspberry-pi">☁️ Offline-Verhalten &amp; Cloud-Deployment (VPS / Raspberry Pi)</h3>
+<p>Da <code>postctl</code> eine lokale Anwendung ist, läuft sie auf deinem Rechner. Wenn dein Mac zum geplanten Veröffentlichungszeitpunkt ausgeschaltet oder im Ruhezustand ist, kann der Daemon nicht arbeiten.</p>
+<p><code>postctl</code> löst das elegant:</p>
+<ol>
+<li><strong>Automatisches Nachholen (Lokaler Fallback):</strong> Sobald du deinen Rechner wieder einschaltest und die TUI öffnest oder den Daemon startest, prüft <code>postctl</code> die Datenbank auf verpasste Beiträge der Vergangenheit und veröffentlicht diese sofort nachträglich.</li>
+<li><strong>Cloud-Veröffentlichung (24/7 Online):</strong> Da <code>postctl</code> in Go geschrieben ist und komplett ohne Abhängigkeiten in ein einzelnes statisches Binary kompiliert wird, kannst du es problemlos auf einem billigen 4$-VPS oder einem Raspberry Pi laufen lassen:
+<ul>
+<li><strong>Kompilieren für Linux VPS:</strong>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#E1E4E8">GOOS</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">linux</span><span style="color:#E1E4E8"> GOARCH</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">amd64</span><span style="color:#B392F0"> go</span><span style="color:#9ECBFF"> build</span><span style="color:#79B8FF"> -o</span><span style="color:#9ECBFF"> postctl-linux</span><span style="color:#9ECBFF"> main.go</span></span></code></pre>
+</li>
+<li><strong>Konfiguration &amp; DB kopieren:</strong> Kopiere dein <code>~/.config/postctl/</code> Verzeichnis inklusive der SQLite-Datenbank auf den Server.</li>
+<li><strong>Daemon im Hintergrund starten:</strong> Starte den Scheduler-Daemon auf deinem Server im Hintergrund:
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">nohup</span><span style="color:#9ECBFF"> ./postctl-linux</span><span style="color:#9ECBFF"> daemon</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> daemon.log</span><span style="color:#F97583"> 2>&#x26;1</span><span style="color:#E1E4E8"> &#x26;</span></span></code></pre>
+</li>
+</ul>
 </li>
 </ol>
 <hr>

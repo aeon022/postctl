@@ -83,6 +83,23 @@ Since `postctl` is a local-first application, scheduled posts are published usin
    nohup ./postctl daemon > daemon.log 2>&1 &
    ```
 
+### ☁️ Going Offline & Cloud Deployment (VPS / Raspberry Pi)
+
+Since `postctl` is a local-first application, it runs on your local machine. If your computer is turned off or asleep during a scheduled post time, the daemon cannot run.
+
+`postctl` handles this gracefully:
+1. **Auto-Catchup (Local Fallback):** When you boot your machine and open the TUI or start the daemon, it immediately checks for any missed posts in the past and publishes them instantly.
+2. **Cloud Deployment (24/7 Online):** Because `postctl` is written in Go, it compiles to a single static binary and uses a self-contained SQLite file. You can easily deploy it on a $4 VPS or a Raspberry Pi:
+   * **Cross-compile for Linux VPS:**
+     ```bash
+     GOOS=linux GOARCH=amd64 go build -o postctl-linux main.go
+     ```
+   * **Copy Configuration & DB:** Transfer your `~/.config/postctl/` configuration and database files to the server.
+   * **Run Headless Daemon:** Start the daemon in the background on your server:
+     ```bash
+     nohup ./postctl-linux daemon > daemon.log 2>&1 &
+     ```
+
 ---
 
 ### 📝 Vim / Neovim External Editor Flow (Step-by-Step)
@@ -204,10 +221,27 @@ Da `postctl` eine lokale Anwendung ist, werden geplante Beiträge über einen de
    ```bash
    ./postctl daemon
    ```
-   Um den Daemon geräuschlos im Hintergrund laufen zu lassen:
-   ```bash
-   nohup ./postctl daemon > daemon.log 2>&1 &
-   ```
+    Um den Daemon geräuschlos im Hintergrund laufen zu lassen:
+    ```bash
+    nohup ./postctl daemon > daemon.log 2>&1 &
+    ```
+
+### ☁️ Offline-Verhalten & Cloud-Deployment (VPS / Raspberry Pi)
+
+Da `postctl` eine lokale Anwendung ist, läuft sie auf deinem Rechner. Wenn dein Mac zum geplanten Veröffentlichungszeitpunkt ausgeschaltet oder im Ruhezustand ist, kann der Daemon nicht arbeiten.
+
+`postctl` löst das elegant:
+1. **Automatisches Nachholen (Lokaler Fallback):** Sobald du deinen Rechner wieder einschaltest und die TUI öffnest oder den Daemon startest, prüft `postctl` die Datenbank auf verpasste Beiträge der Vergangenheit und veröffentlicht diese sofort nachträglich.
+2. **Cloud-Veröffentlichung (24/7 Online):** Da `postctl` in Go geschrieben ist und komplett ohne Abhängigkeiten in ein einzelnes statisches Binary kompiliert wird, kannst du es problemlos auf einem billigen 4$-VPS oder einem Raspberry Pi laufen lassen:
+   * **Kompilieren für Linux VPS:**
+     ```bash
+     GOOS=linux GOARCH=amd64 go build -o postctl-linux main.go
+     ```
+   * **Konfiguration & DB kopieren:** Kopiere dein `~/.config/postctl/` Verzeichnis inklusive der SQLite-Datenbank auf den Server.
+   * **Daemon im Hintergrund starten:** Starte den Scheduler-Daemon auf deinem Server im Hintergrund:
+     ```bash
+     nohup ./postctl-linux daemon > daemon.log 2>&1 &
+     ```
 
 ---
 

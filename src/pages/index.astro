@@ -15,7 +15,8 @@ import {
   Calendar, 
   Settings, 
   Edit,
-  Heart
+  Heart,
+  Cloud
 } from '@lucide/astro';
 import ScreenshotCarousel from '../components/ScreenshotCarousel.astro';
 import FooterSignature from '../components/FooterSignature.astro';
@@ -447,6 +448,18 @@ import FooterSignature from '../components/FooterSignature.astro';
 						<div class="feature-icon"><Lock size={40} /></div>
 						<h3 class="feature-title">AES-256 Encrypted Sync</h3>
 						<p class="feature-desc">Securely sync your local database and config files. Backups are encrypted using AES-256-GCM and key-stretched (PBKDF2) for safe storage in public Git repos.</p>
+					</div>
+					<!-- Feature 7 -->
+					<div class="feature-card">
+						<div class="feature-icon"><Cloud size={40} /></div>
+						<h3 class="feature-title">
+							<span class="lang-en">Cloud Deployment (VPS/Pi)</span>
+							<span class="lang-de">Cloud-Bereitstellung (VPS/Pi)</span>
+						</h3>
+						<p class="feature-desc">
+							<span class="lang-en">Cross-compile to Linux and run postctl as a background daemon on a VPS or Raspberry Pi. Posts publish automatically, even when your Mac is shut down.</span>
+							<span class="lang-de">Kompiliere für Linux und lasse postctl als Hintergrund-Daemon auf einem VPS oder Raspberry Pi laufen. Posts werden automatisch gesendet, auch wenn dein Mac aus ist.</span>
+						</p>
 					</div>
 				</div>
 			</div>
