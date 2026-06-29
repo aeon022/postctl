@@ -651,6 +651,76 @@ Campaign successfully posted!
 			</div>
 		</section>
 
+		<!-- Roadmap Section -->
+		<section id="roadmap" class="roadmap-section">
+			<div class="container">
+				<div class="section-header">
+					<h2 class="section-title">
+						<span class="lang-en">Strategic Product Roadmap</span>
+						<span class="lang-de">Strategische Produkt-Roadmap</span>
+					</h2>
+					<p class="section-subtitle">
+						<span class="lang-en">Explore upcoming developer-focused features designed to supercharge your social media pipeline.</span>
+						<span class="lang-de">Entdecke kommende Entwickler-Features, um deine Social-Media-Pipeline zu revolutionieren.</span>
+					</p>
+				</div>
+
+				<div class="roadmap-grid">
+					<!-- Phase 1 -->
+					<div class="roadmap-card">
+						<div class="roadmap-badge next">Q3 2026</div>
+						<h3 class="roadmap-title">
+							<span class="lang-en">AI Repurposer (`postctl repurpose`)</span>
+							<span class="lang-de">KI-Beitragsumwandlung (`postctl repurpose`)</span>
+						</h3>
+						<p class="roadmap-desc">
+							<span class="lang-en">Convert long technical blog posts or Git release notes automatically into formatted platform-specific updates and threads using integrated LLMs.</span>
+							<span class="lang-de">Verwandle lange Blogposts oder Release Notes automatisch in plattformgerechte Beiträge und Threads mit integrierten LLMs.</span>
+						</p>
+					</div>
+
+					<!-- Phase 2 -->
+					<div class="roadmap-card">
+						<div class="roadmap-badge next">Q3 2026</div>
+						<h3 class="roadmap-title">
+							<span class="lang-en">Git Hook Integration & Autopost</span>
+							<span class="lang-de">Git-Hook-Integration & Autopost</span>
+						</h3>
+						<p class="roadmap-desc">
+							<span class="lang-en">Trigger automatic scheduling and publication directly upon committing code or pushing release tags in your repositories.</span>
+							<span class="lang-de">Löse automatische Einplanungen und Veröffentlichungen direkt beim Commit von Code oder Push von Release-Tags in deinen Repositories aus.</span>
+						</p>
+					</div>
+
+					<!-- Phase 3 -->
+					<div class="roadmap-card">
+						<div class="roadmap-badge future">Q4 2026</div>
+						<h3 class="roadmap-title">
+							<span class="lang-en">Terminal Analytics Dashboard</span>
+							<span class="lang-de">Terminal-Statistik-Dashboard</span>
+						</h3>
+						<p class="roadmap-desc">
+							<span class="lang-en">Inspect engagement, impressions, and click rates directly in the Bubbletea TUI, or pull metrics as structured JSON for your AI agents.</span>
+							<span class="lang-de">Überwache Interaktionen, Impressionen und Klickraten direkt in der Bubbletea TUI oder exportiere Metriken als JSON für deine KI-Agenten.</span>
+						</p>
+					</div>
+
+					<!-- Phase 4 -->
+					<div class="roadmap-card">
+						<div class="roadmap-badge future">Q4 2026</div>
+						<h3 class="roadmap-title">
+							<span class="lang-en">Code-Snippet Social Cards</span>
+							<span class="lang-de">Code-Snippet Social Cards</span>
+						</h3>
+						<p class="roadmap-desc">
+							<span class="lang-en">Automatically render beautiful code snippet image cards directly from your markdown source files using local rendering engines.</span>
+							<span class="lang-de">Rendere automatisch wunderschöne Code-Grafikkarten direkt aus deinen Markdown-Quelltexten über lokale Syntax-Rendering-Engines.</span>
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
 		<!-- Pricing Section (Polar.sh integration) -->
 		<section id="pricing" class="pricing-section">
 			<div class="container">
@@ -1623,6 +1693,81 @@ Campaign successfully posted!
 		font-size: 0.9rem;
 		color: var(--text-secondary);
 		line-height: 1.5;
+	}
+	/* Roadmap Section */
+	.roadmap-section {
+		padding: 6.5rem 0;
+		border-top: 1px solid var(--border);
+		position: relative;
+	}
+	.roadmap-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: 2rem;
+		margin-top: 3.5rem;
+	}
+	.roadmap-card {
+		background: rgba(255, 255, 255, 0.01);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		border-radius: 12px;
+		padding: 2rem;
+		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+		position: relative;
+		overflow: hidden;
+	}
+	.roadmap-card::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 2px;
+		background: linear-gradient(90deg, transparent, var(--accent), transparent);
+		transform: scaleX(0);
+		transition: transform 0.5s ease;
+	}
+	.roadmap-card:hover {
+		transform: translateY(-5px);
+		border-color: rgba(139, 124, 248, 0.25);
+		box-shadow: 
+			0 12px 30px rgba(0, 0, 0, 0.4),
+			0 0 15px rgba(139, 124, 248, 0.05);
+		background: rgba(255, 255, 255, 0.02);
+	}
+	.roadmap-card:hover::before {
+		transform: scaleX(1);
+	}
+	.roadmap-badge {
+		display: inline-block;
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		padding: 0.25rem 0.6rem;
+		border-radius: 100px;
+		margin-bottom: 1.25rem;
+	}
+	.roadmap-badge.next {
+		background: rgba(139, 124, 248, 0.15);
+		color: var(--accent);
+		border: 1px solid rgba(139, 124, 248, 0.3);
+	}
+	.roadmap-badge.future {
+		background: rgba(255, 255, 255, 0.05);
+		color: var(--text-secondary);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	.roadmap-title {
+		font-family: var(--font-heading);
+		font-size: 1.15rem;
+		font-weight: 650;
+		color: #fff;
+		margin-bottom: 0.75rem;
+	}
+	.roadmap-desc {
+		font-size: 0.85rem;
+		line-height: 1.6;
+		color: var(--text-secondary);
 	}
 
 	/* Pricing Section */
