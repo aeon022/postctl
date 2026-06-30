@@ -298,3 +298,18 @@ func parseTime(s string) time.Time {
 	}
 	return t
 }
+
+// TryLockPost versucht den Status eines Posts atomar von 'scheduled' auf 'posting' zu setzen.
+// Gibt true zurück, wenn die Sperre erfolgreich erworben wurde (1 Zeile aktualisiert), andernfalls false.
+func (s *SQLiteStore) TryLockPost(ctx context.Context, id string) (bool, error) {
+	query := `UPDATE posts SET status = 'posting', updated_at = ? WHERE id = ? AND status = 'scheduled'`
+	res, err := s.db.ExecContext(ctx, query, time.Now().Format(time.RFC3339), id)
+	if err != nil {
+		return false, fmt.Errorf("execute lock post query: %w", err)
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return false, fmt.Errorf("get lock post rows affected: %w", err)
+	}
+	return rows == 1, nil
+}

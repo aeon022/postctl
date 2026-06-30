@@ -677,6 +677,11 @@ func (m Model) publishDuePostsCmd() tea.Msg {
 	if err == nil {
 		for _, p := range posts {
 			if p.ScheduledAt != nil && p.ScheduledAt.Before(now) {
+				// Versuche den Post atomar zu sperren, um doppeltes Posten im TUI-Hintergrund zu verhindern
+				locked, err := m.store.TryLockPost(ctx, p.ID)
+				if err != nil || !locked {
+					continue
+				}
 				// TUI-Scheduler führt kein dry-run aus
 				_, _ = scheduler.PublishPost(ctx, m.store, &p, false)
 			}

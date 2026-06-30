@@ -133,6 +133,19 @@ func checkAndPublishDue(ctx context.Context, s store.Store, dryRun bool) {
 
 	for _, p := range posts {
 		if p.ScheduledAt != nil && p.ScheduledAt.Before(now) {
+			if !dryRun {
+				// Versuche den Post atomar zu sperren, um doppeltes Posten zu verhindern
+				locked, err := s.TryLockPost(ctx, p.ID)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "[SCHEDULER FEHLER] Fehler beim Sperren von %s: %v\n", p.ID, err)
+					continue
+				}
+				if !locked {
+					// Post wurde bereits von einem anderen Prozess gesperrt oder gepostet
+					continue
+				}
+			}
+
 			fmt.Fprintf(os.Stderr, "[SCHEDULER] Veröffentliche fälligen Post %s (%s)...\n", p.ID, p.Platform)
 			
 			_, err := PublishPost(ctx, s, &p, dryRun)

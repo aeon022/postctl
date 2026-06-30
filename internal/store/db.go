@@ -20,6 +20,7 @@ type Store interface {
 	GetPost(ctx context.Context, id string) (*models.Post, error)
 	ListPosts(ctx context.Context, platform, status, campaign string) ([]models.Post, error)
 	DeletePost(ctx context.Context, id string) error
+	TryLockPost(ctx context.Context, id string) (bool, error)
 
 	// History
 	AddHistoryEntry(ctx context.Context, entry *models.HistoryEntry) error
