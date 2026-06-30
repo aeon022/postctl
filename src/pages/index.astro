@@ -849,13 +849,13 @@ Campaign successfully posted!
 
 					<details class="faq-item">
 						<summary class="faq-question">
-							<span class="lang-en">Why cookie-based authentication for Twitter/X? Is my account safe?</span>
-							<span class="lang-de">Warum Cookie-basierte Authentifizierung für Twitter/X? Ist mein Account sicher?</span>
+							<span class="lang-en">Which Twitter/X authentication methods are supported?</span>
+							<span class="lang-de">Welche Authentifizierungs-Methoden für Twitter/X werden unterstützt?</span>
 							<span class="faq-icon">+</span>
 						</summary>
 						<div class="faq-answer">
-							<p class="lang-en">Twitter/X API pricing is high (~$100/mo). To bypass this for indie developers, <code>postctl</code> supports a cookie-based login that simulates browser interactions. It includes randomized delays and an automated headless Google Chrome fallback (using <code>chromedp</code>) to act like a real browser. While it carries a minor risk of ToS violation, using the official API remains the safest option.</p>
-							<p class="lang-de">Die Twitter/X API-Preise sind sehr hoch (ca. 100$/Monat). Um dies zu umgehen, unterstützt <code>postctl</code> einen Cookie-Login, der einen Browser simuliert. Die App nutzt zufällige Verzögerungen und einen automatischen headless Google Chrome Fallback (via <code>chromedp</code>), um wie ein echter Browser zu agieren. Das Risiko ist minimal, aber die offizielle API bleibt die sicherste Option.</p>
+							<p class="lang-en"><code>postctl</code> supports <strong>both</strong> the official OAuth 2.0 API credentials and cookie-based web session login. Since Twitter/X API pricing is high (~$100/mo), the cookie-based bypass simulates standard browser interactions (including randomized delays and automated headless Google Chrome via <code>chromedp</code>) to post for free. If you have a developer account, we highly recommend using the official API for maximum stability.</p>
+							<p class="lang-de"><code>postctl</code> unterstützt <strong>sowohl</strong> die offizielle OAuth 2.0 API als auch die Cookie-basierte Web-Session-Anmeldung. Da Twitter/X hohe API-Preise (ca. 100$/Monat) verlangt, bietet der Cookie-Bypass eine kostenlose Alternative, die typische Browser-Aktionen (inklusive zufälliger Verzögerungen und headless Google Chrome via <code>chromedp</code>) simuliert. Wenn du einen Entwickler-Account hast, empfehlen wir die Nutzung der offiziellen API für maximale Stabilität.</p>
 						</div>
 					</details>
 
