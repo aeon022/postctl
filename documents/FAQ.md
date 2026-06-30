@@ -21,10 +21,8 @@ This document contains answers to common questions about `postctl`'s architectur
 1. **Auto-Catchup (Local):** As soon as you open your computer and launch the TUI or start the daemon, `postctl` detects any missed scheduled posts and publishes them instantly.
 2. **Cloud Daemon (24/7):** You can cross-compile `postctl` for Linux (`GOOS=linux GOARCH=amd64 go build -o postctl-linux`) and run it as a lightweight background process on a $4/mo VPS or Raspberry Pi.
 
-### Q4: Why does postctl support cookie authentication for Twitter/X? Is my account safe?
-**A:** Twitter/X currently charges ~$100/month for basic API access. To keep `postctl` free and accessible, we built a cookie-based authentication bypass that simulates a browser session. 
-- *Risk:* Using cookie-based automation technically violates X's Terms of Service and carries a minor risk of account suspension. 
-- *Mitigation:* `postctl` mimics official browser headers, adds delay intervals, and has an automated **headless Chrome fallback** (via `chromedp`) to interact with the page just like a human when direct HTTP requests fail. For maximum safety, we recommend using the official API.
+### Q4: Which Twitter/X authentication methods are supported?
+**A:** `postctl` supports **both** official OAuth 2.0 API credentials and cookie-based web session login. Since Twitter/X API pricing is high (~$100/month) for basic access, the cookie-based bypass simulates standard browser interactions (including randomized delays and automated headless Google Chrome via `chromedp`) to post for free. If you have a developer account, we highly recommend using the official API for maximum stability.
 
 ### Q5: How do I sync settings between multiple devices (e.g., MacBook and Mac Studio)?
 **A:** You can easily migrate your configuration and databases:
@@ -53,10 +51,8 @@ This document contains answers to common questions about `postctl`'s architectur
 1. **Automatisches Nachholen (Lokal):** Sobald du deinen Mac aufklappst und die TUI startest oder den Daemon ausführst, erkennt `postctl` verpasste geplante Beiträge und veröffentlicht diese sofort nachträglich.
 2. **Cloud-Daemon (24/7):** Du kannst `postctl` für Linux kompilieren (`GOOS=linux GOARCH=amd64 go build -o postctl-linux`) und es als ressourcenschonenden Hintergrundprozess auf einem 4$-VPS oder einem Raspberry Pi laufen lassen.
 
-### F4: Warum unterstützt postctl Cookie-Authentifizierung für Twitter/X? Ist mein Account sicher?
-**A:** Twitter/X verlangt derzeit ca. 100 $/Monat für den einfachen API-Zugang. Um `postctl` kostenlos zu halten, haben wir einen Cookie-Bypass eingebaut, der eine Browser-Sitzung simuliert.
-- *Risiko:* Die Verwendung von Cookie-Automatisierung verstößt gegen die Nutzungsbedingungen von X und birgt ein geringes Risiko einer Accountsperre.
-- *Schutz:* `postctl` imitiert offizielle Browser-Header, baut künstliche Verzögerungen ein und startet bei Fehlern automatisch ein **headless Chrome-Fenster** (via `chromedp`), um wie ein echter Mensch auf der Seite zu posten. Für maximale Sicherheit empfehlen wir die offizielle API.
+### F4: Welche Authentifizierungs-Methoden für Twitter/X werden unterstützt?
+**A:** `postctl` unterstützt **sowohl** die offizielle OAuth 2.0 API als auch die Cookie-basierte Web-Session-Anmeldung. Da Twitter/X hohe API-Preise (ca. 100 $/Monat) verlangt, bietet der Cookie-Bypass eine kostenlose Alternative, die typische Browser-Aktionen (inklusive zufälliger Verzögerungen und headless Google Chrome via `chromedp`) simuliert. Wenn du einen Entwickler-Account hast, empfehlen wir die Nutzung der offiziellen API für maximale Stabilität.
 
 ### F5: Wie synchronisiere ich Einstellungen zwischen MacBook und Mac Studio?
 **A:** Du kannst deine Konfiguration und Datenbanken ganz einfach übertragen:
