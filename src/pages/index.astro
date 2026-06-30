@@ -796,6 +796,95 @@ Campaign successfully posted!
 				</div>
 			</div>
 		</section>
+		<!-- FAQ Section -->
+		<section id="faq" class="faq-section">
+			<div class="container">
+				<div class="section-header">
+					<h2 class="section-title">
+						<span class="lang-en">Frequently Asked Questions</span>
+						<span class="lang-de">Häufig gestellte Fragen (FAQ)</span>
+					</h2>
+					<p class="section-subtitle">
+						<span class="lang-en">Got questions? We've got answers. Explore how postctl secures credentials, syncs devices, and handles offline workflows.</span>
+						<span class="lang-de">Hast du Fragen? Wir haben Antworten. Erfahre mehr über Verschlüsselung, Synchronisation und Offline-Workflows.</span>
+					</p>
+				</div>
+
+				<div class="faq-accordion">
+					<details class="faq-item">
+						<summary class="faq-question">
+							<span class="lang-en">Is postctl really free? What are the limitations?</span>
+							<span class="lang-de">Ist postctl wirklich kostenlos? Was sind die Einschränkungen?</span>
+							<span class="faq-icon">+</span>
+						</summary>
+						<div class="faq-answer">
+							<p class="lang-en">Yes, the core of <code>postctl</code> is completely open-source (MIT licensed) and free to use. You can connect up to <strong>2 social networks</strong> with unlimited posts and drafts. To connect more than 2 accounts, you can buy a Pro lifetime license on Polar.sh, which helps fund development.</p>
+							<p class="lang-de">Ja, der Kern von <code>postctl</code> ist komplett Open-Source (MIT-Lizenz) und kostenlos. Du kannst bis zu <strong>2 Netzwerke</strong> verbinden und unbegrenzt posten. Um mehr als 2 Konten zu nutzen, kannst du eine Pro-Lizenz auf Lebenszeit erwerben, was die Entwicklung unterstützt.</p>
+						</div>
+					</details>
+
+					<details class="faq-item">
+						<summary class="faq-question">
+							<span class="lang-en">How does postctl store my API keys? Is it secure?</span>
+							<span class="lang-de">Wie speichert postctl meine Zugangsdaten? Ist das sicher?</span>
+							<span class="faq-icon">+</span>
+						</summary>
+						<div class="faq-answer">
+							<p class="lang-en">Your API keys, tokens, and cookies are stored <strong>locally</strong> on your machine inside a SQLite database. No credentials ever leave your computer or get sent to third-party servers. Your backups are encrypted locally using <strong>AES-256-GCM</strong> with key-stretching (PBKDF2).</p>
+							<p class="lang-de">Deine API-Keys, Tokens und Cookies werden <strong>lokal</strong> in einer SQLite-Datenbank auf deinem Rechner gespeichert. Keine Zugangsdaten verlassen jemals dein Gerät. Backups werden lokal mit <strong>AES-256-GCM</strong> und Key-Stretching (PBKDF2) verschlüsselt.</p>
+						</div>
+					</details>
+
+					<details class="faq-item">
+						<summary class="faq-question">
+							<span class="lang-en">What happens if my computer is closed when a post is scheduled?</span>
+							<span class="lang-de">Was passiert, wenn mein Computer zugeklappt ist, wenn ein Post geplant ist?</span>
+							<span class="faq-icon">+</span>
+						</summary>
+						<div class="faq-answer">
+							<p class="lang-en">If your machine is asleep, <code>postctl</code> will not post instantly. However, we have <strong>Auto-Catchup</strong>: as soon as you wake your machine and open the TUI or start the daemon, it immediately detects missed scheduled slots and posts them. Alternatively, you can run the daemon 24/7 on a $4 VPS or a Raspberry Pi.</p>
+							<p class="lang-de">Wenn dein Gerät im Ruhezustand ist, kann <code>postctl</code> nicht sofort senden. Dank <strong>Auto-Catchup</strong> erkennt die App beim nächsten Start sofort verpasste Sendezeitpunkte und holt diese nach. Alternativ kannst du den Daemon 24/7 auf einem 4$-VPS oder Raspberry Pi laufen lassen.</p>
+						</div>
+					</details>
+
+					<details class="faq-item">
+						<summary class="faq-question">
+							<span class="lang-en">Why cookie-based authentication for Twitter/X? Is my account safe?</span>
+							<span class="lang-de">Warum Cookie-basierte Authentifizierung für Twitter/X? Ist mein Account sicher?</span>
+							<span class="faq-icon">+</span>
+						</summary>
+						<div class="faq-answer">
+							<p class="lang-en">Twitter/X API pricing is high (~$100/mo). To bypass this for indie developers, <code>postctl</code> supports a cookie-based login that simulates browser interactions. It includes randomized delays and an automated headless Google Chrome fallback (using <code>chromedp</code>) to act like a real browser. While it carries a minor risk of ToS violation, using the official API remains the safest option.</p>
+							<p class="lang-de">Die Twitter/X API-Preise sind sehr hoch (ca. 100$/Monat). Um dies zu umgehen, unterstützt <code>postctl</code> einen Cookie-Login, der einen Browser simuliert. Die App nutzt zufällige Verzögerungen und einen automatischen headless Google Chrome Fallback (via <code>chromedp</code>), um wie ein echter Browser zu agieren. Das Risiko ist minimal, aber die offizielle API bleibt die sicherste Option.</p>
+						</div>
+					</details>
+
+					<details class="faq-item">
+						<summary class="faq-question">
+							<span class="lang-en">How do I sync settings between multiple devices?</span>
+							<span class="lang-de">Wie synchronisiere ich meine Einstellungen zwischen Geräten?</span>
+							<span class="faq-icon">+</span>
+						</summary>
+						<div class="faq-answer">
+							<p class="lang-en">Simply run <code>./postctl config export -o backup.bin</code> on your source machine, set a password, transfer the file, and run <code>./postctl config import -f backup.bin</code> on the target. You can also symlink your <code>~/.config/postctl/</code> directory directly into iCloud, Dropbox, or Syncthing.</p>
+							<p class="lang-de">Führe einfach <code>./postctl config export -o backup.bin</code> auf deinem Rechner aus, vergebe ein Passwort und importiere die Datei auf dem Zielgerät mit <code>./postctl config import -f backup.bin</code>. Alternativ kannst du deinen <code>~/.config/postctl/</code>-Ordner mit iCloud, Dropbox oder Syncthing verknüpfen.</p>
+						</div>
+					</details>
+
+					<details class="faq-item">
+						<summary class="faq-question">
+							<span class="lang-en">Can my local AI agent (like Claude Engineer or GPT) run postctl?</span>
+							<span class="lang-de">Kann mein lokaler KI-Agent (wie Claude oder GPT) postctl steuern?</span>
+							<span class="faq-icon">+</span>
+						</summary>
+						<div class="faq-answer">
+							<p class="lang-en">Yes! <code>postctl</code> is built on the "AI-as-Operator" principle. Every command runs non-interactively without prompt blocks. Adding the <code>--format json</code> flag forces commands to output machine-readable JSON, and the <code>--dry-run</code> flag lets the AI verify and test the pipeline safely.</p>
+							<p class="lang-de">Ja! <code>postctl</code> ist für das "KI-als-Operator"-Prinzip optimiert. Alle Befehle laufen ohne interaktive Prompts ab. Mit <code>--format json</code> gibt die CLI maschinenlesbare Daten aus, und mit <code>--dry-run</code> kann dein KI-Agent Posts testen, bevor er dich um Freigabe bittet.</p>
+						</div>
+					</details>
+				</div>
+			</div>
+		</section>
 	</main>
 
 	<!-- Footer -->
@@ -1768,6 +1857,64 @@ Campaign successfully posted!
 		font-size: 0.85rem;
 		line-height: 1.6;
 		color: var(--text-secondary);
+	}
+	/* FAQ Section */
+	.faq-section {
+		padding: 6.5rem 0;
+		border-top: 1px solid var(--border);
+		background: rgba(10, 11, 14, 0.3);
+	}
+	.faq-accordion {
+		max-width: 800px;
+		margin: 3.5rem auto 0 auto;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+	.faq-item {
+		background: rgba(255, 255, 255, 0.01);
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		border-radius: 8px;
+		overflow: hidden;
+		transition: all 0.3s ease;
+	}
+	.faq-item[open] {
+		background: rgba(255, 255, 255, 0.02);
+		border-color: rgba(139, 124, 248, 0.2);
+	}
+	.faq-question {
+		padding: 1.25rem 1.5rem;
+		font-family: var(--font-heading);
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: #fff;
+		cursor: pointer;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		list-style: none;
+		user-select: none;
+	}
+	.faq-question::-webkit-details-marker {
+		display: none;
+	}
+	.faq-icon {
+		font-size: 1.25rem;
+		color: var(--text-secondary);
+		transition: transform 0.3s ease;
+	}
+	.faq-item[open] .faq-icon {
+		transform: rotate(45deg);
+		color: var(--accent);
+	}
+	.faq-answer {
+		padding: 0 1.5rem 1.5rem 1.5rem;
+		font-size: 0.92rem;
+		line-height: 1.6;
+		color: var(--text-secondary);
+	}
+	.faq-answer p {
+		margin: 0;
 	}
 
 	/* Pricing Section */
