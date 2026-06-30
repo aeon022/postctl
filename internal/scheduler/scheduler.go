@@ -3,6 +3,7 @@ package scheduler
 import (
 	"context"
 	"fmt"
+	"net"
 	"os"
 	"time"
 
@@ -10,6 +11,12 @@ import (
 	"github.com/aeon022/postctl/internal/platforms"
 	"github.com/aeon022/postctl/internal/store"
 )
+
+// isOnline prüft, ob eine Internetverbindung besteht.
+func isOnline() bool {
+	_, err := net.LookupHost("one.one.one.one")
+	return err == nil
+}
 
 // PublishPost veröffentlicht einen Post und aktualisiert den DB-Status sowie die Historie
 func PublishPost(ctx context.Context, s store.Store, post *models.Post, dryRun bool) (string, error) {
@@ -106,6 +113,21 @@ func checkAndPublishDue(ctx context.Context, s store.Store, dryRun bool) {
 	posts, err := s.ListPosts(ctx, "all", models.StatusScheduled, "")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[SCHEDULER FEHLER] Kann geplante Posts nicht lesen: %v\n", err)
+		return
+	}
+
+	// Prüfe, ob fällige Posts existieren
+	hasDue := false
+	for _, p := range posts {
+		if p.ScheduledAt != nil && p.ScheduledAt.Before(now) {
+			hasDue = true
+			break
+		}
+	}
+
+	// Falls offline und fällige Posts da sind, abbrechen und im nächsten Tick erneut versuchen
+	if hasDue && !dryRun && !isOnline() {
+		fmt.Fprintln(os.Stderr, "[SCHEDULER] Maschine ist offline (DNS-Lookup fehlgeschlagen). Verschiebe Veröffentlichung fälliger Posts, bis Verbindung hergestellt ist.")
 		return
 	}
 
