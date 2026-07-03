@@ -23,6 +23,7 @@ type KeyMap struct {
 	Export    key.Binding
 	Quit      key.Binding
 	Help      key.Binding
+	Filter    key.Binding
 }
 
 // Keys ist die globale KeyMap Instanz
@@ -103,4 +104,9 @@ var Keys = KeyMap{
 		key.WithKeys("x"),
 		key.WithHelp("x", "export history"),
 	),
+	Filter: key.NewBinding(
+		key.WithKeys("f"),
+		key.WithHelp("f", "filter campaign"),
+	),
 }
+

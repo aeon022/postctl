@@ -305,6 +305,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Vorschau schließen / Filter zurücksetzen",
 		"en": "Close Preview / Clear filter",
 	},
+	"help_filter": {
+		"de": "Kampagnen-Filter umschalten",
+		"en": "Toggle campaign filter",
+	},
 	"help_readme": {
 		"de": "Handbuch (README.md Browser) öffnen",
 		"en": "Open complete README documentation with TOC",

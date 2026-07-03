@@ -222,29 +222,34 @@ func ParseScheduleTime(s string) (time.Time, error) {
 
 // parseTweets zerlegt den Body in einzelne Tweets und weist Bilder zu
 func parseTweets(body string, images []string) []models.Tweet {
-	// Suchen nach Überschriften
-	matches := headerRegex.FindAllStringSubmatchIndex(body, -1)
+	// Vorherige Normalisierung der Zeilenenden für den Split
+	normalizedBody := strings.ReplaceAll(body, "\r\n", "\n")
+
+	// Suchen nach Überschriften (z.B. ## Tweet 1)
+	matches := headerRegex.FindAllStringSubmatchIndex(normalizedBody, -1)
 	if len(matches) == 0 {
-		// Keine Header vorhanden, behandle gesamten Body als einen Tweet
-		content := strings.TrimSpace(body)
+		// Falls keine Header vorhanden, prüfen, ob wir durch '---' getrennte Segmente haben
+		if strings.Contains(normalizedBody, "\n---\n") {
+			parts := strings.Split(normalizedBody, "\n---\n")
+			var tweets []models.Tweet
+			for idx, part := range parts {
+				content := strings.TrimSpace(part)
+				if content == "" {
+					continue
+				}
+				tweets = append(tweets, createTweet(idx+1, content, images))
+			}
+			return tweets
+		}
+
+		// Keine Trenner vorhanden, behandle gesamten Body als einen Tweet
+		content := strings.TrimSpace(normalizedBody)
 		if content == "" {
 			return nil
 		}
 		
-		// Inline Bild suchen
-		var inlineImage string
-		if imgMatch := inlineImageRegex.FindStringSubmatch(content); len(imgMatch) > 1 {
-			inlineImage = strings.TrimSpace(imgMatch[1])
-			content = inlineImageRegex.ReplaceAllString(content, "")
-			content = strings.TrimSpace(content)
-		}
-		
 		return []models.Tweet{
-			{
-				Index:   1,
-				Content: content,
-				Image:   inlineImage,
-			},
+			createTweet(1, content, images),
 		}
 	}
 
@@ -254,15 +259,11 @@ func parseTweets(body string, images []string) []models.Tweet {
 
 	for i, match := range matches {
 		headerStart, headerEnd := match[0], match[1]
-		headerText := body[headerStart:headerEnd]
-
-		// Wenn vor dem ersten Header Text stand, ignorieren wir ihn meistens (z.B. Einleitung),
-		// es sei denn, es war relevanter Content. In postctl gehen wir davon aus,
-		// dass der Thread mit "## Tweet 1" startet.
+		headerText := normalizedBody[headerStart:headerEnd]
 
 		// Den vorherigen Block verarbeiten
 		if i > 0 {
-			blockContent := strings.TrimSpace(body[lastEnd:headerStart])
+			blockContent := strings.TrimSpace(normalizedBody[lastEnd:headerStart])
 			if blockContent != "" {
 				tweets = append(tweets, createTweet(tweetIndex, blockContent, images))
 				tweetIndex++
@@ -273,7 +274,7 @@ func parseTweets(body string, images []string) []models.Tweet {
 		
 		// Falls dies der letzte Header ist, müssen wir den Rest des Bodys verarbeiten
 		if i == len(matches)-1 {
-			blockContent := strings.TrimSpace(body[lastEnd:])
+			blockContent := strings.TrimSpace(normalizedBody[lastEnd:])
 			// Prüfen, ob dieser Header ein Reply ist
 			isReply := strings.Contains(strings.ToLower(headerText), "reply")
 			t := createTweet(tweetIndex, blockContent, images)

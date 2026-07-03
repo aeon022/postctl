@@ -264,6 +264,36 @@ func (m Model) loadDataCmd() tea.Msg {
 			}
 		}
 	}
+
+	// Gruppieren nach Kampagnen unter Beibehaltung der chronologischen Reihenfolge der Kampagnen-Starts
+	if len(nextUp) > 0 {
+		type CampaignGroup struct {
+			Slug  string
+			Posts []models.Post
+		}
+		var groups []CampaignGroup
+		groupIndex := make(map[string]int)
+
+		for _, p := range nextUp {
+			idx, exists := groupIndex[p.Campaign]
+			if !exists {
+				idx = len(groups)
+				groupIndex[p.Campaign] = idx
+				groups = append(groups, CampaignGroup{
+					Slug:  p.Campaign,
+					Posts: []models.Post{},
+				})
+			}
+			groups[idx].Posts = append(groups[idx].Posts, p)
+		}
+
+		var groupedNextUp []models.Post
+		for _, g := range groups {
+			groupedNextUp = append(groupedNextUp, g.Posts...)
+		}
+		nextUp = groupedNextUp
+	}
+
 	
 	platforms := map[string]bool{
 		models.PlatformTwitter:  false,
@@ -1182,6 +1212,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.selectedPost = &filtered[m.cursor]
 				}
 			}
+			if m.activeTab == 2 {
+				if len(m.nextUp) > 0 && m.cursor < len(m.nextUp) {
+					m.selectedPost = &m.nextUp[m.cursor]
+				}
+			}
 			if m.activeTab == 3 {
 				if len(m.history) > 0 && m.cursor < len(m.history) {
 					m.selectedHistory = &m.history[m.cursor]
@@ -1225,6 +1260,31 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if m.activeTab == 3 {
 					return m, m.exportHistoryCmd(m.history)
 				}
+			}
+			return m, nil
+
+		case key.Matches(msg, Keys.Filter):
+			if m.selectedPost == nil && !m.showReadme && m.activeTab == 1 {
+				if len(m.campaigns) > 0 {
+					nextCampaign := ""
+					if m.filterCampaign == "" {
+						nextCampaign = m.campaigns[0].Slug
+					} else {
+						idx := -1
+						for i, c := range m.campaigns {
+							if c.Slug == m.filterCampaign {
+								idx = i
+								break
+							}
+						}
+						if idx != -1 && idx < len(m.campaigns)-1 {
+							nextCampaign = m.campaigns[idx+1].Slug
+						}
+					}
+					m.filterCampaign = nextCampaign
+					m.cursor = 0
+				}
+				return m, nil
 			}
 			return m, nil
 

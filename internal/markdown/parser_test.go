@@ -215,6 +215,43 @@ Reply content with link: https://github.com/aeon022/postctl
 	}
 }
 
+func TestParseContentThreadWithDashes(t *testing.T) {
+	content := `---
+platform: twitter
+type: thread
+campaign: dash-test
+---
+First tweet content with dashes.
+---
+Second tweet content with dashes.
+---
+Third tweet content with dashes.
+`
+	posts, err := ParseContent(content, "test-dash-thread.md")
+	if err != nil {
+		t.Fatalf("ParseContent failed: %v", err)
+	}
+
+	if len(posts) != 1 {
+		t.Fatalf("expected 1 post, got %d", len(posts))
+	}
+
+	post := posts[0]
+	if len(post.Tweets) != 3 {
+		t.Fatalf("expected 3 tweets, got %d", len(post.Tweets))
+	}
+
+	if post.Tweets[0].Content != "First tweet content with dashes." {
+		t.Errorf("Tweet 1 content mismatch: %q", post.Tweets[0].Content)
+	}
+	if post.Tweets[1].Content != "Second tweet content with dashes." {
+		t.Errorf("Tweet 2 content mismatch: %q", post.Tweets[1].Content)
+	}
+	if post.Tweets[2].Content != "Third tweet content with dashes." {
+		t.Errorf("Tweet 3 content mismatch: %q", post.Tweets[2].Content)
+	}
+}
+
 func TestParseContentAll(t *testing.T) {
 	content := `---
 platform: all

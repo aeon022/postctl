@@ -107,6 +107,7 @@ func (m Model) renderHelp() string {
 		builder.WriteString("  i          " + Tr("help_import") + "\n")
 		builder.WriteString("  d          " + Tr("help_delete") + "\n")
 		builder.WriteString("  r          " + Tr("help_repurpose") + "\n")
+		builder.WriteString("  f          " + Tr("help_filter") + "\n")
 		builder.WriteString("  esc        " + Tr("help_esc") + "\n")
 		builder.WriteString("  f1/R       " + Tr("help_readme") + "\n")
 		builder.WriteString("  ?          " + Tr("help_toggle") + "\n")
@@ -117,8 +118,12 @@ func (m Model) renderHelp() string {
 		var line1 string
 		if strings.ToLower(config.ActiveConfig.Defaults.Language) == "de" {
 			line1 = "tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Wählen  ·  n: Neu  ·  e: Bearbeiten  ·  i: Import  ·  d: Löschen  ·  r: Umschreiben  ·  q: Beenden"
-			if m.activeTab == 1 && m.filterCampaign != "" {
-				line1 = "esc: Filter löschen  ·  " + line1
+			if m.activeTab == 1 {
+				if m.filterCampaign != "" {
+					line1 = "esc: Filter löschen  ·  f: Filter wechseln  ·  " + line1
+				} else {
+					line1 = "f: Filter (Kampagne)  ·  " + line1
+				}
 			} else if m.activeTab == 3 {
 				line1 = "tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Details öffnen  ·  x: Exportieren  ·  q: Beenden"
 			}
@@ -126,8 +131,12 @@ func (m Model) renderHelp() string {
 			sb.WriteString(StyleHelp.Render(helpText))
 		} else {
 			line1 = "tab: next tab  ·  ↑↓: navigate  ·  enter: select  ·  n: new  ·  e: edit  ·  i: import  ·  d: delete  ·  r: repurpose  ·  q: quit"
-			if m.activeTab == 1 && m.filterCampaign != "" {
-				line1 = "esc: clear filter  ·  " + line1
+			if m.activeTab == 1 {
+				if m.filterCampaign != "" {
+					line1 = "esc: clear filter  ·  f: change filter  ·  " + line1
+				} else {
+					line1 = "f: filter campaign  ·  " + line1
+				}
 			} else if m.activeTab == 3 {
 				line1 = "tab: next tab  ·  ↑↓: navigate  ·  enter: view details  ·  x: export  ·  q: quit"
 			}

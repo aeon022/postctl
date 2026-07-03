@@ -133,13 +133,28 @@ The temporary file opened in Vim contains three main parts:
 
 #### Step 3: Write Your Post / Thread
 - Write your post content.
-- If you are writing a thread (supported on platforms like Twitter/X), separate each post using a single line with `---`.
-- *Example:*
+- If you are writing a thread (supported on platforms like Twitter/X, Mastodon, or Bluesky), you can separate each post using either:
+  1. A single line with `---` (recommended, aligned with the TUI editor).
+  2. Distinct Markdown headings such as `## Tweet 1`, `## Tweet 2`, and optionally `## Reply` at the end (useful if you want to explicitly declare inline image overrides or designate a specific reply tweet).
+- *Example using `---`:*
   ```text
   This is the first tweet of my thread.
   ---
   This is the second tweet of my thread.
   ```
+- *Example using Headings:*
+  ```text
+  ## Tweet 1
+  This is the first tweet of my thread.
+  <!-- image: screenshot.png -->
+  
+  ## Tweet 2
+  This is the second tweet of my thread.
+  
+  ## Reply
+  Check it out: https://github.com/aeon022/postctl
+  ```
+
 
 #### Step 4: Save & Sync Back
 1. Save and exit the editor by typing **`:wq`** or **`:x`** (or press **`ZZ`** in normal mode).
@@ -276,13 +291,28 @@ Die in Vim geöffnete temporäre Datei besteht aus drei Abschnitten:
 
 #### Schritt 3: Beitrag oder Thread schreiben
 - Schreibe deinen gewünschten Text.
-- Wenn du einen mehrteiligen Thread verfasst (z. B. für Twitter/X), trenne die einzelnen Beiträge mit einer Zeile, die nur aus **`---`** besteht.
-- *Beispiel:*
+- Wenn du einen mehrteiligen Thread verfasst (z. B. für Twitter/X, Mastodon oder Bluesky), kannst du die einzelnen Beiträge auf zwei Arten trennen:
+  1. Mit einer Zeile, die nur aus **`---`** besteht (empfohlen, einheitlich mit dem TUI-Editor).
+  2. Mit Markdown-Überschriften wie **`## Tweet 1`**, **`## Tweet 2`** und optional **`## Reply`** am Ende (hilfreich, um inline Bilder zuzuweisen oder den letzten Tweet explizit als Reply zu kennzeichnen).
+- *Beispiel mit `---`:*
   ```text
   Das ist der erste Tweet meines Threads.
   ---
   Das ist der zweite Tweet meines Threads.
   ```
+- *Beispiel mit Überschriften:*
+  ```text
+  ## Tweet 1
+  Das ist der erste Tweet meines Threads.
+  <!-- image: screenshot.png -->
+  
+  ## Tweet 2
+  Das ist der zweite Tweet meines Threads.
+  
+  ## Reply
+  Hier ausprobieren: https://github.com/aeon022/postctl
+  ```
+
 
 #### Schritt 4: Speichern & Zurückkehren
 1. Speichere und schließe den Editor mit **`:wq`** oder **`:x`** (oder drücke **`ZZ`** im Normal-Modus).
