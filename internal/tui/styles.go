@@ -2,26 +2,26 @@ package tui
 
 import "github.com/charmbracelet/lipgloss"
 
-// Farben
+// Palette — aligned with missionctl design system
 var (
-	ColorPrimary   = lipgloss.Color("#8b7cf8") // Lavender / Purple
-	ColorSecondary = lipgloss.Color("#00f5d4") // Cyan
-	ColorDarkGray  = lipgloss.Color("#2d3748") // Dark Slate
-	ColorLightGray = lipgloss.Color("#718096") // Gray
-	ColorBg        = lipgloss.Color("#1a202c") // Very Dark Slate
-	ColorText      = lipgloss.Color("#f7fafc") // White/Off-white
+	ColorPrimary   = lipgloss.AdaptiveColor{Light: "25",  Dark: "33"}  // blue (header, borders)
+	ColorSecondary = lipgloss.AdaptiveColor{Light: "30",  Dark: "43"}  // teal (active/selected)
+	ColorDarkGray  = lipgloss.AdaptiveColor{Light: "250", Dark: "239"} // subtle (inactive borders)
+	ColorLightGray = lipgloss.AdaptiveColor{Light: "243", Dark: "246"} // muted (metadata, help)
+	ColorBgFg      = lipgloss.AdaptiveColor{Light: "232", Dark: "255"} // badge foreground (dark/light swap)
 
-	ColorDraft     = lipgloss.Color("#a0aec0") // Gray
-	ColorScheduled = lipgloss.Color("#ecc94b") // Yellow
-	ColorPosted    = lipgloss.Color("#48bb78") // Green
-	ColorFailed    = lipgloss.Color("#f56565") // Red
+	// Status colors
+	ColorDraft     = lipgloss.AdaptiveColor{Light: "250", Dark: "239"} // subtle gray
+	ColorScheduled = lipgloss.AdaptiveColor{Light: "214", Dark: "220"} // amber
+	ColorPosted    = lipgloss.AdaptiveColor{Light: "28",  Dark: "42"}  // green
+	ColorFailed    = lipgloss.AdaptiveColor{Light: "160", Dark: "203"} // red
 )
 
-// Lipgloss Stile
+// Styles
 var (
 	StyleTitle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(ColorBg).
+			Foreground(ColorBgFg).
 			Background(ColorPrimary).
 			Padding(0, 1)
 
@@ -66,25 +66,25 @@ var (
 			Foreground(ColorPrimary)
 
 	StyleStatusDraft = lipgloss.NewStyle().
-				Foreground(ColorBg).
+				Foreground(ColorBgFg).
 				Background(ColorDraft).
 				Padding(0, 1).
 				Bold(true)
 
 	StyleStatusScheduled = lipgloss.NewStyle().
-				Foreground(ColorBg).
+				Foreground(ColorBgFg).
 				Background(ColorScheduled).
 				Padding(0, 1).
 				Bold(true)
 
 	StyleStatusPosted = lipgloss.NewStyle().
-				Foreground(ColorBg).
+				Foreground(ColorBgFg).
 				Background(ColorPosted).
 				Padding(0, 1).
 				Bold(true)
 
 	StyleStatusFailed = lipgloss.NewStyle().
-				Foreground(ColorText).
+				Foreground(ColorBgFg).
 				Background(ColorFailed).
 				Padding(0, 1).
 				Bold(true)

@@ -171,7 +171,7 @@ func (m Model) renderReadmeTOC() string {
 	headerStr := " SYSTEM DOKUMENTATION & README — INHALTSVERZEICHNIS "
 	builder.WriteString(lipgloss.NewStyle().
 		Bold(true).
-		Foreground(ColorBg).
+		Foreground(ColorBgFg).
 		Background(ColorSecondary).
 		Padding(0, 1).
 		Render(headerStr))
@@ -202,7 +202,7 @@ func (m Model) renderReadmeTOC() string {
 			}
 		}
 
-		lineStyle := lipgloss.NewStyle().Foreground(ColorText)
+		lineStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
 		if selected {
 			lineStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 		} else if item.level == 1 {
@@ -260,7 +260,7 @@ func (m Model) renderReadmeContent() string {
 	headerStr := " SYSTEM DOKUMENTATION & README "
 	builder.WriteString(lipgloss.NewStyle().
 		Bold(true).
-		Foreground(ColorBg).
+		Foreground(ColorBgFg).
 		Background(ColorSecondary).
 		Padding(0, 1).
 		Render(headerStr))
@@ -326,7 +326,7 @@ func (m Model) renderReadmeContent() string {
 		} else if strings.HasPrefix(trimmed, "#### ") {
 			title := strings.TrimPrefix(trimmed, "#### ")
 			title = stripEmojis(title)
-			contentBuilder.WriteString(lipgloss.NewStyle().Bold(true).Underline(true).Foreground(ColorText).Render("  "+title) + "\n")
+			contentBuilder.WriteString(lipgloss.NewStyle().Bold(true).Underline(true).Foreground(ColorLightGray).Render("  "+title) + "\n")
 		} else {
 			// Format bullet points
 			if strings.HasPrefix(trimmed, "* ") || strings.HasPrefix(trimmed, "- ") {
@@ -390,7 +390,7 @@ func formatInlineMarkdown(text string) string {
 	// 3. Format bold markers
 	boldParts := strings.Split(text, "**")
 	for idx := 1; idx < len(boldParts); idx += 2 {
-		boldParts[idx] = lipgloss.NewStyle().Bold(true).Foreground(ColorText).Render(boldParts[idx])
+		boldParts[idx] = lipgloss.NewStyle().Bold(true).Foreground(ColorLightGray).Render(boldParts[idx])
 	}
 	return strings.Join(boldParts, "")
 }

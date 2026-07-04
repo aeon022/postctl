@@ -20,7 +20,7 @@ func (m Model) renderDetailView() string {
 	titleStr := fmt.Sprintf(" PREVIEW: %s %s ", strings.ToUpper(p.Platform), strings.ToUpper(p.Language))
 	builder.WriteString(lipgloss.NewStyle().
 		Bold(true).
-		Foreground(ColorBg).
+		Foreground(ColorBgFg).
 		Background(ColorSecondary).
 		Padding(0, 1).
 		Render(titleStr))

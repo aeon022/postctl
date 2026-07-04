@@ -202,7 +202,7 @@ func (m Model) renderEditor() string {
 
 	builder.WriteString(lipgloss.NewStyle().
 		Bold(true).
-		Foreground(ColorBg).
+		Foreground(ColorBgFg).
 		Background(ColorSecondary).
 		Padding(0, 1).
 		Render(titleText))
@@ -210,7 +210,7 @@ func (m Model) renderEditor() string {
 
 	// 1. Plattform
 	platPrefix := "  "
-	platStyle := lipgloss.NewStyle().Foreground(ColorText)
+	platStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
 	if m.editorFocus == 0 {
 		platPrefix = "➔ "
 		platStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
@@ -233,7 +233,7 @@ func (m Model) renderEditor() string {
 
 	// 2. Kampagne
 	campPrefix := "  "
-	campStyle := lipgloss.NewStyle().Foreground(ColorText)
+	campStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
 	if m.editorFocus == 1 {
 		campPrefix = "➔ "
 		campStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
@@ -243,7 +243,7 @@ func (m Model) renderEditor() string {
 
 	// 3. Geplantes Datum
 	schedPrefix := "  "
-	schedStyle := lipgloss.NewStyle().Foreground(ColorText)
+	schedStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
 	if m.editorFocus == 2 {
 		schedPrefix = "➔ "
 		schedStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
@@ -264,7 +264,7 @@ func (m Model) renderEditor() string {
 
 	// 4. Bilder
 	imgPrefix := "  "
-	imgStyle := lipgloss.NewStyle().Foreground(ColorText)
+	imgStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
 	if m.editorFocus == 3 {
 		imgPrefix = "➔ "
 		imgStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
@@ -279,7 +279,7 @@ func (m Model) renderEditor() string {
 
 	// 5. Text-Inhalt
 	bodyPrefix := "  "
-	bodyStyle := lipgloss.NewStyle().Foreground(ColorText)
+	bodyStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
 	bodyLabel := Tr("editor_label_body")
 	if m.editorPlatform == "twitter" || m.editorPlatform == "mastodon" || m.editorPlatform == "bluesky" {
 		bodyLabel += Tr("editor_twitter_thread_note")
@@ -295,13 +295,13 @@ func (m Model) renderEditor() string {
 	cancelLabel := Tr("editor_cancel")
 	
 	if m.editorFocus == 5 {
-		saveLabel = lipgloss.NewStyle().Bold(true).Foreground(ColorBg).Background(ColorPosted).Render(saveLabel)
+		saveLabel = lipgloss.NewStyle().Bold(true).Foreground(ColorBgFg).Background(ColorPosted).Render(saveLabel)
 	} else {
 		saveLabel = lipgloss.NewStyle().Foreground(ColorPosted).Render(saveLabel)
 	}
 	
 	if m.editorFocus == 6 {
-		cancelLabel = lipgloss.NewStyle().Bold(true).Foreground(ColorBg).Background(ColorFailed).Render(cancelLabel)
+		cancelLabel = lipgloss.NewStyle().Bold(true).Foreground(ColorBgFg).Background(ColorFailed).Render(cancelLabel)
 	} else {
 		cancelLabel = lipgloss.NewStyle().Foreground(ColorFailed).Render(cancelLabel)
 	}
@@ -359,7 +359,7 @@ func (m Model) renderCalendar(selectedDate time.Time) string {
 		if day == selectedDate.Day() {
 			sb.WriteString(lipgloss.NewStyle().
 				Bold(true).
-				Foreground(ColorBg).
+				Foreground(ColorBgFg).
 				Background(ColorSecondary).
 				Render(dayStr) + " ")
 		} else {

@@ -27,7 +27,7 @@ func (m Model) renderHistoryDetailView() string {
 
 	builder.WriteString(lipgloss.NewStyle().
 		Bold(true).
-		Foreground(ColorBg).
+		Foreground(ColorBgFg).
 		Background(headerBg).
 		Padding(0, 1).
 		Render(titleStr))

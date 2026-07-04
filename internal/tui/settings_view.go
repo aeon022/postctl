@@ -54,7 +54,7 @@ func (m Model) renderSettings() string {
 			cursorStr = "> "
 		}
 
-		labelStyle := lipgloss.NewStyle().Foreground(ColorText)
+		labelStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
 		if i == m.cursor && i != 4 {
 			labelStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 		}

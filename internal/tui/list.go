@@ -182,7 +182,7 @@ func (m Model) renderPostList() string {
 		}
 
 		// Listeneintrag gestalten
-		lineColor := lipgloss.Color("#cbd5e0")
+		lineColor := ColorLightGray
 		if selected {
 			lineColor = ColorSecondary
 		}
