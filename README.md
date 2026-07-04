@@ -1,320 +1,325 @@
-# postctl — Social Media Management from your Terminal
+# postctl
 
-`postctl` is a lightweight, offline-first CLI and TUI tool written in Go to manage and schedule social media posts directly from Markdown files. It is built for developer workflows, Git versioning, and AI-assisted post conversion.
+Terminal social media manager. Write posts in Markdown, schedule them, and publish to Twitter/X, LinkedIn, Threads, Mastodon, and Bluesky from the command line or a full TUI.
 
-*Scrollen Sie nach unten für die deutsche Version.*
-
----
-
-## English Version
-
-### 🚀 Features (2026 Standards)
-
-1. **Markdown-First Workflow**: Write your posts as Markdown. Frontmatter fields define platforms, campaigns, schedule times, and image paths.
-2. **Terminal User Interface (TUI)**: Interactive Bubble Tea-based dashboard to manage campaigns, posts, history, and settings.
-3. **Modern API Integrations**:
-   * **Twitter/X**: Post tweets and threads via the official OAuth 2.0 API (recommended, requires paid API credits) or a free but unofficial Cookie-based bypass (risk of account suspension).
-   * **LinkedIn**: Authenticate via modern **OpenID Connect (OIDC)** (Scopes: `openid`, `profile`, `w_member_social`).
-   * **Threads (Meta)**: Official Threads API integration with secure HTTPS callbacks (`https://localhost:8753/callback`).
-4. **Encrypted Backup & Multi-Device Sync (AES-256-GCM)**: Synchronize your database (tokens, history, drafts) across devices securely and for free.
+**Supported platforms:** Twitter/X · LinkedIn · Threads · Mastodon · Bluesky
 
 ---
 
-### 💾 Posting & Image Import/Export (Deep Dive)
+## Quick Start
 
-#### 1. Importing Posts (`postctl import <path>`)
-When you run `./postctl import [file.md or directory]`, the CLI performs the following steps:
-* **Scan & Parse:** It parses all `.md` and `.markdown` files. The frontmatter properties are converted into SQLite database models.
-* **Validation:** Before saving, `postctl` validates:
-  * **Char Limits:** Twitter/X tweets are verified to be under 280 characters.
-  * **Image Existence:** Every referenced image path is checked on your local disk. If any validation fails, the entire import is aborted.
-* **Save:** Validated posts are saved to the local SQLite database (`postctl.db`) as `draft` or `scheduled`.
+1. **Install**
 
-#### 2. Image Path Resolution
-When you reference an image in your frontmatter (e.g., `images: ["logo.png"]`), `postctl` searches for it in this exact order:
-1. **Absolute Path:** Check the literal absolute path (e.g., `/Users/gweiher/Images/logo.png`).
-2. **Relative to Markdown File:** Check the directory containing the imported Markdown file (best practice for Git repositories).
-3. **Relative to Working Directory (CWD):** Check the directory where you executed the command.
-4. **Relative to configured Image Dir:** Check the path configured under `defaults.image_dir` in `config.yaml`.
+   ```bash
+   git clone https://github.com/aeon022/postctl && cd postctl
+   ./setup.sh
+   ```
 
-#### 3. Image Exporting (Publishing to Platforms)
-When a post containing images is published, `postctl` uploads the local images first:
-* **LinkedIn (Native Host):** `postctl` registers the upload, performs a binary `PUT` request to LinkedIn's media servers, and attaches the resulting URN (e.g., `urn:li:digitalmediaAsset:...`) to the post.
-* **Twitter/X (Native Host):** Uploads the image using the Twitter v1.1 Media Upload API to receive a `media_id`, which is then attached to the v2 tweet.
-* **Threads (Meta HTTPS Requirement):** The Threads API *does not* allow binary uploads from local machines. It requires a **publicly accessible HTTPS URL** from which Meta downloads the image. 
-  * *Production Tip:* For Threads, host your images on a public cloud storage (e.g., AWS S3, Cloudflare R2, Imgur) and use these URLs directly in the Markdown frontmatter.
+2. **Authenticate with a platform**
+
+   ```bash
+   postctl auth --platform twitter
+   ```
+
+3. **Write a post** — create a Markdown file (see [Post Format](#post-markdown-format)):
+
+   ```markdown
+   ---
+   platform: twitter
+   title: My first post
+   ---
+
+   Hello from postctl.
+   ```
+
+4. **Import the file**
+
+   ```bash
+   postctl import my-post.md
+   ```
+
+5. **Publish immediately or schedule**
+
+   ```bash
+   postctl post <ID>
+   postctl schedule <ID> --time 2026-07-10T09:00:00+02:00
+   ```
+
+6. **Open the TUI to manage everything**
+
+   ```bash
+   postctl tui
+   ```
 
 ---
 
-### 🛠️ Installation & Setup
-Run the interactive setup script:
-```bash
-chmod +x setup.sh
-./setup.sh
+## Cheatsheet
+
+```
+postctl                                  Open TUI (default)
+postctl tui                              Open TUI explicitly
+
+postctl auth --platform PLATFORM         Authenticate with a platform
+postctl config [--show] [--set K V]      View or set config values
+
+postctl import FILE_OR_DIR               Import Markdown post(s)
+postctl list [--platform P] [--status S] [--campaign C] [--format human|json]
+postctl template --platform PLATFORM     Generate a post template
+
+postctl post ID [--dry-run]              Publish a post immediately
+postctl schedule ID --time DATETIME      Schedule a post (RFC3339)
+postctl campaign list                    List all campaigns
+postctl campaign post NAME [--dry-run]   Publish all posts in a campaign
+
+postctl generate URL                     AI-generate a post from a URL
+postctl repurpose ID --platform TARGET   Repurpose a post for another platform
+
+postctl analytics [--platform P] [--format human|json]
+postctl daemon [--dry-run]               Run the background scheduler
+postctl mcp                              Start the MCP server (stdio)
+postctl version                          Print version
 ```
 
-For platform-specific setup details and authentication instructions, see the guides:
-* 🐦 [Twitter/X API & Cookie Setup Guide](docs/api-twitter-en.md) (Official paid API setup or free unofficial cookie bypass, troubleshooting `empty tweet ID` errors)
+---
+
+## Post Markdown Format
+
+### Frontmatter Fields
+
+| Field      | Required | Values / Format                                                       | Description                       |
+|------------|----------|-----------------------------------------------------------------------|-----------------------------------|
+| `platform` | Yes      | `twitter`, `linkedin`, `threads`, `mastodon`, `bluesky`               | Target platform                   |
+| `title`    | No       | String                                                                | Internal label (not published)    |
+| `campaign` | No       | String slug                                                           | Groups posts into a campaign      |
+| `schedule` | No       | RFC3339, e.g. `2026-07-10T09:00:00+02:00`                            | Scheduled publish time            |
+
+### Body Format
+
+Write the post body in plain Markdown below the closing `---` of the frontmatter block.
+
+- **LinkedIn, Threads, Mastodon, Bluesky:** Single body. No separators.
+- **Twitter/X threads:** Separate individual tweets with a line containing only `---`. Each segment becomes one tweet in the thread.
+
+### Twitter Thread Example
+
+```markdown
+---
+platform: twitter
+title: Launch announcement
+campaign: product-launch
+schedule: 2026-07-10T09:00:00+02:00
+---
+
+This is the first tweet. Max 280 characters for Twitter/X.
 
 ---
 
-### ⚙️ Settings & Auth in TUI
-Run `./postctl tui` and navigate to the **Settings** tab:
-* **Account Auth:** Highlight an account under **PLATFORM ACCOUNTS** and press **Enter** to start the OAuth login. The TUI pauses, opens your standard browser, and displays a status message upon completion.
-* **Interactive Post Import:** In any main tab (Dashboard, Posts, Schedule, History), you can press **`i`** to trigger an interactive post import. The TUI will temporarily pause, clear the terminal, and prompt you for the Markdown file/directory path. **Tip: You can simply drag and drop the file or folder directly from your Finder into the terminal window.** The tool automatically cleans quote characters, validates the posts/images, imports them, and returns to the TUI.
-* **Backup & Sync:** Go to **BACKUP & SYNC** at the bottom, select `Backup Exp.` (Export) or `Backup Imp.` (Import), and press **Enter** to enter your master password.
-  * CLI Commands: `./postctl config export -o backup.bin` and `./postctl config import -f backup.bin`.
+Second tweet in the thread.
 
 ---
 
-### 🕒 Running the Scheduler
-Since `postctl` is a local-first application, scheduled posts are published using one of the following two modes:
-
-1. **Interactive Mode (Automatic TUI Background Goroutine):**
-   When the interactive TUI is open (`./postctl tui` or just `./postctl`), a background scheduler goroutine runs automatically in the background. It polls the database every 10 seconds and publishes any due posts. No separate setup or terminal tab is needed as long as the TUI is open.
-
-2. **Headless Mode (Scheduler Daemon):**
-   If you want to run `postctl` headless (e.g., on a server or without keeping the interactive terminal TUI open), you can start the scheduler daemon:
-   ```bash
-   ./postctl daemon
-   ```
-   To run the daemon silently in the background:
-   ```bash
-   nohup ./postctl daemon > daemon.log 2>&1 &
-   ```
-
-### ☁️ Going Offline & Cloud Deployment (VPS / Raspberry Pi)
-
-Since `postctl` is a local-first application, it runs on your local machine. If your computer is turned off or asleep during a scheduled post time, the daemon cannot run.
-
-`postctl` handles this gracefully:
-1. **Auto-Catchup (Local Fallback):** When you boot your machine and open the TUI or start the daemon, it immediately checks for any missed posts in the past and publishes them instantly.
-2. **Cloud Deployment (24/7 Online):** Because `postctl` is written in Go, it compiles to a single static binary and uses a self-contained SQLite file. You can easily deploy it on a $4 VPS or a Raspberry Pi:
-   * **Cross-compile for Linux VPS:**
-     ```bash
-     GOOS=linux GOARCH=amd64 go build -o postctl-linux main.go
-     ```
-   * **Copy Configuration & DB:** Transfer your `~/.config/postctl/` configuration and database files to the server.
-   * **Run Headless Daemon:** Start the daemon in the background on your server:
-     ```bash
-     nohup ./postctl-linux daemon > daemon.log 2>&1 &
-     ```
-
----
-
-### 📝 Vim / Neovim External Editor Flow (Step-by-Step)
-
-When editing or creating a post within the TUI, you can spawn your favorite terminal text editor (like Vim or Neovim) for a rich, distraction-free editing environment.
-
-#### Step 1: Open the External Editor
-1. In the TUI, highlight or select a post and press **`e`** to open the built-in edit form.
-2. Press **`ctrl+v`** from any focused form field.
-3. The TUI will suspend itself and open Neovim/Vim (it uses your `$EDITOR` environment variable, falling back to `nvim` or `vim`).
-
-#### Step 2: Understand the Template Structure
-The temporary file opened in Vim contains three main parts:
-1. **Interactive Helper Block (`<!-- ... -->`)**:
-   - Contains a character ruler showing the maximum length for the current platform (e.g., 280 for Twitter, 300 for Bluesky, 500 for Mastodon).
-   - Shows live counts (at the time of launch) for single posts or thread segments (delimited by `---`).
-   - *Note:* This entire HTML comment block is automatically removed upon saving.
-2. **YAML Frontmatter Block**:
-   - Defined between the `---` delimiters:
-     ```yaml
-     ---
-     platform: twitter
-     campaign: launch-2026
-     schedule: 2026-06-25 15:00:00
-     images: ["logo.png"]
-     ---
-     ```
-   - **Bidirectional Sync:** You can edit these metadata values directly inside Vim! When you exit, `postctl` parses this YAML header and automatically updates the corresponding input fields back in the TUI form.
-3. **Post Body Content**:
-   - The actual content of your post starts directly below the closing `---` frontmatter delimiter.
-
-#### Step 3: Write Your Post / Thread
-- Write your post content.
-- If you are writing a thread (supported on platforms like Twitter/X, Mastodon, or Bluesky), you can separate each post using either:
-  1. A single line with `---` (recommended, aligned with the TUI editor).
-  2. Distinct Markdown headings such as `## Tweet 1`, `## Tweet 2`, and optionally `## Reply` at the end (useful if you want to explicitly declare inline image overrides or designate a specific reply tweet).
-- *Example using `---`:*
-  ```text
-  This is the first tweet of my thread.
-  ---
-  This is the second tweet of my thread.
-  ```
-- *Example using Headings:*
-  ```text
-  ## Tweet 1
-  This is the first tweet of my thread.
-  <!-- image: screenshot.png -->
-  
-  ## Tweet 2
-  This is the second tweet of my thread.
-  
-  ## Reply
-  Check it out: https://github.com/aeon022/postctl
-  ```
-
-
-#### Step 4: Save & Sync Back
-1. Save and exit the editor by typing **`:wq`** or **`:x`** (or press **`ZZ`** in normal mode).
-2. The TUI will resume instantly. The body text is updated, the helper comments are stripped, and the edited frontmatter values are synced back into the TUI fields.
-3. Review your changes in the TUI and navigate to the **`Save`** button (or press `Enter` when focused) to write the changes to the database.
-
----
----
-
-## Deutsche Version
-
-### 🚀 Features (Stand 2026)
-
-1. **Markdown-First Workflow**: Schreibe Beiträge als Markdown. Frontmatter-Felder definieren Plattformen, Kampagnen, Zeiten und Bildpfade.
-2. **Terminal User Interface (TUI)**: Interaktives Bubble-Tea-Dashboard zur Verwaltung von Kampagnen, Beiträgen, Historie und Einstellungen.
-3. **Moderne API-Integrationen**:
-    * **Twitter/X**: Veröffentliche Tweets/Threads über die offizielle API (empfohlen, erfordert kostenpflichtige API-Credits) oder einen kostenlosen, aber inoffiziellen Cookie-Bypass (Risiko von Kontosperrung).
-   * **LinkedIn**: Authentifizierung über den modernen **OpenID Connect (OIDC)**-Standard (Scopes: `openid`, `profile`, `w_member_social`).
-   * **Threads (Meta)**: Offizielle Threads API mit sicherem HTTPS-Callback (`https://localhost:8753/callback`).
-4. **Backup & Multi-Device Sync (AES-256-GCM)**: Synchronisiere deine Datenbank (Tokens, Historie, Entwürfe) sicher und kostenlos zwischen Geräten.
-
----
-
-### 💾 Import/Export von Beiträgen & Bildern (Detailerklärung)
-
-#### 1. Importieren von Beiträgen (`postctl import <pfad>`)
-Wenn du `./postctl import [datei.md oder ordner/]` ausführst, führt das CLI folgende Schritte aus:
-* **Scan & Parse:** Alle `.md` und `.markdown`-Dateien werden analysiert. Die Frontmatter-Eigenschaften werden in SQLite-Datenbankmodelle umgewandelt.
-* **Validierung:** Vor dem Speichern prüft `postctl`:
-  * **Zeichenlimits:** Twitter/X-Tweets werden auf die Grenze von 280 Zeichen validiert.
-  * **Bild-Existenz:** Jeder verlinkte Bildpfad wird auf der lokalen Festplatte geprüft. Schlägt die Validierung auch nur einer Datei fehl, wird der gesamte Import abgebrochen.
-* **Speichern:** Validierte Beiträge werden in der lokalen SQLite-Datenbank (`postctl.db`) als `draft` (Entwurf) oder `scheduled` (Geplant) abgelegt.
-
-#### 2. Auflösung von Bildpfaden
-Wenn du ein Bild im Frontmatter angibst (z. B. `images: ["logo.png"]`), sucht `postctl` dieses in folgender Reihenfolge:
-1. **Absoluter Pfad:** Direkte Prüfung des absoluten Pfads (z. B. `/Users/gweiher/Bilder/logo.png`).
-2. **Relativ zur Markdown-Datei:** Prüfung im Ordner der importierten Markdown-Datei (Best Practice für Git-Repositories).
-3. **Relativ zum Arbeitsverzeichnis (CWD):** Prüfung im aktuellen Ordner, in dem der Befehl ausgeführt wird.
-4. **Relativ zum Standard-Bildordner:** Prüfung im unter `defaults.image_dir` in der `config.yaml` definierten Pfad.
-
-#### 3. Bild-Export (Veröffentlichung auf den Plattformen)
-Wird ein Beitrag mit Bildern veröffentlicht, lädt `postctl` die lokalen Bilder zuerst hoch:
-* **LinkedIn (Nativer Upload):** `postctl` registriert den Upload, führt einen binären `PUT`-Request auf die LinkedIn-Server aus und hängt den erhaltenen URN (z. B. `urn:li:digitalmediaAsset:...`) an das Posting an.
-* **Twitter/X (Nativer Upload):** Das Bild wird über die v1.1 Media Upload API von X hochgeladen, um eine `media_id` zu erhalten. Diese wird an den v2-Tweet angehängt.
-* **Threads (Meta HTTPS-Pflicht):** Die Threads API erlaubt *keine* binären Uploads von lokalen Rechnern. Sie erfordert eine **öffentlich erreichbare HTTPS-URL**, von der Meta das Bild herunterlädt.
-  * *Praxis-Tipp:* Hoste deine Bilder für Threads auf einem öffentlichen Cloud-Speicher (z. B. AWS S3, Cloudflare R2, Imgur) und verwende diese URLs direkt im Markdown-Frontmatter.
-
----
-
-### 🛠️ Installation & Setup
-Starte das interaktive Setup-Skript:
-```bash
-chmod +x setup.sh
-./setup.sh
+Third tweet. Threads are Twitter-only.
 ```
 
-Für plattformspezifische Details und Zugangsdaten findest du hier die passenden Anleitungen:
-* 🐦 [Twitter/X API & Cookie Setup Guide](docs/api-twitter.md) (Nutzung des kostenlosen Cookie-Bypasses oder der offiziellen API, sowie Fehlerbehebung für `empty tweet ID`)
+---
+
+## CLI Reference
+
+### Authentication and Configuration
+
+| Command | Description |
+|---------|-------------|
+| `postctl auth --platform PLATFORM` | Authenticate with the given platform (OAuth flow) |
+| `postctl config --show` | Print the current configuration |
+| `postctl config --set KEY VALUE` | Set a configuration value |
+
+### Content Management
+
+| Command | Description |
+|---------|-------------|
+| `postctl import FILE_OR_DIR` | Import one Markdown file or a directory of files |
+| `postctl list` | List posts; filter with `--platform`, `--status`, `--campaign`; format with `--format human\|json` |
+| `postctl template --platform PLATFORM` | Print a Markdown template for the given platform |
+| `postctl generate URL` | AI-generate a draft post from the article at URL |
+| `postctl repurpose ID --platform TARGET` | Repurpose an existing post for a different platform |
+
+### Publishing
+
+| Command | Description |
+|---------|-------------|
+| `postctl post ID` | Publish post immediately |
+| `postctl post ID --dry-run` | Simulate publishing without sending |
+| `postctl schedule ID --time DATETIME` | Set or update the scheduled publish time |
+| `postctl campaign list` | List all campaigns with post counts |
+| `postctl campaign post NAME` | Publish all posts in a campaign |
+| `postctl campaign post NAME --dry-run` | Dry-run campaign publish |
+| `postctl daemon` | Start the background scheduler daemon |
+| `postctl daemon --dry-run` | Run daemon in dry-run mode |
+
+### Analytics
+
+| Command | Description |
+|---------|-------------|
+| `postctl analytics` | Show analytics across all platforms |
+| `postctl analytics --platform PLATFORM` | Filter to one platform |
+| `postctl analytics --format json` | Output as JSON |
+
+### MCP Server
+
+| Command | Description |
+|---------|-------------|
+| `postctl mcp` | Start the MCP server on stdio for use by AI agents |
 
 ---
 
-### ⚙️ Einstellungen & Auth in der TUI
-Führe `./postctl tui` aus und wechsle in den **Settings**-Tab:
-* **Account Auth:** Wähle einen Account unter **PLATFORM ACCOUNTS** und drücke **Enter**. Die TUI pausiert, öffnet deinen Browser und aktualisiert den Status nach erfolgreichem Login.
-* **Interaktiver Beitrags-Import:** In jedem Haupt-Tab (Dashboard, Posts, Schedule, History) kannst du die Taste **`i`** drücken, um einen interaktiven Import zu starten. Die TUI pausiert kurz, leert das Terminal und bittet dich um den Pfad zur Markdown-Datei oder zum Ordner. **Tipp: Du kannst die Datei oder den Ordner einfach per Drag & Drop aus dem Finder direkt in das Terminalfenster ziehen.** Das Tool entfernt automatisch störende Anführungszeichen, validiert die Beiträge/Bilder und kehrt direkt wieder zur TUI zurück.
-* **Backup & Sync:** Wähle unten im Bereich **BACKUP & SYNC** entweder `Backup Exp.` (Export) oder `Backup Imp.` (Import) und drücke **Enter**, um dein Master-Passwort einzugeben.
-  * CLI-Befehle: `./postctl config export -o backup.bin` und `./postctl config import -f backup.bin`.
+## TUI Guide
+
+Launch with `postctl` or `postctl tui`.
+
+### Views
+
+| View | Description |
+|------|-------------|
+| Posts list | Main view; shows all posts with status badges (draft / scheduled / posted / failed) |
+| Detail | Full post content and metadata |
+| Editor | Write or edit post body and frontmatter fields |
+| Schedule | Set or adjust the scheduled time for a post |
+| Analytics | Platform-level metrics overview |
+| History | Log of past publish events |
+| Settings | App configuration |
+| Readme | In-app documentation |
+
+Switch between views using tabs or the keybindings below.
+
+### Keybindings
+
+**Posts List**
+
+| Key | Action |
+|-----|--------|
+| `j` / `k` | Navigate up and down |
+| `Enter` | Open detail view |
+| `n` | New post |
+| `e` | Edit selected post |
+| `d` | Delete selected post |
+| `p` | Publish selected post |
+| `s` | Schedule selected post |
+| `Tab` | Switch tabs |
+| `q` | Quit |
+
+**Detail View**
+
+| Key | Action |
+|-----|--------|
+| `Esc` | Back to list |
+| `e` | Edit post |
+| `p` | Publish post |
+| `r` | Repurpose post |
+
+**Editor**
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+S` | Save |
+| `Esc` | Cancel |
+| `Tab` | Move between fields |
 
 ---
 
-### 🕒 Veröffentlichen geplanter Beiträge (Scheduler)
-Da `postctl` eine lokale Anwendung ist, werden geplante Beiträge über einen der folgenden zwei Modi veröffentlicht:
+## MCP — AI Integration
 
-1. **Interaktiver Modus (Automatische TUI-Hintergrund-Goroutine):**
-   Sobald die interaktive TUI geöffnet ist (`./postctl tui` oder einfach `./postctl`), läuft automatisch eine Hintergrund-Goroutine mit. Diese prüft die Datenbank alle 10 Sekunden und veröffentlicht fällige Beiträge. Solange die TUI geöffnet ist, musst du nichts weiter tun.
+postctl ships a built-in MCP server that exposes all core operations to AI agents. This lets tools like Claude Desktop create, schedule, and publish posts on your behalf.
 
-2. **Headless-Modus (Scheduler-Daemon):**
-   Wenn du `postctl` headless (z. B. auf einem Server oder ohne die TUI geöffnet zu lassen) betreiben möchtest, kannst du den Scheduler-Daemon starten:
-   ```bash
-   ./postctl daemon
-   ```
-    Um den Daemon geräuschlos im Hintergrund laufen zu lassen:
-    ```bash
-    nohup ./postctl daemon > daemon.log 2>&1 &
-    ```
+### Claude Desktop Configuration
 
-### ☁️ Offline-Verhalten & Cloud-Deployment (VPS / Raspberry Pi)
+Add the following to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
-Da `postctl` eine lokale Anwendung ist, läuft sie auf deinem Rechner. Wenn dein Mac zum geplanten Veröffentlichungszeitpunkt ausgeschaltet oder im Ruhezustand ist, kann der Daemon nicht arbeiten.
+```json
+{
+  "mcpServers": {
+    "postctl": {
+      "command": "postctl",
+      "args": ["mcp"]
+    }
+  }
+}
+```
 
-`postctl` löst das elegant:
-1. **Automatisches Nachholen (Lokaler Fallback):** Sobald du deinen Rechner wieder einschaltest und die TUI öffnest oder den Daemon startest, prüft `postctl` die Datenbank auf verpasste Beiträge der Vergangenheit und veröffentlicht diese sofort nachträglich.
-2. **Cloud-Veröffentlichung (24/7 Online):** Da `postctl` in Go geschrieben ist und komplett ohne Abhängigkeiten in ein einzelnes statisches Binary kompiliert wird, kannst du es problemlos auf einem billigen 4$-VPS oder einem Raspberry Pi laufen lassen:
-   * **Kompilieren für Linux VPS:**
-     ```bash
-     GOOS=linux GOARCH=amd64 go build -o postctl-linux main.go
-     ```
-   * **Konfiguration & DB kopieren:** Kopiere dein `~/.config/postctl/` Verzeichnis inklusive der SQLite-Datenbank auf den Server.
-   * **Daemon im Hintergrund starten:** Starte den Scheduler-Daemon auf deinem Server im Hintergrund:
-     ```bash
-     nohup ./postctl-linux daemon > daemon.log 2>&1 &
-     ```
+Restart Claude Desktop after saving. The `postctl` binary must be on your `PATH`.
+
+### MCP Tools
+
+| Tool | Parameters | Description |
+|------|------------|-------------|
+| `list_posts` | `platform`, `status`, `campaign` (all optional) | List posts with optional filters |
+| `get_post` | `id` | Retrieve full post content and metadata by ID |
+| `create_post` | `platform`, `body`, `title`, `campaign`, `schedule` | Create a draft or scheduled post |
+| `publish_post` | `id`, `dry_run` | Publish a post immediately |
+| `schedule_post` | `id`, `schedule` (RFC3339) | Set or update the scheduled publish time |
+| `list_campaigns` | — | List all campaigns with total count and per-status breakdown |
+| `get_campaign` | `name`, `status` (optional filter) | Get all posts in a campaign with full content |
+
+For Twitter threads, separate tweets with `\n---\n` in the `body` field when calling `create_post`.
+
+Schedule values must be RFC3339, e.g. `2026-07-10T09:00:00+02:00`.
+
+### AI Workflow Examples
+
+**Plan a campaign from an article**
+
+> "Read the article at https://example.com/blog/launch, then create a five-post campaign called `launch-week` with one post per day starting Monday. Use twitter for three posts and linkedin for two."
+
+Claude calls `create_post` for each post with appropriate bodies, the campaign name, and staggered `schedule` values derived from the article content.
+
+**Review and publish scheduled posts**
+
+> "Show me everything scheduled for this week and publish any posts that look ready."
+
+Claude calls `list_posts` with `status: scheduled`, presents the results for your review, then calls `publish_post` for each approved post — or all of them at once if you confirm.
+
+**Repurpose a blog post across platforms**
+
+> "Take post abc123 and create adapted versions for LinkedIn and Threads."
+
+Claude calls `get_post` to retrieve the original, then calls `create_post` twice — once for `linkedin` and once for `threads` — adapting tone and length for each platform automatically.
 
 ---
 
-### 📝 Vim- / Neovim-Bearbeitungsflow (Schritt für Schritt)
+## Platform Notes
 
-Beim Bearbeiten oder Erstellen eines Beitrags in der TUI kannst du deinen bevorzugten Terminal-Texteditor (wie Vim oder Neovim) starten, um eine ablenkungsfreie und flexible Schreibumgebung zu nutzen.
+| Platform | Character Limit | Threads | Images |
+|----------|-----------------|---------|--------|
+| Twitter/X | 280 per tweet | Yes, separate with `---` | Supported |
+| LinkedIn | ~3,000 recommended | No | Supported |
+| Threads | 500 | No | At least one recommended (Meta requirement) |
+| Mastodon | 500 (instance default) | No | Supported |
+| Bluesky | 300 | No | Supported |
 
-#### Schritt 1: Externen Editor öffnen
-1. Wähle in der TUI einen Beitrag aus und drücke **`e`**, um das Bearbeitungsformular zu öffnen.
-2. Drücke die Tastenkombination **`ctrl+v`** in einem beliebigen Eingabefeld.
-3. Die TUI pausiert und öffnet Neovim/Vim (das Tool nutzt die Umgebungsvariable `$EDITOR` und weicht bei Bedarf auf `nvim` oder `vim` aus).
+Twitter threads have no hard post count limit, but keep threads focused. LinkedIn, Threads, Mastodon, and Bluesky do not support thread-style multi-part posts — use a single body for those platforms.
 
-#### Schritt 2: Aufbau der Vorlage verstehen
-Die in Vim geöffnete temporäre Datei besteht aus drei Abschnitten:
-1. **Interaktiver Hilfeblock (`<!-- ... -->`)**:
-   - Zeigt ein Zeichenlineal passend zur aktuellen Plattform (z. B. 280 Zeichen für Twitter, 300 für Bluesky, 500 für Mastodon).
-   - Zeigt die Zeichenanzahl zum Zeitpunkt des Aufrufs für Einzelbeiträge oder Threads (getrennt durch `---`).
-   - *Hinweis:* Dieser HTML-Kommentarblock wird beim Speichern automatisch entfernt.
-2. **YAML-Frontmatter-Block**:
-   - Eingegrenzt durch die `---` Linien:
-     ```yaml
-     ---
-     platform: twitter
-     campaign: launch-2026
-     schedule: 2026-06-25 15:00:00
-     images: ["logo.png"]
-     ---
-     ```
-   - **Bidirektionale Synchronisierung:** Du kannst diese Metadaten direkt in Vim ändern! Nach dem Schließen parst `postctl` diesen YAML-Header und aktualisiert automatisch die Eingabefelder in der TUI.
-3. **Beitragsinhalt (Body)**:
-   - Der eigentliche Inhalt deines Beitrags beginnt direkt unter der schließenden `---`-Linie des Frontmatter-Blocks.
+---
 
-#### Schritt 3: Beitrag oder Thread schreiben
-- Schreibe deinen gewünschten Text.
-- Wenn du einen mehrteiligen Thread verfasst (z. B. für Twitter/X, Mastodon oder Bluesky), kannst du die einzelnen Beiträge auf zwei Arten trennen:
-  1. Mit einer Zeile, die nur aus **`---`** besteht (empfohlen, einheitlich mit dem TUI-Editor).
-  2. Mit Markdown-Überschriften wie **`## Tweet 1`**, **`## Tweet 2`** und optional **`## Reply`** am Ende (hilfreich, um inline Bilder zuzuweisen oder den letzten Tweet explizit als Reply zu kennzeichnen).
-- *Beispiel mit `---`:*
-  ```text
-  Das ist der erste Tweet meines Threads.
-  ---
-  Das ist der zweite Tweet meines Threads.
-  ```
-- *Beispiel mit Überschriften:*
-  ```text
-  ## Tweet 1
-  Das ist der erste Tweet meines Threads.
-  <!-- image: screenshot.png -->
-  
-  ## Tweet 2
-  Das ist der zweite Tweet meines Threads.
-  
-  ## Reply
-  Hier ausprobieren: https://github.com/aeon022/postctl
-  ```
+## Architecture
 
+```
+Markdown files
+      |
+   postctl import
+      |
+      v
+SQLite  (~/.local/share/postctl/postctl.db)
+      |
+      +---> TUI (Bubbletea)    ---> Platform APIs  (Twitter, LinkedIn, Threads, Mastodon, Bluesky)
+      |
+      +---> MCP server (stdio) ---> AI agents  (Claude Desktop, etc.)
+      |
+      +---> postctl daemon     ---> scheduled publish via platform APIs
+```
 
-#### Schritt 4: Speichern & Zurückkehren
-1. Speichere und schließe den Editor mit **`:wq`** oder **`:x`** (oder drücke **`ZZ`** im Normal-Modus).
-2. Die TUI wird sofort fortgesetzt. Der Textinhalt wird aktualisiert, die Hilfskommentare entfernt und die editierten Frontmatter-Metadaten werden direkt in die TUI-Formularfelder übernommen.
-3. Überprüfe die Änderungen in der TUI, navigiere auf den **`Save`**-Button und bestätige mit **`Enter`**, um den Beitrag in der Datenbank zu speichern.
+**Requirements:** macOS or Linux · Go 1.21+ · API credentials for each platform you use
+
+---
+
+## License
+
+See [LICENSE](LICENSE).
