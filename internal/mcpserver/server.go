@@ -26,6 +26,7 @@ func Serve() error {
 	s.AddTool(toolPublishPost(), handlePublishPost)
 	s.AddTool(toolSchedulePost(), handleSchedulePost)
 	s.AddTool(toolListCampaigns(), handleListCampaigns)
+	s.AddTool(toolGetCampaign(), handleGetCampaign)
 	return mcpserver.ServeStdio(s)
 }
 
@@ -72,6 +73,14 @@ func toolSchedulePost() mcp.Tool {
 		mcp.WithDescription("Update the scheduled publish time of an existing post."),
 		mcp.WithString("id", mcp.Required(), mcp.Description("Post ID")),
 		mcp.WithString("schedule", mcp.Required(), mcp.Description("New schedule time in RFC3339 format")),
+	)
+}
+
+func toolGetCampaign() mcp.Tool {
+	return mcp.NewTool("get_campaign",
+		mcp.WithDescription("Get all posts in a specific campaign, including full content. Use list_campaigns to discover campaign names first."),
+		mcp.WithString("name", mcp.Required(), mcp.Description("Campaign name")),
+		mcp.WithString("status", mcp.Description("Filter by status: draft, scheduled, posted, failed")),
 	)
 }
 
@@ -262,6 +271,29 @@ func handleSchedulePost(_ context.Context, req mcp.CallToolRequest) (*mcp.CallTo
 		return mcp.NewToolResultError(err.Error()), nil
 	}
 	return jsonResult(map[string]any{"ok": true, "id": id, "scheduled_at": t.Format(time.RFC3339)})
+}
+
+func handleGetCampaign(_ context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	name := req.GetString("name", "")
+	status := req.GetString("status", "")
+	if name == "" {
+		return mcp.NewToolResultError("name is required"), nil
+	}
+
+	s, err := openStore()
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	defer s.Close()
+
+	posts, err := s.ListPosts(context.Background(), "", status, name)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+	if len(posts) == 0 {
+		return mcp.NewToolResultText(fmt.Sprintf("No posts found in campaign %q", name)), nil
+	}
+	return jsonResult(posts)
 }
 
 func handleListCampaigns(_ context.Context, _ mcp.CallToolRequest) (*mcp.CallToolResult, error) {
