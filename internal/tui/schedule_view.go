@@ -15,7 +15,7 @@ func (m Model) renderSchedule() string {
 	builder.WriteString(StyleHeader.Render("SCHEDULED POSTS") + "\n")
 	if len(m.nextUp) == 0 {
 		builder.WriteString("No posts currently scheduled.\n")
-		return StyleBox.Width(78).Height(12).Render(builder.String())
+		return StyleBox.Width(84).Height(12).Render(builder.String())
 	}
 
 	type lineItem struct {
@@ -49,7 +49,7 @@ func (m Model) renderSchedule() string {
 			timeStr = p.ScheduledAt.Format("02.01.2006 15:04")
 		}
 
-		titlePreview := p.Title
+		titlePreview := stripEmojis(p.Title)
 		if len(titlePreview) > 40 {
 			titlePreview = titlePreview[:37] + "..."
 		}
@@ -71,7 +71,7 @@ func (m Model) renderSchedule() string {
 	}
 
 	// Viewport-Größe (Höhe des Inhalts-Bereichs)
-	viewportHeight := 12
+	viewportHeight := 22
 	startIdx := 0
 	endIdx := len(items)
 
@@ -108,20 +108,22 @@ func (m Model) renderSchedule() string {
 			if p.ScheduledAt != nil {
 				timeStr = p.ScheduledAt.Format("02.01.2006 15:04")
 			}
-			titlePreview := p.Title
+			titlePreview := stripEmojis(p.Title)
 			if len(titlePreview) > 40 {
 				titlePreview = titlePreview[:37] + "..."
 			}
 
-			builder.WriteString(fmt.Sprintf("%s◷ %-17s %-8s %-2s  %s\n", 
+			platformStr := fmt.Sprintf("%-8s", strings.ToUpper(p.Platform))
+
+			builder.WriteString(fmt.Sprintf("%s◷ %-17s %s %-2s  %s\n", 
 				cursor,
 				timeStr,
-				itemStyle.Render(strings.ToUpper(p.Platform)),
+				itemStyle.Render(platformStr),
 				strings.ToUpper(p.Language),
 				titlePreview,
 			))
 		}
 	}
 
-	return StyleBox.Width(78).Height(14).Render(builder.String())
+	return StyleBox.Width(84).Height(28).Render(builder.String())
 }

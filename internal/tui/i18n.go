@@ -40,12 +40,12 @@ var translationsMap = map[string]map[string]string{
 		"en": "↺ SCHEDULE",
 	},
 	"tab_history": {
-		"de": "📊 VERLAUF",
-		"en": "📊 HISTORY",
+		"de": "▤ VERLAUF",
+		"en": "▤ HISTORY",
 	},
 	"tab_analytics": {
-		"de": "📈 ANALYTICS",
-		"en": "📈 ANALYTICS",
+		"de": "⇗ ANALYTICS",
+		"en": "⇗ ANALYTICS",
 	},
 	"tab_settings": {
 		"de": "⚙ EINSTELLUNGEN",

@@ -836,6 +836,28 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 	}))
 
 	actions = append(actions, chromedp.Navigate("https://x.com/compose/post"))
+	actions = append(actions, chromedp.Sleep(2*time.Second))
+
+	// Cookie-Banner akzeptieren/schließen, falls vorhanden
+	actions = append(actions, chromedp.ActionFunc(func(ctx context.Context) error {
+		var exists bool
+		err := chromedp.Evaluate(`document.querySelector('[data-testid="BottomBar"]') !== null`, &exists).Do(ctx)
+		if err == nil && exists {
+			fmt.Println("🍪 Cookie-Banner erkannt, akzeptiere Cookies...")
+			err = chromedp.Evaluate(`
+				const btn = Array.from(document.querySelectorAll('[data-testid="BottomBar"] button, [data-testid="BottomBar"] [role="button"]'))
+					.find(el => el.innerText.includes('akzeptieren') || el.innerText.includes('Accept') || el.innerText.includes('ablehnen') || el.innerText.includes('Decline'));
+				if (btn) {
+					btn.click();
+				}
+			`, nil).Do(ctx)
+			if err != nil {
+				fmt.Printf("⚠️ Fehler beim Klicken des Cookie-Buttons: %v\n", err)
+			}
+			time.Sleep(1 * time.Second)
+		}
+		return nil
+	}))
 
 	var tweetsToPost []models.Tweet
 	if post.Type == "thread" {
@@ -876,9 +898,19 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 		}
 	}
 
-	postButtonSelector := `[data-testid="tweetButton"], [data-testid="tweetButtonInline"]`
+	postButtonSelector := `[data-testid="tweetButtonConfirm"], [data-testid="tweetButton"]`
 	actions = append(actions, chromedp.WaitVisible(postButtonSelector))
-	actions = append(actions, chromedp.Click(postButtonSelector))
+	actions = append(actions, chromedp.ActionFunc(func(ctx context.Context) error {
+		fmt.Println("🚀 Clicking post button via JS (dispatching events)...")
+		return chromedp.Evaluate(fmt.Sprintf(`{
+			const btn = document.querySelector('%s');
+			if (btn) {
+				btn.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window }));
+				btn.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, view: window }));
+				btn.click();
+			}
+		}`, postButtonSelector), nil).Do(ctx)
+	}))
 
 	// Wait briefly for GQL intercept to catch the tweet ID
 	actions = append(actions, chromedp.Sleep(5*time.Second))

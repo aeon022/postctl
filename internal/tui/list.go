@@ -32,8 +32,8 @@ func (m Model) renderDashboard() string {
 	if len(m.nextUp) == 0 {
 		col1.WriteString(Tr("dash_no_schedules"))
 	} else {
-		// Maximal 3 anstehende Posts anzeigen
-		limit := 3
+		// Maximal 5 anstehende Posts anzeigen
+		limit := 5
 		if len(m.nextUp) < limit {
 			limit = len(m.nextUp)
 		}
@@ -44,8 +44,8 @@ func (m Model) renderDashboard() string {
 				timeStr = p.ScheduledAt.Format("Mon 15:04")
 			}
 			titlePreview := p.Title
-			if len(titlePreview) > 30 {
-				titlePreview = titlePreview[:27] + "..."
+			if len(titlePreview) > 16 {
+				titlePreview = titlePreview[:13] + "..."
 			}
 			col1.WriteString(fmt.Sprintf("◷ %-11s %-8s %-2s  %s\n", 
 				timeStr, strings.ToUpper(p.Platform), strings.ToUpper(p.Language), titlePreview))
@@ -87,8 +87,16 @@ func (m Model) renderDashboard() string {
 	}
 
 	// Beider Spalten in Boxen verpacken
-	box1 := StyleBox.Width(40).Height(14).Render(col1.String())
-	box2 := StyleBox.Width(35).Height(14).Render(col2.String())
+	lines1 := len(strings.Split(col1.String(), "\n"))
+	lines2 := len(strings.Split(col2.String(), "\n"))
+	maxLines := lines1
+	if lines2 > maxLines {
+		maxLines = lines2
+	}
+	boxHeight := maxLines + 4
+
+	box1 := StyleBox.Width(50).Height(boxHeight).Render(col1.String())
+	box2 := StyleBox.Width(34).Height(boxHeight).Render(col2.String())
 
 	return lipgloss.JoinHorizontal(lipgloss.Top, box1, "   ", box2)
 }
@@ -114,7 +122,7 @@ func (m Model) renderPostList() string {
 		return StyleBox.Width(78).Height(12).Render(builder.String())
 	}
 
-	windowSize := 3
+	windowSize := 7
 	startIdx := 0
 	endIdx := len(filtered)
 
@@ -173,7 +181,7 @@ func (m Model) renderPostList() string {
 			metaInfo += " · 📁 " + p.Campaign
 		}
 
-		titlePreview := p.Title
+		titlePreview := stripEmojis(p.Title)
 		if titlePreview == "" {
 			titlePreview = "(no title)"
 		}
@@ -190,9 +198,9 @@ func (m Model) renderPostList() string {
 
 		builder.WriteString(fmt.Sprintf("%s%s / %s %s\n", 
 			cursor, strings.ToUpper(p.Platform), strings.ToUpper(p.Language), statusStr))
-		builder.WriteString(itemStyle.Render(fmt.Sprintf("    %q\n", titlePreview)))
-		builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render(fmt.Sprintf("    %s\n\n", metaInfo)))
+		builder.WriteString(itemStyle.Render(fmt.Sprintf("    %q", titlePreview)) + "\n")
+		builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render(fmt.Sprintf("    %s", metaInfo)) + "\n\n")
 	}
 
-	return StyleBox.Width(78).Height(16).Render(builder.String())
+	return StyleBox.Width(84).Height(34).Render(builder.String())
 }

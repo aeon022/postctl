@@ -15,7 +15,7 @@ func (m Model) renderHistory() string {
 	builder.WriteString(StyleHeader.Render(Tr("header_history")) + "\n")
 	if len(m.history) == 0 {
 		builder.WriteString(Tr("history_none_found"))
-		return StyleBox.Width(78).Height(12).Render(builder.String())
+		return StyleBox.Width(84).Height(14).Render(builder.String())
 	}
 
 	windowSize := 9
@@ -45,11 +45,12 @@ func (m Model) renderHistory() string {
 		timeStr := entry.CreatedAt.Format("02.01.2006 15:04:05")
 		
 		// Status Aktion formatieren (posted = grün, failed = rot)
-		actionStr := entry.Action
+		actionFormatted := fmt.Sprintf("%-8s", entry.Action)
+		actionStr := actionFormatted
 		if entry.Action == "posted" {
-			actionStr = lipgloss.NewStyle().Foreground(ColorPosted).Render(entry.Action)
+			actionStr = lipgloss.NewStyle().Foreground(ColorPosted).Render(actionFormatted)
 		} else if entry.Action == "failed" {
-			actionStr = lipgloss.NewStyle().Foreground(ColorFailed).Render(entry.Action)
+			actionStr = lipgloss.NewStyle().Foreground(ColorFailed).Render(actionFormatted)
 		}
 
 		infoText := fmt.Sprintf("Post: %s", entry.PostID)
@@ -75,7 +76,7 @@ func (m Model) renderHistory() string {
 			itemStyle = lipgloss.NewStyle().Foreground(ColorSecondary)
 		}
 
-		builder.WriteString(fmt.Sprintf("%s%s  %-8s %s\n", 
+		builder.WriteString(fmt.Sprintf("%s%s  %s %s\n", 
 			cursor,
 			timeStr,
 			actionStr,
@@ -83,7 +84,7 @@ func (m Model) renderHistory() string {
 		))
 	}
 
-	return StyleBox.Width(78).Height(12).Render(builder.String())
+	return StyleBox.Width(84).Height(14).Render(builder.String())
 }
 
 // renderHelp rendert die Tastaturbefehle am unteren Bildschirmrand
