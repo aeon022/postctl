@@ -372,30 +372,52 @@ func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, 
 	publishParams.Set("creation_id", createResp.ID)
 	publishParams.Set("access_token", token)
 
-	req, err = http.NewRequestWithContext(ctx, "POST", publishURL+"?"+publishParams.Encode(), nil)
-	if err != nil {
-		return "", err
-	}
-
-	resp, err = t.client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("publish threads container request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return "", fmt.Errorf("failed to publish threads container (status %d): %s", resp.StatusCode, string(body))
-	}
-
 	var publishResp struct {
 		ID string `json:"id"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&publishResp); err != nil {
-		return "", err
+
+	maxRetries := 5
+	var lastErr error
+	var body []byte
+
+	for i := 0; i < maxRetries; i++ {
+		if i > 0 {
+			time.Sleep(3 * time.Second)
+		}
+
+		req, err = http.NewRequestWithContext(ctx, "POST", publishURL+"?"+publishParams.Encode(), nil)
+		if err != nil {
+			return "", err
+		}
+
+		resp, err = t.client.Do(req)
+		if err != nil {
+			lastErr = fmt.Errorf("publish threads container request: %w", err)
+			continue
+		}
+
+		body, _ = io.ReadAll(resp.Body)
+		resp.Body.Close()
+
+		if resp.StatusCode == http.StatusOK {
+			if err := json.Unmarshal(body, &publishResp); err != nil {
+				return "", err
+			}
+			return publishResp.ID, nil
+		}
+
+		lastErr = fmt.Errorf("failed to publish threads container (status %d): %s", resp.StatusCode, string(body))
+
+		// Wenn der Fehlercode auf eine verzögerte Indizierung hindeutet (subcode 4279009), versuchen wir es erneut
+		if strings.Contains(string(body), "4279009") {
+			continue
+		}
+
+		// Andernfalls (z. B. OAuth-Token abgelaufen) direkt abbrechen
+		return "", lastErr
 	}
 
-	return publishResp.ID, nil
+	return "", fmt.Errorf("after %d retries: %w", maxRetries, lastErr)
 }
 
 // FetchAnalytics retrieves public metrics from Threads API
