@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
 )
 
@@ -89,7 +88,6 @@ func ValidateLicenseKey(key string) bool {
 
 // LoadConfig lädt die Konfiguration aus ~/.config/postctl/config.yaml oder setzt Defaultwerte
 func LoadConfig() error {
-	viper.Reset()
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return fmt.Errorf("get user home dir: %w", err)
@@ -98,21 +96,17 @@ func LoadConfig() error {
 	configDir := filepath.Join(home, ".config", "postctl")
 	
 	// Default-Werte setzen
-	viper.SetDefault("db_path", "~/.config/postctl/postctl.db")
-	viper.SetDefault("defaults.timezone", "Europe/Vienna")
-	viper.SetDefault("defaults.dry_run", false)
-	viper.SetDefault("defaults.image_dir", "./screenshots")
-	viper.SetDefault("defaults.language", "en")
-	viper.SetDefault("ai.provider", "openai")
-	viper.SetDefault("ai.model", "gpt-4o-mini")
-	viper.SetDefault("license_key", "")
-	viper.SetDefault("license_status", "")
-	viper.SetDefault("polar_org_id", "aa792ea4-650e-492e-a955-9b3d564e943e")
-	viper.SetDefault("mastodon.instance_url", "https://mastodon.social")
-
-	viper.AddConfigPath(configDir)
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
+	ActiveConfig.DBPath = "~/.config/postctl/postctl.db"
+	ActiveConfig.Defaults.Timezone = "Europe/Vienna"
+	ActiveConfig.Defaults.DryRun = false
+	ActiveConfig.Defaults.ImageDir = "./screenshots"
+	ActiveConfig.Defaults.Language = "en"
+	ActiveConfig.AI.Provider = "openai"
+	ActiveConfig.AI.Model = "gpt-4o-mini"
+	ActiveConfig.LicenseKey = ""
+	ActiveConfig.LicenseStatus = ""
+	ActiveConfig.PolarOrgID = "aa792ea4-650e-492e-a955-9b3d564e943e"
+	ActiveConfig.Mastodon.InstanceURL = "https://mastodon.social"
 
 	// Falls die Konfigurationsdatei nicht existiert, erstellen wir sie mit Standardwerten
 	configPath := filepath.Join(configDir, "config.yaml")
@@ -173,11 +167,12 @@ facebook:
 		}
 	}
 
-	if err := viper.ReadInConfig(); err != nil {
+	yamlBytes, err := os.ReadFile(configPath)
+	if err != nil {
 		return fmt.Errorf("read config file: %w", err)
 	}
 
-	if err := viper.Unmarshal(&ActiveConfig); err != nil {
+	if err := yaml.Unmarshal(yamlBytes, &ActiveConfig); err != nil {
 		return fmt.Errorf("unmarshal config: %w", err)
 	}
 
@@ -215,35 +210,6 @@ func SaveConfig() error {
 	if err := os.WriteFile(configPath, yamlBytes, 0644); err != nil {
 		return fmt.Errorf("write config file: %w", err)
 	}
-
-	// Viper Instanz ebenfalls aktualisieren
-	viper.Set("db_path", ActiveConfig.DBPath)
-	viper.Set("defaults.timezone", ActiveConfig.Defaults.Timezone)
-	viper.Set("defaults.dry_run", ActiveConfig.Defaults.DryRun)
-	viper.Set("defaults.image_dir", ActiveConfig.Defaults.ImageDir)
-	viper.Set("defaults.language", ActiveConfig.Defaults.Language)
-	viper.Set("ai.provider", ActiveConfig.AI.Provider)
-	viper.Set("ai.model", ActiveConfig.AI.Model)
-	viper.Set("ai.api_key", ActiveConfig.AI.APIKey)
-	viper.Set("ai.base_url", ActiveConfig.AI.BaseURL)
-	viper.Set("twitter.client_id", ActiveConfig.Twitter.ClientID)
-	viper.Set("twitter.client_secret", ActiveConfig.Twitter.ClientSecret)
-	viper.Set("twitter.auth_mode", ActiveConfig.Twitter.AuthMode)
-	viper.Set("linkedin.client_id", ActiveConfig.LinkedIn.ClientID)
-	viper.Set("linkedin.client_secret", ActiveConfig.LinkedIn.ClientSecret)
-	viper.Set("threads.app_id", ActiveConfig.Threads.AppID)
-	viper.Set("threads.app_secret", ActiveConfig.Threads.AppSecret)
-	viper.Set("mastodon.instance_url", ActiveConfig.Mastodon.InstanceURL)
-	viper.Set("mastodon.client_id", ActiveConfig.Mastodon.ClientID)
-	viper.Set("mastodon.client_secret", ActiveConfig.Mastodon.ClientSecret)
-	viper.Set("bluesky.handle", ActiveConfig.Bluesky.Handle)
-	viper.Set("bluesky.app_password", ActiveConfig.Bluesky.AppPassword)
-	viper.Set("facebook.app_id", ActiveConfig.Facebook.AppID)
-	viper.Set("facebook.app_secret", ActiveConfig.Facebook.AppSecret)
-	viper.Set("facebook.page_id", ActiveConfig.Facebook.PageID)
-	viper.Set("license_key", ActiveConfig.LicenseKey)
-	viper.Set("license_status", ActiveConfig.LicenseStatus)
-	viper.Set("polar_org_id", ActiveConfig.PolarOrgID)
 
 	return nil
 }
