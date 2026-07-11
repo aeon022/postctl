@@ -11,7 +11,6 @@ import (
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/scheduler"
 	"github.com/aeon022/postctl/internal/store"
-	"github.com/google/uuid"
 	"github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 )
@@ -175,7 +174,7 @@ func handleCreatePost(_ context.Context, req mcp.CallToolRequest) (*mcp.CallTool
 	}
 
 	post := &models.Post{
-		ID:        uuid.New().String(),
+		ID:        store.GenerateUUID(),
 		Platform:  platform,
 		Title:     title,
 		Campaign:  campaign,

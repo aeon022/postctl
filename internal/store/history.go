@@ -7,13 +7,12 @@ import (
 	"time"
 
 	"github.com/aeon022/postctl/internal/models"
-	"github.com/google/uuid"
 )
 
 // AddHistoryEntry fügt einen neuen Eintrag in die Historie ein
 func (s *SQLiteStore) AddHistoryEntry(ctx context.Context, entry *models.HistoryEntry) error {
 	if entry.ID == "" {
-		entry.ID = uuid.New().String()
+		entry.ID = GenerateUUID()
 	}
 	if entry.CreatedAt.IsZero() {
 		entry.CreatedAt = time.Now()

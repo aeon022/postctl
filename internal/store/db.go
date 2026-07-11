@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
 	"fmt"
 	"os"
@@ -142,4 +143,13 @@ func (s *SQLiteStore) migrate() error {
 	}
 
 	return nil
+}
+
+// GenerateUUID erzeugt eine Version 4 UUID mit crypto/rand
+func GenerateUUID() string {
+	b := make([]byte, 16)
+	_, _ = rand.Read(b)
+	b[6] = (b[6] & 0x0f) | 0x40 // Version 4
+	b[8] = (b[8] & 0x3f) | 0x80 // Variant 10
+	return fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }
