@@ -333,7 +333,7 @@ func handleListCampaigns(_ context.Context, _ mcp.CallToolRequest) (*mcp.CallToo
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-func openStore() (store.Store, error) {
+func openStore() (*store.SQLiteStore, error) {
 	dbPath := config.GetDBPath()
 	return store.NewSQLiteStore(dbPath)
 }

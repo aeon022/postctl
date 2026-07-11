@@ -18,13 +18,13 @@ import (
 )
 
 type LinkedInPlatform struct {
-	store        store.Store
+	store        *store.SQLiteStore
 	clientID     string
 	clientSecret string
 	client       *http.Client
 }
 
-func NewLinkedInPlatform(s store.Store, clientID, clientSecret string) *LinkedInPlatform {
+func NewLinkedInPlatform(s *store.SQLiteStore, clientID, clientSecret string) *LinkedInPlatform {
 	return &LinkedInPlatform{
 		store:        s,
 		clientID:     clientID,

@@ -34,7 +34,7 @@ type PostStats struct {
 
 // Model repräsentiert den Zustand der Bubbletea-Anwendung
 type Model struct {
-	store         store.Store
+	store         *store.SQLiteStore
 	activeTab     int // 0: Dashboard, 1: Posts, 2: Schedule, 3: History
 	cursor        int
 	
@@ -180,7 +180,7 @@ type platformClearedMsg struct {
 type tickMsg struct{}
 
 // NewModel initialisiert ein TUI-Model
-func NewModel(s store.Store) Model {
+func NewModel(s *store.SQLiteStore) Model {
 	return Model{
 		store:     s,
 		activeTab: 0,

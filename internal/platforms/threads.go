@@ -20,13 +20,13 @@ import (
 )
 
 type ThreadsPlatform struct {
-	store        store.Store
+	store        *store.SQLiteStore
 	appID        string
 	appSecret    string
 	client       *http.Client
 }
 
-func NewThreadsPlatform(s store.Store, appID, appSecret string) *ThreadsPlatform {
+func NewThreadsPlatform(s *store.SQLiteStore, appID, appSecret string) *ThreadsPlatform {
 	return &ThreadsPlatform{
 		store:     s,
 		appID:     appID,

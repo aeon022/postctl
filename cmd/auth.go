@@ -77,7 +77,7 @@ type authErrorJSON struct {
 	Errors []string `json:"errors"`
 }
 
-func reportAuthStatus(ctx context.Context, s store.Store) {
+func reportAuthStatus(ctx context.Context, s *store.SQLiteStore) {
 	plats := []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon, models.PlatformBluesky, models.PlatformFacebook}
 	statusMap := make(map[string]bool)
 

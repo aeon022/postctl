@@ -20,7 +20,7 @@ type Platform interface {
 }
 
 // GetPlatform liefert die passende Platform-Instanz. Im Simulationsmodus (dryRun) wird ein Mock zurückgegeben.
-func GetPlatform(name string, s store.Store, dryRun bool) (Platform, error) {
+func GetPlatform(name string, s *store.SQLiteStore, dryRun bool) (Platform, error) {
 	if dryRun {
 		return NewDryRunPlatform(name), nil
 	}

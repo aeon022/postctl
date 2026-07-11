@@ -19,13 +19,13 @@ import (
 )
 
 type BlueskyPlatform struct {
-	store       store.Store
+	store       *store.SQLiteStore
 	handle      string
 	appPassword string
 	client      *http.Client
 }
 
-func NewBlueskyPlatform(s store.Store, handle, appPassword string) *BlueskyPlatform {
+func NewBlueskyPlatform(s *store.SQLiteStore, handle, appPassword string) *BlueskyPlatform {
 	if handle != "" && !strings.Contains(handle, ".") {
 		handle = handle + ".bsky.social"
 	}

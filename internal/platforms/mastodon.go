@@ -20,14 +20,14 @@ import (
 )
 
 type MastodonPlatform struct {
-	store        store.Store
+	store        *store.SQLiteStore
 	instanceURL  string
 	clientID     string
 	clientSecret string
 	client       *http.Client
 }
 
-func NewMastodonPlatform(s store.Store, instanceURL, clientID, clientSecret string) *MastodonPlatform {
+func NewMastodonPlatform(s *store.SQLiteStore, instanceURL, clientID, clientSecret string) *MastodonPlatform {
 	// Standard-Instanz falls nicht konfiguriert
 	if instanceURL == "" {
 		instanceURL = "https://mastodon.social"

@@ -20,14 +20,14 @@ import (
 )
 
 type FacebookPlatform struct {
-	store        store.Store
+	store        *store.SQLiteStore
 	appID        string
 	appSecret    string
 	pageID       string
 	client       *http.Client
 }
 
-func NewFacebookPlatform(s store.Store, appID, appSecret, pageID string) *FacebookPlatform {
+func NewFacebookPlatform(s *store.SQLiteStore, appID, appSecret, pageID string) *FacebookPlatform {
 	return &FacebookPlatform{
 		store:        s,
 		appID:        appID,

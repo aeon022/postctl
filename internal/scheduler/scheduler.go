@@ -19,7 +19,7 @@ func isOnline() bool {
 }
 
 // PublishPost veröffentlicht einen Post und aktualisiert den DB-Status sowie die Historie
-func PublishPost(ctx context.Context, s store.Store, post *models.Post, dryRun bool) (string, error) {
+func PublishPost(ctx context.Context, s *store.SQLiteStore, post *models.Post, dryRun bool) (string, error) {
 	// Falls es ein Thread-Post ist, verteile die globalen Bilder auf die einzelnen Tweets
 	post.PrepareTweets()
 
@@ -84,7 +84,7 @@ func PublishPost(ctx context.Context, s store.Store, post *models.Post, dryRun b
 }
 
 // RunDaemon startet den Scheduler-Daemon im Headless-Modus (Endlosschleife)
-func RunDaemon(ctx context.Context, s store.Store, checkInterval time.Duration, dryRun bool) error {
+func RunDaemon(ctx context.Context, s *store.SQLiteStore, checkInterval time.Duration, dryRun bool) error {
 	fmt.Fprintf(os.Stderr, "Starte postctl Scheduler-Daemon (Intervall: %v, Dry-Run: %v)...\n", checkInterval, dryRun)
 	fmt.Fprintln(os.Stderr, "Drücke Ctrl+C zum Beenden.")
 
@@ -106,7 +106,7 @@ func RunDaemon(ctx context.Context, s store.Store, checkInterval time.Duration, 
 }
 
 // checkAndPublishDue prüft die DB auf fällige geplante Posts und veröffentlicht sie
-func checkAndPublishDue(ctx context.Context, s store.Store, dryRun bool) {
+func checkAndPublishDue(ctx context.Context, s *store.SQLiteStore, dryRun bool) {
 	now := time.Now()
 	
 	// Hole alle geplanten Posts

@@ -1,40 +1,16 @@
 package store
 
 import (
-	"context"
 	"crypto/rand"
 	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
-	"github.com/aeon022/postctl/internal/models"
 	_ "modernc.org/sqlite"
 )
 
-// Store definiert die Schnittstelle für die Datenhaltung
-type Store interface {
-	// Posts
-	SavePost(ctx context.Context, post *models.Post) error
-	GetPost(ctx context.Context, id string) (*models.Post, error)
-	ListPosts(ctx context.Context, platform, status, campaign string) ([]models.Post, error)
-	DeletePost(ctx context.Context, id string) error
-	TryLockPost(ctx context.Context, id string) (bool, error)
-
-	// History
-	AddHistoryEntry(ctx context.Context, entry *models.HistoryEntry) error
-	GetHistory(ctx context.Context, limit int) ([]models.HistoryEntry, error)
-
-	// Auth Tokens
-	SaveToken(ctx context.Context, platform, token, refresh string, expiresAt *time.Time) error
-	GetToken(ctx context.Context, platform string) (token, refresh string, expiresAt *time.Time, err error)
-	DeleteToken(ctx context.Context, platform string) error
-
-	// Close schließt die Datenbankverbindung
-	Close() error
-}
 
 // SQLiteStore ist die konkrete Implementierung des Store-Interfaces mit SQLite
 type SQLiteStore struct {

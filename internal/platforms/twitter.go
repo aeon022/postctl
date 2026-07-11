@@ -24,13 +24,13 @@ import (
 )
 
 type TwitterPlatform struct {
-	store        store.Store
+	store        *store.SQLiteStore
 	clientID     string
 	clientSecret string
 	client       *http.Client
 }
 
-func NewTwitterPlatform(s store.Store, clientID, clientSecret string) *TwitterPlatform {
+func NewTwitterPlatform(s *store.SQLiteStore, clientID, clientSecret string) *TwitterPlatform {
 	return &TwitterPlatform{
 		store:        s,
 		clientID:     clientID,

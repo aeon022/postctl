@@ -92,7 +92,7 @@ type scheduleErrorJSON struct {
 	Errors []string `json:"errors"`
 }
 
-func reportScheduledList(ctx context.Context, s store.Store) {
+func reportScheduledList(ctx context.Context, s *store.SQLiteStore) {
 	posts, err := s.ListPosts(ctx, "all", models.StatusScheduled, "")
 	if err != nil {
 		reportScheduleError(fmt.Errorf("list scheduled posts: %w", err), 2)
