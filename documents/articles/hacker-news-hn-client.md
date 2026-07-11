@@ -1,7 +1,7 @@
-# Show HN: hn-client – A fast, minimalist Hacker News terminal client in Go
+# Show HN: hn-client – Keyboard-driven Hacker News reader with color-coded comments
 
-*Suggested Title:* Show HN: hn-client – A fast, minimalist Hacker News terminal client in Go
-*Submission URL:* https://github.com/aeon022/hn-client
+*Suggested Title:* Show HN: hn-client – Keyboard-driven Hacker News reader with color-coded comments
+*Submission URL:* 
 *GitHub Repository:* https://github.com/aeon022/hn-client
 
 ---

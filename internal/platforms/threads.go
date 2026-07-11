@@ -290,8 +290,32 @@ func (t *ThreadsPlatform) UploadImage(ctx context.Context, path string) (string,
 		return "https://dummy-image-url.com/mock.png", nil
 	}
 
-	// Direct link URL erhalten, indem wir "https://tmpfiles.org/" durch "https://tmpfiles.org/dl/" ersetzen
+	// Direct link URL erhalten, indem wir die HTML-Vorschauseite abrufen und den tokenisierten Download-Link extrahieren
+	// Fallback: Falls das Abrufen/Parsen fehlschlägt, nutzen wir das alte Muster (Ersetzen von https://tmpfiles.org/ durch https://tmpfiles.org/dl/)
 	directURL := strings.Replace(uploadResp.Data.URL, "https://tmpfiles.org/", "https://tmpfiles.org/dl/", 1)
+
+	reqPreview, err := http.NewRequestWithContext(ctx, "GET", uploadResp.Data.URL, nil)
+	if err == nil {
+		respPreview, err := uploadClient.Do(reqPreview)
+		if err == nil {
+			defer respPreview.Body.Close()
+			if respPreview.StatusCode == http.StatusOK {
+				htmlBytes, err := io.ReadAll(respPreview.Body)
+				if err == nil {
+					htmlContent := string(htmlBytes)
+					dlIndex := strings.Index(htmlContent, "https://tmpfiles.org/dl/")
+					if dlIndex != -1 {
+						subStr := htmlContent[dlIndex:]
+						endIndex := strings.IndexAny(subStr, "\"> \n\t")
+						if endIndex != -1 {
+							directURL = subStr[:endIndex]
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return directURL, nil
 }
 
