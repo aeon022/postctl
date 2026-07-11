@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -254,16 +255,24 @@ func (m Model) loadDataCmd() tea.Msg {
 	}
 	
 	// Sortieren von nextUp nach schedule time (ASC)
-	// Ein einfacher Bubble-Sort, um externe Bibliotheken zu vermeiden
-	for i := 0; i < len(nextUp)-1; i++ {
-		for j := 0; j < len(nextUp)-i-1; j++ {
-			if nextUp[j].ScheduledAt != nil && nextUp[j+1].ScheduledAt != nil {
-				if nextUp[j].ScheduledAt.After(*nextUp[j+1].ScheduledAt) {
-					nextUp[j], nextUp[j+1] = nextUp[j+1], nextUp[j]
-				}
-			}
+	slices.SortFunc(nextUp, func(a, b models.Post) int {
+		if a.ScheduledAt == nil && b.ScheduledAt == nil {
+			return 0
 		}
-	}
+		if a.ScheduledAt == nil {
+			return 1
+		}
+		if b.ScheduledAt == nil {
+			return -1
+		}
+		if a.ScheduledAt.Before(*b.ScheduledAt) {
+			return -1
+		}
+		if a.ScheduledAt.After(*b.ScheduledAt) {
+			return 1
+		}
+		return 0
+	})
 
 	// Gruppieren nach Kampagnen unter Beibehaltung der chronologischen Reihenfolge der Kampagnen-Starts
 	if len(nextUp) > 0 {
