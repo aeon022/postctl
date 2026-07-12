@@ -57,7 +57,40 @@ func (m Model) renderHistoryDetailView() string {
 
 	// Legend / Action-Guide für den Footer
 	builder.WriteString("\n")
-	builder.WriteString(StyleHelp.Render("esc: back  ·  x: export this entry to JSON"))
+	builder.WriteString(StyleHelp.Render("esc: back  ·  x: export this entry to JSON  ·  j/k: scroll"))
 
-	return StyleBox.Width(78).Height(20).Render(builder.String())
+	// Dynamic height bounding and scrolling
+	boxHeight := m.getBoxHeight()
+	lines := strings.Split(builder.String(), "\n")
+	totalLines := len(lines)
+	
+	visibleLines := boxHeight - 4
+	if visibleLines < 5 {
+		visibleLines = 5
+	}
+	
+	maxOffset := totalLines - visibleLines
+	if maxOffset < 0 {
+		maxOffset = 0
+	}
+	
+	offset := m.detailScrollOffset
+	if offset > maxOffset {
+		offset = maxOffset
+	}
+	if offset < 0 {
+		offset = 0
+	}
+
+	endIdx := offset + visibleLines
+	if endIdx > totalLines {
+		endIdx = totalLines
+	}
+
+	var visibleContent strings.Builder
+	for i := offset; i < endIdx; i++ {
+		visibleContent.WriteString(lines[i] + "\n")
+	}
+
+	return StyleBox.Width(78).Height(boxHeight).Render(visibleContent.String())
 }

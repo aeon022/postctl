@@ -55,7 +55,8 @@ type Model struct {
 	err              error
 	loading          bool
 	repurposing      bool
-	statusMessage    string
+	statusMessage      string
+	detailScrollOffset int
 	
 	// Editor Zustand
 	editorPostID      string
@@ -1083,9 +1084,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch {
 			case key.Matches(msg, Keys.Esc):
 				m.selectedHistory = nil
+				m.detailScrollOffset = 0
 				return m, nil
 			case key.Matches(msg, Keys.Export):
 				return m, m.exportHistoryEntryCmd(m.selectedHistory)
+			case key.Matches(msg, Keys.Up) || msg.String() == "k":
+				if m.detailScrollOffset > 0 {
+					m.detailScrollOffset--
+				}
+				return m, nil
+			case key.Matches(msg, Keys.Down) || msg.String() == "j":
+				m.detailScrollOffset++
+				return m, nil
 			}
 			return m, nil
 		}
@@ -1097,14 +1107,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch {
 			case key.Matches(msg, Keys.Esc):
 				m.selectedPost = nil
+				m.detailScrollOffset = 0
 				return m, nil
 			case key.Matches(msg, Keys.Delete):
 				idToDelete := m.selectedPost.ID
+				m.detailScrollOffset = 0
 				return m, m.deletePostCmd(idToDelete)
 			case key.Matches(msg, Keys.Edit):
 				postToEdit := *m.selectedPost
 				m.selectedPost = nil
+				m.detailScrollOffset = 0
 				m.initEditor(&postToEdit)
+				return m, nil
+			case key.Matches(msg, Keys.Up) || msg.String() == "k":
+				if m.detailScrollOffset > 0 {
+					m.detailScrollOffset--
+				}
+				return m, nil
+			case key.Matches(msg, Keys.Down) || msg.String() == "j":
+				m.detailScrollOffset++
 				return m, nil
 			case key.Matches(msg, Keys.Repurpose):
 				if m.repurposing {
@@ -1401,21 +1422,6 @@ func (m Model) View() string {
 		return m.renderEditor()
 	}
 
-	// Detailansicht anzeigen, falls ein Post ausgewählt ist
-	if m.selectedPost != nil {
-		return m.renderDetailView()
-	}
-
-	// History-Detailansicht anzeigen, falls ausgewählt
-	if m.selectedHistory != nil {
-		return m.renderHistoryDetailView()
-	}
-
-	// README / System-Dokumentation anzeigen, falls geöffnet
-	if m.showReadme {
-		return m.renderReadme()
-	}
-
 	var builder strings.Builder
 
 	// Header
@@ -1426,23 +1432,31 @@ func (m Model) View() string {
 	builder.WriteString(RenderTabs(m.activeTab))
 	builder.WriteString("\n\n")
 
-	// Inhalt je nach Tab
+	// Inhalt je nach Tab / Zustand
 	var tabContent string
-	switch m.activeTab {
-	case 0:
-		tabContent = m.renderDashboard()
-	case 1:
-		tabContent = m.renderPostList()
-	case 2:
-		tabContent = m.renderSchedule()
-	case 3:
-		tabContent = m.renderHistory()
-	case 4:
-		tabContent = m.renderAnalytics()
-	case 5:
-		tabContent = m.renderSettings()
-	case 6:
-		tabContent = m.renderLogs()
+	if m.selectedPost != nil {
+		tabContent = m.renderDetailView()
+	} else if m.selectedHistory != nil {
+		tabContent = m.renderHistoryDetailView()
+	} else if m.showReadme {
+		tabContent = m.renderReadme()
+	} else {
+		switch m.activeTab {
+		case 0:
+			tabContent = m.renderDashboard()
+		case 1:
+			tabContent = m.renderPostList()
+		case 2:
+			tabContent = m.renderSchedule()
+		case 3:
+			tabContent = m.renderHistory()
+		case 4:
+			tabContent = m.renderAnalytics()
+		case 5:
+			tabContent = m.renderSettings()
+		case 6:
+			tabContent = m.renderLogs()
+		}
 	}
 	builder.WriteString(tabContent)
 	builder.WriteString("\n\n")
