@@ -67,12 +67,15 @@ postctl list [--platform P] [--status S] [--campaign C] [--format human|json]
 postctl template --platform PLATFORM     Generate a post template
 
 postctl post ID [--dry-run]              Publish a post immediately
-postctl schedule ID --time DATETIME      Schedule a post (RFC3339)
+postctl schedule ID [--time DATETIME] [--queue] Schedule a post (RFC3339) or to the queue
 postctl campaign list                    List all campaigns
 postctl campaign post NAME [--dry-run]   Publish all posts in a campaign
 
 postctl generate URL                     AI-generate a post from a URL
-postctl repurpose ID --platform TARGET   Repurpose a post for another platform
+postctl repurpose ID --platform TARGET [--tone TONE] Repurpose a post with custom tone
+
+postctl git-hook install [--dir DIR]     Install a post-commit git hook
+postctl git-hook uninstall               Uninstall the git hook
 
 postctl analytics [--platform P] [--format human|json]
 postctl daemon [--dry-run]               Run the background scheduler
@@ -91,7 +94,7 @@ postctl version                          Print version
 | `platform` | Yes      | `twitter`, `linkedin`, `threads`, `mastodon`, `bluesky`               | Target platform                   |
 | `title`    | No       | String                                                                | Internal label (not published)    |
 | `campaign` | No       | String slug                                                           | Groups posts into a campaign      |
-| `schedule` | No       | RFC3339, e.g. `2026-07-10T09:00:00+02:00`                            | Scheduled publish time            |
+| `schedule` | No       | RFC3339 or `"queue"`                                                  | Scheduled publish time or Smart Queue |
 
 ### Body Format
 
@@ -141,7 +144,7 @@ Third tweet. Threads are Twitter-only.
 | `postctl list` | List posts; filter with `--platform`, `--status`, `--campaign`; format with `--format human\|json` |
 | `postctl template --platform PLATFORM` | Print a Markdown template for the given platform |
 | `postctl generate URL` | AI-generate a draft post from the article at URL |
-| `postctl repurpose ID --platform TARGET` | Repurpose an existing post for a different platform |
+| `postctl repurpose ID --platform TARGET [--tone TONE]` | Repurpose an existing post with an optional custom tone |
 
 ### Publishing
 
@@ -150,9 +153,12 @@ Third tweet. Threads are Twitter-only.
 | `postctl post ID` | Publish post immediately |
 | `postctl post ID --dry-run` | Simulate publishing without sending |
 | `postctl schedule ID --time DATETIME` | Set or update the scheduled publish time |
+| `postctl schedule ID --queue` | Schedule a post to the next available queue slot |
 | `postctl campaign list` | List all campaigns with post counts |
 | `postctl campaign post NAME` | Publish all posts in a campaign |
 | `postctl campaign post NAME --dry-run` | Dry-run campaign publish |
+| `postctl git-hook install [--dir DIR]` | Install local git post-commit hook for auto-import |
+| `postctl git-hook uninstall` | Remove local git post-commit hook |
 | `postctl daemon` | Start the background scheduler daemon |
 | `postctl daemon --dry-run` | Run daemon in dry-run mode |
 

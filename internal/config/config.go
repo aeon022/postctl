@@ -38,6 +38,41 @@ type Config struct {
 		AppSecret string `mapstructure:"app_secret" yaml:"app_secret"`
 		PageID    string `mapstructure:"page_id" yaml:"page_id"`
 	} `mapstructure:"facebook" yaml:"facebook"`
+	Telegram struct {
+		BotToken string `mapstructure:"bot_token" yaml:"bot_token"`
+		ChatID   string `mapstructure:"chat_id" yaml:"chat_id"`
+	} `mapstructure:"telegram" yaml:"telegram"`
+	Discord struct {
+		WebhookURL string `mapstructure:"webhook_url" yaml:"webhook_url"`
+	} `mapstructure:"discord" yaml:"discord"`
+	Reddit struct {
+		ClientID     string `mapstructure:"client_id" yaml:"client_id"`
+		ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
+		Username     string `mapstructure:"username" yaml:"username"`
+		Password     string `mapstructure:"password" yaml:"password"`
+	} `mapstructure:"reddit" yaml:"reddit"`
+	DevTo struct {
+		APIToken string `mapstructure:"api_token" yaml:"api_token"`
+	} `mapstructure:"devto" yaml:"devto"`
+	Hashnode struct {
+		APIToken      string `mapstructure:"api_token" yaml:"api_token"`
+		PublicationID string `mapstructure:"publication_id" yaml:"publication_id"`
+	} `mapstructure:"hashnode" yaml:"hashnode"`
+	Medium struct {
+		IntegrationToken string `mapstructure:"integration_token" yaml:"integration_token"`
+	} `mapstructure:"medium" yaml:"medium"`
+	Instagram struct {
+		AccessToken string `mapstructure:"access_token" yaml:"access_token"`
+		AccountID   string `mapstructure:"account_id" yaml:"account_id"`
+	} `mapstructure:"instagram" yaml:"instagram"`
+	Pinterest struct {
+		AccessToken string `mapstructure:"access_token" yaml:"access_token"`
+		BoardID     string `mapstructure:"board_id" yaml:"board_id"`
+	} `mapstructure:"pinterest" yaml:"pinterest"`
+	YouTube struct {
+		ClientID     string `mapstructure:"client_id" yaml:"client_id"`
+		ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
+	} `mapstructure:"youtube" yaml:"youtube"`
 	Defaults struct {
 		Timezone string `mapstructure:"timezone" yaml:"timezone"`
 		DryRun   bool   `mapstructure:"dry_run" yaml:"dry_run"`
@@ -50,6 +85,9 @@ type Config struct {
 		Model    string `mapstructure:"model" yaml:"model"`
 		BaseURL  string `mapstructure:"base_url" yaml:"base_url"`
 	} `mapstructure:"ai" yaml:"ai"`
+	Scheduler struct {
+		Slots []string `mapstructure:"slots" yaml:"slots"`
+	} `mapstructure:"scheduler" yaml:"scheduler"`
 	DBPath        string `mapstructure:"db_path" yaml:"db_path"`
 	LicenseKey    string `mapstructure:"license_key" yaml:"license_key"`
 	LicenseStatus string `mapstructure:"license_status" yaml:"license_status"`
@@ -107,6 +145,7 @@ func LoadConfig() error {
 	ActiveConfig.LicenseStatus = ""
 	ActiveConfig.PolarOrgID = "aa792ea4-650e-492e-a955-9b3d564e943e"
 	ActiveConfig.Mastodon.InstanceURL = "https://mastodon.social"
+	ActiveConfig.Scheduler.Slots = []string{"Mon 09:00", "Wed 14:00", "Fri 17:30"}
 
 	// Falls die Konfigurationsdatei nicht existiert, erstellen wir sie mit Standardwerten
 	configPath := filepath.Join(configDir, "config.yaml")
@@ -160,7 +199,40 @@ facebook:
   app_secret: ""
   page_id: ""
 
+telegram:
+  bot_token: ""
+  chat_id: ""
 
+discord:
+  webhook_url: ""
+
+reddit:
+  client_id: ""
+  client_secret: ""
+  username: ""
+  password: ""
+
+devto:
+  api_token: ""
+
+hashnode:
+  api_token: ""
+  publication_id: ""
+
+medium:
+  integration_token: ""
+
+instagram:
+  access_token: ""
+  account_id: ""
+
+pinterest:
+  access_token: ""
+  board_id: ""
+
+youtube:
+  client_id: ""
+  client_secret: ""
 `
 		if err := os.WriteFile(configPath, []byte(dummyContent), 0644); err != nil {
 			return fmt.Errorf("create default config file: %w", err)

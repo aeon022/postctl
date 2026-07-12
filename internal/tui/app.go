@@ -84,6 +84,10 @@ type Model struct {
 	// Analytics Zustand
 	analyticsLoading bool
 	analyticsData    *analyticsLoadedMsg
+
+	// Queue Slots Editor
+	editingQueueSlots bool
+	queueSlotsInput   textinput.Model
 }
 
 // Msg-Typen
@@ -122,6 +126,7 @@ type analyticsLoadedMsg struct {
 	totalImpressions int
 	platStats        map[string]*platMetricSummary
 	analyzedPosts    []postMetric
+	dailyEngagement  []int
 	err              error
 }
 
@@ -182,12 +187,19 @@ type tickMsg struct{}
 
 // NewModel initialisiert ein TUI-Model
 func NewModel(s *store.SQLiteStore) Model {
+	qInput := textinput.New()
+	qInput.Placeholder = "Mon 09:00, Wed 14:00, Fri 17:30"
+	qInput.CharLimit = 150
+	qInput.Width = 60
+
 	return Model{
-		store:     s,
-		activeTab: 0,
-		cursor:    0,
-		platforms: make(map[string]bool),
-		loading:   true,
+		store:             s,
+		activeTab:         0,
+		cursor:            0,
+		platforms:         make(map[string]bool),
+		loading:           true,
+		queueSlotsInput:   qInput,
+		editingQueueSlots: false,
 	}
 }
 
@@ -312,6 +324,7 @@ func (m Model) loadDataCmd() tea.Msg {
 		models.PlatformMastodon: false,
 		models.PlatformBluesky:  false,
 		models.PlatformFacebook: false,
+		models.PlatformTelegram: config.ActiveConfig.Telegram.BotToken != "" && config.ActiveConfig.Telegram.ChatID != "",
 	}
 	for p := range platforms {
 		_, _, _, err := m.store.GetToken(ctx, p)
@@ -380,6 +393,8 @@ func platformNeedsSetup(platformName string) bool {
 		return config.ActiveConfig.Bluesky.Handle == "" || config.ActiveConfig.Bluesky.AppPassword == ""
 	case models.PlatformFacebook:
 		return config.ActiveConfig.Facebook.AppID == "" || config.ActiveConfig.Facebook.AppSecret == ""
+	case models.PlatformTelegram:
+		return config.ActiveConfig.Telegram.BotToken == "" || config.ActiveConfig.Telegram.ChatID == ""
 	}
 	return false
 }
@@ -422,6 +437,9 @@ func (m Model) clearPlatformCmd(platformName string) tea.Cmd {
 			config.ActiveConfig.Facebook.AppID = ""
 			config.ActiveConfig.Facebook.AppSecret = ""
 			config.ActiveConfig.Facebook.PageID = ""
+		case models.PlatformTelegram:
+			config.ActiveConfig.Telegram.BotToken = ""
+			config.ActiveConfig.Telegram.ChatID = ""
 		}
 
 		// 3. Speichern
@@ -648,6 +666,8 @@ func (m Model) loadAnalyticsCmd() tea.Msg {
 		"facebook": {Name: "Facebook"},
 	}
 
+	dailyEngagement := make([]int, days)
+
 	for _, p := range posts {
 		if p.PostedAt != nil && p.PostedAt.Before(cutoff) {
 			continue
@@ -668,6 +688,14 @@ func (m Model) loadAnalyticsCmd() tea.Msg {
 		postedAtStr := ""
 		if p.PostedAt != nil {
 			postedAtStr = p.PostedAt.Format("02.01. 15:04")
+			
+			// Tägliche Interaktionen berechnen
+			postDate := time.Date(p.PostedAt.Year(), p.PostedAt.Month(), p.PostedAt.Day(), 0, 0, 0, 0, time.Local)
+			nowDate := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local)
+			daysAgo := int(nowDate.Sub(postDate).Hours() / 24)
+			if daysAgo >= 0 && daysAgo < days {
+				dailyEngagement[days-1-daysAgo] += metrics.Likes + metrics.Shares + metrics.Comments
+			}
 		}
 
 		metricItem := postMetric{
@@ -705,6 +733,7 @@ func (m Model) loadAnalyticsCmd() tea.Msg {
 		totalImpressions: totalImpressions,
 		platStats:        platStats,
 		analyzedPosts:    analyzedPosts,
+		dailyEngagement:  dailyEngagement,
 	}
 }
 
@@ -815,7 +844,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			if m.editorFocus == 0 {
-				platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook"}
+				platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram"}
 				currIdx := -1
 				for idx, p := range platformsList {
 					if p == m.editorPlatform {
@@ -1015,6 +1044,35 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.KeyMsg:
+		// Wenn wir die Queue Slots bearbeiten, verarbeite nur diese Tasten
+		if m.editingQueueSlots {
+			var cmd tea.Cmd
+			switch {
+			case msg.String() == "esc":
+				m.editingQueueSlots = false
+				return m, nil
+			case msg.String() == "enter":
+				inputVal := m.queueSlotsInput.Value()
+				parts := strings.Split(inputVal, ",")
+				var newSlots []string
+				for _, part := range parts {
+					trimmed := strings.TrimSpace(part)
+					if trimmed != "" {
+						newSlots = append(newSlots, trimmed)
+					}
+				}
+				config.ActiveConfig.Scheduler.Slots = newSlots
+				if err := config.SaveConfig(); err != nil {
+					m.err = err
+				}
+				m.editingQueueSlots = false
+				return m, nil
+			default:
+				m.queueSlotsInput, cmd = m.queueSlotsInput.Update(msg)
+				return m, cmd
+			}
+		}
+
 		// Wenn README offen ist, verarbeite nur README-Tasten
 		if m.showReadme {
 			if m.readmeFocus == 1 && (msg.String() == "t" || msg.String() == "backspace") {
@@ -1204,7 +1262,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 5 {
-				if m.cursor >= 5 && m.cursor <= 10 {
+				if m.cursor >= 5 && m.cursor <= 11 {
 					var platName string
 					switch m.cursor {
 					case 5:
@@ -1219,6 +1277,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						platName = models.PlatformBluesky
 					case 10:
 						platName = models.PlatformFacebook
+					case 11:
+						platName = models.PlatformTelegram
 					}
 					if platformNeedsSetup(platName) || (platName == models.PlatformTwitter && config.ActiveConfig.Twitter.AuthMode == "cookie") {
 						return m, m.runSetupWizardCmd(platName)
@@ -1227,11 +1287,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
 					return m, m.runAuthCmd(platName)
 				}
-				if m.cursor == 11 {
+				if m.cursor == 12 {
 					return m, m.runBackupExportCmd()
 				}
-				if m.cursor == 12 {
+				if m.cursor == 13 {
 					return m, m.runBackupImportCmd()
+				}
+				if m.cursor == 14 {
+					m.editingQueueSlots = true
+					m.queueSlotsInput.SetValue(strings.Join(config.ActiveConfig.Scheduler.Slots, ", "))
+					m.queueSlotsInput.Focus()
+					return m, nil
 				}
 				m.cycleSetting()
 				return m, nil
@@ -1268,7 +1334,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, m.deletePostCmd(idToDelete)
 				}
 			} else if m.activeTab == 5 { // Settings
-				if m.cursor >= 5 && m.cursor <= 10 {
+				if m.cursor >= 5 && m.cursor <= 11 {
 					var platName string
 					switch m.cursor {
 					case 5:
@@ -1283,6 +1349,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						platName = models.PlatformBluesky
 					case 10:
 						platName = models.PlatformFacebook
+					case 11:
+						platName = models.PlatformTelegram
 					}
 					m.loading = true
 					m.statusMessage = fmt.Sprintf("Setze %s zurück...", platName)
@@ -1388,7 +1456,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 5: // Settings
-		return 13
+		return 15
 	default:
 		return 0
 	}
@@ -1430,7 +1498,7 @@ func (m Model) View() string {
 
 	// Tabs
 	builder.WriteString(RenderTabs(m.activeTab))
-	builder.WriteString("\n\n")
+	builder.WriteString("\n")
 
 	// Inhalt je nach Tab / Zustand
 	var tabContent string
@@ -1501,7 +1569,7 @@ func (m Model) repurposePostCmd(p *models.Post, targets []string) tea.Cmd {
 			return postRepurposedMsg{err: fmt.Errorf("AI API-Key fehlt. Bitte setze ihn in config.yaml oder als Umgebungsvariable")}
 		}
 
-		result, err := generator.RepurposeContent(ctx, aiCfg, p.Platform, p.Type, p.Title, srcContent, targets)
+		result, err := generator.RepurposeContent(ctx, aiCfg, p.Platform, p.Type, p.Title, srcContent, targets, "")
 		if err != nil {
 			return postRepurposedMsg{err: err}
 		}

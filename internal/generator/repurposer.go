@@ -48,11 +48,15 @@ You must return ONLY a raw JSON object matching this schema:
 Do not include any chat prefix/suffix or markdown formatting like ` + "`" + "```json" + "`" + ` or similar outside the JSON object. Return ONLY the JSON object. Keep the output clean and parseable by standard JSON decoders.`
 
 // RepurposeContent contacts the LLM API to repurpose a post to the target platforms.
-func RepurposeContent(ctx context.Context, cfg GeneratorConfig, srcPlatform, srcType, srcTitle, srcContent string, targets []string) (*RepurposeResult, error) {
+func RepurposeContent(ctx context.Context, cfg GeneratorConfig, srcPlatform, srcType, srcTitle, srcContent string, targets []string, tone string) (*RepurposeResult, error) {
 	targetsStr := strings.Join(targets, ", ")
+	tonePrompt := ""
+	if tone != "" {
+		tonePrompt = fmt.Sprintf("\nTone of Voice / Schreibstil: %s\nBitte passe den Schreibstil des Ziel-Beitrags entsprechend an.", tone)
+	}
 	userPrompt := fmt.Sprintf(
-		"Source Post Metadata:\n- Platform: %s\n- Type: %s\n- Title: %s\n\nSource Post Content:\n%s\n\nTarget Platforms to generate: %s\n\nPlease repurpose the post to the specified target platforms.",
-		srcPlatform, srcType, srcTitle, srcContent, targetsStr,
+		"Source Post Metadata:\n- Platform: %s\n- Type: %s\n- Title: %s\n\nSource Post Content:\n%s\n\nTarget Platforms to generate: %s\n%s\n\nPlease repurpose the post to the specified target platforms.",
+		srcPlatform, srcType, srcTitle, srcContent, targetsStr, tonePrompt,
 	)
 
 	var rawResponse string

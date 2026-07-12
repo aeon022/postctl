@@ -319,40 +319,17 @@ func (t *ThreadsPlatform) UploadImage(ctx context.Context, path string) (string,
 	return directURL, nil
 }
 
-// Post veröffentlicht einen Beitrag auf Threads (Container erstellen + publizieren)
-func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
-	userID, token, err := t.getUserIDAndToken(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	postBody := post.Body
-	if postBody == "" && len(post.Tweets) > 0 {
-		var contents []string
-		for _, tw := range post.Tweets {
-			contents = append(contents, tw.Content)
-		}
-		postBody = strings.Join(contents, "\n\n")
-	}
-
+// createAndPublishContainer erstellt einen Container für Threads und veröffentlicht ihn.
+// Falls replyToID angegeben ist, wird der Beitrag als Antwort auf diesen deklariert.
+func (t *ThreadsPlatform) createAndPublishContainer(ctx context.Context, userID, token, text, imgPath, replyToID string) (string, error) {
 	// 1. Container erstellen
 	createURL := fmt.Sprintf("https://graph.threads.net/v1.0/%s/threads", userID)
 	
 	params := url.Values{}
-	params.Set("text", postBody)
+	params.Set("text", text)
 	params.Set("access_token", token)
-
-	// Erstes verfügbares Bild ermitteln
-	var imgPath string
-	if len(post.Images) > 0 {
-		imgPath = post.Images[0]
-	} else {
-		for _, tw := range post.Tweets {
-			if tw.Image != "" {
-				imgPath = tw.Image
-				break
-			}
-		}
+	if replyToID != "" {
+		params.Set("reply_to_id", replyToID)
 	}
 
 	if imgPath != "" {
@@ -373,7 +350,7 @@ func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, 
 
 	resp, err := t.client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("create threads container request: %w", err)
+		return "", fmt.Errorf("create threads container request failed: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -442,6 +419,58 @@ func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, 
 	}
 
 	return "", fmt.Errorf("after %d retries: %w", maxRetries, lastErr)
+}
+
+// Post veröffentlicht einen einzelnen Beitrag oder einen Thread auf Threads
+func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
+	userID, token, err := t.getUserIDAndToken(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	var contents []string
+	var images []string
+
+	if post.Type == "thread" {
+		for _, tw := range post.Tweets {
+			contents = append(contents, tw.Content)
+			images = append(images, tw.Image)
+		}
+	} else {
+		contents = []string{post.Body}
+		var img string
+		if len(post.Images) > 0 {
+			img = post.Images[0]
+		}
+		images = []string{img}
+	}
+
+	var lastPostID string
+	var firstPostID string
+
+	for i, content := range contents {
+		var imgPath string
+		if i < len(images) {
+			imgPath = images[i]
+		}
+
+		// Meta empfiehlt eine kurze Pause zwischen Veröffentlichungen, um Index-Konflikte zu vermeiden
+		if i > 0 {
+			time.Sleep(1 * time.Second)
+		}
+
+		postID, err := t.createAndPublishContainer(ctx, userID, token, content, imgPath, lastPostID)
+		if err != nil {
+			return "", fmt.Errorf("failed to post thread item %d: %w", i+1, err)
+		}
+
+		lastPostID = postID
+		if i == 0 {
+			firstPostID = postID
+		}
+	}
+
+	return firstPostID, nil
 }
 
 // FetchAnalytics retrieves public metrics from Threads API

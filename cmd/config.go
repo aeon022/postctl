@@ -116,6 +116,40 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Facebook.AppSecret = value
 	case "facebook.page_id":
 		config.ActiveConfig.Facebook.PageID = value
+	case "telegram.bot_token":
+		config.ActiveConfig.Telegram.BotToken = value
+	case "telegram.chat_id":
+		config.ActiveConfig.Telegram.ChatID = value
+	case "discord.webhook_url":
+		config.ActiveConfig.Discord.WebhookURL = value
+	case "reddit.client_id":
+		config.ActiveConfig.Reddit.ClientID = value
+	case "reddit.client_secret":
+		config.ActiveConfig.Reddit.ClientSecret = value
+	case "reddit.username":
+		config.ActiveConfig.Reddit.Username = value
+	case "reddit.password":
+		config.ActiveConfig.Reddit.Password = value
+	case "devto.api_token":
+		config.ActiveConfig.DevTo.APIToken = value
+	case "hashnode.api_token":
+		config.ActiveConfig.Hashnode.APIToken = value
+	case "hashnode.publication_id":
+		config.ActiveConfig.Hashnode.PublicationID = value
+	case "medium.integration_token":
+		config.ActiveConfig.Medium.IntegrationToken = value
+	case "instagram.access_token":
+		config.ActiveConfig.Instagram.AccessToken = value
+	case "instagram.account_id":
+		config.ActiveConfig.Instagram.AccountID = value
+	case "pinterest.access_token":
+		config.ActiveConfig.Pinterest.AccessToken = value
+	case "pinterest.board_id":
+		config.ActiveConfig.Pinterest.BoardID = value
+	case "youtube.client_id":
+		config.ActiveConfig.YouTube.ClientID = value
+	case "youtube.client_secret":
+		config.ActiveConfig.YouTube.ClientSecret = value
 	case "license_key", "licensekey":
 		config.ActiveConfig.LicenseKey = value
 	case "license_status", "licensestatus":
@@ -156,6 +190,16 @@ func reportConfigShow(cmd *cobra.Command) {
 	masked.Mastodon.ClientSecret = maskSecret(masked.Mastodon.ClientSecret)
 	masked.Bluesky.AppPassword = maskSecret(masked.Bluesky.AppPassword)
 	masked.Facebook.AppSecret = maskSecret(masked.Facebook.AppSecret)
+	masked.Telegram.BotToken = maskSecret(masked.Telegram.BotToken)
+	masked.Discord.WebhookURL = maskSecret(masked.Discord.WebhookURL)
+	masked.Reddit.ClientSecret = maskSecret(masked.Reddit.ClientSecret)
+	masked.Reddit.Password = maskSecret(masked.Reddit.Password)
+	masked.DevTo.APIToken = maskSecret(masked.DevTo.APIToken)
+	masked.Hashnode.APIToken = maskSecret(masked.Hashnode.APIToken)
+	masked.Medium.IntegrationToken = maskSecret(masked.Medium.IntegrationToken)
+	masked.Instagram.AccessToken = maskSecret(masked.Instagram.AccessToken)
+	masked.Pinterest.AccessToken = maskSecret(masked.Pinterest.AccessToken)
+	masked.YouTube.ClientSecret = maskSecret(masked.YouTube.ClientSecret)
 	masked.LicenseKey = maskSecret(masked.LicenseKey)
 
 	out := cmd.OutOrStdout()

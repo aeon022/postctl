@@ -11,6 +11,29 @@ import (
 
 // renderSettings zeichnet das Einstellungsmenü im Terminal
 func (m Model) renderSettings() string {
+	if m.editingQueueSlots {
+		var builder strings.Builder
+		builder.WriteString(StyleHeader.Render("QUEUE-SLOTS BEARBEITEN (EDIT QUEUE SLOTS)") + "\n\n")
+		
+		var helpText string
+		if config.ActiveConfig.Defaults.Language == "de" {
+			helpText = "Gib die Slots kommagetrennt ein (Format: 'Tag HH:MM', z.B. 'Mon 09:00, Wed 14:00'):"
+		} else {
+			helpText = "Enter slots comma-separated (format: 'Day HH:MM', e.g. 'Mon 09:00, Wed 14:00'):"
+		}
+		builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render(helpText) + "\n\n")
+		builder.WriteString(m.queueSlotsInput.View() + "\n\n\n\n\n\n\n\n")
+		
+		var keysText string
+		if config.ActiveConfig.Defaults.Language == "de" {
+			keysText = "Enter: Speichern  ·  Esc: Abbrechen"
+		} else {
+			keysText = "Enter: Save  ·  Esc: Cancel"
+		}
+		builder.WriteString(StyleHelp.Render(keysText))
+		return StyleBox.Width(78).Height(21).Render(builder.String())
+	}
+
 	var builder strings.Builder
 
 	builder.WriteString(StyleHeader.Render(Tr("header_settings")) + "\n\n")
@@ -43,8 +66,10 @@ func (m Model) renderSettings() string {
 		{Tr("settings_auth_mastodon"), getPlatformStatus(models.PlatformMastodon), true},
 		{Tr("settings_auth_bluesky"), getPlatformStatus(models.PlatformBluesky), true},
 		{Tr("settings_auth_facebook"), getPlatformStatus(models.PlatformFacebook), true},
+		{Tr("settings_auth_telegram"), getPlatformStatus(models.PlatformTelegram), true},
 		{Tr("settings_config_export"), Tr("settings_run_action"), true},
 		{Tr("settings_config_import"), Tr("settings_run_action"), true},
+		{Tr("settings_edit_slots"), Tr("settings_run_action"), true},
 	}
 
 	for i, opt := range options {
@@ -87,16 +112,23 @@ func (m Model) renderSettings() string {
 			builder.WriteString("\n" + StyleHeader.Render("PLATFORM ACCOUNTS") + "\n")
 		}
 		// Einen kleinen visuellen Trenner vor Backup & Sync einfügen
-		if i == 10 {
+		if i == 11 {
 			builder.WriteString("\n" + StyleHeader.Render("BACKUP & SYNC") + "\n")
 		}
 	}
 
-	builder.WriteString("\n")
+	// 3. Scheduler Slots anzeigen
+	slotsStr := strings.Join(config.ActiveConfig.Scheduler.Slots, ", ")
+	if slotsStr == "" {
+		slotsStr = "None"
+	}
+	builder.WriteString("\n" + StyleHeader.Render("SCHEDULER QUEUE SLOTS") + "\n")
+	builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render("  " + slotsStr) + "\n\n")
+
 	if m.statusMessage != "" {
 		builder.WriteString(lipgloss.NewStyle().Foreground(ColorSecondary).Render(m.statusMessage) + "\n")
 	}
 	builder.WriteString(StyleHelp.Render(Tr("settings_help_footer")))
 
-	return StyleBox.Width(78).Height(17).Render(builder.String())
+	return StyleBox.Width(78).Height(21).Render(builder.String())
 }

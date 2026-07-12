@@ -52,7 +52,7 @@ func TestRepurposeContent(t *testing.T) {
 		BaseURL:  server.URL,
 	}
 
-	result, err := RepurposeContent(context.Background(), cfg, "twitter", "thread", "Original Title", "Original Content", []string{"linkedin"})
+	result, err := RepurposeContent(context.Background(), cfg, "twitter", "thread", "Original Title", "Original Content", []string{"linkedin"}, "")
 	if err != nil {
 		t.Fatalf("RepurposeContent failed: %v", err)
 	}

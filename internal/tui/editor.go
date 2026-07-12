@@ -3,6 +3,7 @@ package tui
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -218,7 +219,7 @@ func (m Model) renderEditor() string {
 	platformLabel := platPrefix + Tr("editor_label_platform")
 	
 	platSelect := ""
-	platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook"}
+	platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram"}
 	for i, p := range platformsList {
 		if p == m.editorPlatform {
 			platSelect += lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("[" + strings.ToUpper(p) + "]")
@@ -288,7 +289,15 @@ func (m Model) renderEditor() string {
 		bodyPrefix = "➔ "
 		bodyStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 	}
-	builder.WriteString(bodyStyle.Render(bodyPrefix + bodyLabel) + "\n" + m.editorBody.View() + "\n\n")
+	builder.WriteString(bodyStyle.Render(bodyPrefix + bodyLabel) + "\n" + m.editorBody.View() + "\n")
+
+	// Live Längen-Validierung
+	charLimitMsg, _ := m.checkCharacterLimits()
+	if charLimitMsg != "" {
+		builder.WriteString("     " + charLimitMsg + "\n\n")
+	} else {
+		builder.WriteString("\n")
+	}
 
 	// 6. Action-Buttons
 	saveLabel := Tr("editor_save")
@@ -369,4 +378,100 @@ func (m Model) renderCalendar(selectedDate time.Time) string {
 	
 	sb.WriteString("\n  (Pfeiltasten: Tag | p/n: Monat | Enter: Wählen | Esc: Schließen)")
 	return sb.String()
+}
+
+var editorUrlRegex = regexp.MustCompile(`https?://[^\s]+`)
+
+// checkCharacterLimits prüft die Zeichenbeschränkungen der Plattform live im Editor
+func (m Model) checkCharacterLimits() (string, bool) {
+	platform := m.editorPlatform
+	body := m.editorBody.Value()
+
+	var limit int
+	switch platform {
+	case "twitter":
+		limit = 280
+	case "bluesky":
+		limit = 300
+	case "mastodon", "threads":
+		limit = 500
+	case "linkedin":
+		limit = 3000
+	case "telegram":
+		limit = 4096
+	default:
+		return "", true
+	}
+
+	isThread := (platform == "twitter" || platform == "mastodon" || platform == "bluesky") && strings.Contains(body, "\n---\n")
+
+	if isThread {
+		parts := strings.Split(body, "\n---\n")
+		var overflowIndices []int
+		var counts []string
+		
+		for idx, part := range parts {
+			var count int
+			if platform == "twitter" {
+				processed := editorUrlRegex.ReplaceAllString(part, "12345678901234567890123")
+				count = len([]rune(processed))
+			} else {
+				count = len([]rune(strings.TrimSpace(part)))
+			}
+			
+			counts = append(counts, fmt.Sprintf("%d", count))
+			if count > limit {
+				overflowIndices = append(overflowIndices, idx+1)
+			}
+		}
+		
+		countsStr := strings.Join(counts, " | ")
+		if len(overflowIndices) > 0 {
+			var errParts []string
+			for _, o := range overflowIndices {
+				errParts = append(errParts, fmt.Sprintf("#%d", o))
+			}
+			var errMsg string
+			if config.ActiveConfig.Defaults.Language == "de" {
+				errMsg = fmt.Sprintf("⚠️ Limit überschritten in Post: %s (Längen: %s, Max: %d)", strings.Join(errParts, ", "), countsStr, limit)
+			} else {
+				errMsg = fmt.Sprintf("⚠️ Limit exceeded in post: %s (lengths: %s, max: %d)", strings.Join(errParts, ", "), countsStr, limit)
+			}
+			return lipgloss.NewStyle().Foreground(ColorFailed).Render(errMsg), false
+		}
+		
+		var successMsg string
+		if config.ActiveConfig.Defaults.Language == "de" {
+			successMsg = fmt.Sprintf("✓ Thread-Längen okay (%s, Max: %d)", countsStr, limit)
+		} else {
+			successMsg = fmt.Sprintf("✓ Thread lengths okay (%s, max: %d)", countsStr, limit)
+		}
+		return lipgloss.NewStyle().Foreground(ColorPosted).Render(successMsg), true
+	} else {
+		var count int
+		if platform == "twitter" {
+			processed := editorUrlRegex.ReplaceAllString(body, "12345678901234567890123")
+			count = len([]rune(processed))
+		} else {
+			count = len([]rune(strings.TrimSpace(body)))
+		}
+		
+		if count > limit {
+			var errMsg string
+			if config.ActiveConfig.Defaults.Language == "de" {
+				errMsg = fmt.Sprintf("⚠️ Limit überschritten! Zeichen: %d/%d", count, limit)
+			} else {
+				errMsg = fmt.Sprintf("⚠️ Limit exceeded! Chars: %d/%d", count, limit)
+			}
+			return lipgloss.NewStyle().Foreground(ColorFailed).Render(errMsg), false
+		}
+		
+		var successMsg string
+		if config.ActiveConfig.Defaults.Language == "de" {
+			successMsg = fmt.Sprintf("✓ Länge okay. Zeichen: %d/%d", count, limit)
+		} else {
+			successMsg = fmt.Sprintf("✓ Length okay. Chars: %d/%d", count, limit)
+		}
+		return lipgloss.NewStyle().Foreground(ColorPosted).Render(successMsg), true
+	}
 }

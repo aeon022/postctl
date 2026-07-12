@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/aeon022/postctl/internal/config"
+	"github.com/aeon022/postctl/internal/generator"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
 )
@@ -220,6 +221,18 @@ func (m *MastodonPlatform) UploadImage(ctx context.Context, path string) (string
 	if _, err := io.Copy(part, file); err != nil {
 		return "", err
 	}
+
+	// Alt-Text automatisch generieren falls möglich
+	aiCfg := generator.GeneratorConfig{
+		Provider: config.ActiveConfig.AI.Provider,
+		APIKey:   config.ActiveConfig.AI.APIKey,
+		Model:    config.ActiveConfig.AI.Model,
+		BaseURL:  config.ActiveConfig.AI.BaseURL,
+	}
+	if desc, err := generator.GenerateAltText(ctx, aiCfg, path); err == nil && desc != "" {
+		_ = writer.WriteField("description", desc)
+	}
+
 	writer.Close()
 
 	req, err := http.NewRequestWithContext(ctx, "POST", uploadURL, body)

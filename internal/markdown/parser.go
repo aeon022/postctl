@@ -98,12 +98,17 @@ func ParseContent(content, sourcePath string) ([]models.Post, error) {
 	}
 
 	var scheduledAt *time.Time
+	isQueue := false
 	if fm.Schedule != "" {
-		parsed, err := ParseScheduleTime(fm.Schedule)
-		if err != nil {
-			return nil, fmt.Errorf("invalid schedule time %q: %w", fm.Schedule, err)
+		if strings.ToLower(strings.TrimSpace(fm.Schedule)) == "queue" {
+			isQueue = true
+		} else {
+			parsed, err := ParseScheduleTime(fm.Schedule)
+			if err != nil {
+				return nil, fmt.Errorf("invalid schedule time %q: %w", fm.Schedule, err)
+			}
+			scheduledAt = &parsed
 		}
-		scheduledAt = &parsed
 	}
 
 	// Plattformen ermitteln
@@ -147,6 +152,8 @@ func ParseContent(content, sourcePath string) ([]models.Post, error) {
 
 		if scheduledAt != nil {
 			post.Status = models.StatusScheduled
+		} else if isQueue {
+			post.Status = "queue"
 		}
 
 		// Generiere deterministische ID

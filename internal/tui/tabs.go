@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"strings"
+
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -18,12 +20,27 @@ func RenderTabs(activeTab int) string {
 	
 	var renderedTabs []string
 	for i, name := range tabs {
+		label := " " + strings.ToUpper(name) + " "
 		if i == activeTab {
-			renderedTabs = append(renderedTabs, StyleTabActive.Render(name))
+			styled := lipgloss.NewStyle().
+				Bold(true).
+				Foreground(ColorSecondary).
+				Render(label)
+			renderedTabs = append(renderedTabs, styled)
 		} else {
-			renderedTabs = append(renderedTabs, StyleTabInactive.Render(name))
+			styled := lipgloss.NewStyle().
+				Foreground(ColorLightGray).
+				Render(label)
+			renderedTabs = append(renderedTabs, styled)
 		}
 	}
 
-	return lipgloss.JoinHorizontal(lipgloss.Bottom, renderedTabs...)
+	// Trennzeichen
+	divider := lipgloss.NewStyle().Foreground(ColorDarkGray).Render("│")
+	tabRow := strings.Join(renderedTabs, divider)
+	
+	// Horizontale Trennlinie passend zur Boxbreite (78 Zeichen)
+	bottomLine := lipgloss.NewStyle().Foreground(ColorPrimary).Render(strings.Repeat("─", 78))
+
+	return tabRow + "\n" + bottomLine
 }

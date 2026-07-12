@@ -32,25 +32,50 @@ This document outlines the milestones, current achievements, and planned feature
 
 ---
 
-## 🔮 Future Roadmap (New Feature Ideas)
+## 🔮 Future Roadmap (Completed)
 
 ### 📊 1. Monospace TUI Analytics Dashboard
-- [ ] Add a **TUI Analytics Tab** displaying real-time post engagement (likes, shares, comments, impressions).
-- [ ] Fetch stats asynchronously using background workers to avoid UI freezes.
-- [ ] Generate comparative charts (ASCII bar charts) comparing campaign performances.
+- [x] Add a **TUI Analytics Tab** displaying real-time post engagement (likes, reposts, comments, impressions) using ASCII/Sparkline charts.
+- [x] Fetch stats asynchronously using background workers to avoid TUI thread locks.
+- [x] Implement command line analytics output (`postctl analytics`) with ASCII formatting.
 
-### 🧵 2. Multi-Platform Threads
-- [ ] Extend thread-splitting support to **Mastodon**, **Bluesky**, and **Threads** (currently only Twitter/X is fully thread-native).
-- [ ] Implement sequential posting loops with status checks for all thread-capable platforms.
+### 🧵 2. Multi-Platform Threads & Live Editor Preview
+- [x] Extend thread-splitting support (`---` separator) to **Mastodon**, **Bluesky**, and **Threads**.
+- [x] Implement live character-limit warning indicator and thread-view in the TUI Editor.
+- [x] Implement sequential posting loops with custom safety delays between replies to prevent rate limits.
 
 ### 📅 3. Smart Queues & Auto-Scheduling
-- [ ] Support defining standard **Publishing Windows** (e.g., weekdays at 09:00, 15:00, 18:00) per campaign or platform.
-- [ ] Add an auto-queue function: importing a draft automatically assigns it to the next available publishing window slot.
+- [x] Support defining standard **Publishing Windows** (e.g. weekdays at 09:00, 15:00, 18:00) per campaign/platform in config.
+- [x] Add support for `schedule: queue` in frontmatter or `postctl schedule <ID> --queue`.
+- [x] Automatically assign posts to the next available publishing window slot.
 
-### 📂 4. Media Library & Video Support
-- [ ] Implement video uploads for platforms that support it.
-- [ ] Add a TUI-based **Media Library browser** to preview and reuse uploaded images or assets.
+### 🔄 4. Git Hooks & Static Site Generator (SSG) Pipeline
+- [x] Create `postctl git-hook install` command to automatically import posts from a specific directory on commit/push.
+- [x] Write integration guidelines/scripts for Hugo, Jekyll, and Astro to extract frontmatter social teasers.
 
-### 👥 5. Multi-Profile Management
-- [ ] Support multiple accounts or profiles per platform (e.g. `@personal` vs. `@company`).
-- [ ] Allow toggling active profiles directly inside the TUI settings dashboard.
+### 🤖 5. Offline LLM & Repurposing (Ollama Integration)
+- [x] Integrate local Ollama support (`llama3`, `mistral`, `phi3`) alongside OpenAI and Anthropic.
+- [x] Add tone selection flag for repurposing: `postctl repurpose <ID> --platform <TARGET> --tone <TONE>` (e.g. professional, shitpost, educational).
+- [x] Implement AI-based automatic ALT-text generator for uploaded images.
+
+---
+
+## 🚀 Milestone 5: Multi-Platform Expansion (Planned & In Progress)
+
+Integrate additional platforms to support a wider range of developer community, tech blogging, and visual/video networks.
+
+### 💬 Category A: Developer & Community Channels (Easiest)
+- [ ] **Telegram:** Broadcast to channels/groups using a bot token and chat ID.
+- [ ] **Discord:** Send updates to server channels via Webhook URLs.
+- [ ] **Reddit:** Submit text or link posts to subreddits using OAuth API.
+
+### ✍️ Category B: Developer Blogging (Markdown-Native)
+- [ ] **Dev.to:** Publish tech articles directly via personal API token (native Markdown/Frontmatter).
+- [ ] **Hashnode:** Publish articles to personal blogs using GraphQL API and personal access token.
+- [ ] **Medium:** Publish articles to Medium publication drafts or posts via Integration Token.
+
+### 📸 Category C: Visual & Video Networks (Media-Focused)
+- [ ] **Instagram:** Publish single images, carousels, or Reels using Facebook Graph API.
+- [ ] **Pinterest:** Create image-rich Pins with links using Pinterest API.
+- [ ] **YouTube / YouTube Shorts:** Upload teaser videos via YouTube API.
+

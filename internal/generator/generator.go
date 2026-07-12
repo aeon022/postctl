@@ -3,6 +3,7 @@ package generator
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -413,5 +414,187 @@ func marshalYAML(v interface{}) ([]byte, error) {
 
 func writeFile(path string, data []byte) error {
 	return os.WriteFile(path, data, 0644)
+}
+
+// GenerateAltText liest ein Bild ein und generiert eine Barrierefreiheits-Beschreibung via Vision LLM
+func GenerateAltText(ctx context.Context, cfg GeneratorConfig, imagePath string) (string, error) {
+	if cfg.APIKey == "" && strings.ToLower(cfg.Provider) != "ollama" {
+		if strings.ToLower(cfg.Provider) == "claude" {
+			cfg.APIKey = os.Getenv("ANTHROPIC_API_KEY")
+		} else {
+			cfg.APIKey = os.Getenv("OPENAI_API_KEY")
+		}
+		if cfg.APIKey == "" {
+			return "", nil
+		}
+	}
+
+	fileBytes, err := os.ReadFile(imagePath)
+	if err != nil {
+		return "", fmt.Errorf("read image file: %w", err)
+	}
+
+	mimeType := "image/jpeg"
+	if strings.HasSuffix(strings.ToLower(imagePath), ".png") {
+		mimeType = "image/png"
+	} else if strings.HasSuffix(strings.ToLower(imagePath), ".gif") {
+		mimeType = "image/gif"
+	} else if strings.HasSuffix(strings.ToLower(imagePath), ".webp") {
+		mimeType = "image/webp"
+	}
+
+	base64Data := base64.StdEncoding.EncodeToString(fileBytes)
+
+	provider := strings.ToLower(cfg.Provider)
+	if provider == "claude" {
+		return callClaudeVision(ctx, cfg, base64Data, mimeType)
+	} else if provider == "openai" || provider == "" {
+		return callOpenAIVision(ctx, cfg, base64Data, mimeType)
+	}
+
+	return "", nil
+}
+
+func callOpenAIVision(ctx context.Context, cfg GeneratorConfig, base64Data, mimeType string) (string, error) {
+	url := cfg.BaseURL
+	if url == "" {
+		url = "https://api.openai.com/v1/chat/completions"
+	}
+
+	model := cfg.Model
+	if model == "" || model == "gpt-4o-mini" {
+		model = "gpt-4o-mini"
+	}
+
+	payload := map[string]interface{}{
+		"model": model,
+		"messages": []map[string]interface{}{
+			{
+				"role": "user",
+				"content": []map[string]interface{}{
+					{
+						"type": "text",
+						"text": "Describe this image in detail, but concisely, to be used as social media alt text (accessible description). Return ONLY the description, no intro or quotes.",
+					},
+					{
+						"type": "image_url",
+						"image_url": map[string]interface{}{
+							"url": fmt.Sprintf("data:%s;base64,%s", mimeType, base64Data),
+						},
+					},
+				},
+			},
+		},
+		"max_tokens": 150,
+	}
+
+	jsonBytes, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+cfg.APIKey)
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("openai vision status %d: %s", resp.StatusCode, string(body))
+	}
+
+	var openAIResp OpenAIResponse
+	if err := json.NewDecoder(resp.Body).Decode(&openAIResp); err != nil {
+		return "", err
+	}
+
+	if len(openAIResp.Choices) == 0 {
+		return "", fmt.Errorf("no choice returned")
+	}
+
+	return strings.TrimSpace(openAIResp.Choices[0].Message.Content), nil
+}
+
+func callClaudeVision(ctx context.Context, cfg GeneratorConfig, base64Data, mimeType string) (string, error) {
+	url := cfg.BaseURL
+	if url == "" {
+		url = "https://api.anthropic.com/v1/messages"
+	}
+
+	model := cfg.Model
+	if model == "" {
+		model = "claude-3-5-sonnet-latest"
+	}
+
+	payload := map[string]interface{}{
+		"model":      model,
+		"max_tokens": 150,
+		"messages": []map[string]interface{}{
+			{
+				"role": "user",
+				"content": []map[string]interface{}{
+					{
+						"type": "image",
+						"source": map[string]interface{}{
+							"type":       "base64",
+							"media_type": mimeType,
+							"data":       base64Data,
+						},
+					},
+					{
+						"type": "text",
+						"text": "Describe this image in detail, but concisely, to be used as social media alt text (accessible description). Return ONLY the description, no intro or quotes.",
+					},
+				},
+			},
+		},
+	}
+
+	jsonBytes, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("x-api-key", cfg.APIKey)
+	req.Header.Set("anthropic-version", "2023-06-01")
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("claude vision status %d: %s", resp.StatusCode, string(body))
+	}
+
+	var claudeResp ClaudeResponse
+	if err := json.NewDecoder(resp.Body).Decode(&claudeResp); err != nil {
+		return "", err
+	}
+
+	if len(claudeResp.Content) == 0 {
+		return "", fmt.Errorf("no content returned")
+	}
+
+	return strings.TrimSpace(claudeResp.Content[0].Text), nil
 }
 

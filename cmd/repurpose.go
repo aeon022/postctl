@@ -18,6 +18,7 @@ var (
 	repurposeTo        string
 	repurposeCampaign  string
 	repurposeOutputDir string
+	repurposeTone      string
 )
 
 // repurposeCmd represents the repurpose command
@@ -105,7 +106,7 @@ var repurposeCmd = &cobra.Command{
 		}
 
 		// 6. AI Repurposing ausführen
-		result, err := generator.RepurposeContent(ctx, aiCfg, post.Platform, post.Type, post.Title, srcContent, targetPlatforms)
+		result, err := generator.RepurposeContent(ctx, aiCfg, post.Platform, post.Type, post.Title, srcContent, targetPlatforms, repurposeTone)
 		if err != nil {
 			reportRepurposeError(fmt.Errorf("AI repurposing failed: %w", err), 2)
 			return
@@ -204,5 +205,6 @@ func init() {
 	repurposeCmd.Flags().StringVar(&repurposeTo, "to", "", "Target platforms (comma-separated, e.g., twitter,linkedin,threads)")
 	repurposeCmd.Flags().StringVar(&repurposeCampaign, "campaign", "", "Campaign slug for the frontmatter")
 	repurposeCmd.Flags().StringVar(&repurposeOutputDir, "output-dir", ".", "Directory where markdown files are saved")
+	repurposeCmd.Flags().StringVar(&repurposeTone, "tone", "", "Tone of voice (e.g. professional, shitpost, educational)")
 	rootCmd.AddCommand(repurposeCmd)
 }

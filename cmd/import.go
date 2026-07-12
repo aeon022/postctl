@@ -11,6 +11,7 @@ import (
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/markdown"
 	"github.com/aeon022/postctl/internal/models"
+	"github.com/aeon022/postctl/internal/scheduler"
 	"github.com/aeon022/postctl/internal/store"
 	"github.com/spf13/cobra"
 )
@@ -196,6 +197,15 @@ var importCmd = &cobra.Command{
 			defer s.Close()
 
 			for _, post := range posts {
+				if post.Status == "queue" {
+					slot, err := scheduler.GetNextQueueSlot(ctx, s, post.Platform)
+					if err != nil {
+						reportError(fmt.Errorf("failed to get queue slot for post %s: %w", post.ID, err), 2)
+						return
+					}
+					post.ScheduledAt = &slot
+					post.Status = models.StatusScheduled
+				}
 				if err := s.SavePost(ctx, &post); err != nil {
 					reportError(fmt.Errorf("save post %s: %w", post.ID, err), 2)
 					return

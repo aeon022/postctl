@@ -11,11 +11,13 @@ import (
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/markdown"
 	"github.com/aeon022/postctl/internal/models"
+	"github.com/aeon022/postctl/internal/scheduler"
 	"github.com/aeon022/postctl/internal/store"
 	"github.com/spf13/cobra"
 )
 
 var listFlag bool
+var queueFlag bool
 
 // scheduleCmd repräsentiert den schedule-Befehl
 var scheduleCmd = &cobra.Command{
@@ -38,26 +40,44 @@ var scheduleCmd = &cobra.Command{
 			return
 		}
 
-		if len(args) < 2 {
+		if len(args) < 1 {
 			cmd.Help()
 			return
 		}
 
 		postID := args[0]
-		timeStr := args[1]
+		var parsedTime time.Time
 
-		// 1. Zeit parsen
-		parsedTime, err := markdown.ParseScheduleTime(timeStr)
-		if err != nil {
-			reportScheduleError(fmt.Errorf("invalid datetime format %q: %w", timeStr, err), 1) // 1 = Validierungsfehler
-			return
-		}
+		// Check if we schedule via queue
+		isQueue := queueFlag || (len(args) >= 2 && strings.ToLower(args[1]) == "queue")
 
 		// 2. Post laden
 		post, err := s.GetPost(ctx, postID)
 		if err != nil {
 			reportScheduleError(fmt.Errorf("post with ID %q not found: %w", postID, err), 1)
 			return
+		}
+
+		if isQueue {
+			// Find next queue slot for this platform
+			slot, err := scheduler.GetNextQueueSlot(ctx, s, post.Platform)
+			if err != nil {
+				reportScheduleError(fmt.Errorf("find next queue slot: %w", err), 2)
+				return
+			}
+			parsedTime = slot
+		} else {
+			if len(args) < 2 {
+				reportScheduleError(fmt.Errorf("datetime is required when not scheduling to queue"), 1)
+				return
+			}
+			timeStr := args[1]
+			t, err := markdown.ParseScheduleTime(timeStr)
+			if err != nil {
+				reportScheduleError(fmt.Errorf("invalid datetime format %q: %w", timeStr, err), 1)
+				return
+			}
+			parsedTime = t
 		}
 
 		// 3. Post als geplant markieren
@@ -159,5 +179,6 @@ func reportScheduleError(err error, exitCode int) {
 
 func init() {
 	scheduleCmd.Flags().BoolVar(&listFlag, "list", false, "List all scheduled posts")
+	scheduleCmd.Flags().BoolVar(&queueFlag, "queue", false, "Schedule post to the next available queue slot")
 	rootCmd.AddCommand(scheduleCmd)
 }

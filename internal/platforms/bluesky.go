@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/aeon022/postctl/internal/config"
+	"github.com/aeon022/postctl/internal/generator"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
 )
@@ -320,6 +321,7 @@ func (b *BlueskyPlatform) Post(ctx context.Context, post *models.Post) (string, 
 
 		// Image Embeddings
 		var currentBlobs []string
+		var originalPaths []string
 		if post.Type == "thread" {
 			if len(post.Tweets) > i && post.Tweets[i].Image != "" {
 				blobStr, err := b.UploadImage(ctx, post.Tweets[i].Image)
@@ -327,19 +329,36 @@ func (b *BlueskyPlatform) Post(ctx context.Context, post *models.Post) (string, 
 					return "", fmt.Errorf("upload image %s for thread item %d: %w", post.Tweets[i].Image, i+1, err)
 				}
 				currentBlobs = []string{blobStr}
+				originalPaths = []string{post.Tweets[i].Image}
 			}
 		} else {
 			currentBlobs = uploadedBlobs
+			originalPaths = post.Images
 		}
 
 		if len(currentBlobs) > 0 {
 			var images []map[string]interface{}
-			for _, blobStr := range currentBlobs {
+			for idx, blobStr := range currentBlobs {
 				var blobObj interface{}
 				_ = json.Unmarshal([]byte(blobStr), &blobObj)
+				
+				// Alt-Text automatisch generieren falls möglich
+				altText := ""
+				if idx < len(originalPaths) {
+					aiCfg := generator.GeneratorConfig{
+						Provider: config.ActiveConfig.AI.Provider,
+						APIKey:   config.ActiveConfig.AI.APIKey,
+						Model:    config.ActiveConfig.AI.Model,
+						BaseURL:  config.ActiveConfig.AI.BaseURL,
+					}
+					if desc, err := generator.GenerateAltText(ctx, aiCfg, originalPaths[idx]); err == nil {
+						altText = desc
+					}
+				}
+
 				images = append(images, map[string]interface{}{
 					"image": blobObj,
-					"alt":   "",
+					"alt":   altText,
 				})
 			}
 			record["embed"] = map[string]interface{}{

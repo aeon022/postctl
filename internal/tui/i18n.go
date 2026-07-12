@@ -32,23 +32,23 @@ var translationsMap = map[string]map[string]string{
 		"en": "● DASHBOARD",
 	},
 	"tab_posts": {
-		"de": "◷ BEITRÄGE",
+		"de": "◷ POSTS",
 		"en": "◷ POSTS",
 	},
 	"tab_schedule": {
-		"de": "↺ TIMELINE",
-		"en": "↺ SCHEDULE",
+		"de": "↺ QUEUE",
+		"en": "↺ QUEUE",
 	},
 	"tab_history": {
-		"de": "▤ VERLAUF",
+		"de": "▤ HISTORY",
 		"en": "▤ HISTORY",
 	},
 	"tab_analytics": {
-		"de": "⇗ ANALYTICS",
-		"en": "⇗ ANALYTICS",
+		"de": "⇗ STATS",
+		"en": "⇗ STATS",
 	},
 	"tab_settings": {
-		"de": "⚙ EINSTELLUNGEN",
+		"de": "⚙ SETTINGS",
 		"en": "⚙ SETTINGS",
 	},
 	"tab_logs": {
@@ -207,6 +207,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Facebook     ",
 		"en": "Facebook     ",
 	},
+	"settings_auth_telegram": {
+		"de": "Telegram     ",
+		"en": "Telegram     ",
+	},
 	"settings_config_export": {
 		"de": "Backup Exp.  ",
 		"en": "Backup Exp.  ",
@@ -214,6 +218,10 @@ var translationsMap = map[string]map[string]string{
 	"settings_config_import": {
 		"de": "Backup Imp.  ",
 		"en": "Backup Imp.  ",
+	},
+	"settings_edit_slots": {
+		"de": "Queue bearb. ",
+		"en": "Edit Queue   ",
 	},
 	"license_core": {
 		"de": "Core (Gratis)",
