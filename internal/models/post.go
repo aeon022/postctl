@@ -24,6 +24,7 @@ const (
 	PlatformBluesky  = "bluesky"
 	PlatformFacebook = "facebook"
 	PlatformTelegram = "telegram"
+	PlatformDiscord  = "discord"
 )
 
 // Post repräsentiert einen Social-Media-Post

@@ -325,6 +325,7 @@ func (m Model) loadDataCmd() tea.Msg {
 		models.PlatformBluesky:  false,
 		models.PlatformFacebook: false,
 		models.PlatformTelegram: config.ActiveConfig.Telegram.BotToken != "" && config.ActiveConfig.Telegram.ChatID != "",
+		models.PlatformDiscord:  config.ActiveConfig.Discord.WebhookURL != "",
 	}
 	for p := range platforms {
 		_, _, _, err := m.store.GetToken(ctx, p)
@@ -395,6 +396,8 @@ func platformNeedsSetup(platformName string) bool {
 		return config.ActiveConfig.Facebook.AppID == "" || config.ActiveConfig.Facebook.AppSecret == ""
 	case models.PlatformTelegram:
 		return config.ActiveConfig.Telegram.BotToken == "" || config.ActiveConfig.Telegram.ChatID == ""
+	case models.PlatformDiscord:
+		return config.ActiveConfig.Discord.WebhookURL == ""
 	}
 	return false
 }
@@ -440,6 +443,8 @@ func (m Model) clearPlatformCmd(platformName string) tea.Cmd {
 		case models.PlatformTelegram:
 			config.ActiveConfig.Telegram.BotToken = ""
 			config.ActiveConfig.Telegram.ChatID = ""
+		case models.PlatformDiscord:
+			config.ActiveConfig.Discord.WebhookURL = ""
 		}
 
 		// 3. Speichern
@@ -844,7 +849,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			if m.editorFocus == 0 {
-				platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram"}
+				platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord"}
 				currIdx := -1
 				for idx, p := range platformsList {
 					if p == m.editorPlatform {
@@ -1262,7 +1267,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 5 {
-				if m.cursor >= 5 && m.cursor <= 11 {
+				if m.cursor >= 5 && m.cursor <= 12 {
 					var platName string
 					switch m.cursor {
 					case 5:
@@ -1279,6 +1284,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						platName = models.PlatformFacebook
 					case 11:
 						platName = models.PlatformTelegram
+					case 12:
+						platName = models.PlatformDiscord
 					}
 					if platformNeedsSetup(platName) || (platName == models.PlatformTwitter && config.ActiveConfig.Twitter.AuthMode == "cookie") {
 						return m, m.runSetupWizardCmd(platName)
@@ -1287,13 +1294,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
 					return m, m.runAuthCmd(platName)
 				}
-				if m.cursor == 12 {
+				if m.cursor == 13 {
 					return m, m.runBackupExportCmd()
 				}
-				if m.cursor == 13 {
+				if m.cursor == 14 {
 					return m, m.runBackupImportCmd()
 				}
-				if m.cursor == 14 {
+				if m.cursor == 15 {
 					m.editingQueueSlots = true
 					m.queueSlotsInput.SetValue(strings.Join(config.ActiveConfig.Scheduler.Slots, ", "))
 					m.queueSlotsInput.Focus()
@@ -1334,7 +1341,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, m.deletePostCmd(idToDelete)
 				}
 			} else if m.activeTab == 5 { // Settings
-				if m.cursor >= 5 && m.cursor <= 11 {
+				if m.cursor >= 5 && m.cursor <= 12 {
 					var platName string
 					switch m.cursor {
 					case 5:
@@ -1351,6 +1358,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						platName = models.PlatformFacebook
 					case 11:
 						platName = models.PlatformTelegram
+					case 12:
+						platName = models.PlatformDiscord
 					}
 					m.loading = true
 					m.statusMessage = fmt.Sprintf("Setze %s zurück...", platName)
@@ -1456,7 +1465,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 5: // Settings
-		return 15
+		return 16
 	default:
 		return 0
 	}

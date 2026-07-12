@@ -211,6 +211,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Telegram     ",
 		"en": "Telegram     ",
 	},
+	"settings_auth_discord": {
+		"de": "Discord      ",
+		"en": "Discord      ",
+	},
 	"settings_config_export": {
 		"de": "Backup Exp.  ",
 		"en": "Backup Exp.  ",
