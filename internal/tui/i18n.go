@@ -215,6 +215,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Discord      ",
 		"en": "Discord      ",
 	},
+	"settings_auth_devto": {
+		"de": "Dev.to       ",
+		"en": "Dev.to       ",
+	},
 	"settings_config_export": {
 		"de": "Backup Exp.  ",
 		"en": "Backup Exp.  ",

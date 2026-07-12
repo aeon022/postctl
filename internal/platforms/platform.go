@@ -42,6 +42,8 @@ func GetPlatform(name string, s *store.SQLiteStore, dryRun bool) (Platform, erro
 		return NewTelegramPlatform(s, config.ActiveConfig.Telegram.BotToken, config.ActiveConfig.Telegram.ChatID), nil
 	case models.PlatformDiscord:
 		return NewDiscordPlatform(s, config.ActiveConfig.Discord.WebhookURL), nil
+	case models.PlatformDevTo:
+		return NewDevToPlatform(s, config.ActiveConfig.DevTo.APIToken), nil
 	default:
 		return nil, fmt.Errorf("unknown platform %q", name)
 	}
