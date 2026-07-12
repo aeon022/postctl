@@ -297,6 +297,9 @@ Claude calls `get_post` to retrieve the original, then calls `create_post` twice
 
 Twitter threads have no hard post count limit, but keep threads focused. LinkedIn, Threads, Mastodon, and Bluesky do not support thread-style multi-part posts — use a single body for those platforms.
 
+> [!WARNING]
+> **API Rate Limits & Bulk Publishing:** Publishing multiple posts simultaneously or in quick succession can lead to API rate limits or permanent account bans (especially on federated networks like Mastodon). Always space out posts over time (e.g., at least 15-30 minutes delay between consecutive publishing events).
+
 ---
 
 ## Architecture

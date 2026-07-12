@@ -311,7 +311,7 @@ func (t *TwitterPlatform) Post(ctx context.Context, post *models.Post) (string, 
 		// ponytail: try fast direct HTTP/GraphQL approach first, fallback to headless browser if rate limited (344) or outdated queryId
 		tweetID, err := t.postCookieBased(ctx, post, authToken, csrfToken)
 		if err != nil {
-			fmt.Printf("⚠️ GraphQL direct post failed: %v. Falling back to headless browser...\n", err)
+			Log("⚠️ GraphQL direct post failed: %v. Falling back to headless browser...", err)
 			return t.postHeadless(ctx, post, authToken, csrfToken)
 		}
 		return tweetID, nil
@@ -843,7 +843,7 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 		var exists bool
 		err := chromedp.Evaluate(`document.querySelector('[data-testid="BottomBar"]') !== null`, &exists).Do(ctx)
 		if err == nil && exists {
-			fmt.Println("🍪 Cookie-Banner erkannt, akzeptiere Cookies...")
+			Log("🍪 Cookie-Banner erkannt, akzeptiere Cookies...")
 			err = chromedp.Evaluate(`
 				const btn = Array.from(document.querySelectorAll('[data-testid="BottomBar"] button, [data-testid="BottomBar"] [role="button"]'))
 					.find(el => el.innerText.includes('akzeptieren') || el.innerText.includes('Accept') || el.innerText.includes('ablehnen') || el.innerText.includes('Decline'));
@@ -852,7 +852,7 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 				}
 			`, nil).Do(ctx)
 			if err != nil {
-				fmt.Printf("⚠️ Fehler beim Klicken des Cookie-Buttons: %v\n", err)
+				Log("⚠️ Fehler beim Klicken des Cookie-Buttons: %v", err)
 			}
 			time.Sleep(1 * time.Second)
 		}
@@ -901,7 +901,7 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 	postButtonSelector := `[data-testid="tweetButtonConfirm"], [data-testid="tweetButton"]`
 	actions = append(actions, chromedp.WaitVisible(postButtonSelector))
 	actions = append(actions, chromedp.ActionFunc(func(ctx context.Context) error {
-		fmt.Println("🚀 Clicking post button via JS (dispatching events)...")
+		Log("🚀 Clicking post button via JS (dispatching events)...")
 		return chromedp.Evaluate(fmt.Sprintf(`{
 			const btn = document.querySelector('%s');
 			if (btn) {
@@ -924,7 +924,7 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 		var buf []byte
 		if shotErr := chromedp.Run(chromeCtx, chromedp.CaptureScreenshot(&buf)); shotErr == nil {
 			_ = os.WriteFile("/Users/gweiher/Desktop/postctl_headless_error.png", buf, 0644)
-			fmt.Println("📸 Headless failure screenshot saved to Desktop as 'postctl_headless_error.png'")
+			Log("📸 Headless failure screenshot saved to Desktop as 'postctl_headless_error.png'")
 		}
 		return "", fmt.Errorf("headless post failed: %w", err)
 	}

@@ -13,6 +13,7 @@ func RenderTabs(activeTab int) string {
 		Tr("tab_history"),
 		Tr("tab_analytics"),
 		Tr("tab_settings"),
+		Tr("tab_logs"),
 	}
 	
 	var renderedTabs []string

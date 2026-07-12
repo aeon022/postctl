@@ -157,6 +157,9 @@ func ParseContent(content, sourcePath string) ([]models.Post, error) {
 			// Für Twitter/Mastodon/Bluesky oder explizite Threads teilen wir in Tweets auf
 			post.Tweets = parseTweets(bodyStr, []string(fm.Images))
 			post.Body = strings.TrimSpace(bodyStr)
+			if len(post.Tweets) > 1 {
+				post.Type = "thread"
+			}
 			
 			// Titel aus erstem Tweet generieren, falls leer
 			if post.Title == "" && len(post.Tweets) > 0 {

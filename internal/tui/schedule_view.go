@@ -71,7 +71,11 @@ func (m Model) renderSchedule() string {
 	}
 
 	// Viewport-Größe (Höhe des Inhalts-Bereichs)
-	viewportHeight := 22
+	boxHeight := m.getBoxHeight()
+	viewportHeight := boxHeight - 6
+	if viewportHeight < 5 {
+		viewportHeight = 5
+	}
 	startIdx := 0
 	endIdx := len(items)
 
@@ -125,5 +129,5 @@ func (m Model) renderSchedule() string {
 		}
 	}
 
-	return StyleBox.Width(84).Height(28).Render(builder.String())
+	return StyleBox.Width(84).Height(boxHeight).Render(builder.String())
 }

@@ -18,7 +18,11 @@ func (m Model) renderHistory() string {
 		return StyleBox.Width(84).Height(14).Render(builder.String())
 	}
 
-	windowSize := 9
+	boxHeight := m.getBoxHeight()
+	windowSize := boxHeight - 6
+	if windowSize < 5 {
+		windowSize = 5
+	}
 	startIdx := 0
 	endIdx := len(m.history)
 
@@ -84,7 +88,7 @@ func (m Model) renderHistory() string {
 		))
 	}
 
-	return StyleBox.Width(84).Height(14).Render(builder.String())
+	return StyleBox.Width(84).Height(boxHeight).Render(builder.String())
 }
 
 // renderHelp rendert die Tastaturbefehle am unteren Bildschirmrand

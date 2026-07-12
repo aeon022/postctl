@@ -51,6 +51,14 @@ var translationsMap = map[string]map[string]string{
 		"de": "⚙ EINSTELLUNGEN",
 		"en": "⚙ SETTINGS",
 	},
+	"tab_logs": {
+		"de": "▤ LOGS",
+		"en": "▤ LOGS",
+	},
+	"header_logs": {
+		"de": "HINTERGRUND-LOGS (SYSTEMVERLAUF)",
+		"en": "BACKGROUND LOGS (SYSTEM ACTIVITY)",
+	},
 
 	// Common Headers
 	"header_dashboard": {

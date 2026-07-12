@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sort"
 	"time"
 
 	"github.com/aeon022/postctl/internal/models"
@@ -105,11 +106,69 @@ func RunDaemon(ctx context.Context, s *store.SQLiteStore, checkInterval time.Dur
 	}
 }
 
+// RescheduleOverdue prüft, ob mehrere überfällige Beiträge für dieselbe Plattform vorhanden sind.
+// Falls ja, bleibt der älteste Beitrag wie geplant (sofortige Veröffentlichung), während die
+// nachfolgenden Beiträge in 20-Minuten-Abständen ab time.Now() neu geplant werden.
+func RescheduleOverdue(ctx context.Context, s *store.SQLiteStore) error {
+	now := time.Now()
+	posts, err := s.ListPosts(ctx, "all", models.StatusScheduled, "")
+	if err != nil {
+		return err
+	}
+
+	// Überfällige Beiträge nach Plattform gruppieren
+	overdueByPlatform := make(map[string][]models.Post)
+	for _, p := range posts {
+		if p.ScheduledAt != nil && p.ScheduledAt.Before(now) {
+			overdueByPlatform[p.Platform] = append(overdueByPlatform[p.Platform], p)
+		}
+	}
+
+	for platform, overdueList := range overdueByPlatform {
+		if len(overdueList) <= 1 {
+			continue
+		}
+
+		// Nach ursprünglicher geplanter Zeit sortieren (älteste zuerst)
+		sort.Slice(overdueList, func(i, j int) bool {
+			if overdueList[i].ScheduledAt == nil {
+				return true
+			}
+			if overdueList[j].ScheduledAt == nil {
+				return false
+			}
+			return overdueList[i].ScheduledAt.Before(*overdueList[j].ScheduledAt)
+		})
+
+		// Der erste (Index 0) bleibt unverändert (geht sofort raus).
+		// Die nachfolgenden werden in 20-Minuten-Schritten neu geplant.
+		for i := 1; i < len(overdueList); i++ {
+			p := overdueList[i]
+			newScheduled := now.Add(time.Duration(i) * 20 * time.Minute)
+			p.ScheduledAt = &newScheduled
+			p.UpdatedAt = now
+			
+			if err := s.SavePost(ctx, &p); err != nil {
+				return fmt.Errorf("reschedule post %s failed: %w", p.ID, err)
+			}
+			platforms.Log("[SAFETY] Überfälliger Post %s (%s) wurde auf %s verschoben, um Spam/Sperren zu vermeiden.", 
+				p.ID, platform, newScheduled.Format("15:04:05"))
+		}
+	}
+
+	return nil
+}
+
 // checkAndPublishDue prüft die DB auf fällige geplante Posts und veröffentlicht sie
 func checkAndPublishDue(ctx context.Context, s *store.SQLiteStore, dryRun bool) {
+	// Sicherheits-Rescheduling für überfällige Beiträge durchführen
+	if err := RescheduleOverdue(ctx, s); err != nil {
+		platforms.Log("[SCHEDULER FEHLER] Sicherheits-Rescheduling fehlgeschlagen: %v", err)
+	}
+
 	now := time.Now()
 	
-	// Hole alle geplanten Posts
+	// Hole alle geplanten Posts erneut (nach potentiellem Rescheduling)
 	posts, err := s.ListPosts(ctx, "all", models.StatusScheduled, "")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[SCHEDULER FEHLER] Kann geplante Posts nicht lesen: %v\n", err)

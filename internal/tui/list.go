@@ -10,6 +10,8 @@ import (
 
 // renderDashboard rendert die Dashboard-Ansicht (Tab 0)
 func (m Model) renderDashboard() string {
+	boxHeight := m.getBoxHeight()
+
 	// Spalte 1: Campaigns & Next Up
 	var col1 strings.Builder
 
@@ -17,7 +19,27 @@ func (m Model) renderDashboard() string {
 	if len(m.campaigns) == 0 {
 		col1.WriteString(Tr("dash_no_campaigns"))
 	} else {
-		for i, c := range m.campaigns {
+		innerCampaignsHeight := boxHeight - 14
+		visibleCampaigns := innerCampaignsHeight / 2
+		if visibleCampaigns < 2 {
+			visibleCampaigns = 2
+		}
+
+		startIdx := 0
+		endIdx := len(m.campaigns)
+		if len(m.campaigns) > visibleCampaigns {
+			startIdx = m.cursor - visibleCampaigns/2
+			if startIdx < 0 {
+				startIdx = 0
+			}
+			if startIdx+visibleCampaigns > len(m.campaigns) {
+				startIdx = len(m.campaigns) - visibleCampaigns
+			}
+			endIdx = startIdx + visibleCampaigns
+		}
+
+		for i := startIdx; i < endIdx; i++ {
+			c := m.campaigns[i]
 			cursor := "  "
 			if m.activeTab == 0 && i == m.cursor {
 				cursor = "> "
@@ -87,14 +109,6 @@ func (m Model) renderDashboard() string {
 	}
 
 	// Beider Spalten in Boxen verpacken
-	lines1 := len(strings.Split(col1.String(), "\n"))
-	lines2 := len(strings.Split(col2.String(), "\n"))
-	maxLines := lines1
-	if lines2 > maxLines {
-		maxLines = lines2
-	}
-	boxHeight := maxLines + 4
-
 	box1 := StyleBox.Width(50).Height(boxHeight).Render(col1.String())
 	box2 := StyleBox.Width(34).Height(boxHeight).Render(col2.String())
 
@@ -122,7 +136,11 @@ func (m Model) renderPostList() string {
 		return StyleBox.Width(78).Height(12).Render(builder.String())
 	}
 
-	windowSize := 7
+	boxHeight := m.getBoxHeight()
+	windowSize := (boxHeight - 6) / 4
+	if windowSize < 2 {
+		windowSize = 2
+	}
 	startIdx := 0
 	endIdx := len(filtered)
 
@@ -202,5 +220,22 @@ func (m Model) renderPostList() string {
 		builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render(fmt.Sprintf("    %s", metaInfo)) + "\n\n")
 	}
 
-	return StyleBox.Width(84).Height(34).Render(builder.String())
+	return StyleBox.Width(84).Height(boxHeight).Render(builder.String())
+}
+
+// getBoxHeight berechnet die dynamische Höhe für die TUI-Boxen basierend auf der Terminal-Höhe
+func (m Model) getBoxHeight() int {
+	overhead := 12
+	if m.showHelp {
+		overhead = 26
+	}
+	
+	h := m.height - overhead
+	if h < 10 {
+		return 12 // Mindesthöhe
+	}
+	if h > 24 {
+		return 24 // Maximale Standardhöhe für Listenboxen
+	}
+	return h
 }

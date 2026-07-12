@@ -710,6 +710,12 @@ func (m Model) loadAnalyticsCmd() tea.Msg {
 // publishDuePostsCmd prüft und veröffentlicht fällige Posts im TUI-Hintergrund
 func (m Model) publishDuePostsCmd() tea.Msg {
 	ctx := context.Background()
+	
+	// Sicherheits-Rescheduling für überfällige Beiträge durchführen
+	if err := scheduler.RescheduleOverdue(ctx, m.store); err != nil {
+		platforms.Log("[SCHEDULER FEHLER] Sicherheits-Rescheduling fehlgeschlagen: %v", err)
+	}
+
 	now := time.Now()
 	
 	posts, err := m.store.ListPosts(ctx, "all", models.StatusScheduled, "")
@@ -1132,7 +1138,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 			
 		case key.Matches(msg, Keys.Tab):
-			m.activeTab = (m.activeTab + 1) % 6
+			m.activeTab = (m.activeTab + 1) % 7
 			m.cursor = 0
 			if m.activeTab == 4 {
 				m.analyticsLoading = true
@@ -1141,7 +1147,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 			
 		case key.Matches(msg, Keys.ShiftTab):
-			m.activeTab = (m.activeTab - 1 + 6) % 6
+			m.activeTab = (m.activeTab - 1 + 7) % 7
 			m.cursor = 0
 			if m.activeTab == 4 {
 				m.analyticsLoading = true
@@ -1435,6 +1441,8 @@ func (m Model) View() string {
 		tabContent = m.renderAnalytics()
 	case 5:
 		tabContent = m.renderSettings()
+	case 6:
+		tabContent = m.renderLogs()
 	}
 	builder.WriteString(tabContent)
 	builder.WriteString("\n\n")
