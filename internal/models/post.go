@@ -26,6 +26,7 @@ const (
 	PlatformTelegram = "telegram"
 	PlatformDiscord  = "discord"
 	PlatformDevTo    = "devto"
+	PlatformReddit   = "reddit"
 )
 
 // Post repräsentiert einen Social-Media-Post

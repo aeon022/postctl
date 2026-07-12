@@ -219,6 +219,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Dev.to       ",
 		"en": "Dev.to       ",
 	},
+	"settings_auth_reddit": {
+		"de": "Reddit       ",
+		"en": "Reddit       ",
+	},
 	"settings_config_export": {
 		"de": "Backup Exp.  ",
 		"en": "Backup Exp.  ",

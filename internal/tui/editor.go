@@ -219,7 +219,7 @@ func (m Model) renderEditor() string {
 	platformLabel := platPrefix + Tr("editor_label_platform")
 	
 	platSelect := ""
-	platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord", "devto"}
+	platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord", "devto", "reddit"}
 	for i, p := range platformsList {
 		if p == m.editorPlatform {
 			platSelect += lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("[" + strings.ToUpper(p) + "]")
@@ -403,6 +403,8 @@ func (m Model) checkCharacterLimits() (string, bool) {
 		limit = 2000
 	case "devto":
 		limit = 100000
+	case "reddit":
+		limit = 40000
 	default:
 		return "", true
 	}

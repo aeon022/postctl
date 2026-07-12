@@ -69,6 +69,7 @@ func (m Model) renderSettings() string {
 		{Tr("settings_auth_telegram"), getPlatformStatus(models.PlatformTelegram), true},
 		{Tr("settings_auth_discord"), getPlatformStatus(models.PlatformDiscord), true},
 		{Tr("settings_auth_devto"), getPlatformStatus(models.PlatformDevTo), true},
+		{Tr("settings_auth_reddit"), getPlatformStatus(models.PlatformReddit), true},
 		{Tr("settings_config_export"), Tr("settings_run_action"), true},
 		{Tr("settings_config_import"), Tr("settings_run_action"), true},
 		{Tr("settings_edit_slots"), Tr("settings_run_action"), true},
@@ -114,7 +115,7 @@ func (m Model) renderSettings() string {
 			builder.WriteString("\n" + StyleHeader.Render("PLATFORM ACCOUNTS") + "\n")
 		}
 		// Einen kleinen visuellen Trenner vor Backup & Sync einfügen
-		if i == 13 {
+		if i == 14 {
 			builder.WriteString("\n" + StyleHeader.Render("BACKUP & SYNC") + "\n")
 		}
 	}

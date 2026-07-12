@@ -44,6 +44,8 @@ func GetPlatform(name string, s *store.SQLiteStore, dryRun bool) (Platform, erro
 		return NewDiscordPlatform(s, config.ActiveConfig.Discord.WebhookURL), nil
 	case models.PlatformDevTo:
 		return NewDevToPlatform(s, config.ActiveConfig.DevTo.APIToken), nil
+	case models.PlatformReddit:
+		return NewRedditPlatform(s, config.ActiveConfig.Reddit.ClientID, config.ActiveConfig.Reddit.ClientSecret, config.ActiveConfig.Reddit.Username, config.ActiveConfig.Reddit.Password), nil
 	default:
 		return nil, fmt.Errorf("unknown platform %q", name)
 	}
