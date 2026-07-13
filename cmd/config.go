@@ -689,6 +689,115 @@ var configSetupCmd = &cobra.Command{
 				config.ActiveConfig.Facebook.PageID = pageID
 			}
 
+		case "telegram":
+			fmt.Println("Schritt 1: Erstelle einen Telegram Bot via @BotFather in Telegram.")
+			fmt.Println("Schritt 2: Kopiere das erhaltene HTTP API Token.")
+			fmt.Println("Schritt 3: Füge den Bot zu deinem Kanal oder deiner Gruppe hinzu und mache ihn zum Admin.")
+			fmt.Println("Schritt 4: Trage unten das Bot Token und die Chat ID (z.B. @deinkanal oder Gruppen-ID) ein:")
+			fmt.Println()
+
+			fmt.Print("➔ Bot Token: ")
+			botToken, _ := reader.ReadString('\n')
+			botToken = strings.TrimSpace(botToken)
+
+			fmt.Print("➔ Chat ID (z.B. @kanalname oder -100...): ")
+			chatID, _ := reader.ReadString('\n')
+			chatID = strings.TrimSpace(chatID)
+
+			if botToken != "" {
+				config.ActiveConfig.Telegram.BotToken = botToken
+			}
+			if chatID != "" {
+				config.ActiveConfig.Telegram.ChatID = chatID
+			}
+
+		case "discord":
+			fmt.Println("Schritt 1: Gehe in deinem Discord-Server zu den Kanaleinstellungen.")
+			fmt.Println("Schritt 2: Gehe zu Integrationen ➔ Webhooks.")
+			fmt.Println("Schritt 3: Erstelle einen neuen Webhook und kopiere die Webhook-URL.")
+			fmt.Println("Schritt 4: Trage unten die Webhook-URL ein:")
+			fmt.Println()
+
+			fmt.Print("➔ Webhook URL: ")
+			webhookURL, _ := reader.ReadString('\n')
+			webhookURL = strings.TrimSpace(webhookURL)
+
+			if webhookURL != "" {
+				config.ActiveConfig.Discord.WebhookURL = webhookURL
+			}
+
+		case "devto":
+			fmt.Println("Schritt 1: Logge dich auf dev.to ein.")
+			fmt.Println("Schritt 2: Gehe zu Settings ➔ Extensions.")
+			fmt.Println("Schritt 3: Scrolle nach unten zu 'DEV Community API Keys' und generiere einen neuen Key.")
+			fmt.Println("Schritt 4: Trage unten den API-Key ein:")
+			fmt.Println()
+
+			fmt.Print("➔ API Token: ")
+			apiToken, _ := reader.ReadString('\n')
+			apiToken = strings.TrimSpace(apiToken)
+
+			if apiToken != "" {
+				config.ActiveConfig.DevTo.APIToken = apiToken
+			}
+
+		case "reddit":
+			fmt.Println("Schritt 1: Gehe zu https://www.reddit.com/prefs/apps.")
+			fmt.Println("Schritt 2: Erstelle eine neue App (App-Typ: script).")
+			fmt.Println("Schritt 3: Trage unten Client-ID, Client-Secret, Reddit-Benutzername und Reddit-Passwort ein:")
+			fmt.Println()
+
+			fmt.Print("➔ Client ID: ")
+			clientID, _ := reader.ReadString('\n')
+			clientID = strings.TrimSpace(clientID)
+
+			fmt.Print("➔ Client Secret: ")
+			clientSecret, _ := reader.ReadString('\n')
+			clientSecret = strings.TrimSpace(clientSecret)
+
+			fmt.Print("➔ Reddit Username: ")
+			username, _ := reader.ReadString('\n')
+			username = strings.TrimSpace(username)
+
+			fmt.Print("➔ Reddit Password: ")
+			password, _ := reader.ReadString('\n')
+			password = strings.TrimSpace(password)
+
+			if clientID != "" {
+				config.ActiveConfig.Reddit.ClientID = clientID
+			}
+			if clientSecret != "" {
+				config.ActiveConfig.Reddit.ClientSecret = clientSecret
+			}
+			if username != "" {
+				config.ActiveConfig.Reddit.Username = username
+			}
+			if password != "" {
+				config.ActiveConfig.Reddit.Password = password
+			}
+
+		case "hashnode":
+			fmt.Println("Schritt 1: Logge dich auf hashnode.com ein und gehe ins Blog Dashboard.")
+			fmt.Println("Schritt 2: Gehe zu Account Settings ➔ Developer und erstelle einen Personal Access Token.")
+			fmt.Println("Schritt 3: Kopiere deine Publication ID (zu finden in Blog Dashboard ➔ Settings).")
+			fmt.Println("Schritt 4: Trage unten den Token und die Publication ID ein:")
+			fmt.Println()
+
+			fmt.Print("➔ API Token: ")
+			apiToken, _ := reader.ReadString('\n')
+			apiToken = strings.TrimSpace(apiToken)
+
+			fmt.Print("➔ Publication ID: ")
+			publicationID, _ := reader.ReadString('\n')
+			publicationID = strings.TrimSpace(publicationID)
+
+			if apiToken != "" {
+				config.ActiveConfig.Hashnode.APIToken = apiToken
+			}
+			if publicationID != "" {
+				config.ActiveConfig.Hashnode.PublicationID = publicationID
+			}
+
 		default:
 			fmt.Printf("Unbekannte Plattform: %s\n", platform)
 			return
