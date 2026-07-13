@@ -67,11 +67,11 @@ Integrate additional platforms to support a wider range of developer community, 
 ### 💬 Category A: Developer & Community Channels (Easiest)
 - [x] **Telegram:** Broadcast to channels/groups using a bot token and chat ID.
 - [x] **Discord:** Send updates to server channels via Webhook URLs.
-- [ ] **Reddit:** Submit text or link posts to subreddits using OAuth API.
+- [x] **Reddit:** Submit text or link posts to subreddits using OAuth API.
 
 ### ✍️ Category B: Developer Blogging (Markdown-Native)
 - [x] **Dev.to:** Publish tech articles directly via personal API token (native Markdown/Frontmatter).
-- [ ] **Hashnode:** Publish articles to personal blogs using GraphQL API and personal access token.
+- [x] **Hashnode:** Publish articles to personal blogs using GraphQL API and personal access token.
 - [ ] **Medium:** Publish articles to Medium publication drafts or posts via Integration Token.
 
 ### 📸 Category C: Visual & Video Networks (Media-Focused)
