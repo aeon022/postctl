@@ -27,6 +27,7 @@ const (
 	PlatformDiscord  = "discord"
 	PlatformDevTo    = "devto"
 	PlatformReddit   = "reddit"
+	PlatformHashnode = "hashnode"
 )
 
 // Post repräsentiert einen Social-Media-Post

@@ -328,6 +328,7 @@ func (m Model) loadDataCmd() tea.Msg {
 		models.PlatformDiscord:  config.ActiveConfig.Discord.WebhookURL != "",
 		models.PlatformDevTo:    config.ActiveConfig.DevTo.APIToken != "",
 		models.PlatformReddit:   config.ActiveConfig.Reddit.ClientID != "" && config.ActiveConfig.Reddit.ClientSecret != "" && config.ActiveConfig.Reddit.Username != "" && config.ActiveConfig.Reddit.Password != "",
+		models.PlatformHashnode: config.ActiveConfig.Hashnode.APIToken != "" && config.ActiveConfig.Hashnode.PublicationID != "",
 	}
 	for p := range platforms {
 		_, _, _, err := m.store.GetToken(ctx, p)
@@ -404,6 +405,8 @@ func platformNeedsSetup(platformName string) bool {
 		return config.ActiveConfig.DevTo.APIToken == ""
 	case models.PlatformReddit:
 		return config.ActiveConfig.Reddit.ClientID == "" || config.ActiveConfig.Reddit.ClientSecret == "" || config.ActiveConfig.Reddit.Username == "" || config.ActiveConfig.Reddit.Password == ""
+	case models.PlatformHashnode:
+		return config.ActiveConfig.Hashnode.APIToken == "" || config.ActiveConfig.Hashnode.PublicationID == ""
 	}
 	return false
 }
@@ -458,6 +461,9 @@ func (m Model) clearPlatformCmd(platformName string) tea.Cmd {
 			config.ActiveConfig.Reddit.ClientSecret = ""
 			config.ActiveConfig.Reddit.Username = ""
 			config.ActiveConfig.Reddit.Password = ""
+		case models.PlatformHashnode:
+			config.ActiveConfig.Hashnode.APIToken = ""
+			config.ActiveConfig.Hashnode.PublicationID = ""
 		}
 
 		// 3. Speichern
@@ -862,7 +868,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			if m.editorFocus == 0 {
-				platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord", "devto", "reddit"}
+				platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord", "devto", "reddit", "hashnode"}
 				currIdx := -1
 				for idx, p := range platformsList {
 					if p == m.editorPlatform {
@@ -1280,7 +1286,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 5 {
-				if m.cursor >= 5 && m.cursor <= 14 {
+				if m.cursor >= 5 && m.cursor <= 15 {
 					var platName string
 					switch m.cursor {
 					case 5:
@@ -1303,6 +1309,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						platName = models.PlatformDevTo
 					case 14:
 						platName = models.PlatformReddit
+					case 15:
+						platName = models.PlatformHashnode
 					}
 					if platformNeedsSetup(platName) || (platName == models.PlatformTwitter && config.ActiveConfig.Twitter.AuthMode == "cookie") {
 						return m, m.runSetupWizardCmd(platName)
@@ -1311,13 +1319,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
 					return m, m.runAuthCmd(platName)
 				}
-				if m.cursor == 15 {
+				if m.cursor == 16 {
 					return m, m.runBackupExportCmd()
 				}
-				if m.cursor == 16 {
+				if m.cursor == 17 {
 					return m, m.runBackupImportCmd()
 				}
-				if m.cursor == 17 {
+				if m.cursor == 18 {
 					m.editingQueueSlots = true
 					m.queueSlotsInput.SetValue(strings.Join(config.ActiveConfig.Scheduler.Slots, ", "))
 					m.queueSlotsInput.Focus()
@@ -1358,7 +1366,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, m.deletePostCmd(idToDelete)
 				}
 			} else if m.activeTab == 5 { // Settings
-				if m.cursor >= 5 && m.cursor <= 14 {
+				if m.cursor >= 5 && m.cursor <= 15 {
 					var platName string
 					switch m.cursor {
 					case 5:
@@ -1381,6 +1389,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						platName = models.PlatformDevTo
 					case 14:
 						platName = models.PlatformReddit
+					case 15:
+						platName = models.PlatformHashnode
 					}
 					m.loading = true
 					m.statusMessage = fmt.Sprintf("Setze %s zurück...", platName)
@@ -1486,7 +1496,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 5: // Settings
-		return 18
+		return 19
 	default:
 		return 0
 	}

@@ -46,6 +46,8 @@ func GetPlatform(name string, s *store.SQLiteStore, dryRun bool) (Platform, erro
 		return NewDevToPlatform(s, config.ActiveConfig.DevTo.APIToken), nil
 	case models.PlatformReddit:
 		return NewRedditPlatform(s, config.ActiveConfig.Reddit.ClientID, config.ActiveConfig.Reddit.ClientSecret, config.ActiveConfig.Reddit.Username, config.ActiveConfig.Reddit.Password), nil
+	case models.PlatformHashnode:
+		return NewHashnodePlatform(s, config.ActiveConfig.Hashnode.APIToken, config.ActiveConfig.Hashnode.PublicationID), nil
 	default:
 		return nil, fmt.Errorf("unknown platform %q", name)
 	}

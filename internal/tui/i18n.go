@@ -223,6 +223,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Reddit       ",
 		"en": "Reddit       ",
 	},
+	"settings_auth_hashnode": {
+		"de": "Hashnode     ",
+		"en": "Hashnode     ",
+	},
 	"settings_config_export": {
 		"de": "Backup Exp.  ",
 		"en": "Backup Exp.  ",
