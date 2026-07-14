@@ -3,6 +3,11 @@ package tui
 import (
 	"context"
 	"fmt"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -272,6 +277,29 @@ func (m Model) renderEditor() string {
 	}
 	imgLabel := imgPrefix + Tr("editor_label_images")
 	builder.WriteString(imgStyle.Render(imgLabel) + m.editorImages.View() + "\n")
+
+	// Bild-Vorschau anzeigen
+	imagesStr := m.editorImages.Value()
+	if strings.TrimSpace(imagesStr) != "" {
+		parts := strings.Split(imagesStr, ",")
+		for _, part := range parts {
+			trimmed := strings.TrimSpace(part)
+			if trimmed != "" {
+				fullPath := trimmed
+				if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+					fullPath = filepath.Join(config.ActiveConfig.Defaults.ImageDir, trimmed)
+				}
+				if _, err := os.Stat(fullPath); err == nil {
+					preview := renderImageANSI(fullPath, 40, 10)
+					if preview != "" {
+						builder.WriteString("     " + lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true).Render("Vorschau:") + "\n" + preview + "\n")
+						break
+					}
+				}
+			}
+		}
+	}
+
 	if m.editorFocus == 3 {
 		builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render(Tr("editor_images_help")) + "\n\n")
 	} else {
@@ -484,4 +512,83 @@ func (m Model) checkCharacterLimits() (string, bool) {
 		}
 		return lipgloss.NewStyle().Foreground(ColorPosted).Render(successMsg), true
 	}
+}
+
+func resizeImage(img image.Image, width, height int) image.Image {
+	srcW := img.Bounds().Dx()
+	srcH := img.Bounds().Dy()
+	if srcW == 0 || srcH == 0 || width == 0 || height == 0 {
+		return img
+	}
+
+	resized := image.NewRGBA(image.Rect(0, 0, width, height))
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			srcX := x * srcW / width
+			srcY := y * srcH / height
+			resized.Set(x, y, img.At(srcX, srcY))
+		}
+	}
+	return resized
+}
+
+func renderImageANSI(path string, maxW, maxH int) string {
+	file, err := os.Open(path)
+	if err != nil {
+		return ""
+	}
+	defer file.Close()
+
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return ""
+	}
+
+	bounds := img.Bounds()
+	w := bounds.Dx()
+	h := bounds.Dy()
+	if w == 0 || h == 0 {
+		return ""
+	}
+
+	aspect := float64(w) / float64(h)
+	targetW := maxW
+	targetH := int(float64(maxW) / aspect * 0.5)
+
+	if targetH > maxH {
+		targetH = maxH
+		targetW = int(float64(maxH) * aspect * 2.0)
+	}
+
+	if targetW > maxW {
+		targetW = maxW
+	}
+	if targetH < 1 {
+		targetH = 1
+	}
+	if targetW < 1 {
+		targetW = 1
+	}
+
+	resized := resizeImage(img, targetW, targetH*2)
+
+	var sb strings.Builder
+	for y := 0; y < targetH*2; y += 2 {
+		sb.WriteString("     ")
+		for x := 0; x < targetW; x++ {
+			cTop := resized.At(x, y)
+			cBottom := resized.At(x, y+1)
+
+			r1, g1, b1, _ := cTop.RGBA()
+			r2, g2, b2, _ := cBottom.RGBA()
+
+			topR, topG, topB := uint8(r1>>8), uint8(g1>>8), uint8(b1>>8)
+			botR, botG, botB := uint8(r2>>8), uint8(g2>>8), uint8(b2>>8)
+
+			sb.WriteString(fmt.Sprintf("\x1b[38;2;%d;%d;%dm\x1b[48;2;%d;%d;%dm▄\x1b[0m", botR, botG, botB, topR, topG, topB))
+		}
+		sb.WriteString("\n")
+	}
+
+	return sb.String()
 }
