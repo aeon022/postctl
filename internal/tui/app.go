@@ -329,6 +329,7 @@ func (m Model) loadDataCmd() tea.Msg {
 		models.PlatformDevTo:    config.ActiveConfig.DevTo.APIToken != "",
 		models.PlatformReddit:   config.ActiveConfig.Reddit.ClientID != "" && config.ActiveConfig.Reddit.ClientSecret != "" && config.ActiveConfig.Reddit.Username != "" && config.ActiveConfig.Reddit.Password != "",
 		models.PlatformHashnode: config.ActiveConfig.Hashnode.APIToken != "" && config.ActiveConfig.Hashnode.PublicationID != "",
+		models.PlatformMedium:   config.ActiveConfig.Medium.IntegrationToken != "",
 	}
 	for p := range platforms {
 		_, _, _, err := m.store.GetToken(ctx, p)
@@ -407,6 +408,8 @@ func platformNeedsSetup(platformName string) bool {
 		return config.ActiveConfig.Reddit.ClientID == "" || config.ActiveConfig.Reddit.ClientSecret == "" || config.ActiveConfig.Reddit.Username == "" || config.ActiveConfig.Reddit.Password == ""
 	case models.PlatformHashnode:
 		return config.ActiveConfig.Hashnode.APIToken == "" || config.ActiveConfig.Hashnode.PublicationID == ""
+	case models.PlatformMedium:
+		return config.ActiveConfig.Medium.IntegrationToken == ""
 	}
 	return false
 }
@@ -464,6 +467,8 @@ func (m Model) clearPlatformCmd(platformName string) tea.Cmd {
 		case models.PlatformHashnode:
 			config.ActiveConfig.Hashnode.APIToken = ""
 			config.ActiveConfig.Hashnode.PublicationID = ""
+		case models.PlatformMedium:
+			config.ActiveConfig.Medium.IntegrationToken = ""
 		}
 
 		// 3. Speichern
@@ -868,7 +873,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			if m.editorFocus == 0 {
-				platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord", "devto", "reddit", "hashnode"}
+				platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord", "devto", "reddit", "hashnode", "medium"}
 				currIdx := -1
 				for idx, p := range platformsList {
 					if p == m.editorPlatform {
@@ -1286,7 +1291,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 5 {
-				if m.cursor >= 5 && m.cursor <= 15 {
+				if m.cursor >= 5 && m.cursor <= 16 {
 					var platName string
 					switch m.cursor {
 					case 5:
@@ -1311,6 +1316,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						platName = models.PlatformReddit
 					case 15:
 						platName = models.PlatformHashnode
+					case 16:
+						platName = models.PlatformMedium
 					}
 					if platformNeedsSetup(platName) || (platName == models.PlatformTwitter && config.ActiveConfig.Twitter.AuthMode == "cookie") {
 						return m, m.runSetupWizardCmd(platName)
@@ -1319,13 +1326,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
 					return m, m.runAuthCmd(platName)
 				}
-				if m.cursor == 16 {
+				if m.cursor == 17 {
 					return m, m.runBackupExportCmd()
 				}
-				if m.cursor == 17 {
+				if m.cursor == 18 {
 					return m, m.runBackupImportCmd()
 				}
-				if m.cursor == 18 {
+				if m.cursor == 19 {
 					m.editingQueueSlots = true
 					m.queueSlotsInput.SetValue(strings.Join(config.ActiveConfig.Scheduler.Slots, ", "))
 					m.queueSlotsInput.Focus()
@@ -1366,7 +1373,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, m.deletePostCmd(idToDelete)
 				}
 			} else if m.activeTab == 5 { // Settings
-				if m.cursor >= 5 && m.cursor <= 15 {
+				if m.cursor >= 5 && m.cursor <= 16 {
 					var platName string
 					switch m.cursor {
 					case 5:
@@ -1391,6 +1398,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						platName = models.PlatformReddit
 					case 15:
 						platName = models.PlatformHashnode
+					case 16:
+						platName = models.PlatformMedium
 					}
 					m.loading = true
 					m.statusMessage = fmt.Sprintf("Setze %s zurück...", platName)
@@ -1496,7 +1505,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 5: // Settings
-		return 19
+		return 20
 	default:
 		return 0
 	}

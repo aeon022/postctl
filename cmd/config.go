@@ -798,6 +798,21 @@ var configSetupCmd = &cobra.Command{
 				config.ActiveConfig.Hashnode.PublicationID = publicationID
 			}
 
+		case "medium":
+			fmt.Println("Schritt 1: Logge dich auf medium.com ein.")
+			fmt.Println("Schritt 2: Gehe zu Settings ➔ Security and apps ➔ Integration tokens.")
+			fmt.Println("Schritt 3: Generiere einen neuen Integration Token.")
+			fmt.Println("Schritt 4: Trage unten den Token ein:")
+			fmt.Println()
+
+			fmt.Print("➔ Integration Token: ")
+			integrationToken, _ := reader.ReadString('\n')
+			integrationToken = strings.TrimSpace(integrationToken)
+
+			if integrationToken != "" {
+				config.ActiveConfig.Medium.IntegrationToken = integrationToken
+			}
+
 		default:
 			fmt.Printf("Unbekannte Plattform: %s\n", platform)
 			return

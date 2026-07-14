@@ -227,6 +227,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Hashnode     ",
 		"en": "Hashnode     ",
 	},
+	"settings_auth_medium": {
+		"de": "Medium       ",
+		"en": "Medium       ",
+	},
 	"settings_config_export": {
 		"de": "Backup Exp.  ",
 		"en": "Backup Exp.  ",
