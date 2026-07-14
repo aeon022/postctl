@@ -25,10 +25,12 @@ This document outlines the milestones, current achievements, and planned feature
 - [x] Terminal calendar datepicker (`ctrl+d`).
 - [x] Multi-platform status checker and setup wizard.
 
-### Milestone 4: AI-as-Operator & MCP (Completed)
-- [x] Local LLM integration for AI-powered repurposing.
-- [x] Machine-readable output formats (`--format json`) and safe `--dry-run` operations.
-- [x] Native **Model Context Protocol (MCP)** server over stdio for agent integration.
+### Milestone 4.5: Power-User Utilities & Platform Integration (Completed)
+- [x] Connection Diagnostic Tool (`postctl config test`) to safely test all credential states.
+- [x] RSS Auto-Importer (`postctl rss`) to fetch and queue posts from blog feeds.
+- [x] Terminal Image Preview in TUI Editor using high-fidelity ANSI 24-bit half-blocks.
+- [x] TUI Bulk Actions (multi-select with Space, bulk delete with `d`, bulk schedule to queues with `s`).
+- [x] Platform Expansion Category A & B (Telegram, Discord, Reddit, Dev.to, Hashnode, Medium).
 
 ---
 
