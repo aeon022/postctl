@@ -72,7 +72,7 @@ Integrate additional platforms to support a wider range of developer community, 
 ### ✍️ Category B: Developer Blogging (Markdown-Native)
 - [x] **Dev.to:** Publish tech articles directly via personal API token (native Markdown/Frontmatter).
 - [x] **Hashnode:** Publish articles to personal blogs using GraphQL API and personal access token.
-- [ ] **Medium:** Publish articles to Medium publication drafts or posts via Integration Token.
+- [x] **Medium:** Publish articles to Medium publication drafts or posts via Integration Token.
 
 ### 📸 Category C: Visual & Video Networks (Media-Focused)
 - [ ] **Instagram:** Publish single images, carousels, or Reels using Facebook Graph API.
