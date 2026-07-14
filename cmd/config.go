@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
+	"github.com/aeon022/postctl/internal/platforms"
 	"github.com/aeon022/postctl/internal/store"
 	"github.com/spf13/cobra"
 )
@@ -831,6 +833,112 @@ var configSetupCmd = &cobra.Command{
 	},
 }
 
+var configTestCmd = &cobra.Command{
+	Use:   "test",
+	Short: "Test connection to all configured platform APIs",
+	Long:  `Test the API credentials and connections for all configured social media and blog platforms.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		ctx := context.Background()
+		dbPath := config.GetDBPath()
+		s, err := store.NewSQLiteStore(dbPath)
+		if err != nil {
+			cmd.Printf("❌ Fehler beim Öffnen der Datenbank: %v\n", err)
+			return
+		}
+		defer s.Close()
+
+		platformsList := []string{
+			models.PlatformTwitter,
+			models.PlatformLinkedIn,
+			models.PlatformThreads,
+			models.PlatformMastodon,
+			models.PlatformBluesky,
+			models.PlatformFacebook,
+			models.PlatformTelegram,
+			models.PlatformDiscord,
+			models.PlatformDevTo,
+			models.PlatformReddit,
+			models.PlatformHashnode,
+			models.PlatformMedium,
+		}
+
+		cmd.Println("=== postctl CONNECTION DIAGNOSTIC ===")
+		cmd.Println("Teste Verbindungen zu den konfigurierten Plattform-APIs...")
+		cmd.Println("=====================================")
+		cmd.Println()
+
+		for _, pName := range platformsList {
+			isConfigured := false
+			switch pName {
+			case models.PlatformTwitter:
+				isConfigured = config.ActiveConfig.Twitter.ClientID != "" || config.ActiveConfig.Twitter.AuthMode == "cookie"
+			case models.PlatformLinkedIn:
+				isConfigured = config.ActiveConfig.LinkedIn.ClientID != ""
+			case models.PlatformThreads:
+				isConfigured = config.ActiveConfig.Threads.AppID != ""
+			case models.PlatformMastodon:
+				isConfigured = config.ActiveConfig.Mastodon.InstanceURL != ""
+			case models.PlatformBluesky:
+				isConfigured = config.ActiveConfig.Bluesky.Handle != ""
+			case models.PlatformFacebook:
+				isConfigured = config.ActiveConfig.Facebook.AppID != ""
+			case models.PlatformTelegram:
+				isConfigured = config.ActiveConfig.Telegram.BotToken != ""
+			case models.PlatformDiscord:
+				isConfigured = config.ActiveConfig.Discord.WebhookURL != ""
+			case models.PlatformDevTo:
+				isConfigured = config.ActiveConfig.DevTo.APIToken != ""
+			case models.PlatformReddit:
+				isConfigured = config.ActiveConfig.Reddit.ClientID != ""
+			case models.PlatformHashnode:
+				isConfigured = config.ActiveConfig.Hashnode.APIToken != ""
+			case models.PlatformMedium:
+				isConfigured = config.ActiveConfig.Medium.IntegrationToken != ""
+			}
+
+			if !isConfigured {
+				cmd.Printf("➖ %-10s: Nicht konfiguriert (Übersprungen)\n", strings.ToUpper(pName))
+				continue
+			}
+
+			// Bei OAuth-Plattformen prüfen wir, ob ein Token in der DB liegt, um das blockierende Öffnen des Browsers zu vermeiden
+			isOAuth := pName == models.PlatformLinkedIn || pName == models.PlatformThreads || pName == models.PlatformMastodon || pName == models.PlatformFacebook || (pName == models.PlatformTwitter && config.ActiveConfig.Twitter.AuthMode != "cookie")
+
+			if isOAuth {
+				token, _, expiry, err := s.GetToken(ctx, pName)
+				if err == nil && token != "" {
+					if expiry != nil && !expiry.IsZero() && expiry.Before(time.Now()) {
+						cmd.Printf("⚠️  %-10s: Token abgelaufen (Re-Authentifizierung erforderlich)\n", strings.ToUpper(pName))
+					} else {
+						cmd.Printf("✅ %-10s: Verbindung aktiv (Token vorhanden)\n", strings.ToUpper(pName))
+					}
+				} else {
+					cmd.Printf("❌ %-10s: Nicht verbunden (Bitte führe 'postctl config setup %s' aus)\n", strings.ToUpper(pName), pName)
+				}
+				continue
+			}
+
+			plat, err := platforms.GetPlatform(pName, s, false)
+			if err != nil {
+				cmd.Printf("❌ %-10s: Fehler beim Erstellen des API-Clients: %v\n", strings.ToUpper(pName), err)
+				continue
+			}
+
+			cmd.Printf("⏳ %-10s: Teste Verbindung...", strings.ToUpper(pName))
+			err = plat.Auth(ctx)
+			// Text zurücksetzen
+			cmd.Print("\r\033[K")
+			if err != nil {
+				cmd.Printf("❌ %-10s: Fehler bei Authentifizierung: %v\n", strings.ToUpper(pName), err)
+			} else {
+				cmd.Printf("✅ %-10s: Verbindung erfolgreich hergestellt!\n", strings.ToUpper(pName))
+			}
+		}
+		cmd.Println()
+		cmd.Println("=====================================")
+	},
+}
+
 func init() {
 	configExportCmd.Flags().StringVarP(&exportPassword, "password", "p", "", "Master password for encryption")
 	configExportCmd.Flags().StringVarP(&exportOutputFile, "output", "o", "postctl_backup.bin", "Path to the output encrypted backup file")
@@ -846,5 +954,6 @@ func init() {
 	configCmd.AddCommand(configExportCmd)
 	configCmd.AddCommand(configImportCmd)
 	configCmd.AddCommand(configSetupCmd)
+	configCmd.AddCommand(configTestCmd)
 	rootCmd.AddCommand(configCmd)
 }

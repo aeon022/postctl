@@ -88,10 +88,11 @@ type Config struct {
 	Scheduler struct {
 		Slots []string `mapstructure:"slots" yaml:"slots"`
 	} `mapstructure:"scheduler" yaml:"scheduler"`
-	DBPath        string `mapstructure:"db_path" yaml:"db_path"`
-	LicenseKey    string `mapstructure:"license_key" yaml:"license_key"`
-	LicenseStatus string `mapstructure:"license_status" yaml:"license_status"`
-	PolarOrgID    string `mapstructure:"polar_org_id" yaml:"polar_org_id"`
+	DBPath        string   `mapstructure:"db_path" yaml:"db_path"`
+	LicenseKey    string   `mapstructure:"license_key" yaml:"license_key"`
+	LicenseStatus string   `mapstructure:"license_status" yaml:"license_status"`
+	PolarOrgID    string   `mapstructure:"polar_org_id" yaml:"polar_org_id"`
+	RSSFeeds      []string `mapstructure:"rss_feeds" yaml:"rss_feeds"`
 }
 
 // ActiveConfig stellt die geladene Konfiguration global zur Verfügung

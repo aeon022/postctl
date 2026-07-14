@@ -73,3 +73,31 @@ func TestConfigSetCmd(t *testing.T) {
 		t.Errorf("expected AI provider to be updated to 'test-claude', got %q", config.ActiveConfig.AI.Provider)
 	}
 }
+
+func TestConfigTestCmd(t *testing.T) {
+	var capturedExitCode int
+	originalExitFunc := exitFunc
+	exitFunc = func(code int) {
+		capturedExitCode = code
+	}
+	defer func() {
+		exitFunc = originalExitFunc
+	}()
+
+	buf := new(bytes.Buffer)
+	rootCmd.SetOut(buf)
+	rootCmd.SetErr(buf)
+
+	rootCmd.SetArgs([]string{"config", "test"})
+	rootCmd.Execute()
+
+	if capturedExitCode != 0 {
+		t.Errorf("expected exit code 0, got %d", capturedExitCode)
+	}
+
+	output := buf.String()
+	if !testingContains(output, "CONNECTION DIAGNOSTIC") {
+		t.Errorf("expected output to contain 'CONNECTION DIAGNOSTIC', got:\n%s", output)
+	}
+}
+
