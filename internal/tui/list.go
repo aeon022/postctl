@@ -214,8 +214,13 @@ func (m Model) renderPostList() string {
 		}
 		itemStyle := lipgloss.NewStyle().Foreground(lineColor)
 
-		builder.WriteString(fmt.Sprintf("%s%s / %s %s\n", 
-			cursor, strings.ToUpper(p.Platform), strings.ToUpper(p.Language), statusStr))
+		checked := "[ ] "
+		if m.selectedPosts[p.ID] {
+			checked = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true).Render("[x] ")
+		}
+
+		builder.WriteString(fmt.Sprintf("%s%s%s / %s %s\n", 
+			cursor, checked, strings.ToUpper(p.Platform), strings.ToUpper(p.Language), statusStr))
 		builder.WriteString(itemStyle.Render(fmt.Sprintf("    %q", titlePreview)) + "\n")
 		builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render(fmt.Sprintf("    %s", metaInfo)) + "\n\n")
 	}

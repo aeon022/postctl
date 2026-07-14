@@ -88,6 +88,9 @@ type Model struct {
 	// Queue Slots Editor
 	editingQueueSlots bool
 	queueSlotsInput   textinput.Model
+
+	// Massen-Aktionen (Bulk Actions)
+	selectedPosts map[string]bool
 }
 
 // Msg-Typen
@@ -200,6 +203,7 @@ func NewModel(s *store.SQLiteStore) Model {
 		loading:           true,
 		queueSlotsInput:   qInput,
 		editingQueueSlots: false,
+		selectedPosts:     make(map[string]bool),
 	}
 }
 
@@ -356,6 +360,54 @@ func (m Model) deletePostCmd(id string) tea.Cmd {
 			return errorMsg{err}
 		}
 		return postDeletedMsg{id}
+	}
+}
+
+// deletePostsCmd löscht mehrere Posts asynchron
+func (m Model) deletePostsCmd(ids []string) tea.Cmd {
+	return func() tea.Msg {
+		ctx := context.Background()
+		for _, id := range ids {
+			if err := m.store.DeletePost(ctx, id); err != nil {
+				return errorMsg{err}
+			}
+		}
+		dummyId := ""
+		if len(ids) > 0 {
+			dummyId = ids[0]
+		}
+		return postDeletedMsg{dummyId}
+	}
+}
+
+// bulkSchedulePostsCmd plant mehrere Posts asynchron ein
+func (m Model) bulkSchedulePostsCmd(ids []string) tea.Cmd {
+	return func() tea.Msg {
+		ctx := context.Background()
+		for _, id := range ids {
+			post, err := m.store.GetPost(ctx, id)
+			if err != nil {
+				return errorMsg{err}
+			}
+
+			if post.Status != models.StatusDraft && post.Status != models.StatusFailed {
+				continue
+			}
+
+			slot, err := scheduler.GetNextQueueSlot(ctx, m.store, post.Platform)
+			if err != nil {
+				return errorMsg{err}
+			}
+
+			post.Status = models.StatusScheduled
+			post.ScheduledAt = &slot
+			post.UpdatedAt = time.Now()
+
+			if err := m.store.SavePost(ctx, post); err != nil {
+				return errorMsg{err}
+			}
+		}
+		return m.loadDataCmd()
 	}
 }
 
@@ -1158,10 +1210,31 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 
-		// Filter zurücksetzen bei Esc im Posts-Tab, wenn keine Detailansicht offen ist
-		if m.activeTab == 1 && m.selectedPost == nil && m.filterCampaign != "" && key.Matches(msg, Keys.Esc) {
-			m.filterCampaign = ""
-			m.cursor = 0
+		// Filter zurücksetzen oder Auswahl aufheben bei Esc im Posts-Tab, wenn keine Detailansicht offen ist
+		if m.activeTab == 1 && m.selectedPost == nil && !m.showReadme && key.Matches(msg, Keys.Esc) {
+			hasSelected := false
+			for _, sel := range m.selectedPosts {
+				if sel {
+					hasSelected = true
+					break
+				}
+			}
+			if hasSelected {
+				m.selectedPosts = make(map[string]bool)
+			} else if m.filterCampaign != "" {
+				m.filterCampaign = ""
+				m.cursor = 0
+			}
+			return m, nil
+		}
+
+		// Leertaste wählt Post aus / wählt Post ab im Posts-Tab (Massenaktionen)
+		if m.activeTab == 1 && m.selectedPost == nil && !m.showReadme && msg.String() == " " {
+			filtered := m.getFilteredPosts()
+			if len(filtered) > 0 && m.cursor < len(filtered) {
+				p := filtered[m.cursor]
+				m.selectedPosts[p.ID] = !m.selectedPosts[p.ID]
+			}
 			return m, nil
 		}
 
@@ -1367,6 +1440,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, Keys.Delete):
 			if m.activeTab == 1 {
+				var ids []string
+				for id, selected := range m.selectedPosts {
+					if selected {
+						ids = append(ids, id)
+					}
+				}
+				if len(ids) > 0 {
+					m.selectedPosts = make(map[string]bool)
+					return m, m.deletePostsCmd(ids)
+				}
+
 				filtered := m.getFilteredPosts()
 				if len(filtered) > 0 {
 					idToDelete := filtered[m.cursor].ID
@@ -1467,6 +1551,29 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						postToEdit := m.nextUp[m.cursor]
 						m.initEditor(&postToEdit)
 						return m, nil
+					}
+				}
+			}
+			return m, nil
+
+		case key.Matches(msg, Keys.Schedule):
+			if m.selectedPost == nil && !m.showReadme {
+				if m.activeTab == 1 { // Posts
+					var ids []string
+					for id, selected := range m.selectedPosts {
+						if selected {
+							ids = append(ids, id)
+						}
+					}
+					if len(ids) > 0 {
+						m.selectedPosts = make(map[string]bool)
+						return m, m.bulkSchedulePostsCmd(ids)
+					}
+
+					filtered := m.getFilteredPosts()
+					if len(filtered) > 0 && m.cursor < len(filtered) {
+						idToSchedule := filtered[m.cursor].ID
+						return m, m.bulkSchedulePostsCmd([]string{idToSchedule})
 					}
 				}
 			}
