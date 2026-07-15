@@ -361,6 +361,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "History exportieren (x)",
 		"en": "Export history as JSON (x)",
 	},
+	"help_schedule": {
+		"de": "Beitrag in Warteschlange einplanen",
+		"en": "Schedule post (add to queue)",
+	},
 
 	// Editor helper comments
 	"editor_helper_title_twitter": {

@@ -109,6 +109,7 @@ func (m Model) renderHelp() string {
 		builder.WriteString("  enter      " + Tr("help_enter") + "\n")
 		builder.WriteString("  n          " + Tr("help_new_post") + "\n")
 		builder.WriteString("  e          " + Tr("help_edit_post") + "\n")
+		builder.WriteString("  s          " + Tr("help_schedule") + "\n")
 		builder.WriteString("  i          " + Tr("help_import") + "\n")
 		builder.WriteString("  d          " + Tr("help_delete") + "\n")
 		builder.WriteString("  r          " + Tr("help_repurpose") + "\n")
@@ -119,33 +120,41 @@ func (m Model) renderHelp() string {
 		builder.WriteString("  q/ctrl+c   " + Tr("help_quit") + "\n")
 		sb.WriteString(StyleHelp.Render(builder.String()))
 	} else {
-		// Standard Kurzhilfe (zweizeilig)
-		var line1 string
+		// Standard Kurzhilfe (zweizeilig & ausgewogen)
+		var line1, line2 string
 		if strings.ToLower(config.ActiveConfig.Defaults.Language) == "de" {
-			line1 = "tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Wählen  ·  n: Neu  ·  e: Bearbeiten  ·  i: Import  ·  d: Löschen  ·  r: Umschreiben  ·  q: Beenden"
-			if m.activeTab == 1 {
+			if m.activeTab == 1 { // Posts
 				if m.filterCampaign != "" {
-					line1 = "esc: Filter löschen  ·  f: Filter wechseln  ·  " + line1
+					line1 = "esc: Filter löschen  ·  f: Filter wechseln  ·  tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Wählen"
 				} else {
-					line1 = "f: Filter (Kampagne)  ·  " + line1
+					line1 = "f: Filter (Kampagne)  ·  tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Wählen"
 				}
-			} else if m.activeTab == 3 {
-				line1 = "tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Details öffnen  ·  x: Exportieren  ·  q: Beenden"
+				line2 = "n: Neu  ·  e: Bearbeiten  ·  s: Einplanen  ·  d: Löschen  ·  r: Umschreiben  ·  i: Import  ·  f1/R: Handbuch  ·  ?: Hilfe  ·  q: Beenden"
+			} else if m.activeTab == 3 { // History
+				line1 = "tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Details öffnen  ·  x: Exportieren"
+				line2 = "f1/R: Handbuch  ·  ?: Schnellhilfe  ·  q: Beenden"
+			} else { // Default
+				line1 = "tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Wählen  ·  n: Neu  ·  e: Bearbeiten  ·  d: Löschen"
+				line2 = "r: Umschreiben  ·  i: Import  ·  f1/R: Handbuch  ·  ?: Schnellhilfe  ·  q: Beenden"
 			}
-			helpText := line1 + "\n" + "f1/R: Handbuch  ·  ?: Schnellhilfe"
+			helpText := line1 + "\n" + line2
 			sb.WriteString(StyleHelp.Render(helpText))
 		} else {
-			line1 = "tab: next tab  ·  ↑↓: navigate  ·  enter: select  ·  n: new  ·  e: edit  ·  i: import  ·  d: delete  ·  r: repurpose  ·  q: quit"
-			if m.activeTab == 1 {
+			if m.activeTab == 1 { // Posts
 				if m.filterCampaign != "" {
-					line1 = "esc: clear filter  ·  f: change filter  ·  " + line1
+					line1 = "esc: clear filter  ·  f: change filter  ·  tab: next tab  ·  ↑↓: navigate  ·  enter: select"
 				} else {
-					line1 = "f: filter campaign  ·  " + line1
+					line1 = "f: filter campaign  ·  tab: next tab  ·  ↑↓: navigate  ·  enter: select"
 				}
-			} else if m.activeTab == 3 {
-				line1 = "tab: next tab  ·  ↑↓: navigate  ·  enter: view details  ·  x: export  ·  q: quit"
+				line2 = "n: new  ·  e: edit  ·  s: schedule  ·  d: delete  ·  r: repurpose  ·  i: import  ·  f1/R: readme  ·  ?: help  ·  q: quit"
+			} else if m.activeTab == 3 { // History
+				line1 = "tab: next tab  ·  ↑↓: navigate  ·  enter: view details  ·  x: export"
+				line2 = "f1/R: readme  ·  ?: quick help  ·  q: quit"
+			} else { // Default
+				line1 = "tab: next tab  ·  ↑↓: navigate  ·  enter: select  ·  n: new  ·  e: edit  ·  d: delete"
+				line2 = "r: repurpose  ·  i: import  ·  f1/R: readme  ·  ?: quick help  ·  q: quit"
 			}
-			helpText := line1 + "\n" + "f1/R: readme  ·  ?: quick help"
+			helpText := line1 + "\n" + line2
 			sb.WriteString(StyleHelp.Render(helpText))
 		}
 	}

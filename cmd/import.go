@@ -197,7 +197,15 @@ var importCmd = &cobra.Command{
 			defer s.Close()
 
 			for _, post := range posts {
-				if post.Status == "queue" {
+				// Falls der Post bereits erfolgreich veröffentlicht wurde,
+				// behalten wir den Status bei, um doppeltes Posten zu verhindern.
+				existing, err := s.GetPost(ctx, post.ID)
+				if err == nil && existing.Status == models.StatusPosted {
+					post.Status = existing.Status
+					post.PostedAt = existing.PostedAt
+					post.PlatformID = existing.PlatformID
+					post.Error = existing.Error
+				} else if post.Status == "queue" {
 					slot, err := scheduler.GetNextQueueSlot(ctx, s, post.Platform)
 					if err != nil {
 						reportError(fmt.Errorf("failed to get queue slot for post %s: %w", post.ID, err), 2)
