@@ -1,8 +1,8 @@
 # postctl
 
-Terminal social media manager. Write posts in Markdown, schedule them, and publish to Twitter/X, LinkedIn, Threads, Mastodon, and Bluesky from the command line or a full TUI.
+Terminal social media and blogging manager. Write posts in Markdown, schedule them, and publish to Twitter/X, LinkedIn, Threads, Mastodon, Bluesky, Facebook, Telegram, Discord, Reddit, Dev.to, Hashnode, and Medium from the command line or a full TUI.
 
-**Supported platforms:** Twitter/X · LinkedIn · Threads · Mastodon · Bluesky
+**Supported platforms:** Twitter/X · LinkedIn · Threads · Mastodon · Bluesky · Facebook · Telegram · Discord · Reddit · Dev.to · Hashnode · Medium
 
 ---
 
@@ -61,6 +61,11 @@ postctl tui                              Open TUI explicitly
 
 postctl auth --platform PLATFORM         Authenticate with a platform
 postctl config [--show] [--set K V]      View or set config values
+postctl config test                      Test connection to configured platform APIs
+postctl rss add URL                      Add an RSS feed URL
+postctl rss list                         List all configured RSS feeds
+postctl rss remove URL                   Remove a configured RSS feed
+postctl rss import                       Fetch feeds and import articles as drafts
 
 postctl import FILE_OR_DIR               Import Markdown post(s)
 postctl list [--platform P] [--status S] [--campaign C] [--format human|json]
@@ -135,6 +140,16 @@ Third tweet. Threads are Twitter-only.
 | `postctl auth --platform PLATFORM` | Authenticate with the given platform (OAuth flow) |
 | `postctl config --show` | Print the current configuration |
 | `postctl config --set KEY VALUE` | Set a configuration value |
+| `postctl config test` | Run connectivity diagnostics for all configured platform APIs |
+
+### RSS Feed Importer
+
+| Command | Description |
+|---------|-------------|
+| `postctl rss add URL` | Add a new RSS feed URL to configuration |
+| `postctl rss list` | List all configured RSS feeds |
+| `postctl rss remove URL` | Remove a configured RSS feed |
+| `postctl rss import` | Fetch RSS feeds and import new articles as drafts |
 
 ### Content Management
 
@@ -204,12 +219,14 @@ Switch between views using tabs or the keybindings below.
 | Key | Action |
 |-----|--------|
 | `j` / `k` | Navigate up and down |
+| `Space` | Toggle post selection for mass/bulk actions |
 | `Enter` | Open detail view |
 | `n` | New post |
 | `e` | Edit selected post |
-| `d` | Delete selected post |
+| `d` | Delete selected (or highlighted) post(s) |
 | `p` | Publish selected post |
-| `s` | Schedule selected post |
+| `s` | Schedule selected (or highlighted) post(s) to queue slots |
+| `Esc` | Clear bulk selections (or clear campaign filter) |
 | `Tab` | Switch tabs |
 | `q` | Quit |
 
@@ -300,8 +317,15 @@ Claude calls `get_post` to retrieve the original, then calls `create_post` twice
 | Threads | 500 | No | At least one recommended (Meta requirement) |
 | Mastodon | 500 (instance default) | No | Supported |
 | Bluesky | 300 | No | Supported |
+| Facebook | ~63,206 | No | Supported |
+| Telegram | 4,096 (1,024 for captions) | No | Supported |
+| Discord | 2,000 | No | Supported |
+| Reddit | 40,000 | No | Not Supported |
+| Dev.to | ~100,000 | No | Not Supported |
+| Hashnode | ~100,000 | No | Not Supported |
+| Medium | ~100,000 | No | Not Supported |
 
-Twitter threads have no hard post count limit, but keep threads focused. LinkedIn, Threads, Mastodon, and Bluesky do not support thread-style multi-part posts — use a single body for those platforms.
+Twitter threads have no hard post count limit, but keep threads focused. Other platforms do not support thread-style multi-part posts — use a single body for those platforms.
 
 > [!WARNING]
 > **API Rate Limits & Bulk Publishing:** Publishing multiple posts simultaneously or in quick succession can lead to API rate limits or permanent account bans (especially on federated networks like Mastodon). Always space out posts over time (e.g., at least 15-30 minutes delay between consecutive publishing events).
