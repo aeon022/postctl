@@ -485,3 +485,34 @@ func (t *ThreadsPlatform) FetchAnalytics(ctx context.Context, platformID string)
 	}, nil
 }
 
+// Delete entfernt einen Beitrag von Threads über die API
+func (t *ThreadsPlatform) Delete(ctx context.Context, platformID string) error {
+	_, token, err := t.getUserIDAndToken(ctx)
+	if err != nil {
+		return err
+	}
+	// Meta Threads API delete endpoint: DELETE /{threads-media-id}
+	// Da der API-Endpunkt über graph.threads.net/v1.0 läuft, nutzen wir diese Basis
+	deleteURL := fmt.Sprintf("https://graph.threads.net/v1.0/%s", platformID)
+	
+	params := url.Values{}
+	params.Set("access_token", token)
+
+	req, err := http.NewRequestWithContext(ctx, "DELETE", deleteURL+"?"+params.Encode(), nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := t.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to delete threads post (status %d): %s", resp.StatusCode, string(body))
+	}
+	return nil
+}
+

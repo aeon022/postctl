@@ -90,3 +90,10 @@ func (d *DryRunPlatform) FetchAnalytics(ctx context.Context, platformID string) 
 	}, nil
 }
 
+// Delete simuliert das Löschen eines Beitrags
+func (d *DryRunPlatform) Delete(ctx context.Context, platformID string) error {
+	fmt.Fprintf(os.Stderr, "[DRY RUN] Lösche Beitrag auf %s (ID: %s)...\n", d.platformName, platformID)
+	time.Sleep(200 * time.Millisecond)
+	return nil
+}
+

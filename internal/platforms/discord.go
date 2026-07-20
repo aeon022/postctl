@@ -180,3 +180,28 @@ func parseDiscordResponse(resp *http.Response) (string, error) {
 
 	return "webhook-posted", nil
 }
+
+// Delete löscht eine gesendete Webhook-Nachricht von Discord
+func (d *DiscordPlatform) Delete(ctx context.Context, platformID string) error {
+	if platformID == "webhook-posted" || platformID == "" {
+		return nil
+	}
+
+	deleteURL := d.webhookURL + "/messages/" + platformID
+	req, err := http.NewRequestWithContext(ctx, "DELETE", deleteURL, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := d.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to delete discord webhook message (status %d): %s", resp.StatusCode, string(body))
+	}
+	return nil
+}

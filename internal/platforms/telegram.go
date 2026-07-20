@@ -251,3 +251,42 @@ func parseTelegramResponse(resp *http.Response) (string, error) {
 
 	return fmt.Sprintf("%d", result.Result.MessageID), nil
 }
+
+// Delete löscht eine gesendete Nachricht aus dem Telegram Chat
+func (t *TelegramPlatform) Delete(ctx context.Context, platformID string) error {
+	url := fmt.Sprintf("%s/bot%s/deleteMessage", t.apiURL, t.botToken)
+	
+	var msgID int
+	_, err := fmt.Sscanf(platformID, "%d", &msgID)
+	if err != nil {
+		return fmt.Errorf("invalid telegram message id: %w", err)
+	}
+
+	payload := map[string]interface{}{
+		"chat_id":    t.chatID,
+		"message_id": msgID,
+	}
+
+	jsonBytes, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := t.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("telegram API error (status %d): %s", resp.StatusCode, string(body))
+	}
+	return nil
+}

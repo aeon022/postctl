@@ -365,6 +365,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Beitrag in Warteschlange einplanen",
 		"en": "Schedule post (add to queue)",
 	},
+	"help_post": {
+		"de": "Beitrag sofort veröffentlichen (p)",
+		"en": "Publish post immediately (p)",
+	},
 
 	// Editor helper comments
 	"editor_helper_title_twitter": {

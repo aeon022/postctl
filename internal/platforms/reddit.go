@@ -179,3 +179,8 @@ func (r *RedditPlatform) Post(ctx context.Context, post *models.Post) (string, e
 func (r *RedditPlatform) FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error) {
 	return models.AnalyticsData{}, nil
 }
+
+// Delete is a stub for Reddit delete method
+func (r *RedditPlatform) Delete(ctx context.Context, platformID string) error {
+	return nil
+}

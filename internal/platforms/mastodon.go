@@ -409,3 +409,30 @@ func (m *MastodonPlatform) FetchAnalytics(ctx context.Context, platformID string
 		FetchedAt:   time.Now(),
 	}, nil
 }
+
+// Delete entfernt einen Beitrag (Status) von Mastodon über die API
+func (m *MastodonPlatform) Delete(ctx context.Context, platformID string) error {
+	token, err := m.getValidToken(ctx)
+	if err != nil {
+		return err
+	}
+
+	deleteURL := fmt.Sprintf("%s/api/v1/statuses/%s", m.instanceURL, platformID)
+	req, err := http.NewRequestWithContext(ctx, "DELETE", deleteURL, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	resp, err := m.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to delete mastodon status (status %d): %s", resp.StatusCode, string(body))
+	}
+	return nil
+}

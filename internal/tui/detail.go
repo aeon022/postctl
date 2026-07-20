@@ -103,7 +103,7 @@ func (m Model) renderDetailView() string {
 
 	// Legend / Action-Guide für den Footer
 	builder.WriteString("\n")
-	builder.WriteString(StyleHelp.Render("esc: back  ·  e: edit  ·  d: delete  ·  r: repurpose via AI  ·  j/k: scroll"))
+	builder.WriteString(StyleHelp.Render("esc: back  ·  e: edit  ·  d: delete  ·  p: post now  ·  r: repurpose via AI  ·  j/k: scroll"))
 
 	// Dynamic height bounding and scrolling
 	boxHeight := m.getBoxHeight()

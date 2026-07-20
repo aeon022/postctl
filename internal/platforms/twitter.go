@@ -937,3 +937,8 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 	}
 }
 
+// Delete is a stub for Twitter delete method
+func (t *TwitterPlatform) Delete(ctx context.Context, platformID string) error {
+	return nil
+}
+

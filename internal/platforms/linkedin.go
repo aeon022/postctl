@@ -387,3 +387,8 @@ func (l *LinkedInPlatform) FetchAnalytics(ctx context.Context, platformID string
 	}, nil
 }
 
+// Delete is a stub for LinkedIn delete method
+func (l *LinkedInPlatform) Delete(ctx context.Context, platformID string) error {
+	return nil
+}
+

@@ -465,3 +465,38 @@ func (b *BlueskyPlatform) FetchAnalytics(ctx context.Context, platformID string)
 		FetchedAt:   time.Now(),
 	}, nil
 }
+
+// Delete entfernt einen Beitrag von Bluesky über die API
+func (b *BlueskyPlatform) Delete(ctx context.Context, platformID string) error {
+	_, did, err := b.getValidToken(ctx)
+	if err != nil {
+		return err
+	}
+
+	// did:plc/app.bsky.feed.post/3mqgxp56f4k2b -> extrahiere rkey
+	parts := strings.Split(platformID, "/")
+	if len(parts) == 0 {
+		return fmt.Errorf("invalid bluesky platformID format: %s", platformID)
+	}
+	rkey := parts[len(parts)-1]
+
+	reqBody, err := json.Marshal(map[string]interface{}{
+		"repo":       did,
+		"collection": "app.bsky.feed.post",
+		"rkey":       rkey,
+	})
+	if err != nil {
+		return err
+	}
+
+	deleteURL := "https://bsky.social/xrpc/com.atproto.repo.deleteRecord"
+	resp, body, err := b.doRequest(ctx, "POST", deleteURL, reqBody, "application/json")
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("delete bluesky record failed (status %d): %s", resp.StatusCode, string(body))
+	}
+	return nil
+}

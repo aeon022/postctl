@@ -186,3 +186,8 @@ func (m *MediumPlatform) Post(ctx context.Context, post *models.Post) (string, e
 func (m *MediumPlatform) FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error) {
 	return models.AnalyticsData{}, nil
 }
+
+// Delete is a stub for Medium delete method
+func (m *MediumPlatform) Delete(ctx context.Context, platformID string) error {
+	return nil
+}
