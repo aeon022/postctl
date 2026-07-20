@@ -885,6 +885,85 @@ Campaign successfully posted!
 				</div>
 			</div>
 		</section>
+
+		<!-- Changelog Section -->
+		<section id="changelog" class="changelog-section">
+			<div class="container">
+				<div class="section-header">
+					<span class="badge">Updates</span>
+					<h2 class="section-title">
+						<span class="lang-en">Changelog & Letzte Updates</span>
+						<span class="lang-de">Changelog & Letzte Updates</span>
+					</h2>
+					<p class="section-subtitle">
+						<span class="lang-en">Track the latest features, improvements, and bug fixes in postctl.</span>
+						<span class="lang-de">Verfolge die neuesten Funktionen, Verbesserungen und Bugfixes in postctl.</span>
+					</p>
+				</div>
+
+				<div class="changelog-timeline">
+					<!-- Version v0.3.0 -->
+					<div class="changelog-item">
+						<div class="changelog-meta">
+							<span class="version-tag">v0.3.0</span>
+							<span class="changelog-date">July 2026</span>
+						</div>
+						<div class="changelog-content">
+							<h3 class="changelog-item-title">
+								<span class="lang-en">TUI Immediate Posting & Remote Deletion</span>
+								<span class="lang-de">TUI Direkt-Posting & Remote-Löschung</span>
+							</h3>
+							<ul class="changelog-list">
+								<li>
+									<span class="lang-en"><strong>TUI Quick Publish:</strong> Press <kbd class="kbd">p</kbd> in the posts list or detail view to publish drafts immediately.</span>
+									<span class="lang-de"><strong>TUI Direkt-Post:</strong> Drücke <kbd class="kbd">p</kbd> in der Liste oder Detailansicht, um Entwürfe sofort zu veröffentlichen.</span>
+								</li>
+								<li>
+									<span class="lang-en"><strong>Remote Deletion:</strong> Deleting a post locally (TUI <kbd class="kbd">d</kbd> or <code>postctl delete</code>) now automatically deletes the post from the remote platform (Threads, Bluesky, Mastodon, Telegram, and Discord webhook messages).</span>
+									<span class="lang-de"><strong>Remote-Löschung:</strong> Das Löschen eines Posts (TUI <kbd class="kbd">d</kbd> oder <code>postctl delete</code>) löscht diesen jetzt auch automatisch direkt auf der Plattform (Threads, Bluesky, Mastodon, Telegram, und Discord Webhooks).</span>
+								</li>
+								<li>
+									<span class="lang-en"><strong>New CLI commands:</strong> Added <code>postctl delete &lt;id&gt;</code> for remote cleanup and <code>postctl cancel &lt;id&gt;</code> to abort scheduled posts.</span>
+									<span class="lang-de"><strong>Neue CLI-Befehle:</strong> <code>postctl delete &lt;id&gt;</code> zur Remote-Bereinigung und <code>postctl cancel &lt;id&gt;</code> zum Abbrechen geplanter Beiträge hinzugefügt.</span>
+								</li>
+								<li>
+									<span class="lang-en"><strong>Safe spacing & overdue protection:</strong> Scheduler daemon automatically reschedules accumulated overdue posts (e.g. after offline periods) in 20-minute intervals to prevent spam flags.</span>
+									<span class="lang-de"><strong>Spam-Schutz:</strong> Der Scheduler-Daemon verschiebt überfällige Posts (z.B. nach Offline-Phasen) automatisch in 20-Minuten-Intervalle, um Spam-Sperren zu verhindern.</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<!-- Version v0.2.0 -->
+					<div class="changelog-item">
+						<div class="changelog-meta">
+							<span class="version-tag">v0.2.0</span>
+							<span class="changelog-date">June 2026</span>
+						</div>
+						<div class="changelog-content">
+							<h3 class="changelog-item-title">
+								<span class="lang-en">Headless Daemon & TUI Replica Demo</span>
+								<span class="lang-de">Headless-Daemon & TUI Replica-Demo</span>
+							</h3>
+							<ul class="changelog-list">
+								<li>
+									<span class="lang-en"><strong>Headless scheduler daemon:</strong> Run <code>postctl daemon</code> to monitor and publish scheduled posts in the background.</span>
+									<span class="lang-de"><strong>Hintergrund-Scheduler:</strong> Führe <code>postctl daemon</code> aus, um geplante Posts im Hintergrund automatisch zu veröffentlichen.</span>
+								</li>
+								<li>
+									<span class="lang-en"><strong>Interactive web TUI replica:</strong> Added a fully-interactive mockup of the postctl TUI directly to the homepage.</span>
+									<span class="lang-de"><strong>Interaktive TUI-Demo:</strong> Ein voll-interaktives Mockup der postctl-TUI wurde direkt auf der Homepage integriert.</span>
+								</li>
+								<li>
+									<span class="lang-en"><strong>Bilingual support:</strong> Fully translated TUI, CLI, and docs into English and German.</span>
+									<span class="lang-de"><strong>Zweisprachiger Support:</strong> Komplette Übersetzung von TUI, CLI und Dokumentation auf Deutsch und Englisch.</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
 	</main>
 
 	<!-- Footer -->
@@ -1915,6 +1994,126 @@ Campaign successfully posted!
 	}
 	.faq-answer p {
 		margin: 0;
+	}
+
+	/* Changelog Section */
+	.changelog-section {
+		padding: 6.5rem 0;
+		border-top: 1px solid var(--border);
+		background: rgba(10, 11, 14, 0.45);
+	}
+	.changelog-timeline {
+		max-width: 800px;
+		margin: 3.5rem auto 0 auto;
+		display: flex;
+		flex-direction: column;
+		gap: 2.5rem;
+		position: relative;
+	}
+	.changelog-timeline::before {
+		content: '';
+		position: absolute;
+		left: 110px;
+		top: 10px;
+		bottom: 10px;
+		width: 2px;
+		background: var(--border);
+	}
+	.changelog-item {
+		display: flex;
+		gap: 2.5rem;
+		position: relative;
+	}
+	.changelog-meta {
+		width: 90px;
+		text-align: right;
+		flex-shrink: 0;
+		padding-top: 0.25rem;
+	}
+	.version-tag {
+		display: block;
+		font-family: var(--font-heading);
+		font-size: 0.9rem;
+		font-weight: 700;
+		color: var(--accent);
+	}
+	.changelog-date {
+		display: block;
+		font-size: 0.72rem;
+		color: var(--text-secondary);
+		margin-top: 0.25rem;
+	}
+	.changelog-content {
+		flex-grow: 1;
+		background: rgba(255, 255, 255, 0.01);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		padding: 1.5rem 1.75rem;
+		position: relative;
+	}
+	.changelog-content::before {
+		content: '';
+		position: absolute;
+		left: -29px;
+		top: 18px;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--accent);
+		border: 2px solid var(--bg);
+		z-index: 2;
+	}
+	.changelog-item-title {
+		font-family: var(--font-heading);
+		font-size: 1.15rem;
+		font-weight: 600;
+		color: #fff;
+		margin-top: 0;
+		margin-bottom: 1rem;
+	}
+	.changelog-list {
+		margin: 0;
+		padding-left: 1.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+	.changelog-list li {
+		font-size: 0.9rem;
+		line-height: 1.6;
+		color: var(--text-secondary);
+	}
+	.changelog-list li strong {
+		color: #fff;
+	}
+	.changelog-list kbd {
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		padding: 0.1rem 0.3rem;
+		border-radius: 4px;
+		font-family: monospace;
+		font-size: 0.78rem;
+		color: #fff;
+	}
+
+	@media (max-width: 640px) {
+		.changelog-timeline::before {
+			left: 15px;
+		}
+		.changelog-item {
+			flex-direction: column;
+			gap: 1rem;
+			padding-left: 2.5rem;
+		}
+		.changelog-meta {
+			width: auto;
+			text-align: left;
+			padding-top: 0;
+		}
+		.changelog-content::before {
+			left: -29px;
+			top: -24px;
+		}
 	}
 
 	/* Pricing Section */
