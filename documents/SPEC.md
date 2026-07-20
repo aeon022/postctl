@@ -2,7 +2,7 @@
 
 ## Overview
 
-**postctl** is a TUI CLI tool written in Go that manages social media postings across Twitter/X, LinkedIn, and Threads. Posts are authored as Markdown files, imported into a local SQLite database, previewed in a terminal UI, and published via platform APIs — immediately or on a schedule.
+**postctl** is a TUI CLI tool written in Go that manages social media postings and blogs across Twitter/X, LinkedIn, Threads, Mastodon, Bluesky, Facebook, Telegram, Discord, Reddit, Dev.to, Hashnode, and Medium. Posts are authored as Markdown files, imported into a local SQLite database, previewed in a terminal UI, and published via platform APIs — immediately or on a schedule.
 
 ## User Stories
 

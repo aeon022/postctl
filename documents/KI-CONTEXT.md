@@ -40,7 +40,9 @@ postctl/
 │   ├── post.go                # `postctl post <id>` — sofort posten
 │   ├── schedule.go            # `postctl schedule <id> <datetime>` — planen
 │   ├── tui.go                 # `postctl` (ohne args) — TUI starten
-│   └── auth.go                # `postctl auth <platform>` — OAuth Flow
+│   ├── auth.go                # `postctl auth <platform>` — OAuth Flow
+│   ├── rss.go                 # `postctl rss <add|list|remove|import>` — RSS-Importer
+│   └── rss_test.go            # RSS-Importer Unit-Tests
 │
 ├── internal/
 │   ├── config/
@@ -64,6 +66,12 @@ postctl/
 │   │   ├── twitter.go         # Twitter/X v2 Implementation
 │   │   ├── linkedin.go        # LinkedIn Implementation
 │   │   ├── threads.go         # Threads/Meta Implementation
+│   │   ├── telegram.go        # Telegram Implementation
+│   │   ├── discord.go         # Discord Webhook Implementation
+│   │   ├── reddit.go          # Reddit Implementation
+│   │   ├── devto.go           # Dev.to Implementation
+│   │   ├── hashnode.go        # Hashnode Implementation
+│   │   ├── medium.go          # Medium Implementation
 │   │   └── dry_run.go         # Dry-Run Implementation (kein echtes Posting)
 │   │
 │   ├── scheduler/
@@ -74,10 +82,11 @@ postctl/
 │       ├── tabs.go            # Tab-Navigation (Posts, Schedule, History)
 │       ├── list.go            # Post-Liste mit Status-Farben
 │       ├── detail.go          # Post-Detail-Ansicht mit Preview
-│       ├── compose.go         # Neuen Post schreiben/bearbeiten
+│       ├── editor.go          # Neuen Post schreiben/bearbeiten, Bild-Vorschau
 │       ├── schedule_view.go   # Schedule-Kalender
 │       ├── styles.go          # Lipgloss Styling (Farben, Borders)
-│       └── keys.go            # Keybindings
+│       ├── keys.go            # Keybindings
+│       └── bulk_test.go       # Massen-Aktionen Unit-Tests
 │
 ├── templates/                 # Beispiel-Markdown-Posts
 │   └── example-thread.md
@@ -86,6 +95,7 @@ postctl/
     ├── api-twitter.md         # Twitter API Setup Guide
     ├── api-linkedin.md        # LinkedIn API Setup Guide
     ├── api-threads.md         # Threads API Setup Guide
+    ├── roadmap.md             # Projekt-Roadmap (Meilensteine)
     └── architecture.md        # Architektur-Übersicht
 ```
 
