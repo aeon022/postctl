@@ -858,8 +858,8 @@ import Layout from '../layouts/Layout.astro';
 	// Click the window to focus it
 	tuiWindow?.addEventListener('click', () => tuiWindow.focus());
 
-	// Auto-focus on load
-	tuiWindow?.focus();
+	// Auto-focus on load (without scrolling the page — the header isn't sticky here)
+	tuiWindow?.focus({ preventScroll: true });
 
 	// Row cursor movement per panel
 	const panelCursors: Record<string, number> = {
