@@ -30,7 +30,7 @@ import * as TutorialDocEn from '../../documents/TUTORIAL-en.md';
 				<span class="system-status"><span class="status-dot"></span>DOCS_ONLINE</span>
 			</div>
 			<nav class="nav" id="main-nav">
-        <a href="/" class="nav-link"><span class="lang-en">Home</span><span class="lang-de">Start</span></a>
+        <a href="/" class="back-link"><span class="lang-en">← Back to Home</span><span class="lang-de">← Zurück zur Startseite</span></a>
         <a href="/#features" class="nav-link"><span class="lang-en">Features</span><span class="lang-de">Funktionen</span></a>
         <a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="lang-en">Support</span><span class="lang-de">Unterstützen</span></a>
         <a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="nav-link github-link">
@@ -775,6 +775,21 @@ images: ["logo.png"]
 	.nav-link:hover {
 		color: var(--text-primary);
 		background: rgba(255, 255, 255, 0.04);
+	}
+	.back-link {
+		color: var(--text-secondary);
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+		padding: 0.35rem 0.65rem;
+		border-radius: 100px;
+		border: 1px solid var(--border);
+		white-space: nowrap;
+		flex-shrink: 0;
+		transition: var(--transition);
+	}
+	.back-link:hover {
+		color: var(--accent);
+		border-color: var(--accent);
 	}
 	.github-link {
 		display: flex;
