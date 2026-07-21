@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import FooterSignature from '../components/FooterSignature.astro';
+import LangToggle from '../components/LangToggle.astro';
 ---
 
 <Layout title="Datenschutzerklärung — postctl">
@@ -15,15 +16,28 @@ import FooterSignature from '../components/FooterSignature.astro';
       <span class="logo-icon">&gt;_</span>
       <span class="logo-text">postctl<span class="logo-blink">_</span></span>
     </a>
-    <a href="/" class="back-link">← Zurück zur Startseite</a>
+    <div class="tui-page-header-right">
+      <a href="/" class="back-link"><span class="lang-en">← Back to Home</span><span class="lang-de">← Zurück zur Startseite</span></a>
+      <button id="lang-toggle" class="lang-toggle-btn" aria-label="Toggle Language">
+        <span class="lang-en">DE</span>
+        <span class="lang-de">EN</span>
+      </button>
+    </div>
   </header>
 
   <main class="tui-page-main">
     <!-- Section Header -->
     <div class="tui-page-section-header">
-      <div class="section-tag">Sicherheit</div>
-      <h1 class="section-title">Datenschutzerklärung</h1>
-      <p class="section-subtitle">Informationen über die Verarbeitung personenbezogener Daten gemäß EU-DSGVO.</p>
+      <div class="section-tag"><span class="lang-en">Security</span><span class="lang-de">Sicherheit</span></div>
+      <h1 class="section-title"><span class="lang-en">Privacy Policy</span><span class="lang-de">Datenschutzerklärung</span></h1>
+      <p class="section-subtitle">
+        <span class="lang-en">Information on the processing of personal data under the EU GDPR.</span>
+        <span class="lang-de">Informationen über die Verarbeitung personenbezogener Daten gemäß EU-DSGVO.</span>
+      </p>
+      <p class="lang-note">
+        <span class="lang-en">This English version is a courtesy translation. The German version is legally binding.</span>
+        <span class="lang-de">Diese englische Version ist eine Übersetzung zur Information. Maßgeblich ist die deutsche Fassung.</span>
+      </p>
     </div>
 
     <!-- Privacy Stack Layout -->
@@ -31,68 +45,104 @@ import FooterSignature from '../components/FooterSignature.astro';
       <!-- Section 1 -->
       <div class="privacy-card">
         <div class="card-label">// 01_PRIVACY_OVERVIEW</div>
-        <h3 class="card-title">Datenschutz auf einen Blick</h3>
+        <h3 class="card-title"><span class="lang-en">Privacy at a Glance</span><span class="lang-de">Datenschutz auf einen Blick</span></h3>
         <p class="card-text">
-          Wir legen größten Wert auf den Schutz deiner Privatsphäre. postctl ist als <strong>local-first</strong> Anwendung konzipiert. 
-          Das bedeutet, dass deine Daten (wie Passwörter, API-Keys, Session-Cookies und Beitragsdaten) lokal auf deinem Rechner in einer 
-          SQLite-Datenbank verschlüsselt gespeichert werden und zu keinem Zeitpunkt an uns übertragen werden.
+          <span class="lang-en">
+            We place the greatest importance on protecting your privacy. postctl is designed as a <strong>local-first</strong> application.
+            This means your data (such as passwords, API keys, session cookies, and post data) is stored locally on your machine in an
+            encrypted SQLite database and is never transmitted to us.
+          </span>
+          <span class="lang-de">
+            Wir legen größten Wert auf den Schutz deiner Privatsphäre. postctl ist als <strong>local-first</strong> Anwendung konzipiert.
+            Das bedeutet, dass deine Daten (wie Passwörter, API-Keys, Session-Cookies und Beitragsdaten) lokal auf deinem Rechner in einer
+            SQLite-Datenbank verschlüsselt gespeichert werden und zu keinem Zeitpunkt an uns übertragen werden.
+          </span>
         </p>
       </div>
 
       <!-- Section 2 -->
       <div class="privacy-card">
         <div class="card-label">// 02_DESKTOP_CLIENT_DATA</div>
-        <h3 class="card-title">Datenerfassung in der App (Desktop-Client)</h3>
+        <h3 class="card-title"><span class="lang-en">Data Collection in the App (Desktop Client)</span><span class="lang-de">Datenerfassung in der App (Desktop-Client)</span></h3>
         <p class="card-text">
-          Die App speichert Anmeldedaten und Tokens für verbundene Social-Media-Accounts (z. B. LinkedIn, Threads, Twitter/X) 
-          ausschließlich lokal auf dem Gerät des Benutzers unter Verwendung von AES-256-GCM Verschlüsselung.
+          <span class="lang-en">The app stores login credentials and tokens for connected social media accounts (e.g. LinkedIn, Threads, Twitter/X) exclusively locally on the user's device using AES-256-GCM encryption.</span>
+          <span class="lang-de">Die App speichert Anmeldedaten und Tokens für verbundene Social-Media-Accounts (z. B. LinkedIn, Threads, Twitter/X) ausschließlich lokal auf dem Gerät des Benutzers unter Verwendung von AES-256-GCM Verschlüsselung.</span>
         </p>
         <p class="card-text">
-          Es gibt keine zentrale Cloud-Datenbank, keine Tracker, keine Telemetrie und keine Serverprotokolle unsererseits. Deine Daten 
-          gehören ausschließlich dir.
+          <span class="lang-en">There is no central cloud database, no trackers, no telemetry, and no server logs on our part. Your data belongs exclusively to you.</span>
+          <span class="lang-de">Es gibt keine zentrale Cloud-Datenbank, keine Tracker, keine Telemetrie und keine Serverprotokolle unsererseits. Deine Daten gehören ausschließlich dir.</span>
         </p>
       </div>
 
       <!-- Section 3 -->
       <div class="privacy-card">
         <div class="card-label">// 03_MERCHANT_OF_RECORD</div>
-        <h3 class="card-title">Zahlungsabwicklung & Lizenzierung (Polar.sh)</h3>
+        <h3 class="card-title"><span class="lang-en">Payment Processing & Licensing (Polar.sh)</span><span class="lang-de">Zahlungsabwicklung & Lizenzierung (Polar.sh)</span></h3>
         <p class="card-text">
-          Wenn du eine Pro-Lizenz von postctl erwirbst, wird die Zahlungsabwicklung und Lizenzschlüssel-Generierung über den externen Dienst 
-          <strong>Polar.sh</strong> (Polar Technologies Inc.) abgewickelt. Polar agiert als „Merchant of Record“.
+          <span class="lang-en">
+            If you purchase a postctl Pro license, payment processing and license key generation are handled via the external service
+            <strong>Polar.sh</strong> (Polar Technologies Inc.). Polar acts as the "Merchant of Record".
+          </span>
+          <span class="lang-de">
+            Wenn du eine Pro-Lizenz von postctl erwirbst, wird die Zahlungsabwicklung und Lizenzschlüssel-Generierung über den externen Dienst
+            <strong>Polar.sh</strong> (Polar Technologies Inc.) abgewickelt. Polar agiert als „Merchant of Record“.
+          </span>
         </p>
         <p class="card-text">
-          Dabei werden personenbezogene Daten wie E-Mail-Adresse und Rechnungsdaten erfasst, um die Lizenz auszustellen und steuerliche 
-          Pflichten zu erfüllen. Weitere Informationen findest du in der Datenschutzerklärung von Polar.sh unter 
-          <a href="https://polar.sh/privacy" target="_blank" rel="noopener noreferrer" class="accent-link underline">https://polar.sh/privacy</a>.
+          <span class="lang-en">
+            In doing so, personal data such as your e-mail address and billing information is collected in order to issue the license and
+            fulfil tax obligations. Further information can be found in Polar.sh's privacy policy at
+            <a href="https://polar.sh/privacy" target="_blank" rel="noopener noreferrer" class="accent-link underline">https://polar.sh/privacy</a>.
+          </span>
+          <span class="lang-de">
+            Dabei werden personenbezogene Daten wie E-Mail-Adresse und Rechnungsdaten erfasst, um die Lizenz auszustellen und steuerliche
+            Pflichten zu erfüllen. Weitere Informationen findest du in der Datenschutzerklärung von Polar.sh unter
+            <a href="https://polar.sh/privacy" target="_blank" rel="noopener noreferrer" class="accent-link underline">https://polar.sh/privacy</a>.
+          </span>
         </p>
       </div>
 
       <!-- Section 4 -->
       <div class="privacy-card">
         <div class="card-label">// 04_WEB_HOSTING_LOGS</div>
-        <h3 class="card-title">Hosting der Website</h3>
+        <h3 class="card-title"><span class="lang-en">Website Hosting</span><span class="lang-de">Hosting der Website</span></h3>
         <p class="card-text">
-          Diese Website wird gehostet auf GitHub Pages / Cloudflare. Beim Aufrufen dieser Website werden standardmäßig IP-Adressen und 
-          Verbindungsprotokolle erhoben, um die Stabilität und Sicherheit der Website zu gewährleisten. Dies ist ein berechtigtes Interesse 
-          gemäß Art. 6 Abs. 1 lit. f DSGVO.
+          <span class="lang-en">
+            This website is hosted on GitHub Pages / Cloudflare. When you visit this website, IP addresses and connection logs are
+            collected by default to ensure the stability and security of the website. This constitutes a legitimate interest under
+            Art. 6(1)(f) GDPR.
+          </span>
+          <span class="lang-de">
+            Diese Website wird gehostet auf GitHub Pages / Cloudflare. Beim Aufrufen dieser Website werden standardmäßig IP-Adressen und
+            Verbindungsprotokolle erhoben, um die Stabilität und Sicherheit der Website zu gewährleisten. Dies ist ein berechtigtes Interesse
+            gemäß Art. 6 Abs. 1 lit. f DSGVO.
+          </span>
         </p>
       </div>
 
       <!-- Section 5 -->
       <div class="privacy-card">
         <div class="card-label">// 05_USER_RIGHTS</div>
-        <h3 class="card-title">Deine Rechte (DSGVO)</h3>
+        <h3 class="card-title"><span class="lang-en">Your Rights (GDPR)</span><span class="lang-de">Deine Rechte (DSGVO)</span></h3>
         <p class="card-text">
-          Dir stehen bezüglich deiner bei Polar.sh oder über unsere Server erfassten Daten grundsätzlich die Rechte auf Auskunft, 
-          Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerruf und Widerspruch zu. Wende dich hierzu an die im Impressum 
-          angegebene E-Mail-Adresse.
+          <span class="lang-en">
+            Regarding your data collected via Polar.sh or through our servers, you generally have the rights to access, rectification,
+            erasure, restriction, data portability, and to withdraw consent or object. Please contact the e-mail address given in the
+            legal notice for this purpose.
+          </span>
+          <span class="lang-de">
+            Dir stehen bezüglich deiner bei Polar.sh oder über unsere Server erfassten Daten grundsätzlich die Rechte auf Auskunft,
+            Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerruf und Widerspruch zu. Wende dich hierzu an die im Impressum
+            angegebene E-Mail-Adresse.
+          </span>
         </p>
       </div>
     </div>
   </main>
 
   <FooterSignature />
+
+  <LangToggle />
 </Layout>
 
 <style>
@@ -224,6 +274,11 @@ import FooterSignature from '../components/FooterSignature.astro';
     50% { opacity: 1; }
   }
 
+  .tui-page-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
   .back-link {
     color: rgba(255, 255, 255, 0.5);
     font-family: monospace;
@@ -238,6 +293,26 @@ import FooterSignature from '../components/FooterSignature.astro';
     color: #8b7cf8;
     border-color: #8b7cf8;
     background: rgba(139, 124, 248, 0.05);
+  }
+  .lang-toggle-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lang-toggle-btn:hover {
+    background: rgba(139, 124, 248, 0.15);
+    border-color: rgba(139, 124, 248, 0.4);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(139, 124, 248, 0.2);
   }
 
   .tui-page-main {
@@ -271,10 +346,23 @@ import FooterSignature from '../components/FooterSignature.astro';
     margin-bottom: 1rem;
     font-size: 2.6rem;
     font-weight: 700;
+    overflow-wrap: break-word;
   }
   .section-subtitle {
     color: rgba(255, 255, 255, 0.6);
     font-size: 1.1rem;
     line-height: 1.6;
+  }
+  .lang-note {
+    color: rgba(255, 255, 255, 0.35);
+    font-family: monospace;
+    font-size: 0.78rem;
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 480px) {
+    .section-title {
+      font-size: 2rem;
+    }
   }
 </style>

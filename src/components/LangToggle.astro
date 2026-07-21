@@ -1,0 +1,36 @@
+<!--
+  Shared EN/DE language toggle logic. Include once per page:
+  detects saved/browser language, sets <html lang>, and wires up
+  any #lang-toggle button. Pair with markup like:
+
+    <span class="lang-en">Hello</span><span class="lang-de">Hallo</span>
+
+  which this component's global CSS shows/hides based on <html lang>.
+-->
+<style is:global>
+	html[lang="de"] .lang-en { display: none !important; }
+	html[lang="en"] .lang-de { display: none !important; }
+</style>
+
+<script is:inline>
+	function updateLang(lang) {
+		document.documentElement.setAttribute('lang', lang);
+		localStorage.setItem('preferred-lang', lang);
+	}
+
+	const savedLang = localStorage.getItem('preferred-lang');
+	const browserLang = (navigator.language || navigator.userLanguage).startsWith('de') ? 'de' : 'en';
+	const initialLang = savedLang || browserLang;
+	updateLang(initialLang);
+
+	document.addEventListener('DOMContentLoaded', () => {
+		const btn = document.getElementById('lang-toggle');
+		if (btn) {
+			btn.addEventListener('click', () => {
+				const current = document.documentElement.getAttribute('lang') || 'en';
+				const next = current === 'en' ? 'de' : 'en';
+				updateLang(next);
+			});
+		}
+	});
+</script>

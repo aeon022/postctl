@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import FooterSignature from '../components/FooterSignature.astro';
+import LangToggle from '../components/LangToggle.astro';
 ---
 
 <Layout title="Impressum — postctl">
@@ -15,15 +16,28 @@ import FooterSignature from '../components/FooterSignature.astro';
       <span class="logo-icon">&gt;_</span>
       <span class="logo-text">postctl<span class="logo-blink">_</span></span>
     </a>
-    <a href="/" class="back-link">← Zurück zur Startseite</a>
+    <div class="tui-page-header-right">
+      <a href="/" class="back-link"><span class="lang-en">← Back to Home</span><span class="lang-de">← Zurück zur Startseite</span></a>
+      <button id="lang-toggle" class="lang-toggle-btn" aria-label="Toggle Language">
+        <span class="lang-en">DE</span>
+        <span class="lang-de">EN</span>
+      </button>
+    </div>
   </header>
 
   <main class="tui-page-main">
     <!-- Section Header -->
     <div class="tui-page-section-header">
-      <div class="section-tag">Rechtliches</div>
-      <h1 class="section-title">Impressum</h1>
-      <p class="section-subtitle">Offenlegung & Informationspflichten nach österreichischem ECG, UGB, GewO und MedienG.</p>
+      <div class="section-tag"><span class="lang-en">Legal</span><span class="lang-de">Rechtliches</span></div>
+      <h1 class="section-title"><span class="lang-en">Legal Notice</span><span class="lang-de">Impressum</span></h1>
+      <p class="section-subtitle">
+        <span class="lang-en">Disclosure & information obligations under Austrian ECG, UGB, GewO and MedienG law.</span>
+        <span class="lang-de">Offenlegung & Informationspflichten nach österreichischem ECG, UGB, GewO und MedienG.</span>
+      </p>
+      <p class="lang-note">
+        <span class="lang-en">This English version is a courtesy translation. The German version is legally binding.</span>
+        <span class="lang-de">Diese englische Version ist eine Übersetzung zur Information. Maßgeblich ist die deutsche Fassung.</span>
+      </p>
     </div>
 
     <!-- Legal Grid Layout -->
@@ -32,27 +46,27 @@ import FooterSignature from '../components/FooterSignature.astro';
       <div class="legal-card">
         <div class="card-label">// 01_ENTITY_INFORMATION</div>
         <div class="legal-row">
-          <span class="legal-key">Diensteanbieter:</span>
+          <span class="legal-key"><span class="lang-en">Service provider:</span><span class="lang-de">Diensteanbieter:</span></span>
           <span class="legal-val">Abteilung83</span>
         </div>
         <div class="legal-row">
-          <span class="legal-key">Inhaber:</span>
+          <span class="legal-key"><span class="lang-en">Owner:</span><span class="lang-de">Inhaber:</span></span>
           <span class="legal-val">Gerwin Weiher</span>
         </div>
         <div class="legal-row">
-          <span class="legal-key">Rechtsform:</span>
-          <span class="legal-val">Einzelunternehmer</span>
+          <span class="legal-key"><span class="lang-en">Legal form:</span><span class="lang-de">Rechtsform:</span></span>
+          <span class="legal-val"><span class="lang-en">Sole Proprietor</span><span class="lang-de">Einzelunternehmer</span></span>
         </div>
         <div class="legal-row">
-          <span class="legal-key">Gegenstand:</span>
-          <span class="legal-val">IT-Dienstleistungen</span>
+          <span class="legal-key"><span class="lang-en">Business activity:</span><span class="lang-de">Gegenstand:</span></span>
+          <span class="legal-val"><span class="lang-en">IT Services</span><span class="lang-de">IT-Dienstleistungen</span></span>
         </div>
         <div class="legal-row">
-          <span class="legal-key">Ort:</span>
-          <span class="legal-val">8010 Graz, Österreich</span>
+          <span class="legal-key"><span class="lang-en">Location:</span><span class="lang-de">Ort:</span></span>
+          <span class="legal-val"><span class="lang-en">8010 Graz, Austria</span><span class="lang-de">8010 Graz, Österreich</span></span>
         </div>
         <div class="legal-row">
-          <span class="legal-key">Anschrift:</span>
+          <span class="legal-key"><span class="lang-en">Address:</span><span class="lang-de">Anschrift:</span></span>
           <span class="legal-val">Steyrergasse 88/4</span>
         </div>
       </div>
@@ -61,7 +75,7 @@ import FooterSignature from '../components/FooterSignature.astro';
       <div class="legal-card">
         <div class="card-label">// 02_COMMUNICATION_UPLINK</div>
         <div class="legal-row">
-          <span class="legal-key">Tel:</span>
+          <span class="legal-key"><span class="lang-en">Phone:</span><span class="lang-de">Tel:</span></span>
           <span class="legal-val">
             <a href="tel:+436605672361" class="accent-link">+43 660 567 23 61</a>
           </span>
@@ -82,17 +96,17 @@ import FooterSignature from '../components/FooterSignature.astro';
       <div class="legal-card">
         <div class="card-label">// 03_LEGAL_FRAMEWORK</div>
         <div class="legal-row">
-          <span class="legal-key">Mitgliedschaft:</span>
+          <span class="legal-key"><span class="lang-en">Chamber membership:</span><span class="lang-de">Mitgliedschaft:</span></span>
           <span class="legal-val">WKO Steiermark, Fachgruppe UBIT</span>
         </div>
         <div class="legal-row">
-          <span class="legal-key">Behörde:</span>
+          <span class="legal-key"><span class="lang-en">Supervisory authority:</span><span class="lang-de">Behörde:</span></span>
           <span class="legal-val">Magistrat der Stadt Graz</span>
         </div>
         <div class="legal-row">
-          <span class="legal-key">Rechtsvorschriften:</span>
+          <span class="legal-key"><span class="lang-en">Applicable law:</span><span class="lang-de">Rechtsvorschriften:</span></span>
           <span class="legal-val">
-            <a href="https://www.ris.bka.gv.at" target="_blank" rel="noopener noreferrer" class="accent-link underline">Gewerbeordnung</a>
+            <a href="https://www.ris.bka.gv.at" target="_blank" rel="noopener noreferrer" class="accent-link underline"><span class="lang-en">Trade Regulation Act (Gewerbeordnung)</span><span class="lang-de">Gewerbeordnung</span></a>
           </span>
         </div>
       </div>
@@ -101,9 +115,16 @@ import FooterSignature from '../components/FooterSignature.astro';
       <div class="legal-card">
         <div class="card-label">// 04_DISPUTE_RESOLUTION</div>
         <p class="card-text">
-          Verbraucher haben die Möglichkeit, Beschwerden an die Online-Streitbeilegungsplattform der EU zu richten: 
-          <a href="http://ec.europa.eu/odr" target="_blank" rel="noopener noreferrer" class="accent-link underline">http://ec.europa.eu/odr</a>. 
-          Allfällige Beschwerden können auch an die oben angegebene E-Mail-Adresse gerichtet werden.
+          <span class="lang-en">
+            Consumers have the option of submitting complaints to the EU Online Dispute Resolution platform:
+            <a href="http://ec.europa.eu/odr" target="_blank" rel="noopener noreferrer" class="accent-link underline">http://ec.europa.eu/odr</a>.
+            Complaints can also be directed to the e-mail address given above.
+          </span>
+          <span class="lang-de">
+            Verbraucher haben die Möglichkeit, Beschwerden an die Online-Streitbeilegungsplattform der EU zu richten:
+            <a href="http://ec.europa.eu/odr" target="_blank" rel="noopener noreferrer" class="accent-link underline">http://ec.europa.eu/odr</a>.
+            Allfällige Beschwerden können auch an die oben angegebene E-Mail-Adresse gerichtet werden.
+          </span>
         </p>
       </div>
     </div>
@@ -113,22 +134,33 @@ import FooterSignature from '../components/FooterSignature.astro';
       <div class="card-label">// 05_DISCLAIMER_PROTOCOL</div>
       <div class="disclaimer-grid">
         <div class="disclaimer-col">
-          <h4 class="col-title">Haftung für Inhalte</h4>
-          <p class="col-text">Als Diensteanbieter bin ich für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Ich bin jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.</p>
+          <h4 class="col-title"><span class="lang-en">Liability for Content</span><span class="lang-de">Haftung für Inhalte</span></h4>
+          <p class="col-text">
+            <span class="lang-en">As a service provider, I am responsible for my own content on these pages under general law. However, I am not obligated to monitor transmitted or stored third-party information.</span>
+            <span class="lang-de">Als Diensteanbieter bin ich für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Ich bin jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.</span>
+          </p>
         </div>
         <div class="disclaimer-col">
-          <h4 class="col-title">Haftung für Links</h4>
-          <p class="col-text">Mein Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte ich keinen Einfluss habe. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich.</p>
+          <h4 class="col-title"><span class="lang-en">Liability for Links</span><span class="lang-de">Haftung für Links</span></h4>
+          <p class="col-text">
+            <span class="lang-en">My offering contains links to external third-party websites over whose content I have no control. The respective provider or operator is always responsible for the content of the linked pages.</span>
+            <span class="lang-de">Mein Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte ich keinen Einfluss habe. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich.</span>
+          </p>
         </div>
         <div class="disclaimer-col">
-          <h4 class="col-title">Urheberrecht</h4>
-          <p class="col-text">Die durch mich erstellten Inhalte auf diesen Seiten unterliegen dem österreichischen Urheberrecht. Beiträge Dritter sind als solche gekennzeichnet.</p>
+          <h4 class="col-title"><span class="lang-en">Copyright</span><span class="lang-de">Urheberrecht</span></h4>
+          <p class="col-text">
+            <span class="lang-en">The content created by me on these pages is subject to Austrian copyright law. Third-party contributions are marked as such.</span>
+            <span class="lang-de">Die durch mich erstellten Inhalte auf diesen Seiten unterliegen dem österreichischen Urheberrecht. Beiträge Dritter sind als solche gekennzeichnet.</span>
+          </p>
         </div>
       </div>
     </div>
   </main>
 
   <FooterSignature />
+
+  <LangToggle />
 </Layout>
 
 <style>
@@ -296,6 +328,11 @@ import FooterSignature from '../components/FooterSignature.astro';
     50% { opacity: 1; }
   }
 
+  .tui-page-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
   .back-link {
     color: rgba(255, 255, 255, 0.5);
     font-family: monospace;
@@ -310,6 +347,26 @@ import FooterSignature from '../components/FooterSignature.astro';
     color: #8b7cf8;
     border-color: #8b7cf8;
     background: rgba(139, 124, 248, 0.05);
+  }
+  .lang-toggle-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lang-toggle-btn:hover {
+    background: rgba(139, 124, 248, 0.15);
+    border-color: rgba(139, 124, 248, 0.4);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(139, 124, 248, 0.2);
   }
 
   .tui-page-main {
@@ -348,6 +405,12 @@ import FooterSignature from '../components/FooterSignature.astro';
     color: rgba(255, 255, 255, 0.6);
     font-size: 1.1rem;
     line-height: 1.6;
+  }
+  .lang-note {
+    color: rgba(255, 255, 255, 0.35);
+    font-family: monospace;
+    font-size: 0.78rem;
+    margin-top: 0.75rem;
   }
 
   @media (max-width: 480px) {

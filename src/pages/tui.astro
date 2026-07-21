@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import LangToggle from '../components/LangToggle.astro';
 ---
 
 <Layout title="postctl — Interactive TUI Demo">
@@ -14,15 +15,24 @@ import Layout from '../layouts/Layout.astro';
 			<span class="logo-icon">&gt;_</span>
 			<span class="logo-text">postctl<span class="logo-blink">_</span></span>
 		</a>
-		<a href="/" class="back-link">← Back to Home</a>
+		<div class="tui-page-header-right">
+			<a href="/" class="back-link"><span class="lang-en">← Back to Home</span><span class="lang-de">← Zurück zur Startseite</span></a>
+			<button id="lang-toggle" class="lang-toggle-btn" aria-label="Toggle Language">
+				<span class="lang-en">DE</span>
+				<span class="lang-de">EN</span>
+			</button>
+		</div>
 	</header>
 
 	<main class="tui-page-main">
 		<!-- Section Header -->
 		<div class="tui-page-section-header">
-			<div class="section-tag">Live Demo</div>
-			<h1 class="section-title">Interactive TUI Demo</h1>
-			<p class="section-subtitle">A faithful replica of the postctl terminal UI. Click the window, then use <kbd class="kbd">Tab</kbd> or <kbd class="kbd">←→</kbd> to switch tabs, <kbd class="kbd">↑↓</kbd> to navigate, and <kbd class="kbd">Enter</kbd> to interact.</p>
+			<div class="section-tag"><span class="lang-en">Live Demo</span><span class="lang-de">Live-Demo</span></div>
+			<h1 class="section-title"><span class="lang-en">Interactive TUI Demo</span><span class="lang-de">Interaktive TUI-Demo</span></h1>
+			<p class="section-subtitle">
+				<span class="lang-en">A faithful replica of the postctl terminal UI. Click the window, then use <kbd class="kbd">Tab</kbd> or <kbd class="kbd">←→</kbd> to switch tabs, <kbd class="kbd">↑↓</kbd> to navigate, and <kbd class="kbd">Enter</kbd> to interact.</span>
+				<span class="lang-de">Eine originalgetreue Nachbildung der postctl-Terminal-UI. Klicke in das Fenster und nutze dann <kbd class="kbd">Tab</kbd> oder <kbd class="kbd">←→</kbd> zum Wechseln der Tabs, <kbd class="kbd">↑↓</kbd> zur Navigation und <kbd class="kbd">Enter</kbd> zur Auswahl.</span>
+			</p>
 		</div>
 
 		<!-- TUI Window -->
@@ -308,9 +318,12 @@ import Layout from '../layouts/Layout.astro';
 		</div>
 
 		<div class="tui-demo-hint">
-			Click the window to focus · <kbd class="kbd">Tab</kbd> switches tabs · <kbd class="kbd">↑↓</kbd> navigates · <kbd class="kbd">Enter</kbd> to interact
+			<span class="lang-en">Click the window to focus · <kbd class="kbd">Tab</kbd> switches tabs · <kbd class="kbd">↑↓</kbd> navigates · <kbd class="kbd">Enter</kbd> to interact</span>
+			<span class="lang-de">Fenster anklicken zum Fokussieren · <kbd class="kbd">Tab</kbd> wechselt Tabs · <kbd class="kbd">↑↓</kbd> navigiert · <kbd class="kbd">Enter</kbd> zur Auswahl</span>
 		</div>
 	</main>
+
+	<LangToggle />
 </Layout>
 
 <style>
@@ -375,6 +388,11 @@ import Layout from '../layouts/Layout.astro';
 		0%, 100% { opacity: 0; }
 		50% { opacity: 1; }
 	}
+	.tui-page-header-right {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
 	.back-link {
 		color: var(--text-secondary);
 		font-family: var(--font-mono);
@@ -387,6 +405,26 @@ import Layout from '../layouts/Layout.astro';
 	.back-link:hover {
 		color: var(--accent);
 		border-color: var(--accent);
+	}
+	.lang-toggle-btn {
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		color: #e2e8f0;
+		padding: 0.25rem 0.6rem;
+		border-radius: 6px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.lang-toggle-btn:hover {
+		background: rgba(139, 124, 248, 0.15);
+		border-color: rgba(139, 124, 248, 0.4);
+		color: #fff;
+		box-shadow: 0 0 10px rgba(139, 124, 248, 0.2);
 	}
 
 	/* Main content */
