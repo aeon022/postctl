@@ -34,3 +34,6 @@ node_modules/
 
 # Private licensing credentials
 dev-licenses.md
+
+# Local worktree checkout of the deploy/landing branch (see AGENTS.md)
+/.worktree-landing/
