@@ -33,8 +33,10 @@ import FooterSignature from '../components/FooterSignature.astro';
 	<header class="header">
 		<div class="header-capsule">
 			<div class="logo">
-				<span class="logo-icon">&gt;_</span>
-				<span class="logo-text">postctl<span class="logo-blink">_</span></span>
+				<a href="/" class="logo-link">
+					<span class="logo-icon">&gt;_</span>
+					<span class="logo-text">postctl<span class="logo-blink">_</span></span>
+				</a>
 				<span class="system-status"><span class="status-dot"></span>SYS_OK</span>
 			</div>
 			<nav class="nav" id="main-nav">
@@ -1175,6 +1177,17 @@ Campaign successfully posted!
 		font-family: var(--font-heading);
 		font-size: 1.25rem;
 		font-weight: 700;
+	}
+	.logo-link {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		text-decoration: none;
+		color: inherit;
+		transition: var(--transition);
+	}
+	.logo-link:hover {
+		opacity: 0.85;
 	}
 	.logo-icon {
 		color: var(--accent);
