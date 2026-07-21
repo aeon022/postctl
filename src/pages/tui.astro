@@ -497,6 +497,8 @@ import Layout from '../layouts/Layout.astro';
 		padding: 0;
 		gap: 2px;
 		margin-bottom: 1.5rem;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
 	}
 	.tui-tab-btn {
 		background: #1a202c;
@@ -515,6 +517,8 @@ import Layout from '../layouts/Layout.astro';
 		position: relative;
 		bottom: -2px; /* overlap with tabbar border-bottom */
 		z-index: 1;
+		flex-shrink: 0;
+		white-space: nowrap;
 		transition: color 0.15s ease;
 	}
 	.tui-tab-btn:hover { color: #cbd5e0; }

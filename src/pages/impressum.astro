@@ -349,4 +349,36 @@ import FooterSignature from '../components/FooterSignature.astro';
     font-size: 1.1rem;
     line-height: 1.6;
   }
+
+  @media (max-width: 480px) {
+    .tui-page-main {
+      padding: 1rem 1rem 3rem;
+    }
+    .legal-card {
+      padding: 1.25rem;
+    }
+    .disclaimer-panel {
+      padding: 1.5rem;
+    }
+    .disclaimer-grid {
+      grid-template-columns: 1fr;
+    }
+    .legal-grid {
+      grid-template-columns: 1fr;
+    }
+    .legal-row {
+      flex-wrap: wrap;
+      gap: 0.15rem;
+    }
+    .legal-key,
+    .legal-val {
+      overflow-wrap: anywhere;
+    }
+    .legal-val {
+      text-align: left;
+    }
+    .section-title {
+      font-size: 2rem;
+    }
+  }
 </style>

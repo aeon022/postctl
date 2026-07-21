@@ -29,7 +29,7 @@ import * as TutorialDocEn from '../../documents/TUTORIAL-en.md';
 				</a>
 				<span class="system-status"><span class="status-dot"></span>DOCS_ONLINE</span>
 			</div>
-			<nav class="nav" style="display: flex; align-items: center; gap: 1rem;">
+			<nav class="nav" id="main-nav">
         <a href="/" class="nav-link"><span class="lang-en">Home</span><span class="lang-de">Start</span></a>
         <a href="/#features" class="nav-link"><span class="lang-en">Features</span><span class="lang-de">Funktionen</span></a>
         <a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="lang-en">Support</span><span class="lang-de">Unterstützen</span></a>
@@ -42,6 +42,9 @@ import * as TutorialDocEn from '../../documents/TUTORIAL-en.md';
             <span class="lang-de">EN</span>
         </button>
 			</nav>
+			<button id="mobile-nav-toggle" class="mobile-nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="main-nav">
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+			</button>
 		</div>
 	</header>
 
@@ -487,6 +490,30 @@ images: ["logo.png"]
 				});
 			}
 
+			// Setup mobile nav toggle
+			const navToggle = document.getElementById('mobile-nav-toggle');
+			const mainNav = document.getElementById('main-nav');
+			if (navToggle && mainNav) {
+				const closeNav = () => {
+					mainNav.classList.remove('nav-open');
+					navToggle.setAttribute('aria-expanded', 'false');
+				};
+				navToggle.addEventListener('click', (e) => {
+					e.stopPropagation();
+					const isOpen = mainNav.classList.toggle('nav-open');
+					navToggle.setAttribute('aria-expanded', String(isOpen));
+				});
+				mainNav.addEventListener('click', (e) => {
+					if (e.target.closest && e.target.closest('a')) closeNav();
+				});
+				document.addEventListener('click', (e) => {
+					if (!mainNav.contains(e.target) && !navToggle.contains(e.target)) closeNav();
+				});
+				document.addEventListener('keydown', (e) => {
+					if (e.key === 'Escape') closeNav();
+				});
+			}
+
 			// Split README content into en/de sections dynamically
 			const introSec = document.getElementById('doc-introduction');
 			if (introSec) {
@@ -563,6 +590,7 @@ images: ["logo.png"]
 		pointer-events: none;
 	}
 	.header-capsule {
+		position: relative;
 		pointer-events: auto;
 		display: flex;
 		justify-content: space-between;
@@ -575,11 +603,28 @@ images: ["logo.png"]
 		backdrop-filter: blur(20px) saturate(190%);
 		border: 1px solid rgba(255, 255, 255, 0.08);
 		border-radius: 100px;
-		box-shadow: 
+		box-shadow:
 			0 12px 40px rgba(0, 0, 0, 0.5),
 			0 0 0 1px rgba(139, 124, 248, 0.05),
 			inset 0 1px 0 rgba(255, 255, 255, 0.05);
 		transition: var(--transition);
+	}
+	.mobile-nav-toggle {
+		display: none;
+		align-items: center;
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		flex-shrink: 0;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 8px;
+		color: var(--text-primary);
+		cursor: pointer;
+		transition: var(--transition);
+	}
+	.mobile-nav-toggle:hover {
+		background: rgba(255, 255, 255, 0.08);
 	}
 	@media (max-width: 1024px) {
 		.header-capsule {
@@ -683,8 +728,38 @@ images: ["logo.png"]
 		}
 	}
 	@media (max-width: 768px) {
+		.mobile-nav-toggle {
+			display: inline-flex;
+		}
 		.nav {
-			display: none;
+			flex-direction: column;
+			align-items: stretch;
+			gap: 0.15rem;
+			position: absolute;
+			top: calc(100% + 0.6rem);
+			left: 0;
+			right: 0;
+			background: rgba(13, 14, 18, 0.96);
+			backdrop-filter: blur(20px) saturate(190%);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			border-radius: 20px;
+			padding: 0.6rem;
+			box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(-8px);
+			transition: var(--transition);
+		}
+		.nav.nav-open {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
+		.nav .nav-link,
+		.nav .github-link,
+		.nav .lang-toggle-btn {
+			width: 100%;
+			justify-content: flex-start;
 		}
 	}
 	.nav-link {
@@ -1254,9 +1329,11 @@ images: ["logo.png"]
 			navItems.forEach(item => {
 				if (item.getAttribute("data-doc") === docId) {
 					item.classList.add("active");
-					// Update mobile title
+					// Update mobile title (use only the currently active language span)
 					if (mobileDocTitle) {
-						mobileDocTitle.textContent = item.textContent;
+						const currentLang = document.documentElement.getAttribute("lang") || "en";
+						const langSpan = item.querySelector(`.lang-${currentLang}`);
+						mobileDocTitle.textContent = langSpan ? langSpan.textContent : item.textContent;
 					}
 				} else {
 					item.classList.remove("active");
