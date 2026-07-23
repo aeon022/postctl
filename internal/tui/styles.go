@@ -8,7 +8,7 @@ import (
 var (
 	ColorPrimary   = lipgloss.AdaptiveColor{Light: "25",  Dark: "33"}  // blue (header, borders)
 	ColorSecondary = lipgloss.AdaptiveColor{Light: "30",  Dark: "43"}  // teal (active/selected)
-	ColorDarkGray  = lipgloss.AdaptiveColor{Light: "250", Dark: "239"} // subtle (inactive borders)
+	ColorDarkGray  = lipgloss.AdaptiveColor{Light: "250", Dark: "244"} // subtle (inactive borders)
 	ColorLightGray = lipgloss.AdaptiveColor{Light: "243", Dark: "246"} // muted (metadata, help)
 	ColorBgFg      = lipgloss.AdaptiveColor{Light: "232", Dark: "255"} // badge foreground (dark/light swap)
 
