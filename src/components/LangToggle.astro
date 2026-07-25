@@ -5,13 +5,10 @@
 
     <span class="lang-en">Hello</span><span class="lang-de">Hallo</span>
 
-  which this component's global CSS shows/hides based on <html lang>.
+  The show/hide CSS for lang-en/lang-de lives in layouts/Layout.astro, not
+  here — a <style is:global> in a component with no rendered DOM output
+  gets silently dropped by Astro's bundler.
 -->
-<style is:global>
-	html[lang="de"] .lang-en { display: none !important; }
-	html[lang="en"] .lang-de { display: none !important; }
-</style>
-
 <script is:inline>
 	function updateLang(lang) {
 		document.documentElement.setAttribute('lang', lang);

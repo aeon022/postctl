@@ -107,6 +107,13 @@ const ogImageURL = new URL('/screenshots/01-dashboard.png', Astro.site || Astro.
 		padding: 0;
 	}
 
+	/* EN/DE language toggle (see components/LangToggle.astro for the JS half).
+	   Must live here, not in LangToggle.astro: Astro drops <style is:global>
+	   from components that render no DOM output, so it silently never made
+	   it into the built CSS and both languages showed at once everywhere. */
+	html[lang="de"] .lang-en { display: none !important; }
+	html[lang="en"] .lang-de { display: none !important; }
+
 	html {
 		scroll-behavior: smooth;
 		background-color: var(--bg-primary);
