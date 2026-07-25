@@ -4,33 +4,38 @@ This guide explains how to edit, build, and publish/deploy changes to the `postc
 
 ## Git Repository & Branch Structure
 
-- The website source code lives on the branch **`deploy/landing`** of the `postctl` repository (NOT `missionctl`).
+Two branches, two purposes — kept separate so Plesk's `git pull` only ever fetches the site, never the Astro source, docs, or stray build artifacts:
+
+- **`deploy/landing-src`** — the Astro source (components, pages, docs, README, etc.). All editing happens here.
+- **`deploy/landing`** — the *built* static site only (what used to be `dist/`), flattened to the branch root. This is the branch Plesk's Git integration is connected to; its document root can point straight at the repo root, no subfolder config needed.
 - The `main` branch of the `postctl` repository contains only the CLI & TUI tool source code.
-- **Push landing-page changes only to `deploy/landing`.** Never push them to `main`, and never leave them on a throwaway `worktree-agent-*` branch — those are session-local and must be deleted (locally and on the remote, if pushed) once the work is merged or abandoned.
+- **Never** push landing-page changes to `main`, and never leave them on a throwaway `worktree-agent-*` branch — those are session-local and must be deleted (locally and on the remote, if pushed) once the work is merged or abandoned.
 
 ## Folder Structure Rule (applies to every project with its own landing page, not just postctl)
 
-The `deploy/landing` worktree checkout is always a hidden subfolder **inside the project it belongs to**, named **`.worktree-landing/`**. It is never a sibling folder one level up (e.g. `../postctl-landing`), and a project never gets a second or third copy of it. For postctl that means:
+Two hidden worktree subfolders **inside the project it belongs to**, never sibling folders one level up:
 
 ```
-missionctl/postctl/                  ← postctl repo, branch main (CLI/TUI source)
-missionctl/postctl/.worktree-landing/ ← same repo, branch deploy/landing (website source)
+missionctl/postctl/                          ← postctl repo, branch main (CLI/TUI source)
+missionctl/postctl/.worktree-landing/         ← same repo, branch deploy/landing-src (Astro source — edit here)
+missionctl/postctl/.worktree-landing-publish/ ← same repo, branch deploy/landing (built site only — Plesk pulls this)
 ```
 
-`.worktree-landing/` is listed in `postctl/.gitignore` so it never shows up as untracked content on `main`.
+Both are listed in `postctl/.gitignore` so neither shows up as untracked content on `main`.
 
 ## How to Work on the Landing Page & Docs
 
-1. **Access the Website Source Code:**
-   If the worktree does not exist yet, create it from inside the `postctl` repo root:
+1. **Access the worktrees:**
+   If they don't exist yet, create them from inside the `postctl` repo root:
    ```bash
    cd /Users/gweiher/Developing/Projects/missionctl/postctl
-   git worktree add ./.worktree-landing deploy/landing
+   git worktree add ./.worktree-landing deploy/landing-src
+   git worktree add ./.worktree-landing-publish deploy/landing
    ```
-   All editing and building happens in `/Users/gweiher/Developing/Projects/missionctl/postctl/.worktree-landing`.
+   All editing happens in `.worktree-landing`. `.worktree-landing-publish` is a build target — don't hand-edit files there.
 
 2. **Synchronize Docs (if code changes were made on main):**
-   The website docs are rendered directly from the repository Markdown files. If you modified `README.md` or files in `docs/` or `documents/` on the `main` branch, synchronize them to the landing page directory:
+   The website docs are rendered directly from the repository Markdown files. If you modified `README.md` or files in `docs/` or `documents/` on the `main` branch, synchronize them to the source worktree:
    ```bash
    cp /Users/gweiher/Developing/Projects/missionctl/postctl/README.md /Users/gweiher/Developing/Projects/missionctl/postctl/.worktree-landing/README.md
    cp -r /Users/gweiher/Developing/Projects/missionctl/postctl/docs/ /Users/gweiher/Developing/Projects/missionctl/postctl/.worktree-landing/docs/
@@ -45,23 +50,25 @@ missionctl/postctl/.worktree-landing/ ← same repo, branch deploy/landing (webs
    ```
    *(The dev server will run on http://localhost:4322 since http://localhost:4321 is typically taken by the main missionctl landing page).*
 
-4. **Build the Site (CRITICAL):**
-   Before pushing, you MUST rebuild the static production pages to update the `dist/` directory. If you do not rebuild the site, the deployed website will not show any of your changes!
+4. **Build & Sync to the Publish Worktree:**
+   Run the helper script — it builds the source worktree and rsyncs the fresh `dist/` output into `.worktree-landing-publish`, then stages the changes there for review:
    ```bash
-   npm run build
+   /Users/gweiher/Developing/Projects/missionctl/postctl/.worktree-landing/scripts/publish.sh
    ```
+   Review the `git status`/`git diff` it prints before committing. Never push straight from the source worktree — the site branch only ever gets built output, never `src/`.
 
 5. **Commit and Push (Unsandboxed Git):**
    The environment's default sandboxed terminal blocks outbound TCP requests to GitHub. You MUST request `unsandboxed(git)` permission to run the push command.
    ```bash
-   git add .
-   git commit -m "build: regenerate static production pages inside dist/"
+   cd /Users/gweiher/Developing/Projects/missionctl/postctl/.worktree-landing-publish
+   git commit -m "build: regenerate static production pages"
    git push origin deploy/landing
    ```
+   If source changes should also be preserved/shared, commit and push `deploy/landing-src` from `.worktree-landing` too (not required for the site to go live, but keeps source history from being local-only).
 
 ## Cleaning Up After a Session
 
-If you created any extra worktree (e.g. an isolated agent worktree for a one-off task) that is not `.worktree-landing/`, remove it and its branch once done — don't leave it in the repo:
+If you created any extra worktree (e.g. an isolated agent worktree for a one-off task) that is not `.worktree-landing/` or `.worktree-landing-publish/`, remove it and its branch once done — don't leave it in the repo:
 ```bash
 git worktree remove <path>
 git branch -D <branch>
