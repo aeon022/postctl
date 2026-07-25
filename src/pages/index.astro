@@ -121,9 +121,9 @@ import LangToggle from '../components/LangToggle.astro';
 		<section id="tui-demo" class="tui-demo-section">
 			<div class="container">
 				<div class="section-header">
-					<div class="section-tag">Live Demo</div>
-					<h2 class="section-title">Try the TUI</h2>
-					<p class="section-subtitle">A faithful replica of the postctl terminal UI. Click the window to focus, then use <kbd class="kbd">Tab</kbd> to switch tabs and <kbd class="kbd">↑↓</kbd> to navigate.</p>
+					<div class="section-tag"><span class="lang-en">Live Demo</span><span class="lang-de">Live-Demo</span></div>
+					<h2 class="section-title"><span class="lang-en">Try the TUI</span><span class="lang-de">TUI ausprobieren</span></h2>
+					<p class="section-subtitle"><span class="lang-en">A faithful replica of the postctl terminal UI. Click the window to focus, then use <kbd class="kbd">Tab</kbd> to switch tabs and <kbd class="kbd">↑↓</kbd> to navigate.</span><span class="lang-de">Eine originalgetreue Nachbildung der postctl-Terminal-UI. Klicke in das Fenster und nutze dann <kbd class="kbd">Tab</kbd> zum Wechseln der Tabs und <kbd class="kbd">↑↓</kbd> zur Navigation.</span></p>
 				</div>
 
 				<div class="tui-window" id="tui-window" tabindex="0" aria-label="Interactive TUI demo">
@@ -417,46 +417,46 @@ import LangToggle from '../components/LangToggle.astro';
 		<section id="features" class="features-section">
 			<div class="container">
 				<div class="section-header">
-					<h2 class="section-title">Built for Developer Workflows</h2>
-					<p class="section-subtitle">Why switch to bloated web UIs when you can distribute your content alongside your code?</p>
+					<h2 class="section-title"><span class="lang-en">Built for Developer Workflows</span><span class="lang-de">Für Entwickler-Workflows gebaut</span></h2>
+					<p class="section-subtitle"><span class="lang-en">Why switch to bloated web UIs when you can distribute your content alongside your code?</span><span class="lang-de">Wozu aufgeblähte Web-UIs, wenn du deine Inhalte direkt neben deinem Code verwalten kannst?</span></p>
 				</div>
 
 				<div class="features-grid">
 					<!-- Feature 1 -->
 					<div class="feature-card">
 						<div class="feature-icon"><FileText size={40} /></div>
-						<h3 class="feature-title">Markdown-First</h3>
-						<p class="feature-desc">Write your posts inside your favorite editor. Frontmatter fields handle platform targets, scheduling, and image paths. Perfectly Git-versionable and reviewable in PRs.</p>
+						<h3 class="feature-title"><span class="lang-en">Markdown-First</span><span class="lang-de">Markdown-First</span></h3>
+						<p class="feature-desc"><span class="lang-en">Write your posts inside your favorite editor. Frontmatter fields handle platform targets, scheduling, and image paths. Perfectly Git-versionable and reviewable in PRs.</span><span class="lang-de">Schreibe deine Posts in deinem Lieblingseditor. Frontmatter-Felder steuern Plattform-Ziele, Zeitplanung und Bildpfade. Perfekt Git-versionierbar und in PRs überprüfbar.</span></p>
 					</div>
 					<!-- Feature 2 -->
 					<div class="feature-card">
 						<div class="feature-icon"><Terminal size={40} /></div>
-						<h3 class="feature-title">Interactive TUI Editor</h3>
-						<p class="feature-desc">Draft and edit posts directly inside the terminal. Form validations catch platform errors, automatic splitting parses Twitter threads, and `ctrl+v` opens Neovim/Vim instantly.</p>
+						<h3 class="feature-title"><span class="lang-en">Interactive TUI Editor</span><span class="lang-de">Interaktiver TUI-Editor</span></h3>
+						<p class="feature-desc"><span class="lang-en">Draft and edit posts directly inside the terminal. Form validations catch platform errors, automatic splitting parses Twitter threads, and `ctrl+v` opens Neovim/Vim instantly.</span><span class="lang-de">Entwirf und bearbeite Posts direkt im Terminal. Formularvalidierungen fangen Plattformfehler ab, automatisches Splitting zerlegt Twitter-Threads, und `ctrl+v` öffnet sofort Neovim/Vim.</span></p>
 					</div>
 					<!-- Feature 3 -->
 					<div class="feature-card">
 						<div class="feature-icon"><Bot size={40} /></div>
-						<h3 class="feature-title">AI-as-Operator</h3>
-						<p class="feature-desc">Engineered for AI assistants. Claude/GPT can generate Markdown draft files, test publication flows with `--dry-run`, and receive machine-readable outcomes using `--format json`.</p>
+						<h3 class="feature-title"><span class="lang-en">AI-as-Operator</span><span class="lang-de">KI-als-Operator</span></h3>
+						<p class="feature-desc"><span class="lang-en">Engineered for AI assistants. Claude/GPT can generate Markdown draft files, test publication flows with `--dry-run`, and receive machine-readable outcomes using `--format json`.</span><span class="lang-de">Für KI-Assistenten konzipiert. Claude/GPT können Markdown-Entwürfe erzeugen, Veröffentlichungsabläufe mit `--dry-run` testen und mit `--format json` maschinenlesbare Ergebnisse erhalten.</span></p>
 					</div>
 					<!-- Feature 4 -->
 					<div class="feature-card">
 						<div class="feature-icon"><Zap size={40} /></div>
-						<h3 class="feature-title">Zero Infrastructure</h3>
-						<p class="feature-desc">Built in Go with a CGO-free SQLite storage engine. Packaged as a single offline-first binary. Copy the database file to backup all your posts and schedules.</p>
+						<h3 class="feature-title"><span class="lang-en">Zero Infrastructure</span><span class="lang-de">Keine Infrastruktur nötig</span></h3>
+						<p class="feature-desc"><span class="lang-en">Built in Go with a CGO-free SQLite storage engine. Packaged as a single offline-first binary. Copy the database file to backup all your posts and schedules.</span><span class="lang-de">Gebaut in Go mit einer CGO-freien SQLite-Speicher-Engine. Verpackt als einzelnes Offline-First-Binary. Kopiere einfach die Datenbankdatei, um alle Posts und Zeitpläne zu sichern.</span></p>
 					</div>
 					<!-- Feature 5 -->
 					<div class="feature-card">
 						<div class="feature-icon"><BookOpen size={40} /></div>
-						<h3 class="feature-title">Offline Documentation</h3>
-						<p class="feature-desc">Access the full README directly inside the app with a split-pane layout, interactive table of contents, and responsive terminal scrolling—no browser required.</p>
+						<h3 class="feature-title"><span class="lang-en">Offline Documentation</span><span class="lang-de">Offline-Dokumentation</span></h3>
+						<p class="feature-desc"><span class="lang-en">Access the full README directly inside the app with a split-pane layout, interactive table of contents, and responsive terminal scrolling—no browser required.</span><span class="lang-de">Greife direkt in der App auf das komplette README zu — mit geteiltem Layout, interaktivem Inhaltsverzeichnis und responsivem Terminal-Scrolling, ganz ohne Browser.</span></p>
 					</div>
 					<!-- Feature 6 -->
 					<div class="feature-card">
 						<div class="feature-icon"><Lock size={40} /></div>
-						<h3 class="feature-title">AES-256 Encrypted Sync</h3>
-						<p class="feature-desc">Securely sync your local database and config files. Backups are encrypted using AES-256-GCM and key-stretched (PBKDF2) for safe storage in public Git repos.</p>
+						<h3 class="feature-title"><span class="lang-en">AES-256 Encrypted Sync</span><span class="lang-de">AES-256-verschlüsselte Sync</span></h3>
+						<p class="feature-desc"><span class="lang-en">Securely sync your local database and config files. Backups are encrypted using AES-256-GCM and key-stretched (PBKDF2) for safe storage in public Git repos.</span><span class="lang-de">Synchronisiere deine lokale Datenbank und Konfigurationsdateien sicher. Backups werden mit AES-256-GCM verschlüsselt und per PBKDF2 key-gestreckt — sicher auch in öffentlichen Git-Repos.</span></p>
 					</div>
 					<!-- Feature 7 -->
 					<div class="feature-card">
@@ -478,8 +478,8 @@ import LangToggle from '../components/LangToggle.astro';
 		<section id="how-it-works" class="how-section">
 			<div class="container">
 				<div class="section-header">
-					<h2 class="section-title">How It Works</h2>
-					<p class="section-subtitle">Three steps from draft file to multi-platform publication.</p>
+					<h2 class="section-title"><span class="lang-en">How It Works</span><span class="lang-de">So funktioniert's</span></h2>
+					<p class="section-subtitle"><span class="lang-en">Three steps from draft file to multi-platform publication.</span><span class="lang-de">Drei Schritte von der Entwurfsdatei bis zur Veröffentlichung auf mehreren Plattformen.</span></p>
 				</div>
 
 				<div class="how-grid">
@@ -487,8 +487,8 @@ import LangToggle from '../components/LangToggle.astro';
 					<div class="how-step-card">
 						<div class="step-num">01</div>
 						<div class="step-text-col">
-							<h3 class="step-title">Write Markdown Posts</h3>
-							<p class="step-desc">Structure your post as Markdown. Frontmatter defines platforms, campaigns, schedule times, and tags. Separate thread elements using headers.</p>
+							<h3 class="step-title"><span class="lang-en">Write Markdown Posts</span><span class="lang-de">Posts in Markdown schreiben</span></h3>
+							<p class="step-desc"><span class="lang-en">Structure your post as Markdown. Frontmatter defines platforms, campaigns, schedule times, and tags. Separate thread elements using headers.</span><span class="lang-de">Strukturiere deinen Post als Markdown. Frontmatter definiert Plattformen, Kampagnen, Sendezeiten und Tags. Trenne Thread-Elemente mit Überschriften.</span></p>
 						</div>
 						<div class="step-visual">
 							<pre class="code-block"><code>---
@@ -513,8 +513,8 @@ Calendar grid screenshots attached...
 					<div class="how-step-card reverse">
 						<div class="step-num">02</div>
 						<div class="step-text-col">
-							<h3 class="step-title">Import & Preview</h3>
-							<p class="step-desc">Import the Markdown directory to populate the local SQLite database. Open the TUI to visually inspect thread limits, character lengths, and schedules.</p>
+							<h3 class="step-title"><span class="lang-en">Import & Preview</span><span class="lang-de">Importieren & Vorschau</span></h3>
+							<p class="step-desc"><span class="lang-en">Import the Markdown directory to populate the local SQLite database. Open the TUI to visually inspect thread limits, character lengths, and schedules.</span><span class="lang-de">Importiere das Markdown-Verzeichnis, um die lokale SQLite-Datenbank zu befüllen. Öffne die TUI, um Thread-Limits, Zeichenlängen und Zeitpläne visuell zu prüfen.</span></p>
 						</div>
 						<div class="step-visual">
 							<pre class="code-block"><code>$ postctl import ./posts/
@@ -534,8 +534,8 @@ launch-v1-linkedin  linkedin  single  draft
 					<div class="how-step-card">
 						<div class="step-num">03</div>
 						<div class="step-text-col">
-							<h3 class="step-title">Post or Run Daemon</h3>
-							<p class="step-desc">Publish campaigns instantly with `--dry-run` safety gates, or start `postctl daemon` in the background to automatically trigger scheduled items.</p>
+							<h3 class="step-title"><span class="lang-en">Post or Run Daemon</span><span class="lang-de">Posten oder Daemon starten</span></h3>
+							<p class="step-desc"><span class="lang-en">Publish campaigns instantly with `--dry-run` safety gates, or start `postctl daemon` in the background to automatically trigger scheduled items.</span><span class="lang-de">Veröffentliche Kampagnen sofort mit `--dry-run`-Sicherheitsprüfung, oder starte `postctl daemon` im Hintergrund, um geplante Posts automatisch auszulösen.</span></p>
 						</div>
 						<div class="step-visual">
 							<pre class="code-block"><code># Start background scheduler
@@ -556,13 +556,13 @@ Campaign successfully posted!
 		<section id="screenshots" class="screenshot-section">
 			<div class="container">
 				<div class="section-header">
-					<div class="section-tag">Visual Tour</div>
-					<h2 class="section-title">Terminal UI Preview</h2>
-					<p class="section-subtitle">Real screenshots of the Bubbletea TUI — Dashboard, Posts, Schedule & Settings tabs running in your terminal.</p>
+					<div class="section-tag"><span class="lang-en">Visual Tour</span><span class="lang-de">Visuelle Tour</span></div>
+					<h2 class="section-title"><span class="lang-en">Terminal UI Preview</span><span class="lang-de">Terminal-UI-Vorschau</span></h2>
+					<p class="section-subtitle"><span class="lang-en">Real screenshots of the Bubbletea TUI — Dashboard, Posts, Schedule & Settings tabs running in your terminal.</span><span class="lang-de">Echte Screenshots der Bubbletea-TUI — Dashboard-, Posts-, Zeitplan- & Einstellungen-Tabs live in deinem Terminal.</span></p>
 				</div>
 				<ScreenshotCarousel />
 				<div class="screenshot-hint">
-					<span>← → arrow keys to navigate</span>
+					<span class="lang-en">← → arrow keys to navigate</span><span class="lang-de">← → Pfeiltasten zum Navigieren</span>
 					<span class="hint-dot"></span>
 					<span>click thumbnails to jump</span>
 				</div>
@@ -734,8 +734,8 @@ Campaign successfully posted!
 		<section id="pricing" class="pricing-section">
 			<div class="container">
 				<div class="section-header">
-					<h2 class="section-title">Transparent Lifetime Pricing</h2>
-					<p class="section-subtitle">postctl is open-source. Use it for free with up to 2 networks, or buy a lifetime license for unlimited access.</p>
+					<h2 class="section-title"><span class="lang-en">Transparent Lifetime Pricing</span><span class="lang-de">Transparente Lifetime-Preise</span></h2>
+					<p class="section-subtitle"><span class="lang-en">postctl is open-source. Use it for free with up to 2 networks, or buy a lifetime license for unlimited access.</span><span class="lang-de">postctl ist Open-Source. Nutze es kostenlos mit bis zu 2 Netzwerken, oder erwirb eine Lifetime-Lizenz für unbegrenzten Zugriff.</span></p>
 				</div>
 
 				<div class="pricing-grid">
@@ -743,50 +743,50 @@ Campaign successfully posted!
 					<div class="pricing-card">
 						<div class="plan-header">
 							<h3 class="plan-name">Core (OSS)</h3>
-							<div class="plan-price">€0<span class="price-period">/ forever</span></div>
-							<p class="plan-desc">For developers looking to version and post files to their personal networks.</p>
+							<div class="plan-price">€0<span class="price-period"><span class="lang-en">/ forever</span><span class="lang-de">/ für immer</span></span></div>
+							<p class="plan-desc"><span class="lang-en">For developers looking to version and post files to their personal networks.</span><span class="lang-de">Für Entwickler, die Dateien versionieren und in ihren persönlichen Netzwerken posten möchten.</span></p>
 						</div>
 						<ul class="plan-features">
-							<li><span class="check-icon">✓</span> <span>Connect up to 2 social networks</span></li>
-							<li><span class="check-icon">✓</span> <span>Unlimited drafts & publication</span></li>
-							<li><span class="check-icon">✓</span> <span>Full Bubbletea TUI & Cobra CLI</span></li>
-							<li><span class="check-icon">✓</span> <span>In-process daemon background scheduler</span></li>
-							<li><span class="check-icon">✓</span> <span>Analytics Dashboard & ASCII charts</span></li>
-							<li><span class="check-icon">✓</span> <span>100% Open Source (MIT Licensed)</span></li>
+							<li><span class="check-icon">✓</span> <span><span class="lang-en">Connect up to 2 social networks</span><span class="lang-de">Bis zu 2 soziale Netzwerke verbinden</span></span></li>
+							<li><span class="check-icon">✓</span> <span><span class="lang-en">Unlimited drafts & publication</span><span class="lang-de">Unbegrenzte Entwürfe & Veröffentlichungen</span></span></li>
+							<li><span class="check-icon">✓</span> <span><span class="lang-en">Full Bubbletea TUI & Cobra CLI</span><span class="lang-de">Vollständige Bubbletea-TUI & Cobra-CLI</span></span></li>
+							<li><span class="check-icon">✓</span> <span><span class="lang-en">In-process daemon background scheduler</span><span class="lang-de">In-Process-Daemon als Hintergrund-Scheduler</span></span></li>
+							<li><span class="check-icon">✓</span> <span><span class="lang-en">Analytics Dashboard & ASCII charts</span><span class="lang-de">Analytics-Dashboard & ASCII-Diagramme</span></span></li>
+							<li><span class="check-icon">✓</span> <span><span class="lang-en">100% Open Source (MIT Licensed)</span><span class="lang-de">100% Open Source (MIT-Lizenz)</span></span></li>
 						</ul>
 						<div class="plan-cta" style="display: flex; flex-direction: column; gap: 0.75rem;">
-							<a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-full">View Repository on GitHub</a>
+							<a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-full"><span class="lang-en">View Repository on GitHub</span><span class="lang-de">Repository auf GitHub ansehen</span></a>
 							<a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="btn btn-tertiary btn-full">
-								<Heart class="heart-icon" size={14} /> Donate / Support Project
+								<Heart class="heart-icon" size={14} /> <span class="lang-en">Donate / Support Project</span><span class="lang-de">Spenden / Projekt unterstützen</span>
 							</a>
 						</div>
 					</div>
 
 					<!-- Pro Plan -->
 					<div class="pricing-card featured">
-						<div class="pricing-badge">Lifetime Access</div>
+						<div class="pricing-badge"><span class="lang-en">Lifetime Access</span><span class="lang-de">Lebenslanger Zugang</span></div>
 						<div class="plan-header">
 							<h3 class="plan-name">Pro License</h3>
 							<div class="plan-price">
 								<span class="price-original">€24</span>
 								<span class="price-amount">€15</span>
-								<span class="price-period">/ one-time</span>
+								<span class="price-period"><span class="lang-en">/ one-time</span><span class="lang-de">/ einmalig</span></span>
 							</div>
-							<div class="launch-special-tag">Launch Special — Save 37%</div>
+							<div class="launch-special-tag"><span class="lang-en">Launch Special — Save 37%</span><span class="lang-de">Launch-Special — 37% sparen</span></div>
 							<div class="promo-code-box">
-								<span class="promo-label">Code:</span>
+								<span class="promo-label"><span class="lang-en">Code:</span><span class="lang-de">Code:</span></span>
 								<code class="promo-value">postctl2026</code>
 							</div>
-							<p class="plan-desc">Unlock all 6 platforms, stats dashboard, and support open-source development.</p>
+							<p class="plan-desc"><span class="lang-en">Unlock all 6 platforms, stats dashboard, and support open-source development.</span><span class="lang-de">Schalte alle 6 Plattformen und das Statistik-Dashboard frei und unterstütze die Open-Source-Entwicklung.</span></p>
 						</div>
 						<ul class="plan-features">
-							<li><span class="check-icon">✓</span> <span><strong>Connect all 6 supported platforms</strong></span></li>
-							<li><span class="check-icon">✓</span> <span><strong>Use on up to 5 personal devices</strong> (activations limit)</span></li>
-							<li><span class="check-icon">✓</span> <span>Automated license key issuance via Polar.sh</span></li>
-							<li><span class="check-icon">✓</span> <span>Support open-source development & funding</span></li>
+							<li><span class="check-icon">✓</span> <span><strong><span class="lang-en">Connect all 6 supported platforms</span><span class="lang-de">Alle 6 unterstützten Plattformen verbinden</span></strong></span></li>
+							<li><span class="check-icon">✓</span> <span><strong><span class="lang-en">Use on up to 5 personal devices</span><span class="lang-de">Auf bis zu 5 Geräten nutzen</span></strong> <span class="lang-en">(activations limit)</span><span class="lang-de">(Aktivierungslimit)</span></span></li>
+							<li><span class="check-icon">✓</span> <span><span class="lang-en">Automated license key issuance via Polar.sh</span><span class="lang-de">Automatische Lizenzschlüssel-Ausstellung über Polar.sh</span></span></li>
+							<li><span class="check-icon">✓</span> <span><span class="lang-en">Support open-source development & funding</span><span class="lang-de">Unterstützt Open-Source-Entwicklung & Finanzierung</span></span></li>
 						</ul>
 						<div class="plan-cta">
-							<a href="https://buy.polar.sh/polar_cl_ookKcZLP6IjbeYc9inqKu3734J9WA8ssy5cL90jmJSs" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full">Get Pro License</a>
+							<a href="https://buy.polar.sh/polar_cl_ookKcZLP6IjbeYc9inqKu3734J9WA8ssy5cL90jmJSs" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full"><span class="lang-en">Get Pro License</span><span class="lang-de">Pro-Lizenz holen</span></a>
 						</div>
 					</div>
 				</div>
@@ -794,12 +794,12 @@ Campaign successfully posted!
 				<!-- Donate Card -->
 				<div class="donate-banner">
 					<div class="donate-content">
-						<h3>Want to support the project?</h3>
-						<p>Fund development directly, buy us coffee, or become a sponsor on Polar.</p>
+						<h3><span class="lang-en">Want to support the project?</span><span class="lang-de">Möchtest du das Projekt unterstützen?</span></h3>
+						<p><span class="lang-en">Fund development directly, buy us coffee, or become a sponsor on Polar.</span><span class="lang-de">Fördere die Entwicklung direkt, spendier uns einen Kaffee, oder werde Sponsor auf Polar.</span></p>
 					</div>
 					<div class="donate-actions">
 						<a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-							<Heart class="heart-icon" size={14} /> Support on Polar
+							<Heart class="heart-icon" size={14} /> <span class="lang-en">Support on Polar</span><span class="lang-de">Auf Polar unterstützen</span>
 						</a>
 					</div>
 				</div>
