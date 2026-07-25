@@ -2,6 +2,9 @@
 # Astro / Frontend build directories
 .astro/
 node_modules/
+# Build output now lives only on the deploy/landing (publish) branch,
+# synced via scripts/publish.sh — no longer committed on this source branch.
+dist/
 
 # logs
 npm-debug.log*
