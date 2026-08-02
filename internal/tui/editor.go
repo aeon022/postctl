@@ -206,12 +206,11 @@ func (m Model) renderEditor() string {
 		titleText = Tr("editor_title_edit")
 	}
 
-	builder.WriteString(lipgloss.NewStyle().
-		Bold(true).
-		Foreground(ColorBgFg).
-		Background(ColorSecondary).
-		Padding(0, 1).
-		Render(titleText))
+	// Same app badge as every other screen (title+tabs) instead of this
+	// view's own separate style — the editor is the one screen that
+	// otherwise shows no postctl branding at all (it returns before the
+	// shared header in View() ever renders).
+	builder.WriteString(StyleTitle.Render(" postctl — Social Media CLI · " + titleText + " "))
 	builder.WriteString("\n\n")
 
 	// 1. Plattform

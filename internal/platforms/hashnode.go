@@ -207,3 +207,8 @@ func (h *HashnodePlatform) Post(ctx context.Context, post *models.Post) (string,
 func (h *HashnodePlatform) FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error) {
 	return models.AnalyticsData{}, nil
 }
+
+// Delete is a stub for Hashnode delete method
+func (h *HashnodePlatform) Delete(ctx context.Context, platformID string) error {
+	return nil
+}

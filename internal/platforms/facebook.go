@@ -450,3 +450,8 @@ func (f *FacebookPlatform) FetchAnalytics(ctx context.Context, platformID string
 		FetchedAt:   time.Now(),
 	}, nil
 }
+
+// Delete is a stub for Facebook delete method
+func (f *FacebookPlatform) Delete(ctx context.Context, platformID string) error {
+	return nil
+}

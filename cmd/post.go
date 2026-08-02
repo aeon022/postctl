@@ -16,9 +16,10 @@ import (
 
 // postCmd repräsentiert den post-Befehl
 var postCmd = &cobra.Command{
-	Use:   "post <id>",
-	Short: "Publish a post immediately",
-	Long:  `Publish the post with the given ID immediately to its configured platform.`,
+	Use:     "post <id>",
+	Aliases: []string{"publish"},
+	Short:   "Publish a post immediately",
+	Long:    `Publish the post with the given ID immediately to its configured platform.`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		postID := args[0]

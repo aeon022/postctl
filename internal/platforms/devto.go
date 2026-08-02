@@ -147,3 +147,8 @@ func (d *DevToPlatform) Post(ctx context.Context, post *models.Post) (string, er
 func (d *DevToPlatform) FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error) {
 	return models.AnalyticsData{}, nil
 }
+
+// Delete is a stub for DevTo delete method
+func (d *DevToPlatform) Delete(ctx context.Context, platformID string) error {
+	return nil
+}

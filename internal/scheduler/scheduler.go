@@ -45,8 +45,10 @@ func PublishPost(ctx context.Context, s *store.SQLiteStore, post *models.Post, d
 		return "", err
 	}
 
-	// Post veröffentlichen
-	platformID, err := plat.Post(ctx, post)
+	// Post veröffentlichen (mit zentralem Retry bei transienten Fehlern: Netzwerk, 429, 5xx)
+	platformID, err := platforms.WithRetry(ctx, platforms.DefaultRetryConfig, post.Platform, func() (string, error) {
+		return plat.Post(ctx, post)
+	})
 	if err != nil {
 		t := time.Now()
 		post.Status = models.StatusFailed

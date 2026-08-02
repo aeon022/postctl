@@ -110,6 +110,7 @@ func (m Model) renderHelp() string {
 		builder.WriteString("  n          " + Tr("help_new_post") + "\n")
 		builder.WriteString("  e          " + Tr("help_edit_post") + "\n")
 		builder.WriteString("  s          " + Tr("help_schedule") + "\n")
+		builder.WriteString("  p          " + Tr("help_post") + "\n")
 		builder.WriteString("  i          " + Tr("help_import") + "\n")
 		builder.WriteString("  d          " + Tr("help_delete") + "\n")
 		builder.WriteString("  r          " + Tr("help_repurpose") + "\n")
@@ -129,7 +130,7 @@ func (m Model) renderHelp() string {
 				} else {
 					line1 = "f: Filter (Kampagne)  ·  tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Wählen"
 				}
-				line2 = "n: Neu  ·  e: Bearbeiten  ·  s: Einplanen  ·  d: Löschen  ·  r: Umschreiben  ·  i: Import  ·  f1/R: Handbuch  ·  ?: Hilfe  ·  q: Beenden"
+				line2 = "n: Neu  ·  e: Bearbeiten  ·  s: Einplanen  ·  p: Sofort posten  ·  d: Löschen  ·  r: Umschreiben  ·  i: Import  ·  f1/R: Handbuch  ·  ?: Hilfe  ·  q: Beenden"
 			} else if m.activeTab == 3 { // History
 				line1 = "tab: Nächster Tab  ·  ↑↓: Navigieren  ·  enter: Details öffnen  ·  x: Exportieren"
 				line2 = "f1/R: Handbuch  ·  ?: Schnellhilfe  ·  q: Beenden"
@@ -146,7 +147,7 @@ func (m Model) renderHelp() string {
 				} else {
 					line1 = "f: filter campaign  ·  tab: next tab  ·  ↑↓: navigate  ·  enter: select"
 				}
-				line2 = "n: new  ·  e: edit  ·  s: schedule  ·  d: delete  ·  r: repurpose  ·  i: import  ·  f1/R: readme  ·  ?: help  ·  q: quit"
+				line2 = "n: new  ·  e: edit  ·  s: schedule  ·  p: post now  ·  d: delete  ·  r: repurpose  ·  i: import  ·  f1/R: readme  ·  ?: help  ·  q: quit"
 			} else if m.activeTab == 3 { // History
 				line1 = "tab: next tab  ·  ↑↓: navigate  ·  enter: view details  ·  x: export"
 				line2 = "f1/R: readme  ·  ?: quick help  ·  q: quit"

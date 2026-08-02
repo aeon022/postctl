@@ -17,6 +17,7 @@ type Platform interface {
 	UploadImage(ctx context.Context, path string) (string, error) // Gibt die URN / Media-ID zurück
 	IsAuthenticated(ctx context.Context) bool
 	FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error)
+	Delete(ctx context.Context, platformID string) error
 }
 
 // GetPlatform liefert die passende Platform-Instanz. Im Simulationsmodus (dryRun) wird ein Mock zurückgegeben.

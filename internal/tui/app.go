@@ -186,6 +186,11 @@ type platformClearedMsg struct {
 	err      error
 }
 
+type publishFinishedMsg struct {
+	count int
+	err   error
+}
+
 type tickMsg struct{}
 
 // NewModel initialisiert ein TUI-Model
@@ -352,10 +357,17 @@ func (m Model) loadDataCmd() tea.Msg {
 	}
 }
 
-// deletePostCmd löscht einen Post asynchron
+// deletePostCmd löscht einen Post asynchron (und entfernt ihn von der Plattform, falls veröffentlicht)
 func (m Model) deletePostCmd(id string) tea.Cmd {
 	return func() tea.Msg {
 		ctx := context.Background()
+		post, err := m.store.GetPost(ctx, id)
+		if err == nil && post != nil && post.Status == models.StatusPosted && post.PlatformID != "" {
+			plat, err := platforms.GetPlatform(post.Platform, m.store, false)
+			if err == nil {
+				_ = plat.Delete(ctx, post.PlatformID)
+			}
+		}
 		if err := m.store.DeletePost(ctx, id); err != nil {
 			return errorMsg{err}
 		}
@@ -368,6 +380,13 @@ func (m Model) deletePostsCmd(ids []string) tea.Cmd {
 	return func() tea.Msg {
 		ctx := context.Background()
 		for _, id := range ids {
+			post, err := m.store.GetPost(ctx, id)
+			if err == nil && post != nil && post.Status == models.StatusPosted && post.PlatformID != "" {
+				plat, err := platforms.GetPlatform(post.Platform, m.store, false)
+				if err == nil {
+					_ = plat.Delete(ctx, post.PlatformID)
+				}
+			}
 			if err := m.store.DeletePost(ctx, id); err != nil {
 				return errorMsg{err}
 			}
@@ -408,6 +427,33 @@ func (m Model) bulkSchedulePostsCmd(ids []string) tea.Cmd {
 			}
 		}
 		return m.loadDataCmd()
+	}
+}
+
+// bulkPublishPostsCmd veröffentlicht mehrere Posts asynchron sofort
+func (m Model) bulkPublishPostsCmd(ids []string) tea.Cmd {
+	return func() tea.Msg {
+		ctx := context.Background()
+		publishedCount := 0
+		var lastErr error
+		for _, id := range ids {
+			post, err := m.store.GetPost(ctx, id)
+			if err != nil {
+				lastErr = err
+				continue
+			}
+
+			_, err = scheduler.PublishPost(ctx, m.store, post, false)
+			if err != nil {
+				lastErr = err
+			} else {
+				publishedCount++
+			}
+		}
+		return publishFinishedMsg{
+			count: publishedCount,
+			err:   lastErr,
+		}
 	}
 }
 
@@ -1061,6 +1107,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 
+	case publishFinishedMsg:
+		m.loading = false
+		if msg.err != nil {
+			m.statusMessage = fmt.Sprintf("Veröffentlichung fehlgeschlagen: %v", msg.err)
+		} else {
+			if msg.count == 1 {
+				m.statusMessage = "Beitrag erfolgreich veröffentlicht!"
+			} else {
+				m.statusMessage = fmt.Sprintf("%d Beiträge erfolgreich veröffentlicht!", msg.count)
+			}
+		}
+		m.selectedPost = nil
+		m.detailScrollOffset = 0
+		return m, m.loadDataCmd
+
 	case externalEditorFinishedMsg:
 		if msg.err != nil {
 			m.err = fmt.Errorf("Fehler beim Bearbeiten mit externem Editor: %w", msg.err)
@@ -1287,6 +1348,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case key.Matches(msg, Keys.Down) || msg.String() == "j":
 				m.detailScrollOffset++
 				return m, nil
+			case key.Matches(msg, Keys.Post):
+				m.loading = true
+				m.statusMessage = "Veröffentliche Beitrag..."
+				postID := m.selectedPost.ID
+				return m, m.bulkPublishPostsCmd([]string{postID})
 			case key.Matches(msg, Keys.Repurpose):
 				if m.repurposing {
 					return m, nil
@@ -1579,6 +1645,40 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, nil
 
+		case key.Matches(msg, Keys.Post):
+			if m.selectedPost == nil && !m.showReadme {
+				if m.activeTab == 1 { // Posts
+					var ids []string
+					for id, selected := range m.selectedPosts {
+						if selected {
+							ids = append(ids, id)
+						}
+					}
+					if len(ids) > 0 {
+						m.selectedPosts = make(map[string]bool)
+						m.loading = true
+						m.statusMessage = "Veröffentliche Beiträge..."
+						return m, m.bulkPublishPostsCmd(ids)
+					}
+
+					filtered := m.getFilteredPosts()
+					if len(filtered) > 0 && m.cursor < len(filtered) {
+						idToPost := filtered[m.cursor].ID
+						m.loading = true
+						m.statusMessage = "Veröffentliche Beitrag..."
+						return m, m.bulkPublishPostsCmd([]string{idToPost})
+					}
+				} else if m.activeTab == 2 { // Schedule
+					if len(m.nextUp) > 0 && m.cursor < len(m.nextUp) {
+						idToPost := m.nextUp[m.cursor].ID
+						m.loading = true
+						m.statusMessage = "Veröffentliche Beitrag..."
+						return m, m.bulkPublishPostsCmd([]string{idToPost})
+					}
+				}
+			}
+			return m, nil
+
 		case key.Matches(msg, Keys.Readme):
 			if m.selectedPost == nil {
 				lines, toc := getReadmeData()
@@ -1635,6 +1735,9 @@ func (m Model) getFilteredPosts() []models.Post {
 // View rendert den Bildschirm als Zeichenkette
 func (m Model) View() string {
 	if m.loading {
+		if m.statusMessage != "" {
+			return fmt.Sprintf("\n  ⏳ %s\n", m.statusMessage)
+		}
 		return "\n  Lade Daten aus SQLite Store...\n"
 	}
 	

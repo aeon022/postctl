@@ -71,8 +71,11 @@ postctl import FILE_OR_DIR               Import Markdown post(s)
 postctl list [--platform P] [--status S] [--campaign C] [--format human|json]
 postctl template --platform PLATFORM     Generate a post template
 
-postctl post ID [--dry-run]              Publish a post immediately
+postctl post ID [--dry-run]              Publish a post immediately (alias: publish)
+postctl publish ID [--dry-run]           Publish a post immediately
 postctl schedule ID [--time DATETIME] [--queue] Schedule a post (RFC3339) or to the queue
+postctl cancel ID                        Cancel a scheduled post
+postctl delete ID                        Delete a post locally and remotely
 postctl campaign list                    List all campaigns
 postctl campaign post NAME [--dry-run]   Publish all posts in a campaign
 
@@ -165,10 +168,13 @@ Third tweet. Threads are Twitter-only.
 
 | Command | Description |
 |---------|-------------|
-| `postctl post ID` | Publish post immediately |
+| `postctl post ID` | Publish post immediately (alias: `publish`) |
+| `postctl publish ID` | Publish post immediately |
 | `postctl post ID --dry-run` | Simulate publishing without sending |
 | `postctl schedule ID --time DATETIME` | Set or update the scheduled publish time |
 | `postctl schedule ID --queue` | Schedule a post to the next available queue slot |
+| `postctl cancel ID` | Cancel a scheduled post (resets status to draft) |
+| `postctl delete ID` | Delete a post from the local database (and remote platform if published) |
 | `postctl campaign list` | List all campaigns with post counts |
 | `postctl campaign post NAME` | Publish all posts in a campaign |
 | `postctl campaign post NAME --dry-run` | Dry-run campaign publish |
@@ -223,8 +229,8 @@ Switch between views using tabs or the keybindings below.
 | `Enter` | Open detail view |
 | `n` | New post |
 | `e` | Edit selected post |
-| `d` | Delete selected (or highlighted) post(s) |
-| `p` | Publish selected post |
+| `d` | Delete selected post(s) locally and remotely (if published) |
+| `p` | Publish selected post(s) immediately |
 | `s` | Schedule selected (or highlighted) post(s) to queue slots |
 | `Esc` | Clear bulk selections (or clear campaign filter) |
 | `Tab` | Switch tabs |
@@ -236,7 +242,8 @@ Switch between views using tabs or the keybindings below.
 |-----|--------|
 | `Esc` | Back to list |
 | `e` | Edit post |
-| `p` | Publish post |
+| `p` | Publish post immediately |
+| `d` | Delete post locally and remotely |
 | `r` | Repurpose post |
 
 **Editor**
