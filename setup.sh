@@ -63,11 +63,13 @@ echo -e "${BLUE}${BOLD}Globale Installation:${NC}"
 echo -e "Möchtest du postctl nach ${YELLOW}/usr/local/bin${NC} kopieren, damit du es von überall aus starten kannst?"
 read -p "Installieren? (y/n): " -n 1 -r
 echo ""
+POSTCTL_BIN="$(pwd)/postctl"
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo -e "${BLUE}Kopiere Binary nach /usr/local/bin... (sudo benötigt)${NC}"
     if sudo cp postctl /usr/local/bin/postctl; then
         echo -e "${GREEN}✔ Erfolgreich global installiert!${NC}"
         echo -e "Du kannst die App ab sofort überall mit dem Befehl ${GREEN}${BOLD}postctl tui${NC} starten."
+        POSTCTL_BIN="/usr/local/bin/postctl"
     else
         echo -e "${RED}Fehler beim Kopieren des Binaries. Du kannst es lokal ausführen:${NC}"
         echo -e "  ${YELLOW}./postctl tui${NC}"
@@ -76,6 +78,43 @@ else
     echo -e "${YELLOW}Lokale Ausführung gewählt.${NC}"
     echo -e "Du kannst die TUI lokal über diesen Befehl starten:"
     echo -e "  ${GREEN}${BOLD}./postctl tui${NC}"
+fi
+
+echo ""
+
+# ── MCP: register in ~/.claude.json ───────────────────────────────────────────
+CLAUDE_JSON="$HOME/.claude.json"
+if command -v python3 &>/dev/null; then
+  python3 - "$CLAUDE_JSON" "$POSTCTL_BIN" <<'PYEOF'
+import json, sys, os
+
+claude_json = sys.argv[1]
+binary_path = sys.argv[2]
+
+data = {}
+if os.path.exists(claude_json):
+    with open(claude_json) as f:
+        try:
+            data = json.load(f)
+        except Exception:
+            pass
+
+data.setdefault("mcpServers", {})
+data["mcpServers"]["postctl"] = {
+    "command": binary_path,
+    "args": ["mcp"]
+}
+
+with open(claude_json, "w") as f:
+    json.dump(data, f, indent=2)
+    f.write("\n")
+
+print("✓ MCP server registered in ~/.claude.json")
+print("  Restart Claude Code to activate postctl MCP tools")
+PYEOF
+else
+  echo "  To enable MCP (Claude Code integration), add to ~/.claude.json:"
+  echo "  \"mcpServers\": { \"postctl\": { \"command\": \"$POSTCTL_BIN\", \"args\": [\"mcp\"] } }"
 fi
 
 echo ""
