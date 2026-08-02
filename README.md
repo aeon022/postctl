@@ -360,6 +360,30 @@ SQLite  (~/.local/share/postctl/postctl.db)
 
 ---
 
+## Profiles — separate accounts for Work / Private / per-project
+
+By default postctl uses a single config and database. To keep entirely separate sets of credentials, posts, and scheduling — e.g. a private and a work Twitter account, or one set per client project — pass `--profile <name>` (or set `POSTCTL_PROFILE`) on any command:
+
+```bash
+postctl --profile work config set twitter.client_id "..."
+postctl --profile work config set twitter.client_secret "..."
+postctl --profile work tui
+
+postctl --profile privat config set twitter.client_id "..."
+postctl --profile privat tui
+```
+
+A profile is created automatically the first time you use its name — there's no separate "create" step. Each profile gets its own config file (`~/.config/postctl/profiles/<name>/config.yaml`) and its own database (`~/.local/share/postctl/profiles/<name>/postctl.db`), completely independent of the default profile and of each other — no shared credentials file, no mixed post history.
+
+```bash
+postctl profile list      # see every profile that's been used, and which is active
+postctl profile           # show just the currently active profile
+```
+
+Running with no `--profile` always uses the original default (`~/.config/postctl/config.yaml`) — existing setups are unaffected. Each profile can also be synced across devices independently via its own `data_dir` (see below) — e.g. sync "work" to a work Dropbox and "privat" to your personal iCloud Drive.
+
+---
+
 ## Sharing your data directory across devices
 
 By default postctl's database lives at `~/.local/share/postctl/postctl.db`, local to this machine. To share it across devices, set `data_dir` (in `~/.config/postctl/config.yaml`) to a folder you already sync yourself — iCloud Drive, Dropbox, Syncthing, etc:

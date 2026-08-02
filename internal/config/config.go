@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	coreconfig "github.com/aeon022/missionctl-core/config"
@@ -100,6 +101,13 @@ type Config struct {
 // ActiveConfig stellt die geladene Konfiguration global zur Verfügung
 var ActiveConfig Config
 
+// ActiveProfile is the currently loaded profile name ("" = the original,
+// unprofiled default). Set once at startup by LoadConfigProfile (from the
+// --profile flag / POSTCTL_PROFILE env var) and left untouched by
+// LoadConfig()'s no-arg reload calls, so config changes written mid-session
+// (config set, config import) get picked back up for the same profile.
+var ActiveProfile string
+
 // IsPro prüft, ob eine gültige Pro-Lizenz aktiv ist
 func IsPro() bool {
 	key := strings.TrimSpace(ActiveConfig.LicenseKey)
@@ -127,17 +135,74 @@ func ValidateLicenseKey(key string) bool {
 	return false
 }
 
-// LoadConfig lädt die Konfiguration aus ~/.config/postctl/config.yaml oder setzt Defaultwerte
-func LoadConfig() error {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return fmt.Errorf("get user home dir: %w", err)
+// configDir returns the config directory for the given profile: the
+// original ~/.config/postctl for "" (the default/unprofiled case, for
+// backward compatibility with existing installs), or
+// ~/.config/postctl/profiles/<name> for a named one.
+func configDir(profile string) string {
+	home, _ := os.UserHomeDir()
+	if profile == "" {
+		return filepath.Join(home, ".config", "postctl")
 	}
+	return filepath.Join(home, ".config", "postctl", "profiles", profile)
+}
 
-	configDir := filepath.Join(home, ".config", "postctl")
-	
-	// Default-Werte setzen
-	ActiveConfig.DBPath = "~/.config/postctl/postctl.db"
+// ProfilesDir is where named profiles live — ~/.config/postctl/profiles.
+func ProfilesDir() string {
+	home, _ := os.UserHomeDir()
+	return filepath.Join(home, ".config", "postctl", "profiles")
+}
+
+// ListProfiles returns the names of every profile that has been used at
+// least once (i.e. has a config directory under ProfilesDir), sorted
+// alphabetically. The unprofiled default is not included — callers that
+// want to mention it do so explicitly.
+func ListProfiles() ([]string, error) {
+	entries, err := os.ReadDir(ProfilesDir())
+	if os.IsNotExist(err) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	var names []string
+	for _, e := range entries {
+		if e.IsDir() {
+			names = append(names, e.Name())
+		}
+	}
+	sort.Strings(names)
+	return names, nil
+}
+
+// LoadConfig (re)loads the config for the currently active profile — use
+// this to pick up changes written mid-session (config set, config
+// import). To switch profiles, use LoadConfigProfile instead.
+func LoadConfig() error {
+	return loadConfig(ActiveProfile)
+}
+
+// LoadConfigProfile switches to and loads the named profile ("" = the
+// original default). Called once at startup from the --profile flag /
+// POSTCTL_PROFILE env var.
+func LoadConfigProfile(profile string) error {
+	return loadConfig(strings.TrimSpace(profile))
+}
+
+func loadConfig(profile string) error {
+	ActiveProfile = profile
+	dir := configDir(profile)
+
+	// Default-Werte setzen (reset first: LoadConfig can be called more than
+	// once per process — config import reloads after restoring a backup —
+	// and a stale value from a previous load must not survive that).
+	ActiveConfig = Config{}
+	if profile == "" {
+		// Only the original default profile ever had data at this legacy
+		// path — see GetDBPath's legacyDefaultDBPath comment. A new named
+		// profile has no such legacy to carry.
+		ActiveConfig.DBPath = legacyDefaultDBPath
+	}
 	ActiveConfig.Defaults.Timezone = "Europe/Vienna"
 	ActiveConfig.Defaults.DryRun = false
 	ActiveConfig.Defaults.ImageDir = "./screenshots"
@@ -151,13 +216,34 @@ func LoadConfig() error {
 	ActiveConfig.Scheduler.Slots = []string{"Mon 09:00", "Wed 14:00", "Fri 17:30"}
 
 	// Falls die Konfigurationsdatei nicht existiert, erstellen wir sie mit Standardwerten
-	configPath := filepath.Join(configDir, "config.yaml")
+	configPath := filepath.Join(dir, "config.yaml")
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		if err := os.MkdirAll(configDir, 0755); err != nil {
+		if err := os.MkdirAll(dir, 0755); err != nil {
 			return fmt.Errorf("create config dir: %w", err)
 		}
-		
-		dummyContent := `# postctl configuration file
+		if err := os.WriteFile(configPath, []byte(defaultConfigYAML(profile)), 0644); err != nil {
+			return fmt.Errorf("create default config file: %w", err)
+		}
+	}
+
+	yamlBytes, err := os.ReadFile(configPath)
+	if err != nil {
+		return fmt.Errorf("read config file: %w", err)
+	}
+
+	if err := yaml.Unmarshal(yamlBytes, &ActiveConfig); err != nil {
+		return fmt.Errorf("unmarshal config: %w", err)
+	}
+
+	return nil
+}
+
+// defaultConfigYAML is the dummy config content written the first time a
+// profile ("" = default) is loaded. The credential/defaults body is the
+// same for every profile; only the header differs, since db_path's legacy
+// hint only ever applied to the original default.
+func defaultConfigYAML(profile string) string {
+	header := `# postctl configuration file
 db_path: "~/.config/postctl/postctl.db"
 
 # Point postctl's database at a directory you sync yourself (iCloud
@@ -167,7 +253,23 @@ db_path: "~/.config/postctl/postctl.db"
 
 # License Key for Pro Features
 license_key: ""
+`
+	if profile != "" {
+		header = fmt.Sprintf(`# postctl configuration file — profile %q
+# This profile has its own database, independent of the default profile
+# and any other profile (see "postctl profile list"). Point it at a
+# directory you sync yourself (iCloud Drive, Dropbox, ...) to share just
+# this profile's data across devices — see doctor's "Data directory" check.
+# data_dir: "~/Library/Mobile Documents/com~apple~CloudDocs/postctl-%s"
 
+# License Key for Pro Features
+license_key: ""
+`, profile, profile)
+	}
+	return header + defaultConfigBody
+}
+
+const defaultConfigBody = `
 defaults:
   timezone: "Europe/Vienna"
   dry_run: false
@@ -242,22 +344,6 @@ youtube:
   client_id: ""
   client_secret: ""
 `
-		if err := os.WriteFile(configPath, []byte(dummyContent), 0644); err != nil {
-			return fmt.Errorf("create default config file: %w", err)
-		}
-	}
-
-	yamlBytes, err := os.ReadFile(configPath)
-	if err != nil {
-		return fmt.Errorf("read config file: %w", err)
-	}
-
-	if err := yaml.Unmarshal(yamlBytes, &ActiveConfig); err != nil {
-		return fmt.Errorf("unmarshal config: %w", err)
-	}
-
-	return nil
-}
 
 // legacyDefaultDBPath is the hardcoded default this config used before
 // data_dir/coreconfig.DataDir existed. Any db_path still equal to this
@@ -268,11 +354,10 @@ const legacyDefaultDBPath = "~/.config/postctl/postctl.db"
 
 // GetDBPath returns the expanded path to the SQLite database, resolved
 // with this precedence: data_dir (new, directory-shaped — the supported
-// way to point postctl at a folder you sync yourself, e.g. iCloud Drive
-// or Dropbox) > a customized legacy db_path (a full file path) > the
-// migrated default (~/.local/share/postctl, matching the rest of the
-// suite — see migratedDefaultDir for the one-time move of an existing
-// database at the old ~/.config/postctl location).
+// way to point this profile at a folder you sync yourself, e.g. iCloud
+// Drive or Dropbox) > a customized legacy db_path (a full file path,
+// meaningful only for the original default profile) > this profile's own
+// default data directory (see defaultDataDir).
 func GetDBPath() string {
 	if dir := strings.TrimSpace(ActiveConfig.DataDir); dir != "" {
 		resolved, _ := coreconfig.ResolveDir("postctl", dir)
@@ -288,26 +373,33 @@ func GetDBPath() string {
 		return filepath.Clean(path)
 	}
 
-	return filepath.Join(migratedDefaultDir(), "postctl.db")
+	return filepath.Join(defaultDataDir(), "postctl.db")
 }
 
 // Shared reports whether GetDBPath currently resolves to a user-configured
-// directory (data_dir) rather than postctl's own default/legacy path.
+// directory (data_dir) rather than this profile's own default/legacy path.
 func Shared() bool {
 	return strings.TrimSpace(ActiveConfig.DataDir) != ""
 }
 
-// migratedDefaultDir returns postctl's default data directory
-// (~/.local/share/postctl, matching the rest of the suite — postctl
-// previously used ~/.config/postctl for its database, an inconsistency
-// with the rest of the suite that predates this package), migrating a
-// pre-existing database from that old location the first time it's
-// needed, so existing users don't lose data.
-func migratedDefaultDir() string {
-	dir := coreconfig.DataDir("postctl")
-	newPath := filepath.Join(dir, "postctl.db")
+// defaultDataDir returns the active profile's own private data directory.
+// For the original unprofiled default it's ~/.local/share/postctl, with a
+// one-time migration of a pre-existing database from the old
+// ~/.config/postctl location (postctl previously stored its DB there, an
+// inconsistency with the rest of the suite that predates this package).
+// Named profiles are new and never had data at that old location, so no
+// migration applies — they get their own subdirectory directly.
+func defaultDataDir() string {
+	base := coreconfig.DataDir("postctl")
+	if ActiveProfile != "" {
+		dir := filepath.Join(base, "profiles", ActiveProfile)
+		_ = os.MkdirAll(dir, 0o755)
+		return dir
+	}
+
+	newPath := filepath.Join(base, "postctl.db")
 	if _, err := os.Stat(newPath); err == nil {
-		return dir // already migrated
+		return base // already migrated
 	}
 	home, _ := os.UserHomeDir()
 	oldPath := filepath.Join(home, ".config", "postctl", "postctl.db")
@@ -316,18 +408,16 @@ func migratedDefaultDir() string {
 			fmt.Printf("postctl: moved database from %s to %s (new default location, matching the rest of the suite)\n", oldPath, newPath)
 		}
 	}
-	return dir
+	return base
 }
 
-// SaveConfig schreibt die aktuelle ActiveConfig zurück in die ~/.config/postctl/config.yaml Datei
+// SaveConfig schreibt die aktuelle ActiveConfig zurück in config.yaml des aktiven Profils
 func SaveConfig() error {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return fmt.Errorf("get user home dir: %w", err)
+	dir := configDir(ActiveProfile)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return fmt.Errorf("create config dir: %w", err)
 	}
-
-	configDir := filepath.Join(home, ".config", "postctl")
-	configPath := filepath.Join(configDir, "config.yaml")
+	configPath := filepath.Join(dir, "config.yaml")
 
 	yamlBytes, err := yaml.Marshal(ActiveConfig)
 	if err != nil {

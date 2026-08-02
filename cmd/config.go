@@ -165,9 +165,10 @@ func setConfigValue(key, value string) error {
 }
 
 type configShowJSON struct {
-	OK     bool          `json:"ok"`
-	Config config.Config `json:"config"`
-	IsPro  bool          `json:"is_pro"`
+	OK      bool          `json:"ok"`
+	Profile string        `json:"profile"`
+	Config  config.Config `json:"config"`
+	IsPro   bool          `json:"is_pro"`
 }
 
 type configSuccessJSON struct {
@@ -206,16 +207,23 @@ func reportConfigShow(cmd *cobra.Command) {
 
 	out := cmd.OutOrStdout()
 
+	profile := config.ActiveProfile
+	if profile == "" {
+		profile = "default"
+	}
+
 	if FormatFlag == "json" {
 		outJSON := configShowJSON{
-			OK:     true,
-			Config: masked,
-			IsPro:  config.IsPro(),
+			OK:      true,
+			Profile: profile,
+			Config:  masked,
+			IsPro:   config.IsPro(),
 		}
 		jsonBytes, _ := json.MarshalIndent(outJSON, "", "  ")
 		fmt.Fprintln(out, string(jsonBytes))
 	} else {
 		fmt.Fprintln(out, "=== postctl CONFIGURATION ===")
+		fmt.Fprintf(out, "  profile:           %s\n", profile)
 		fmt.Fprintf(out, "  db_path:           %s\n\n", masked.DBPath)
 		fmt.Fprintln(out, "  defaults:")
 		fmt.Fprintf(out, "    timezone:        %s\n", masked.Defaults.Timezone)
