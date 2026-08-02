@@ -353,6 +353,20 @@ SQLite  (~/.local/share/postctl/postctl.db)
 
 ---
 
+## Sharing your data directory across devices
+
+By default postctl's database lives at `~/.local/share/postctl/postctl.db`, local to this machine. To share it across devices, set `data_dir` (in `~/.config/postctl/config.yaml`) to a folder you already sync yourself — iCloud Drive, Dropbox, Syncthing, etc:
+
+```yaml
+data_dir: "~/Library/Mobile Documents/com~apple~CloudDocs/postctl"
+```
+
+Once set, postctl automatically switches its SQLite journal mode from WAL to rollback-journal — WAL splits the database across multiple files that a folder-sync client can't update atomically together, so this switch keeps the directory down to a single consistent file whenever postctl isn't actively writing. A same-machine lock also prevents two postctl processes from opening the database at once (run `postctl doctor` to see the current mode and path). This only protects against the same-machine and stale-snapshot failure modes, not two machines editing at the exact same instant; an undownloaded iCloud file is reported explicitly rather than as a bare error.
+
+(This is separate from `postctl config export`/`import`, which packages your config and database into one encrypted file for a manual one-time transfer — the setting above is for keeping them continuously in sync instead.)
+
+---
+
 ## License
 
 See [LICENSE](LICENSE).
