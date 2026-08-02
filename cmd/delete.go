@@ -22,7 +22,7 @@ var deleteCmd = &cobra.Command{
 		ctx := context.Background()
 
 		dbPath := config.GetDBPath()
-		s, err := store.NewSQLiteStore(dbPath)
+		s, err := store.NewSQLiteStore(dbPath, config.Shared())
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: open store: %v\n", err)
 			os.Exit(1)
