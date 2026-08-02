@@ -25,7 +25,7 @@ var postCmd = &cobra.Command{
 		ctx := context.Background()
 
 		dbPath := config.GetDBPath()
-		s, err := store.NewSQLiteStore(dbPath)
+		s, err := store.NewSQLiteStore(dbPath, config.Shared())
 		if err != nil {
 			reportPostError(fmt.Errorf("open store: %w", err), 2)
 			return

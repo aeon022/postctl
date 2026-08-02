@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	coreconfig "github.com/aeon022/missionctl-core/config"
 	"gopkg.in/yaml.v3"
 )
 
@@ -89,6 +90,7 @@ type Config struct {
 		Slots []string `mapstructure:"slots" yaml:"slots"`
 	} `mapstructure:"scheduler" yaml:"scheduler"`
 	DBPath        string   `mapstructure:"db_path" yaml:"db_path"`
+	DataDir       string   `mapstructure:"data_dir" yaml:"data_dir"`
 	LicenseKey    string   `mapstructure:"license_key" yaml:"license_key"`
 	LicenseStatus string   `mapstructure:"license_status" yaml:"license_status"`
 	PolarOrgID    string   `mapstructure:"polar_org_id" yaml:"polar_org_id"`
@@ -157,6 +159,11 @@ func LoadConfig() error {
 		
 		dummyContent := `# postctl configuration file
 db_path: "~/.config/postctl/postctl.db"
+
+# Point postctl's database at a directory you sync yourself (iCloud
+# Drive, Dropbox, ...) to share data across devices. Takes precedence
+# over db_path above. See doctor's "Data directory" check.
+# data_dir: "~/Library/Mobile Documents/com~apple~CloudDocs/postctl"
 
 # License Key for Pro Features
 license_key: ""
@@ -252,17 +259,64 @@ youtube:
 	return nil
 }
 
-// GetDBPath gibt den expandierten Pfad zur SQLite-Datenbank zurück
+// legacyDefaultDBPath is the hardcoded default this config used before
+// data_dir/coreconfig.DataDir existed. Any db_path still equal to this
+// (i.e. never customized by the user) is treated as unset, so those
+// installs migrate to the new default below rather than being pinned to
+// this path forever.
+const legacyDefaultDBPath = "~/.config/postctl/postctl.db"
+
+// GetDBPath returns the expanded path to the SQLite database, resolved
+// with this precedence: data_dir (new, directory-shaped — the supported
+// way to point postctl at a folder you sync yourself, e.g. iCloud Drive
+// or Dropbox) > a customized legacy db_path (a full file path) > the
+// migrated default (~/.local/share/postctl, matching the rest of the
+// suite — see migratedDefaultDir for the one-time move of an existing
+// database at the old ~/.config/postctl location).
 func GetDBPath() string {
+	if dir := strings.TrimSpace(ActiveConfig.DataDir); dir != "" {
+		resolved, _ := coreconfig.ResolveDir("postctl", dir)
+		return filepath.Join(resolved, "postctl.db")
+	}
+
 	path := ActiveConfig.DBPath
-	if path == "" {
-		path = "~/.config/postctl/postctl.db"
+	if path != "" && path != legacyDefaultDBPath {
+		if strings.HasPrefix(path, "~") {
+			home, _ := os.UserHomeDir()
+			path = filepath.Join(home, path[1:])
+		}
+		return filepath.Clean(path)
 	}
-	if strings.HasPrefix(path, "~") {
-		home, _ := os.UserHomeDir()
-		path = filepath.Join(home, path[1:])
+
+	return filepath.Join(migratedDefaultDir(), "postctl.db")
+}
+
+// Shared reports whether GetDBPath currently resolves to a user-configured
+// directory (data_dir) rather than postctl's own default/legacy path.
+func Shared() bool {
+	return strings.TrimSpace(ActiveConfig.DataDir) != ""
+}
+
+// migratedDefaultDir returns postctl's default data directory
+// (~/.local/share/postctl, matching the rest of the suite — postctl
+// previously used ~/.config/postctl for its database, an inconsistency
+// with the rest of the suite that predates this package), migrating a
+// pre-existing database from that old location the first time it's
+// needed, so existing users don't lose data.
+func migratedDefaultDir() string {
+	dir := coreconfig.DataDir("postctl")
+	newPath := filepath.Join(dir, "postctl.db")
+	if _, err := os.Stat(newPath); err == nil {
+		return dir // already migrated
 	}
-	return filepath.Clean(path)
+	home, _ := os.UserHomeDir()
+	oldPath := filepath.Join(home, ".config", "postctl", "postctl.db")
+	if _, err := os.Stat(oldPath); err == nil {
+		if err := os.Rename(oldPath, newPath); err == nil {
+			fmt.Printf("postctl: moved database from %s to %s (new default location, matching the rest of the suite)\n", oldPath, newPath)
+		}
+	}
+	return dir
 }
 
 // SaveConfig schreibt die aktuelle ActiveConfig zurück in die ~/.config/postctl/config.yaml Datei

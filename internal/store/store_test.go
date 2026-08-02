@@ -15,7 +15,7 @@ func TestStoreWorkflow(t *testing.T) {
 	ctx := context.Background()
 
 	// In-Memory SQLite Instanz erstellen
-	s, err := NewSQLiteStore(":memory:")
+	s, err := NewSQLiteStore(":memory:", false)
 	if err != nil {
 		t.Fatalf("failed to create in-memory store: %v", err)
 	}

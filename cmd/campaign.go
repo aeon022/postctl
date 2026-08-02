@@ -28,7 +28,7 @@ var campaignListCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		dbPath := config.GetDBPath()
-		s, err := store.NewSQLiteStore(dbPath)
+		s, err := store.NewSQLiteStore(dbPath, config.Shared())
 		if err != nil {
 			reportCampaignError(fmt.Errorf("open database: %w", err), 2)
 			return
@@ -83,7 +83,7 @@ var campaignPostCmd = &cobra.Command{
 		ctx := context.Background()
 
 		dbPath := config.GetDBPath()
-		s, err := store.NewSQLiteStore(dbPath)
+		s, err := store.NewSQLiteStore(dbPath, config.Shared())
 		if err != nil {
 			reportCampaignError(fmt.Errorf("open store: %w", err), 2)
 			return

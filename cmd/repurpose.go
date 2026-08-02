@@ -53,7 +53,7 @@ var repurposeCmd = &cobra.Command{
 
 		// 2. Datenbank laden
 		dbPath := config.GetDBPath()
-		s, err := store.NewSQLiteStore(dbPath)
+		s, err := store.NewSQLiteStore(dbPath, config.Shared())
 		if err != nil {
 			reportRepurposeError(fmt.Errorf("open store: %w", err), 2)
 			return

@@ -23,7 +23,7 @@ var authCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		dbPath := config.GetDBPath()
-		s, err := store.NewSQLiteStore(dbPath)
+		s, err := store.NewSQLiteStore(dbPath, config.Shared())
 		if err != nil {
 			reportAuthError(fmt.Errorf("open database: %w", err), 3)
 			return

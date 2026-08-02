@@ -1,8 +1,9 @@
 module github.com/aeon022/postctl
 
-go 1.26.4
+go 1.26.5
 
 require (
+	github.com/aeon022/missionctl-core v0.0.0-20260802150042-e2881ef3fdcf
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
@@ -11,7 +12,7 @@ require (
 	github.com/mark3labs/mcp-go v0.55.1
 	github.com/spf13/cobra v1.10.2
 	gopkg.in/yaml.v3 v3.0.1
-	modernc.org/sqlite v1.53.0
+	modernc.org/sqlite v1.55.0
 )
 
 require (
@@ -49,9 +50,9 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
-	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
-	modernc.org/libc v1.73.4 // indirect
+	modernc.org/libc v1.74.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )

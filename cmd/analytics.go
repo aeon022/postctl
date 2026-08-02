@@ -24,7 +24,7 @@ var analyticsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		dbPath := config.GetDBPath()
-		s, err := store.NewSQLiteStore(dbPath)
+		s, err := store.NewSQLiteStore(dbPath, config.Shared())
 		if err != nil {
 			reportAnalyticsError(fmt.Errorf("open database: %w", err), 2)
 			return

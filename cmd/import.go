@@ -189,7 +189,7 @@ var importCmd = &cobra.Command{
 		// 4. In die DB schreiben (wenn kein dry-run)
 		if !DryRunFlag {
 			dbPath := config.GetDBPath()
-			s, err := store.NewSQLiteStore(dbPath)
+			s, err := store.NewSQLiteStore(dbPath, config.Shared())
 			if err != nil {
 				reportError(fmt.Errorf("open store: %w", err), 2)
 				return

@@ -23,7 +23,7 @@ var tuiCmd = &cobra.Command{
 // runTUI initialisiert den Store, lädt das Bubbletea-Programm und startet die TUI
 func runTUI() error {
 	dbPath := config.GetDBPath()
-	s, err := store.NewSQLiteStore(dbPath)
+	s, err := store.NewSQLiteStore(dbPath, config.Shared())
 	if err != nil {
 		return fmt.Errorf("open sqlite store for TUI: %w", err)
 	}

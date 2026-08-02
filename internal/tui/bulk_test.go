@@ -12,7 +12,7 @@ import (
 )
 
 func TestTUIBulkActions(t *testing.T) {
-	s, err := store.NewSQLiteStore(":memory:")
+	s, err := store.NewSQLiteStore(":memory:", false)
 	if err != nil {
 		t.Fatalf("sqlite memory store error: %v", err)
 	}

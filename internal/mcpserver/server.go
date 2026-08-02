@@ -335,7 +335,7 @@ func handleListCampaigns(_ context.Context, _ mcp.CallToolRequest) (*mcp.CallToo
 
 func openStore() (*store.SQLiteStore, error) {
 	dbPath := config.GetDBPath()
-	return store.NewSQLiteStore(dbPath)
+	return store.NewSQLiteStore(dbPath, config.Shared())
 }
 
 func jsonResult(v any) (*mcp.CallToolResult, error) {

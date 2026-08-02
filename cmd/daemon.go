@@ -35,7 +35,7 @@ var daemonCmd = &cobra.Command{
 		}()
 
 		dbPath := config.GetDBPath()
-		s, err := store.NewSQLiteStore(dbPath)
+		s, err := store.NewSQLiteStore(dbPath, config.Shared())
 		if err != nil {
 			return fmt.Errorf("open sqlite store for daemon: %w", err)
 		}

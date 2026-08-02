@@ -128,7 +128,7 @@ var rssImportCmd = &cobra.Command{
 
 		ctx := context.Background()
 		dbPath := config.GetDBPath()
-		s, err := store.NewSQLiteStore(dbPath)
+		s, err := store.NewSQLiteStore(dbPath, config.Shared())
 		if err != nil {
 			cmd.Printf("❌ Fehler beim Öffnen der Datenbank: %v\n", err)
 			return
