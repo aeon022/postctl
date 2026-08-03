@@ -256,8 +256,8 @@ var translationsMap = map[string]map[string]string{
 		"en": "Execute (Press Enter)",
 	},
 	"settings_help_footer": {
-		"de": "←/→ / enter: Ändern / Verbinden  ·  d: Reset/Disconnect  ·  Sofort gespeichert.\nSupport postctl (Spenden): https://polar.sh/aeon022\nPro-Lizenz über CLI aktivieren: postctl config set license_key <key>",
-		"en": "←/→ / enter: Change / Connect  ·  d: Reset/Disconnect  ·  Saved instantly.\nSupport postctl (Donate): https://polar.sh/aeon022\nActivate Pro license via CLI: postctl config set license_key <key>",
+		"de": "←/→ / enter: Ändern / Verbinden  ·  d: Reset/Disconnect  ·  Sofort gespeichert.\nSupport postctl (Spenden): https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW\nPro-Lizenz kaufen (37% Launch-Special, Code postctl2026): https://buy.polar.sh/polar_cl_ookKcZLP6IjbeYc9inqKu3734J9WA8ssy5cL90jmJSs\nAktivieren: postctl config set license_key <key>",
+		"en": "←/→ / enter: Change / Connect  ·  d: Reset/Disconnect  ·  Saved instantly.\nSupport postctl (Donate): https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW\nBuy Pro (37% launch special, code postctl2026): https://buy.polar.sh/polar_cl_ookKcZLP6IjbeYc9inqKu3734J9WA8ssy5cL90jmJSs\nActivate: postctl config set license_key <key>",
 	},
 
 	// Posts View

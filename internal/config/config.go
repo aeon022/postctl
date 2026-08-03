@@ -110,29 +110,7 @@ var ActiveProfile string
 
 // IsPro prüft, ob eine gültige Pro-Lizenz aktiv ist
 func IsPro() bool {
-	key := strings.TrimSpace(ActiveConfig.LicenseKey)
-	if key == "postctl-pro-dev" || key == "postctl-pro-family" {
-		return true
-	}
-	if (strings.HasPrefix(key, "PCTL-PRO-") && len(key) >= 16) || (strings.HasPrefix(key, "PCTL-DEV-") && len(key) >= 12) || (strings.HasPrefix(key, "a83-postctl") && len(key) >= 15) {
-		return true
-	}
 	return ActiveConfig.LicenseStatus == "active"
-}
-
-// ValidateLicenseKey prüft das Format und die Gültigkeit des Lizenzschlüssels.
-func ValidateLicenseKey(key string) bool {
-	key = strings.TrimSpace(key)
-	if key == "" {
-		return false
-	}
-	if key == "postctl-pro-dev" || key == "postctl-pro-family" {
-		return true
-	}
-	if (strings.HasPrefix(key, "PCTL-PRO-") && len(key) >= 16) || (strings.HasPrefix(key, "PCTL-DEV-") && len(key) >= 12) || (strings.HasPrefix(key, "a83-postctl") && len(key) >= 15) {
-		return true
-	}
-	return false
 }
 
 // configDir returns the config directory for the given profile: the
