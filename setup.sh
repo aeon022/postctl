@@ -16,14 +16,29 @@ echo ""
 
 # 1. Go Installation prüfen
 echo -e "${BLUE}[1/4] Prüfe Go-Installation...${NC}"
+# GOTOOLCHAIN=local verhindert, dass go bei einer zu alten lokalen Version
+# still versucht, die in go.mod geforderte Toolchain aus dem Netz nachzuladen —
+# genau das führte auf WSL/Ubuntu zu einem endlosen, meldungslosen Hänger direkt
+# an dieser Stelle (github.com/aeon022/postctl/issues/1), sobald Proxy/Firewall
+# den Download blockierten. Mit "local" schlägt eine zu alte Version stattdessen
+# sofort mit einer klaren Fehlermeldung fehl.
+export GOTOOLCHAIN=local
 if ! command -v go &> /dev/null; then
     echo -e "${RED}Fehler: Go ist nicht installiert!${NC}"
     echo -e "Bitte installiere Go zuerst über Homebrew:"
     echo -e "  ${YELLOW}brew install go${NC}"
     exit 1
 else
-    GO_VERSION=$(go version)
-    echo -e "${GREEN}✔ Go gefunden:${NC} $GO_VERSION"
+    INSTALLED_GO=$(go env GOVERSION | sed 's/^go//')
+    REQUIRED_GO=$(grep -m1 '^go ' go.mod | awk '{print $2}')
+    NEWEST=$(printf '%s\n%s\n' "$INSTALLED_GO" "$REQUIRED_GO" | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)
+    if [ "$NEWEST" != "$INSTALLED_GO" ]; then
+        echo -e "${RED}Fehler: Installierte Go-Version (go$INSTALLED_GO) ist älter als benötigt (go$REQUIRED_GO).${NC}"
+        echo -e "Bitte Go aktualisieren, z.B. über Homebrew:"
+        echo -e "  ${YELLOW}brew upgrade go${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}✔ Go gefunden:${NC} go$INSTALLED_GO"
 fi
 echo ""
 
