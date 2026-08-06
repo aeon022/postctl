@@ -1,3 +1,7 @@
+---
+joplin_id: 15825a789fe04cd7b951662e2c6c1aca
+updated_at: '2026-08-02T17:41:21.348Z'
+---
 # postctl — Frequently Asked Questions (FAQ)
 
 This document contains answers to common questions about `postctl`'s architecture, security, scheduling, licensing, and AI integrations.

@@ -1,3 +1,7 @@
+---
+joplin_id: 423547a973a7438289115e9edea51398
+updated_at: '2026-08-02T17:41:21.386Z'
+---
 # Go Tutorial — postctl
 
 Dieses Tutorial führt dich durch Go anhand des postctl-Projekts. Jede Phase baut ein Feature und lehrt neue Go-Konzepte.

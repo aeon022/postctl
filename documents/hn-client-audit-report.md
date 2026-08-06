@@ -1,3 +1,7 @@
+---
+joplin_id: c5492a0dbcab4fc2bec4db2d3d41aedf
+updated_at: '2026-08-02T17:41:21.453Z'
+---
 # Audit-Report & Roadmap: Hacker News Client (hn-client)
 ## Resolving Feed Discrepancy & Moderation Visibility
 
