@@ -180,7 +180,10 @@ func (r *RedditPlatform) FetchAnalytics(ctx context.Context, platformID string) 
 	return models.AnalyticsData{}, nil
 }
 
-// Delete is a stub for Reddit delete method
+// Delete is not implemented for Reddit yet. Returning an honest error
+// instead of nil matters: callers use this result to decide whether the
+// local post record is safe to remove, and a lying nil made postctl believe
+// a still-live Reddit post had been deleted.
 func (r *RedditPlatform) Delete(ctx context.Context, platformID string) error {
-	return nil
+	return fmt.Errorf("reddit: delete not implemented — post %s was not removed from Reddit", platformID)
 }

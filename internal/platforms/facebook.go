@@ -451,7 +451,10 @@ func (f *FacebookPlatform) FetchAnalytics(ctx context.Context, platformID string
 	}, nil
 }
 
-// Delete is a stub for Facebook delete method
+// Delete is not implemented for Facebook yet. Returning an honest error
+// instead of nil matters: callers use this result to decide whether the
+// local post record is safe to remove, and a lying nil made postctl believe
+// a still-live Facebook post had been deleted.
 func (f *FacebookPlatform) Delete(ctx context.Context, platformID string) error {
-	return nil
+	return fmt.Errorf("facebook: delete not implemented — post %s was not removed from Facebook", platformID)
 }

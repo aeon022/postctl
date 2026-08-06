@@ -148,7 +148,10 @@ func (d *DevToPlatform) FetchAnalytics(ctx context.Context, platformID string) (
 	return models.AnalyticsData{}, nil
 }
 
-// Delete is a stub for DevTo delete method
+// Delete is not implemented for Dev.to yet. Returning an honest error
+// instead of nil matters: callers use this result to decide whether the
+// local post record is safe to remove, and a lying nil made postctl believe
+// a still-live Dev.to post had been deleted.
 func (d *DevToPlatform) Delete(ctx context.Context, platformID string) error {
-	return nil
+	return fmt.Errorf("devto: delete not implemented — post %s was not removed from Dev.to", platformID)
 }

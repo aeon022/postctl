@@ -187,7 +187,10 @@ func (m *MediumPlatform) FetchAnalytics(ctx context.Context, platformID string) 
 	return models.AnalyticsData{}, nil
 }
 
-// Delete is a stub for Medium delete method
+// Delete is not implemented for Medium yet. Returning an honest error
+// instead of nil matters: callers use this result to decide whether the
+// local post record is safe to remove, and a lying nil made postctl believe
+// a still-live Medium post had been deleted.
 func (m *MediumPlatform) Delete(ctx context.Context, platformID string) error {
-	return nil
+	return fmt.Errorf("medium: delete not implemented — post %s was not removed from Medium", platformID)
 }
