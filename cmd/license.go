@@ -139,7 +139,26 @@ var licenseActivateCmd = &cobra.Command{
 					}
 					return
 				}
+				// The fallback validate call itself didn't come back OK —
+				// treat its status the same as any other response below
+				// (transient-checked before caching "invalid"), not the
+				// original 403's status, which would never be transient.
+				fmt.Printf("✗ Activation failed: verification also failed (Status: %d)\n", valResp.StatusCode)
+				fmt.Printf("  Details: %s\n", string(valBytes))
+				if isTransientStatus(valResp.StatusCode) {
+					fmt.Println("  Not saved — this looks temporary, try again shortly.")
+					os.Exit(1)
+				}
+				config.ActiveConfig.LicenseKey = key
+				config.ActiveConfig.LicenseStatus = "invalid"
+				_ = config.SaveConfig()
+				os.Exit(1)
 			}
+			// Network error on the fallback validate call — also transient,
+			// don't touch the cache.
+			fmt.Printf("✗ Activation failed: network error during verification (%v)\n", valErr)
+			fmt.Println("  Not saved — this looks temporary, try again shortly.")
+			os.Exit(1)
 		}
 
 		errMsg := "Invalid or inactive key"
