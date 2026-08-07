@@ -1,6 +1,6 @@
 ---
 joplin_id: 15825a789fe04cd7b951662e2c6c1aca
-updated_at: '2026-08-02T17:41:21.348Z'
+updated_at: '2026-08-07T19:51:55.652Z'
 ---
 # postctl — Frequently Asked Questions (FAQ)
 
@@ -14,6 +14,8 @@ This document contains answers to common questions about `postctl`'s architectur
 
 ### Q1: Is postctl really free? What are the limitations?
 **A:** Yes, the core of `postctl` is completely open-source (MIT licensed) and free to use. You can connect up to **2 social networks** (e.g., one Twitter/X account and one LinkedIn account) with unlimited posts and drafts. To connect more than 2 accounts, you can buy a Pro lifetime license on Polar.sh, which also helps support the development of the project.
+
+**Launch special:** use code `POSTCTL2026` for 37% off — valid through October 31, 2026.
 
 ### Q2: How does postctl store my credentials? Is it secure?
 **A:** Your API keys, tokens, and cookies are stored **locally** on your computer inside a SQLite database (`~/.config/postctl/postctl.db`). 
@@ -44,6 +46,8 @@ This document contains answers to common questions about `postctl`'s architectur
 
 ### F1: Ist postctl wirklich kostenlos? Was sind die Einschränkungen?
 **A:** Ja, der Kern von `postctl` ist komplett Open-Source (MIT-Lizenz) und kostenlos. Du kannst bis zu **2 soziale Netzwerke** (z. B. ein Twitter/X- und ein LinkedIn-Konto) mit unbegrenzten Beiträgen und Entwürfen verbinden. Wenn du mehr als 2 Konten verknüpfen möchtest, kannst du eine Pro-Lizenz auf Lebenszeit auf Polar.sh erwerben, was gleichzeitig die Weiterentwicklung des Projekts unterstützt.
+
+**Launch-Special:** mit Code `POSTCTL2026` gibt's 37 % Rabatt — gültig bis 31. Oktober 2026.
 
 ### F2: Wie speichert postctl meine Zugangsdaten? Ist das sicher?
 **A:** Deine API-Keys, Tokens und Cookies werden **lokal** auf deinem Rechner in einer SQLite-Datenbank gespeichert (`~/.config/postctl/postctl.db`). 

@@ -109,8 +109,12 @@ var ActiveConfig Config
 var ActiveProfile string
 
 // IsPro prüft, ob eine gültige Pro-Lizenz aktiv ist
+// IsPro prüft, ob eine gültige Pro-Lizenz aktiv ist. Polars echte
+// License-Key-Ressource nutzt "granted" als Status (gegen die Live-API
+// bestätigt) — "active" wird zusätzlich akzeptiert für den lokalen
+// Dev/Family-Bypass, der diesen Wert direkt in die Config schreibt.
 func IsPro() bool {
-	return ActiveConfig.LicenseStatus == "active"
+	return ActiveConfig.LicenseStatus == "granted" || ActiveConfig.LicenseStatus == "active"
 }
 
 // configDir returns the config directory for the given profile: the
