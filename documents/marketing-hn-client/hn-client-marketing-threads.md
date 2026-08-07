@@ -3,7 +3,9 @@ id: hn-client-marketing-threads
 platform: threads
 type: single
 campaign: hn-client-marketing
-schedule: "2026-07-01 10:00"
+schedule: 2026-07-01 10:00
+joplin_id: 7f39131ba827428facc0109e50ad04e9
+updated_at: '2026-08-07T19:27:10.209Z'
 ---
 🚀 Announcing hn-client: A gorgeous, keyboard-driven Hacker News client built for your terminal in Go!
 

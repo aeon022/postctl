@@ -3,7 +3,9 @@ id: postctl-deployment-threads
 platform: threads
 type: single
 campaign: postctl-marketing
-schedule: "2026-07-01 09:00"
+schedule: 2026-07-01 09:00
+joplin_id: 2238499b97704ef7b59a652e6c0e00ad
+updated_at: '2026-08-07T19:27:10.706Z'
 ---
 💻 "What happens to my scheduled posts if my laptop is closed?"
 

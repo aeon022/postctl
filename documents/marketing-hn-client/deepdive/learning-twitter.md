@@ -3,6 +3,8 @@ platform: twitter
 type: thread
 campaign: hn-client-deepdive
 schedule: 2026-07-07 15:30
+joplin_id: 66ec2d9acbdd4bdcb1add9b43737149e
+updated_at: '2026-08-07T19:27:10.116Z'
 ---
 Want to learn Go or get started with TUI (Terminal User Interface) development?
 

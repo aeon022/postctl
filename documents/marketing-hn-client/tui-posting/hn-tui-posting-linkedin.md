@@ -3,7 +3,9 @@ id: hn-tui-posting-linkedin
 platform: linkedin
 type: single
 campaign: hn-client-tui-posting
-schedule: "2026-07-08 10:00"
+schedule: 2026-07-08 10:00
+joplin_id: c16425a5e3414235886eeff813f91a80
+updated_at: '2026-08-07T19:27:10.263Z'
 ---
 ⌨️ Hacker News Browse & Post — 100% in your Terminal!
 

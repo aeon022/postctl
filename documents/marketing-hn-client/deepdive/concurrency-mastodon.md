@@ -2,6 +2,8 @@
 platform: mastodon
 campaign: hn-client-deepdive
 schedule: 2026-07-06 15:30
+joplin_id: 624bde91deb44f079622a1ad910ab856
+updated_at: '2026-08-07T19:27:10.055Z'
 ---
 Concurrent Hacker News client. ⚡
 

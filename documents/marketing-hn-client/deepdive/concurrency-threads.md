@@ -2,6 +2,8 @@
 platform: threads
 campaign: hn-client-deepdive
 schedule: 2026-07-06 15:30
+joplin_id: b0219652bf334dbda008325bdaaaf111
+updated_at: '2026-08-07T19:27:10.061Z'
 ---
 Non-blocking terminal interfaces: Elm + Go Concurrency! ⚡
 

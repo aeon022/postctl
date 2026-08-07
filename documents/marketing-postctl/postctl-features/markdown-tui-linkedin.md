@@ -2,6 +2,8 @@
 platform: linkedin
 campaign: postctl-features
 schedule: 2026-07-04 09:00
+joplin_id: 41a2cec048e04d04b4ce56884bdb3675
+updated_at: '2026-08-07T19:27:10.874Z'
 ---
 🚀 Announcing postctl: Social Media Management, Built for Developers!
 

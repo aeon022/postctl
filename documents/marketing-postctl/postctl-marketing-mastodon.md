@@ -3,7 +3,9 @@ id: postctl-marketing-mastodon
 platform: mastodon
 type: single
 campaign: postctl-marketing
-schedule: "2026-06-30 09:00"
+schedule: 2026-06-30 09:00
+joplin_id: bde9e0a952354557bde3b06ee26dd499
+updated_at: '2026-08-07T19:27:11.096Z'
 ---
 🚀 Meet postctl: Social Media Management Built for Developers & AI
 

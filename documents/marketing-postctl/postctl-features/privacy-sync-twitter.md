@@ -3,6 +3,8 @@ platform: twitter
 type: thread
 campaign: postctl-features
 schedule: 2026-07-05 17:00
+joplin_id: c63b5b3c96254c1397b91fc94ded8371
+updated_at: '2026-08-07T19:27:11.064Z'
 ---
 Why treat social media posts differently than code? 💻
 

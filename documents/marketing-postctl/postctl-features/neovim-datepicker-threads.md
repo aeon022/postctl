@@ -2,6 +2,8 @@
 platform: threads
 campaign: postctl-features
 schedule: 2026-07-05 10:00
+joplin_id: 181bbb9158c645979cfa9543262e17f2
+updated_at: '2026-08-07T19:27:10.983Z'
 ---
 Keyboard-only posting: Write social posts in Neovim! 💻
 

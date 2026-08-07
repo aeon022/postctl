@@ -2,6 +2,8 @@
 platform: bluesky
 campaign: postctl-features
 schedule: 2026-07-05 10:00
+joplin_id: 3416819a3019436e909f1edc3791ba11
+updated_at: '2026-08-07T19:27:10.939Z'
 ---
 Draft your social posts in Neovim! 💻
 

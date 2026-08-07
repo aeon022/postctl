@@ -3,6 +3,8 @@ platform: twitter
 type: thread
 campaign: postctl-features
 schedule: 2026-07-05 10:00
+joplin_id: b88b67fa86214abca721580b3fdd787a
+updated_at: '2026-08-07T19:27:10.992Z'
 ---
 Still copying and pasting post text into a web browser? 💻
 

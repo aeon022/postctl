@@ -2,6 +2,8 @@
 platform: facebook
 campaign: postctl-features
 schedule: 2026-07-05 10:00
+joplin_id: 276a605e097742f18a71bb7648371953
+updated_at: '2026-08-07T19:27:10.947Z'
 ---
 Keyboard-Only Workflow: Write Social Posts in Neovim 💻
 

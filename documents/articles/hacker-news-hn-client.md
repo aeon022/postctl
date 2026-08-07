@@ -1,3 +1,7 @@
+---
+joplin_id: 25d25fe887454f45bdfcf332f0339631
+updated_at: '2026-08-07T19:27:09.564Z'
+---
 # Show HN: hn-client – Keyboard-driven Hacker News reader with color-coded comments
 
 *Suggested Title:* Show HN: hn-client – Keyboard-driven Hacker News reader with color-coded comments

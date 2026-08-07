@@ -2,6 +2,8 @@
 platform: twitter
 type: thread
 campaign: missionctl-tools
+joplin_id: b18e4674e55d41849317ac96188b3846
+updated_at: '2026-08-07T19:27:11.489Z'
 ---
 Track your bank expenses, detect subscriptions, and analyze categories locally. Meet `budgetctl` 💰
 

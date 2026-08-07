@@ -1,3 +1,7 @@
+---
+joplin_id: 894d31c20d73446dbacfac9460f47593
+updated_at: '2026-08-07T19:27:11.382Z'
+---
 Show HN: missionctl – Local-first macOS TUI suite + MCP server to give AI agents 'hands'
 
 Hi HN,

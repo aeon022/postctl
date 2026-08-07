@@ -1,7 +1,9 @@
 ---
 platform: facebook
 campaign: vim-workflow
-schedule: 2026-07-03 08:30:00
+schedule: 2026-07-03T08:30:00.000Z
+joplin_id: 4c7c61ecddb34ace97a657e542d942f5
+updated_at: '2026-08-07T19:27:11.298Z'
 ---
 Keyboard-Only Workflow: Write Social Posts in Neovim 💻
 

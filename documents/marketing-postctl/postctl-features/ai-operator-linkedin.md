@@ -2,6 +2,8 @@
 platform: linkedin
 campaign: postctl-features
 schedule: 2026-07-04 15:30
+joplin_id: 7ee3ced74bab4570b4e0548a7f12e4c2
+updated_at: '2026-08-07T19:27:10.785Z'
 ---
 🤖 The AI-as-Operator Principle: Autonomous Social Media Management
 

@@ -1,7 +1,9 @@
 ---
 platform: bluesky
 campaign: saas-detox
-schedule: 2026-07-02 15:30:00
+schedule: 2026-07-02T15:30:00.000Z
+joplin_id: 78c4c72dff1544c28f3294ec8a16ab9c
+updated_at: '2026-08-07T19:27:11.202Z'
 ---
 Stop paying monthly SaaS fees just to schedule posts! 🔒
 

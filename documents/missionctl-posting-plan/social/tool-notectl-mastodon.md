@@ -1,6 +1,8 @@
 ---
 platform: mastodon
 campaign: missionctl-tools
+joplin_id: bc30a0339cce4559aee6048910639618
+updated_at: '2026-08-07T19:27:11.674Z'
 ---
 📓 Meet notectl: Local Markdown & Obsidian note management from the terminal.
 

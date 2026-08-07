@@ -1,6 +1,8 @@
 ---
 platform: linkedin
 campaign: missionctl-tools
+joplin_id: d2c3322f07c547f385b9a0295360734a
+updated_at: '2026-08-07T19:27:11.569Z'
 ---
 📧 Introducing mailctl: Email Management for the Monospace TUI & AI Era
 

@@ -2,6 +2,8 @@
 platform: threads
 campaign: hn-client-deepdive
 schedule: 2026-07-07 09:00
+joplin_id: dfd6ae9e7dcc45699ca21c7959564a34
+updated_at: '2026-08-07T19:27:10.016Z'
 ---
 Beautiful terminal typography: How we style HN comments! 🎨
 

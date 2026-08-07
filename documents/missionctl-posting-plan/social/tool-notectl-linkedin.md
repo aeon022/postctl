@@ -1,6 +1,8 @@
 ---
 platform: linkedin
 campaign: missionctl-tools
+joplin_id: 70e7415436b6431f91e1228c26a190d7
+updated_at: '2026-08-07T19:27:11.657Z'
 ---
 📓 Introducing notectl: Local Markdown & Obsidian Note Management from the Terminal
 

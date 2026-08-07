@@ -3,9 +3,10 @@ id: hn-client-marketing-twitter
 platform: twitter
 type: thread
 campaign: hn-client-marketing
-schedule: "2026-07-01 10:00"
+schedule: 2026-07-01 10:00
+joplin_id: dac8de25744b47e0a7f78244f8cb630c
+updated_at: '2026-08-07T19:27:10.219Z'
 ---
-
 ## Tweet 1
 
 🚀 Meet hn-client — A modern, blazing-fast, keyboard-driven Hacker News TUI client for your terminal!

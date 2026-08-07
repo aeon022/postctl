@@ -2,6 +2,8 @@
 platform: linkedin
 campaign: hn-client-deepdive
 schedule: 2026-07-07 15:30
+joplin_id: 967d322b471b4ea3b9bab7d5fbad3a3b
+updated_at: '2026-08-07T19:27:10.091Z'
 ---
 🎓 Learn Go & TUI Development: A Real-World Code Sandbox
 

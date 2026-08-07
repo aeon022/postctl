@@ -1,7 +1,9 @@
 ---
 platform: threads
 campaign: vim-workflow
-schedule: 2026-07-03 08:30:00
+schedule: 2026-07-03T08:30:00.000Z
+joplin_id: cf3511d1394d4f868569defc53852c12
+updated_at: '2026-08-07T19:27:11.326Z'
 ---
 Keyboard-only posting: Write social posts in Neovim! 💻
 

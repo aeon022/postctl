@@ -3,9 +3,10 @@ id: postctl-deployment-twitter
 platform: twitter
 type: thread
 campaign: postctl-marketing
-schedule: "2026-07-01 09:00"
+schedule: 2026-07-01 09:00
+joplin_id: ea6f21258aa74a47a1b50ab6305df7bb
+updated_at: '2026-08-07T19:27:10.723Z'
 ---
-
 ## Tweet 1
 
 💻 "But what if my MacBook is closed when a post is scheduled?"

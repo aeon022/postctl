@@ -3,7 +3,9 @@ id: postctl-security-threads
 platform: threads
 type: single
 campaign: postctl-security
-schedule: "2026-07-07 10:00"
+schedule: 2026-07-07 10:00
+joplin_id: 7f6c135fa2024eaa887f069df6d74666
+updated_at: '2026-08-07T19:27:11.160Z'
 ---
 Exposing your social media client secrets to cloud databases is a massive risk. 🔒
 

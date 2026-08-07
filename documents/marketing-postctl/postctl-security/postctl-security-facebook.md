@@ -3,7 +3,9 @@ id: postctl-security-facebook
 platform: facebook
 type: single
 campaign: postctl-security
-schedule: "2026-07-07 10:00"
+schedule: 2026-07-07 10:00
+joplin_id: 9d2b89a05fa0417bacd9c1fbfb13611c
+updated_at: '2026-08-07T19:27:11.135Z'
 ---
 🔒 Why Local-First Security is the Only Way to Manage Social API Keys
 

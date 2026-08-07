@@ -1,39 +1,24 @@
 ---
 platform: linkedin
 campaign: missionctl-roadmap
+joplin_id: 0db098c1042044bca936d9cafd50c2d3
+updated_at: '2026-08-07T19:27:11.667Z'
 ---
-🔮 The missionctl Vision: Our Roadmap for 2026/2027
+🔮 We Shipped Our Roadmap Early — Here's What's Actually Next
 
-When we started developing `missionctl`, our goal was clear: to build the "hands" of a local AI agent. 
+When we first wrote the missionctl roadmap, the plan ran from Q3 2026 (postctl v1.0, calctl v0.1) through Q4 2026 (mailctl/budgetctl alphas, Google Calendar sync) to Q1–Q2 2027 (notectl, taskctl, and a full 9-tool, 43-MCP-tool suite).
 
-By Q2 2027, you should be able to give Claude one sentence and have your entire digital week planned, scheduled, drafted, and tracked—all offline, in Go, with SQLite, and without opening a web browser.
+We beat that by months.
 
-Here is our launch timeline:
+✅ What shipped: All 9 tools are live — mailctl, calctl, taskctl, notectl, budgetctl, habctl, timectl, diaryctl, postctl. 66 MCP tools total, more than the original 43-tool estimate, since habctl, timectl, and diaryctl weren't even in the first draft of the plan.
 
-📅 Q3 2026: The Foundations
-- postctl v1.0 + MCP: Social media campaign management with dry-run support.
-- calctl v0.1: Reading and writing macOS calendar events via Swift/EventKit.
+💵 Pricing landed simpler than planned: instead of one flat bundle price, each tool now sells standalone — free core, with a one-time $9 unlock for AI features (mailctl, calctl, budgetctl, habctl; notectl's $9 unlocks a second vault). The full Bundle is $39 one-time for all 9 tools plus future updates.
 
-📅 Q4 2026: The Bundle Alpha
-- calctl v0.5: Adding Google Calendar OAuth2 sync and a Bubble Tea week grid TUI.
-- mailctl v0.1 + v0.5: Syncing macOS Apple Mail boxes and drafting from Markdown.
-- budgetctl v0.1: Local bank CSV transaction importing and parsing.
-- Alpha Bundle release on Polar.sh (postctl + calctl).
+🔮 What's genuinely next: two tool ideas are written up as proposals — healthctl (a terminal-first medication planner) and investctl (portfolio/holdings tracking). Neither has a repo or a line of code yet, and both have open design questions we're still working through before committing.
 
-📅 Q1 2027: The Full Bundle v1.0
-- mailctl v1.0: Launch of the inbox reading/compose TUI.
-- budgetctl v0.5: Classification rules, TUI charts, and budget goals.
-- notectl v0.1: Indexing and full-text searching Obsidian vaults.
-- taskctl v0.1: Synchronizing with Apple Reminders.
-- Go Tutorial launch: Deep-dive into CLI/TUI design with Go.
-- Full Bundle v1.0 launch on Polar.sh ($39 one-time).
+Building in public means the roadmap is allowed to be wrong. The goal was never to hit arbitrary dates — it was to ship things that actually work.
 
-📅 Q2 2027: The Complete MCP Suite
-- mailctl, budgetctl, notectl, and taskctl reach v1.0 with complete MCP servers.
-- Full bundle integration: Claude can schedule a task, map it to a calendar slot, and log notes in Obsidian concurrently.
+👉 GitHub: https://github.com/aeon022/missionctl
+🌐 Pricing: https://missionctl.sh
 
-We are committed to building local-first tools with lifetime access. Connection for up to 2 domains is free, and the full bundle is a $39 one-time purchase.
-
-👉 Read the detailed roadmap: https://github.com/aeon022/missionctl
-
-#golang #localfirst #opensource #mcp #claude #softwareengineering #productroadmap #techstartups
+#golang #buildinpublic #opensource #localfirst #softwareengineering #indiehacker

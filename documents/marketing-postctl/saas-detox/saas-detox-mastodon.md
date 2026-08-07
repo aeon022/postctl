@@ -1,7 +1,9 @@
 ---
 platform: mastodon
 campaign: saas-detox
-schedule: 2026-07-02 15:30:00
+schedule: 2026-07-02T15:30:00.000Z
+joplin_id: c37f2747274140f692722cccc91bee72
+updated_at: '2026-08-07T19:27:11.230Z'
 ---
 Why send your access tokens to the cloud? 🔒
 

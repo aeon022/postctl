@@ -3,6 +3,8 @@ platform: twitter
 type: thread
 campaign: hn-client-deepdive
 schedule: 2026-07-07 09:00
+joplin_id: d26942efe95e4baa90dfae44da914a1b
+updated_at: '2026-08-07T19:27:10.023Z'
 ---
 Hacker News comments are notorious for raw HTML tags, embedded links, and code snippets. How do you display them cleanly in a monospace terminal?
 

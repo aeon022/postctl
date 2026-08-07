@@ -3,6 +3,8 @@ platform: twitter
 type: thread
 campaign: postctl-features
 schedule: 2026-07-04 15:30
+joplin_id: 436e4b7de7944a53babe2f90ffd8f380
+updated_at: '2026-08-07T19:27:10.829Z'
 ---
 Can an AI manage your social media queue? Yes, and it shouldn't require complex cloud setups.
 

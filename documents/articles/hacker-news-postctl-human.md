@@ -1,3 +1,7 @@
+---
+joplin_id: 333e8e81942544269ae501a5fb88fd8c
+updated_at: '2026-08-07T19:27:09.585Z'
+---
 # Show HN: postctl – Local-first, markdown-native social media scheduler in Go
 
 *Suggested Title:* Show HN: postctl – Local-first, markdown-native social media scheduler in Go

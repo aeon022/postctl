@@ -2,10 +2,12 @@
 platform: twitter
 type: thread
 campaign: postctl-launch
-schedule: 2026-06-28 16:05:00
-images: ["/Users/gweiher/Developing/Projects/# Screenshots/postctl/01-dashboard.png"]
+schedule: 2026-06-28T16:05:00.000Z
+images:
+  - /Users/gweiher/Developing/Projects/# Screenshots/postctl/01-dashboard.png
+joplin_id: b635a9a0421a4c2c938cf00ab743ebdd
+updated_at: '2026-08-07T19:27:11.269Z'
 ---
-
 ## Tweet 1
 
 PostCTL – TUI Social Media Schedules

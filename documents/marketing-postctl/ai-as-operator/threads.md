@@ -1,7 +1,9 @@
 ---
 platform: threads
 campaign: ai-operator
-schedule: 2026-07-02 09:00:00
+schedule: 2026-07-02T09:00:00.000Z
+joplin_id: 4e0bebf3ed204c2ab3858a9119f48776
+updated_at: '2026-08-07T19:27:10.409Z'
 ---
 Social media management as code: How AI runs postctl! 🤖
 

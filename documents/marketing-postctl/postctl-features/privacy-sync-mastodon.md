@@ -2,6 +2,8 @@
 platform: mastodon
 campaign: postctl-features
 schedule: 2026-07-05 17:00
+joplin_id: 683292cd88bc4dc7aa75cff3daeea92e
+updated_at: '2026-08-07T19:27:11.033Z'
 ---
 Social media as code. 🔄
 

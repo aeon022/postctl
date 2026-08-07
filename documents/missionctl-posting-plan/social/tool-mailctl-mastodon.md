@@ -1,6 +1,8 @@
 ---
 platform: mastodon
 campaign: missionctl-tools
+joplin_id: 624d6e45bec242338cfd0e4b82eb4f74
+updated_at: '2026-08-07T19:27:11.578Z'
 ---
 📧 Meet mailctl: Email management for the monospace terminal.
 

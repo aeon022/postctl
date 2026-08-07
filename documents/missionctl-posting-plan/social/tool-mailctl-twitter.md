@@ -2,6 +2,8 @@
 platform: twitter
 type: thread
 campaign: missionctl-tools
+joplin_id: de858ae31ea240cc9e4232ae568623be
+updated_at: '2026-08-07T19:27:11.609Z'
 ---
 Email from the terminal, built for AI agents. Meet `mailctl` 📧
 

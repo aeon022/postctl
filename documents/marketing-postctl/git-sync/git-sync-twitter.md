@@ -1,7 +1,9 @@
 ---
 platform: twitter
 campaign: git-sync
-schedule: 2026-07-03 18:30:00
+schedule: 2026-07-03T18:30:00.000Z
+joplin_id: 85bfc2f4cc39401d979648f694b75268
+updated_at: '2026-08-07T19:27:10.557Z'
 ---
 ## Tweet 1
 Why treat social media posts differently than code? 💻

@@ -3,7 +3,9 @@ id: hn-tui-posting-facebook
 platform: facebook
 type: single
 campaign: hn-client-tui-posting
-schedule: "2026-07-08 10:00"
+schedule: 2026-07-08 10:00
+joplin_id: cbd1071881104d46b17f08223cc303ce
+updated_at: '2026-08-07T19:27:10.253Z'
 ---
 ⌨️ Hacker News Browse & Post — 100% in your Terminal!
 

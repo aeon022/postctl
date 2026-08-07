@@ -3,8 +3,9 @@ title: Why I Built a Terminal-Native, Markdown-First Social Media Manager in Go
 published: false
 description: Stop using bloated web dashboards. Manage your Twitter/X, LinkedIn, and Threads posts as Markdown files versioned in Git.
 tags: go, open-source, showdev, developer
+joplin_id: ccd3004987564b84828a7be9dda3d94c
+updated_at: '2026-08-07T19:27:09.541Z'
 ---
-
 # Why I Built a Terminal-Native, Markdown-First Social Media Manager in Go
 
 As developers, we love version control. We write code in Markdown, review configurations in Pull Requests, and track history in Git. 

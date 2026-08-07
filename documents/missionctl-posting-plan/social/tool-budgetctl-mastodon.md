@@ -1,6 +1,8 @@
 ---
 platform: mastodon
 campaign: missionctl-tools
+joplin_id: 39d79647d94f48259cd48f740a7bb190
+updated_at: '2026-08-07T19:27:11.472Z'
 ---
 💰 Meet budgetctl: Local-First, Privacy-Preserving Expense & Subscription Tracking.
 

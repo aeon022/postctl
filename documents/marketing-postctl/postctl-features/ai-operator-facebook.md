@@ -2,6 +2,8 @@
 platform: facebook
 campaign: postctl-features
 schedule: 2026-07-04 15:30
+joplin_id: d1d7b04735034a98a999d8b21b4b3a5f
+updated_at: '2026-08-07T19:27:10.772Z'
 ---
 Terminal Social Media Automation: AI-as-Operator 🤖
 

@@ -3,7 +3,9 @@ id: postctl-deployment-mastodon
 platform: mastodon
 type: single
 campaign: postctl-marketing
-schedule: "2026-07-01 09:00"
+schedule: 2026-07-01 09:00
+joplin_id: 24c286ee443f4990bc97c2cc553c3649
+updated_at: '2026-08-07T19:27:10.692Z'
 ---
 💻 "What happens to my scheduled posts if my laptop is closed?"
 

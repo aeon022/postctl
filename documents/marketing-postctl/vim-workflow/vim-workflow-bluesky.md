@@ -1,7 +1,9 @@
 ---
 platform: bluesky
 campaign: vim-workflow
-schedule: 2026-07-03 08:30:00
+schedule: 2026-07-03T08:30:00.000Z
+joplin_id: d6d5596995904119b014067a3cad8518
+updated_at: '2026-08-07T19:27:11.289Z'
 ---
 Draft your social posts inside Neovim! 💻
 

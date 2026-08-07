@@ -1,3 +1,7 @@
+---
+joplin_id: 20a1dab748a346d7a7796ee86160238e
+updated_at: '2026-08-07T19:51:55.874Z'
+---
 # postctl — Projekt-Fahrplan & Umsetzungskonzept
 
 Dieses Dokument dient als zentrale Orientierung und Statusübersicht für die Entwicklung von **postctl**. Es fasst die Erkenntnisse aus den Quelldokumenten zusammen und bereitet den konkreten Projektablauf vor.

@@ -3,8 +3,9 @@ title: Why I Built a Terminal-Native Hacker News Client in Go (Using Bubble Tea)
 published: false
 description: Read Hacker News like a developer. Introducing hn-client, a fast, keyboard-driven terminal client written in Go with nested color-coded comments.
 tags: go, open-source, terminal, showdev
+joplin_id: 915c42defa4d413f8ff08c1be13cc747
+updated_at: '2026-08-07T19:27:09.520Z'
 ---
-
 # Why I Built a Terminal-Native Hacker News Client in Go (Using Bubble Tea)
 
 As developers, we love our command-line tools. We run git, build code, tail logs, and edit configuration files without ever touching our mouse. 

@@ -3,7 +3,9 @@ id: postctl-deployment-linkedin
 platform: linkedin
 type: single
 campaign: postctl-marketing
-schedule: "2026-07-01 09:00"
+schedule: 2026-07-01 09:00
+joplin_id: 3de395b83073475d8de93603794dd286
+updated_at: '2026-08-07T19:27:10.676Z'
 ---
 💻 "What happens to my scheduled posts if my laptop is closed?"
 

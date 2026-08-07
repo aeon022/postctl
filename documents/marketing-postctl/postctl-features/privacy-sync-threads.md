@@ -2,6 +2,8 @@
 platform: threads
 campaign: postctl-features
 schedule: 2026-07-05 17:00
+joplin_id: d78c43f782034356b53983a90158ed80
+updated_at: '2026-08-07T19:27:11.049Z'
 ---
 Version control your social media with Git! 🔄
 

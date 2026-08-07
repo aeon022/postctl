@@ -3,7 +3,9 @@ id: postctl-security-linkedin
 platform: linkedin
 type: single
 campaign: postctl-security
-schedule: "2026-07-07 10:00"
+schedule: 2026-07-07 10:00
+joplin_id: 3688d80c81a343318f142742b8d1e22e
+updated_at: '2026-08-07T19:27:11.144Z'
 ---
 🔒 Why Local-First Security is the Only Way to Manage Social API Keys
 

@@ -1,8 +1,11 @@
 ---
 platform: linkedin
 campaign: postctl-launch
-schedule: 2026-06-28 15:00:00
-images: ["/Users/gweiher/Developing/Projects/# Screenshots/postctl/01-dashboard.png"]
+schedule: 2026-06-28T15:00:00.000Z
+images:
+  - /Users/gweiher/Developing/Projects/# Screenshots/postctl/01-dashboard.png
+joplin_id: 0a552374294d450cb2eb03f9bc0e49d2
+updated_at: '2026-08-07T19:27:10.586Z'
 ---
 🚀 Announcing postctl — Social Media Management, built for Developers!
 

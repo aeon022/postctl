@@ -1,3 +1,7 @@
+---
+joplin_id: 04689a6ad1314ab499d0913ab406f97b
+updated_at: '2026-08-07T19:27:09.634Z'
+---
 # Show HN: postctl – A local-first, markdown-native social media manager in Go
 
 *Suggested Title:* Show HN: postctl – A local-first, markdown-native social media manager in Go

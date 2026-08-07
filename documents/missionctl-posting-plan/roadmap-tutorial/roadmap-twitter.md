@@ -2,33 +2,18 @@
 platform: twitter
 type: thread
 campaign: missionctl-roadmap
+joplin_id: 495fe1d5893a4838a021317bd362a2d0
+updated_at: '2026-08-07T19:27:11.698Z'
 ---
-What is the ultimate vision for `missionctl`? 
+We wrote a roadmap in mid-2026 that ran through Q2 2027. We just checked it against what actually shipped. 🧵
+---
+📅 Planned: postctl v1.0 + calctl v0.1 by Q3 2026, mailctl/budgetctl alphas by Q4 2026, notectl + taskctl by Q1 2027, full 9-tool/43-MCP-tool suite by Q2 2027.
+---
+✅ Shipped: all 9 tools, months early — mailctl, calctl, taskctl, notectl, budgetctl, habctl, timectl, diaryctl, postctl. 66 MCP tools total (more than the original 43 — habctl/timectl/diaryctl weren't even in the first draft).
+---
+💵 Pricing changed for the better: instead of one flat bundle, each tool now sells standalone — free core, $9 one-time AI unlock per tool. Full Bundle is $39 for everything.
+---
+🔮 What's actually next: healthctl (meds) and investctl (portfolio) are written up as proposals — no repo, no code yet, real design questions still open.
 
-By Q2 2027, you should be able to give Claude one sentence and have your entire digital week planned, posted, and tracked locally. Here is our 2026/2027 launch roadmap. 🧵
----
-📅 Q3 2026:
-- postctl v1.0 + MCP: Stable CLI scheduling and AI agent operator tools.
-- calctl v0.1: Native macOS calendar read/write via Swift/EventKit.
----
-📅 Q4 2026:
-- calctl v0.5: Google Calendar OAuth2 integration + TUI week grid.
-- mailctl v0.1 + v0.5: Inbox caching and Markdown-first mailing.
-- budgetctl v0.1: Local bank CSV transaction importing.
-- Bundle Alpha release on Polar.sh.
----
-📅 Q1 2027:
-- mailctl v1.0: Full email TUI client.
-- budgetctl v0.5: Category tagging rules + TUI charts.
-- notectl v0.1: Obsidian vault indexing.
-- taskctl v0.1: Apple Reminders sync.
-- Go Tutorial launch.
-- Full Bundle v1.0 on Polar.sh ($39).
----
-📅 Q2 2027:
-- v1.0 releases for mailctl, budgetctl, notectl, taskctl with full MCP.
-- The AI has 43 tools to organize your schedule, emails, notes, budget, and socials locally.
----
-Lifetime access, local-first data, open source binaries. Check out the project roadmap:
 👉 https://github.com/aeon022/missionctl
-🌐 https://postctl.sh
+🌐 https://missionctl.sh

@@ -3,7 +3,9 @@ id: postctl-deployment-bluesky
 platform: bluesky
 type: single
 campaign: postctl-marketing
-schedule: "2026-07-01 09:00"
+schedule: 2026-07-01 09:00
+joplin_id: 6e3cce87ff1640258dbf8797ef371e72
+updated_at: '2026-08-07T19:27:10.632Z'
 ---
 💻 Closed laptop? No problem. `postctl` schedules posts in 2 ways:
 1. Auto-Catchup: Booting checks SQLite and publishes missed schedules instantly.

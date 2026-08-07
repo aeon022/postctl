@@ -2,6 +2,8 @@
 platform: threads
 campaign: postctl-features
 schedule: 2026-07-04 15:30
+joplin_id: 73bfa3dfee95409184ebc84610f729c7
+updated_at: '2026-08-07T19:27:10.815Z'
 ---
 Social media management as code: How AI runs postctl! 🤖
 

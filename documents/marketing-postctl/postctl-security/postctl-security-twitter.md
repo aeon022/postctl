@@ -3,7 +3,9 @@ id: postctl-security-twitter
 platform: twitter
 type: single
 campaign: postctl-security
-schedule: "2026-07-07 10:00"
+schedule: 2026-07-07 10:00
+joplin_id: 6235473fc6234a31a48b7fb55060fa70
+updated_at: '2026-08-07T19:27:11.168Z'
 ---
 ## Tweet 1
 Why trust the cloud with your social media API keys? 🔑

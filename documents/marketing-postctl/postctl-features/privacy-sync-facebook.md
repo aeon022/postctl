@@ -2,6 +2,8 @@
 platform: facebook
 campaign: postctl-features
 schedule: 2026-07-05 17:00
+joplin_id: f5245da42b3d4cdca2766bac47965f07
+updated_at: '2026-08-07T19:27:11.017Z'
 ---
 Social Media as Code: Git Integration and Multi-Device Sync 🔄
 

@@ -1,6 +1,8 @@
 ---
 platform: facebook
 campaign: missionctl-tools
+joplin_id: 8d2044722827496099b4f9f75888e5e5
+updated_at: '2026-08-07T19:27:11.722Z'
 ---
 📝 Introducing taskctl: Fast Task Management Synced with Apple Reminders
 

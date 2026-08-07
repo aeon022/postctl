@@ -3,6 +3,8 @@ platform: twitter
 type: thread
 campaign: hn-client-deepdive
 schedule: 2026-07-06 09:00
+joplin_id: 97992dfce21a47bf9ceec0cffeb333e4
+updated_at: '2026-08-07T19:27:10.165Z'
 ---
 How do you open web links from a Terminal User Interface (TUI) without breaking your command-line flow?
 

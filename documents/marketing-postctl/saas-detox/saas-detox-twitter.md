@@ -1,7 +1,9 @@
 ---
 platform: twitter
 campaign: saas-detox
-schedule: 2026-07-02 15:30:00
+schedule: 2026-07-02T15:30:00.000Z
+joplin_id: a83bb69b384e495f8fb29c3c75ca24ea
+updated_at: '2026-08-07T19:27:11.248Z'
 ---
 ## Tweet 1
 Tired of paying $20+/month for cloud social media schedulers just to post Markdown text? 💸

@@ -2,6 +2,8 @@
 platform: linkedin
 campaign: hn-client-deepdive
 schedule: 2026-07-06 09:00
+joplin_id: eb5b459215c9463ca269dce26224a3c7
+updated_at: '2026-08-07T19:27:10.140Z'
 ---
 🖥️ Deep-Dive: Suspending TUI apps for Terminal Web Browsing (w3m / lynx)
 

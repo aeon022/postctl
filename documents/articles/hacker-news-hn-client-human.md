@@ -1,3 +1,7 @@
+---
+joplin_id: 53a9129bb91b45edb4867f536225f5a6
+updated_at: '2026-08-07T19:27:09.554Z'
+---
 # Show HN: hn-client – Keyboard-driven Hacker News reader in Go
 
 *Suggested Title:* Show HN: hn-client – Keyboard-driven Hacker News reader in Go

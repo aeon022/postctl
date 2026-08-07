@@ -2,6 +2,8 @@
 platform: threads
 campaign: hn-client-deepdive
 schedule: 2026-07-07 15:30
+joplin_id: e44cb2a4016b4f90ad5abd68562c671a
+updated_at: '2026-08-07T19:27:10.109Z'
 ---
 Want to learn Go? Skip the dry manuals! 🎓
 

@@ -3,7 +3,9 @@ id: postctl-deployment-facebook
 platform: facebook
 type: single
 campaign: postctl-marketing
-schedule: "2026-07-01 09:00"
+schedule: 2026-07-01 09:00
+joplin_id: c7f1a3a6e3144a33aecdb2ba0459747d
+updated_at: '2026-08-07T19:27:10.654Z'
 ---
 🚀 Meet postctl v1.2 — Local-first Social Media Scheduler for Developers
 

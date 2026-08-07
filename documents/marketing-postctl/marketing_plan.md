@@ -1,3 +1,7 @@
+---
+joplin_id: 77199dba357e46c7b26e7e327a062743
+updated_at: '2026-08-07T19:27:10.601Z'
+---
 # Marketing Launch Plan: postctl
 
 `postctl` is a developer-first tool designed to bring social media management into the local terminal workflow. This document outlines the positioning, platform-specific strategies, and launch execution plan for releasing `postctl` to the public.

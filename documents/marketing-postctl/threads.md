@@ -1,8 +1,11 @@
 ---
 platform: threads
 campaign: postctl-launch
-schedule: 2026-06-28 15:00:00
-images: ["/Users/gweiher/Developing/Projects/# Screenshots/postctl/01-dashboard.png"]
+schedule: 2026-06-28T15:00:00.000Z
+images:
+  - /Users/gweiher/Developing/Projects/# Screenshots/postctl/01-dashboard.png
+joplin_id: 9627f4a105e24c94906c75aa2d684eee
+updated_at: '2026-08-07T19:27:11.258Z'
 ---
 🚀 Announcing postctl — Social Media Management, built for Developers!
 

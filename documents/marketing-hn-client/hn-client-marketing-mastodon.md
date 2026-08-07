@@ -3,7 +3,9 @@ id: hn-client-marketing-mastodon
 platform: mastodon
 type: single
 campaign: hn-client-marketing
-schedule: "2026-07-01 10:00"
+schedule: 2026-07-01 10:00
+joplin_id: ea75eb35823d4a1782cb1e008aec72d0
+updated_at: '2026-08-07T19:27:10.200Z'
 ---
 🚀 Announcing hn-client — A terminal-native Hacker News Client built in Go!
 

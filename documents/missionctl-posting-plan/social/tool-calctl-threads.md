@@ -1,6 +1,8 @@
 ---
 platform: threads
 campaign: missionctl-tools
+joplin_id: d56fd56663d84762a8973bd3c293e649
+updated_at: '2026-08-07T19:27:11.534Z'
 ---
 📅 Manage your calendar and find free slots directly in your terminal. Meet calctl!
 

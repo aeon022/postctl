@@ -1,16 +1,16 @@
 ---
 platform: threads
 campaign: missionctl-roadmap
+joplin_id: bc0ce8a3c3b842d186c5556e094ae656
+updated_at: '2026-08-07T19:27:11.682Z'
 ---
-🔮 What is the ultimate vision for missionctl? 
+🔮 Our original roadmap said: full 9-tool suite by Q2 2027.
 
-By Q2 2027, you should be able to give Claude one sentence and have your entire digital week planned, posted, and tracked locally. 
+We shipped it months early — 9 tools, 66 MCP tools, still 100% local, still open source.
 
-Roadmap:
-- Q3 2026: postctl v1.0 & calctl v0.1 (macOS EventKit)
-- Q4 2026: Google Calendar sync & mailctl/budgetctl alphas
-- Q1 2027: TUI mail, notectl (Obsidian), taskctl (Reminders)
-- Q2 2027: Full 1.0 & 43 MCP tools
+Pricing: free core + $9 AI-unlock per tool, or $39 for the full Bundle.
+
+What's next (not committed, just proposals): healthctl, investctl.
 
 Local-first or cloud?
 

@@ -1,7 +1,9 @@
 ---
 platform: mastodon
 campaign: ai-operator
-schedule: 2026-07-02 09:00:00
+schedule: 2026-07-02T09:00:00.000Z
+joplin_id: 8b48e53debf64b479adf2d79ecf4a9a3
+updated_at: '2026-08-07T19:27:10.387Z'
 ---
 Automate your posts without giving up your privacy. 🔒
 

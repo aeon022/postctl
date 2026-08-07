@@ -1,7 +1,9 @@
 ---
 platform: twitter
 campaign: vim-workflow
-schedule: 2026-07-03 08:30:00
+schedule: 2026-07-03T08:30:00.000Z
+joplin_id: c8b404a3d6db4c7d88d012b79537b773
+updated_at: '2026-08-07T19:27:11.337Z'
 ---
 ## Tweet 1
 Still switching tabs to browser dashboards just to draft social media posts? 💻

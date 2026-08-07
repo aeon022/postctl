@@ -1,7 +1,9 @@
 ---
 platform: mastodon
 campaign: vim-workflow
-schedule: 2026-07-03 08:30:00
+schedule: 2026-07-03T08:30:00.000Z
+joplin_id: 8489669416bf4b748b4afac5dcb77f1c
+updated_at: '2026-08-07T19:27:11.318Z'
 ---
 Social media drafting in Neovim. 💻
 

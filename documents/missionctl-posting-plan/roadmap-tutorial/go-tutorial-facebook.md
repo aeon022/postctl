@@ -1,6 +1,8 @@
 ---
 platform: facebook
 campaign: missionctl-tutorial
+joplin_id: 6cfe71a35e7f427a95a8260a0a9303b2
+updated_at: '2026-08-07T19:27:11.584Z'
 ---
 🎓 Learn Go by Dissecting a Real-World Monospace TUI Sandbox
 

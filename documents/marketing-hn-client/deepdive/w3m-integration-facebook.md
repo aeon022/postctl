@@ -2,6 +2,8 @@
 platform: facebook
 campaign: hn-client-deepdive
 schedule: 2026-07-06 09:00
+joplin_id: a114dd0c1b744b26b2655d4719576dc2
+updated_at: '2026-08-07T19:27:10.132Z'
 ---
 Keyboard-Driven Browsing: w3m/lynx Integration in hn-client 🖥️
 

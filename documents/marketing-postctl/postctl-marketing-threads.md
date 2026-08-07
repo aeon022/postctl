@@ -3,7 +3,9 @@ id: postctl-marketing-threads
 platform: threads
 type: single
 campaign: postctl-marketing
-schedule: "2026-06-30 09:00"
+schedule: 2026-06-30 09:00
+joplin_id: 79289ff24f1c4d018d707ed46377bf89
+updated_at: '2026-08-07T19:27:11.104Z'
 ---
 Tired of clicking through heavy web interfaces just to schedule a post? 
 

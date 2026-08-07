@@ -1,7 +1,9 @@
 ---
 platform: linkedin
 campaign: vim-workflow
-schedule: 2026-07-03 08:30:00
+schedule: 2026-07-03T08:30:00.000Z
+joplin_id: ea3efa4a9f7544948774c295f0a93853
+updated_at: '2026-08-07T19:27:11.308Z'
 ---
 ⌨️ Keyboard-Only: Writing Social Media Posts inside Neovim
 

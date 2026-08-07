@@ -3,7 +3,9 @@ id: hn-client-marketing-facebook
 platform: facebook
 type: single
 campaign: hn-client-marketing
-schedule: "2026-07-01 10:00"
+schedule: 2026-07-01 10:00
+joplin_id: 017acb1fdca54a0aa83150f2661199e3
+updated_at: '2026-08-07T19:27:10.182Z'
 ---
 🚀 Announcing hn-client — A terminal-native Hacker News Client built in Go!
 

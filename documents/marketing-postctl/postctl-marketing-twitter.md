@@ -3,9 +3,10 @@ id: postctl-marketing-twitter
 platform: twitter
 type: thread
 campaign: postctl-marketing
-schedule: "2026-06-30 09:00"
+schedule: 2026-06-30 09:00
+joplin_id: 62793d9906414922b22ee0d328690c2b
+updated_at: '2026-08-07T19:27:11.112Z'
 ---
-
 ## Tweet 1
 
 🚀 Announcing postctl v1.2 — The terminal-native social media manager is now fully bilingual (EN/DE) with robust headless Chrome fallbacks!

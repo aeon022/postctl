@@ -2,6 +2,8 @@
 platform: linkedin
 campaign: postctl-features
 schedule: 2026-07-05 17:00
+joplin_id: 7809bc1e08854fa5a43769d1851afffc
+updated_at: '2026-08-07T19:27:11.025Z'
 ---
 💻 Social Media as Code: Versioning & Syncing your Posts with Git
 

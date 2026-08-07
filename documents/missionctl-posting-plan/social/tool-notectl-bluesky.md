@@ -1,6 +1,8 @@
 ---
 platform: bluesky
 campaign: missionctl-tools
+joplin_id: da1c8567873e4ace89f8895747258d20
+updated_at: '2026-08-07T19:27:11.625Z'
 ---
 Read, write, and index your Obsidian Markdown notes from the terminal. Meet notectl 📓
 

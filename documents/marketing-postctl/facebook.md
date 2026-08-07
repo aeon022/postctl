@@ -1,8 +1,11 @@
 ---
 platform: facebook
 campaign: postctl-launch
-schedule: 2026-06-28 15:00:00
-images: ["/Users/gweiher/Developing/Projects/# Screenshots/postctl/01-dashboard.png"]
+schedule: 2026-06-28T15:00:00.000Z
+images:
+  - /Users/gweiher/Developing/Projects/# Screenshots/postctl/01-dashboard.png
+joplin_id: 3fd2b54c44b7461cbb904600e32446ac
+updated_at: '2026-08-07T19:27:10.438Z'
 ---
 🚀 Project Launch: postctl — Social Media Management from your Terminal!
 

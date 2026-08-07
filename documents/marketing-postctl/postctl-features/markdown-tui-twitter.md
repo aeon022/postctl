@@ -3,6 +3,8 @@ platform: twitter
 type: thread
 campaign: postctl-features
 schedule: 2026-07-04 09:00
+joplin_id: 5f5133b961614f6295acbab8cc977bd0
+updated_at: '2026-08-07T19:27:10.922Z'
 ---
 Still managing social media postings through slow, bloated web dashboards? 
 

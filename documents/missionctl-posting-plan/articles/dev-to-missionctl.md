@@ -1,10 +1,11 @@
 ---
-title: "missionctl: Giving Local AI Agents 'Hands' via Monospace CLI/TUI Tools"
+title: 'missionctl: Giving Local AI Agents ''Hands'' via Monospace CLI/TUI Tools'
 published: false
 description: Stop building complex cloud integrations for AI. Give Claude/GPT access to your local email, calendar, tasks, notes, and budget via lightweight, local-first Go binaries + MCP.
 tags: go, open-source, mcp, ai
+joplin_id: 1f52abc24b7c41cfb74127c99b0b2c3d
+updated_at: '2026-08-07T19:27:11.371Z'
 ---
-
 # missionctl: Giving Local AI Agents 'Hands' via Monospace CLI/TUI Tools
 
 AI assistants are incredibly smart. They can summarize books, draft code, and plan marketing strategies. But when it comes to *actually doing* things, they are completely helpless. 

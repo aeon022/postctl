@@ -2,6 +2,8 @@
 platform: linkedin
 campaign: hn-client-deepdive
 schedule: 2026-07-06 15:30
+joplin_id: ae50dc628fdf4627bb48679d152062f3
+updated_at: '2026-08-07T19:27:10.047Z'
 ---
 ⚡ Concurrent TUI Architectures: How We Load Hacker News Feeds in Go
 

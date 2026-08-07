@@ -2,6 +2,8 @@
 platform: twitter
 type: thread
 campaign: missionctl-tutorial
+joplin_id: 19c5f8cdb859414ab712c94ba06f9e50
+updated_at: '2026-08-07T19:27:11.619Z'
 ---
 Want to master Golang and build beautiful, keyboard-driven Terminal UIs (TUIs)? 
 
@@ -19,7 +21,7 @@ See how goroutines fetch bank transactions or social schedules in the background
 4️⃣ Process Suspend & Fork
 Learn to temporarily suspend the TUI buffer to launch external terminal processes (like Vim/Neovim or `w3m`) and restore the screen on exit.
 ---
-The entire suite is open source, making it the perfect sandbox to clone and modify. The tutorial is $19 on Polar.sh, or $49 bundled with all tools.
+The entire suite is open source, making it the perfect sandbox to clone and modify. The tutorial is $19 on Polar.sh, or included free with the missionctl Bundle ($39).
 
 👉 Get started: https://github.com/aeon022/missionctl/tree/main/go-tutorial
-🌐 https://postctl.sh
+🌐 https://missionctl.sh

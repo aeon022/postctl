@@ -2,6 +2,8 @@
 platform: linkedin
 campaign: postctl-features
 schedule: 2026-07-05 10:00
+joplin_id: 8b01efa1be6c467581754ae359e3a735
+updated_at: '2026-08-07T19:27:10.955Z'
 ---
 ⌨️ Keyboard-Only Social Media: Writing inside Neovim & TUI Datepicker
 

@@ -1,6 +1,8 @@
 ---
 platform: linkedin
 campaign: missionctl-tools
+joplin_id: d6a16b68df094d1ba74490242b06900d
+updated_at: '2026-08-07T19:27:11.463Z'
 ---
 💰 Introducing budgetctl: Local-First, Privacy-Preserving Expense & Subscription Tracking
 

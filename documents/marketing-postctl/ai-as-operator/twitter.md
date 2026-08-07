@@ -1,7 +1,9 @@
 ---
 platform: twitter
 campaign: ai-operator
-schedule: 2026-07-02 09:00:00
+schedule: 2026-07-02T09:00:00.000Z
+joplin_id: e649f173934047eba3e36f418f7f0a74
+updated_at: '2026-08-07T19:27:10.420Z'
 ---
 ## Tweet 1
 Can an AI manage your social media queue? Yes, and it shouldn't require bloated web interfaces. 

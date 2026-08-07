@@ -3,7 +3,9 @@ id: postctl-marketing-facebook
 platform: facebook
 type: single
 campaign: postctl-marketing
-schedule: "2026-06-30 09:00"
+schedule: 2026-06-30 09:00
+joplin_id: fbe65050c6ff4b02b53c3e35892bbc05
+updated_at: '2026-08-07T19:27:11.079Z'
 ---
 🚀 Meet postctl: Social Media Management Built for Developers & AI
 

@@ -3,7 +3,9 @@ id: postctl-security-mastodon
 platform: mastodon
 type: single
 campaign: postctl-security
-schedule: "2026-07-07 10:00"
+schedule: 2026-07-07 10:00
+joplin_id: fa000931c113444d94a39dea3bab6716
+updated_at: '2026-08-07T19:27:11.153Z'
 ---
 Stop sending your API keys to the cloud! 🔒
 

@@ -2,6 +2,8 @@
 platform: mastodon
 campaign: hn-client-deepdive
 schedule: 2026-07-07 09:00
+joplin_id: c45d37491b4d484ab331d37c04d3f283
+updated_at: '2026-08-07T19:27:10.008Z'
 ---
 Structured comments in your terminal. 🎨
 

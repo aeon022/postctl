@@ -1,6 +1,8 @@
 ---
 platform: mastodon
 campaign: missionctl-tools
+joplin_id: f7d32a2cf391473fb51d109a6a1c588d
+updated_at: '2026-08-07T19:27:11.740Z'
 ---
 📝 Meet taskctl: Fast task management synced with Apple Reminders.
 

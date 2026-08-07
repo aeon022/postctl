@@ -2,6 +2,8 @@
 platform: bluesky
 campaign: postctl-features
 schedule: 2026-07-04 15:30
+joplin_id: bc25887744454309853ca6bb665d3de4
+updated_at: '2026-08-07T19:27:10.752Z'
 ---
 Automate your social queue with AI + postctl! 🤖
 

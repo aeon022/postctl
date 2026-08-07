@@ -1,6 +1,8 @@
 ---
 platform: bluesky
 campaign: missionctl-tutorial
+joplin_id: db7945b5eba049b68909c36743999867
+updated_at: '2026-08-07T19:27:11.402Z'
 ---
 Learn Go by dissecting a live monospace TUI app! 🎓
 

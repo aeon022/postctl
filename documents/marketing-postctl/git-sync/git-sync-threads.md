@@ -1,7 +1,9 @@
 ---
 platform: threads
 campaign: git-sync
-schedule: 2026-07-03 18:30:00
+schedule: 2026-07-03T18:30:00.000Z
+joplin_id: cbbae8d539a94509876e2b957bd1cdd4
+updated_at: '2026-08-07T19:27:10.548Z'
 ---
 Version control your social media with Git! 🔄
 

@@ -2,6 +2,8 @@
 platform: mastodon
 campaign: hn-client-deepdive
 schedule: 2026-07-06 09:00
+joplin_id: c3b140ebb3af46768fe2d0db19c62ffc
+updated_at: '2026-08-07T19:27:10.149Z'
 ---
 Terminal-native web browsing. 🖥️
 

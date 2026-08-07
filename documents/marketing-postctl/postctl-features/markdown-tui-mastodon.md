@@ -2,6 +2,8 @@
 platform: mastodon
 campaign: postctl-features
 schedule: 2026-07-04 09:00
+joplin_id: d04cecdafd5243468440911278770dc1
+updated_at: '2026-08-07T19:27:10.887Z'
 ---
 A Markdown-first social media scheduler. 📝
 

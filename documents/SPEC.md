@@ -1,3 +1,7 @@
+---
+joplin_id: 8b2dcaf743c64c17b95f710ea59f73f8
+updated_at: '2026-08-07T19:51:55.745Z'
+---
 # postctl — Specification
 
 ## Overview

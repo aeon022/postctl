@@ -2,6 +2,8 @@
 platform: bluesky
 campaign: postctl-features
 schedule: 2026-07-05 17:00
+joplin_id: d34189c8987d468e8467dc2052034360
+updated_at: '2026-08-07T19:27:11.002Z'
 ---
 Social media as code: version your posts with Git! 🔄
 

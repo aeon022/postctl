@@ -1,6 +1,8 @@
 ---
 platform: facebook
 campaign: missionctl-tools
+joplin_id: 5a84f1a71c7c495a9b8b6d70509d5504
+updated_at: '2026-08-07T19:27:11.561Z'
 ---
 📧 Introducing mailctl: Email Management for the Monospace TUI & AI Era
 

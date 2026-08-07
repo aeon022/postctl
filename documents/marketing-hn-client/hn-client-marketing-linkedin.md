@@ -3,7 +3,9 @@ id: hn-client-marketing-linkedin
 platform: linkedin
 type: single
 campaign: hn-client-marketing
-schedule: "2026-07-01 10:00"
+schedule: 2026-07-01 10:00
+joplin_id: c21eec29e04c40ce994d88a3d060e030
+updated_at: '2026-08-07T19:27:10.191Z'
 ---
 🚀 Announcing hn-client — A terminal-native Hacker News Client built in Go!
 

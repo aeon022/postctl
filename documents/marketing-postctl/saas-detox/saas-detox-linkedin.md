@@ -1,7 +1,9 @@
 ---
 platform: linkedin
 campaign: saas-detox
-schedule: 2026-07-02 15:30:00
+schedule: 2026-07-02T15:30:00.000Z
+joplin_id: f5f0b603aecc4759a1e7de1a35f378ed
+updated_at: '2026-08-07T19:27:11.221Z'
 ---
 🔒 SaaS Detox: Why Local-First Social Media Scheduling Matters
 

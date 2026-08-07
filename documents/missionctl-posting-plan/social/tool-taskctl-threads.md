@@ -1,6 +1,8 @@
 ---
 platform: threads
 campaign: missionctl-tools
+joplin_id: 57c392803a01455fae43e7bd029a7c12
+updated_at: '2026-08-07T19:27:11.750Z'
 ---
 📝 Task management from the terminal, synced with Apple Reminders. Meet taskctl!
 

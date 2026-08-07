@@ -2,6 +2,8 @@
 platform: mastodon
 campaign: postctl-features
 schedule: 2026-07-04 15:30
+joplin_id: 9cbadf3601fa4d04a269a73dcc24b751
+updated_at: '2026-08-07T19:27:10.799Z'
 ---
 Automate posts without cloud SaaS lock-in. 🔒
 

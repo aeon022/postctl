@@ -2,6 +2,8 @@
 platform: facebook
 campaign: hn-client-deepdive
 schedule: 2026-07-07 09:00
+joplin_id: e37a5404bbe440fe90da6d0cdd98f0da
+updated_at: '2026-08-07T19:27:09.992Z'
 ---
 Rich Monospace Styling: HTML Comment Sanitization in hn-client 🎨
 

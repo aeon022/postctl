@@ -2,6 +2,8 @@
 platform: twitter
 type: thread
 campaign: missionctl-tools
+joplin_id: b80528ac19894d1da63c0f1d851ad61f
+updated_at: '2026-08-07T19:27:11.699Z'
 ---
 Read, write, and index your Obsidian Markdown notes from the terminal. Meet `notectl` 📓
 

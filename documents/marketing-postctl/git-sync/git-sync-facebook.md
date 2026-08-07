@@ -1,7 +1,9 @@
 ---
 platform: facebook
 campaign: git-sync
-schedule: 2026-07-03 18:30:00
+schedule: 2026-07-03T18:30:00.000Z
+joplin_id: 2f236bedf52845008bc0542cb3c8c9f6
+updated_at: '2026-08-07T19:27:10.500Z'
 ---
 Social Media as Code: Git Integration and Multi-Device Sync 🔄
 

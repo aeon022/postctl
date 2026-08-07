@@ -3,7 +3,9 @@ id: postctl-marketing-linkedin
 platform: linkedin
 type: single
 campaign: postctl-marketing
-schedule: "2026-06-30 09:00"
+schedule: 2026-06-30 09:00
+joplin_id: 024b647568e844a1951d211f095eb358
+updated_at: '2026-08-07T19:27:11.089Z'
 ---
 🚀 Meet postctl: Social Media Management Built for Developers & AI
 

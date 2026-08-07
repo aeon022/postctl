@@ -2,6 +2,8 @@
 platform: facebook
 campaign: hn-client-deepdive
 schedule: 2026-07-07 15:30
+joplin_id: b01c2819f089461ab632173078ce0a63
+updated_at: '2026-08-07T19:27:10.084Z'
 ---
 Learn Go & Monospace Layouts with a Live Code Sandbox 🎓
 

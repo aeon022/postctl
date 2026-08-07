@@ -1,7 +1,9 @@
 ---
 platform: linkedin
 campaign: git-sync
-schedule: 2026-07-03 18:30:00
+schedule: 2026-07-03T18:30:00.000Z
+joplin_id: 56322777585840d6938d6ca7001fb035
+updated_at: '2026-08-07T19:27:10.515Z'
 ---
 💻 Social Media as Code: Versioning & Syncing your Posts with Git
 

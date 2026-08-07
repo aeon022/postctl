@@ -1,12 +1,15 @@
 ---
 platform: bluesky
 campaign: missionctl-roadmap
+joplin_id: 43f3be746a9c4157876bf18550bdbb0b
+updated_at: '2026-08-07T19:27:11.634Z'
 ---
-The missionctl roadmap: giving AI agents "hands". 🔮
+Our roadmap said full 9-tool suite by Q2 2027. We shipped it months early. 🔮
 
-• Q3 2026: postctl v1.0 + calctl v0.1
-• Q4 2026: calctl v0.5 + mailctl v0.1 + budgetctl v0.1
-• Q1 2027: mailctl v1.0 + budgetctl v0.5 + notectl + taskctl
-• Q2 2027: Full 1.0 & 43 MCP tools
+9 tools, 66 MCP tools, still 100% local.
+
+Pricing: free core + $9 AI-unlock/tool, or $39 Bundle.
+
+Next (not committed): healthctl, investctl.
 
 👉 https://github.com/aeon022/missionctl

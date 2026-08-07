@@ -1,6 +1,8 @@
 ---
 platform: threads
 campaign: missionctl-tools
+joplin_id: 8157e52959f64930b8fd4ce33e883560
+updated_at: '2026-08-07T19:27:11.593Z'
 ---
 📧 Email from the terminal, built for AI agents. Meet mailctl!
 

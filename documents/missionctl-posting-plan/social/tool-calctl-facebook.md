@@ -1,6 +1,8 @@
 ---
 platform: facebook
 campaign: missionctl-tools
+joplin_id: 2e3ed381ea834fe5b2a03e7b6c017b17
+updated_at: '2026-08-07T19:27:11.508Z'
 ---
 📅 Introducing calctl: Calendar Management & Asynchronous Scheduling for Terminal Users
 

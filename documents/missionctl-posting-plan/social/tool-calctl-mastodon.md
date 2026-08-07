@@ -1,6 +1,8 @@
 ---
 platform: mastodon
 campaign: missionctl-tools
+joplin_id: bfd6d6e4c8ed4f0a8055b6ac5f8dd603
+updated_at: '2026-08-07T19:27:11.525Z'
 ---
 📅 Meet calctl: Calendar management & scheduling for terminal power users.
 

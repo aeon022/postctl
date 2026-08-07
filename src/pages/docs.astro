@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import * as ReadmeDoc from '../../README.md';
+import * as ReadmeDocDe from '../../README-de.md';
 import { Search } from '@lucide/astro';
 import * as TwitterDocDe from '../../docs/api-twitter.md';
 import * as TwitterDocEn from '../../docs/api-twitter-en.md';
@@ -130,7 +131,12 @@ import LangToggle from '../components/LangToggle.astro';
 				<!-- Tab 1: Introduction -->
 				<section class="doc-section active" id="doc-introduction">
 					<div class="doc-body markdown-content">
-						<ReadmeDoc.Content />
+						<div class="lang-en">
+							<ReadmeDoc.Content />
+						</div>
+						<div class="lang-de">
+							<ReadmeDocDe.Content />
+						</div>
 					</div>
 				</section>
 
@@ -227,9 +233,10 @@ go build -o postctl main.go
 				<!-- Tab 3: Vim Flow -->
 				<section class="doc-section" id="doc-vim-flow">
 					<div class="doc-body markdown-content">
+					<div class="lang-en">
 						<h1>📝 Vim / Neovim External Editor Flow</h1>
 						<p>Inside the interactive Terminal UI, you can spawn your terminal-native text editor (like Neovim or Vim) to edit post text, adjust templates, or modify metadata on the fly.</p>
-						
+
 						<div class="callout tip">
 							<strong>Did you know?</strong> Any changes to metadata inside the YAML block in Vim will sync back into your TUI fields automatically.
 						</div>
@@ -252,7 +259,7 @@ go build -o postctl main.go
  [Character Ruler (Max 280 characters per tweet)]
  000      030      060      090      120      150      180      210      240      270 280!
  |--------|--------|--------|--------|--------|--------|--------|--------|--------|-|
- 
+
  Current Thread Status:
    Tweet 1: 220 chars (60 remaining) [✓]
    Tweet 2: 110 chars (170 remaining) [✓]
@@ -275,11 +282,62 @@ images: ["logo.png"]
 						<p>The post body begins after the closing <code>---</code> frontmatter delimiter. Write your post in standard Markdown.</p>
 						<p>For multi-post threads, separate each section using a line containing only <code>---</code>.</p>
 					</div>
+					<div class="lang-de">
+						<h1>📝 Vim / Neovim externer Editor-Flow</h1>
+						<p>In der interaktiven Terminal-UI kannst du deinen terminal-nativen Texteditor (wie Neovim oder Vim) starten, um Beitragstext zu bearbeiten, Vorlagen anzupassen oder Metadaten spontan zu ändern.</p>
+
+						<div class="callout tip">
+							<strong>Wusstest du schon?</strong> Änderungen an Metadaten im YAML-Block in Vim werden automatisch mit deinen TUI-Feldern synchronisiert.
+						</div>
+
+						<h2>Editor aufrufen</h2>
+						<ol>
+							<li>TUI-Dashboard starten: <code>./postctl tui</code></li>
+							<li>Zu einem Beitrag oder einer Kampagne navigieren und <strong><code>e</code></strong> drücken, um das Bearbeitungsformular zu öffnen.</li>
+							<li>Im Fokus auf den Body oder ein beliebiges Textfeld <strong><code>ctrl+v</code></strong> drücken.</li>
+							<li>Der TUI-Prozess pausiert, und dein Terminal startet deinen konfigurierten Editor (liest <code>$EDITOR</code>, fällt sonst auf <code>nvim</code> oder <code>vim</code> zurück).</li>
+						</ol>
+
+						<h2>Aufbau der Vorlagendatei</h2>
+						<p>Vim öffnet eine temporäre Datei im Markdown-Format. Sie enthält drei getrennte Blöcke:</p>
+
+						<h3>1. Interaktiver Hilfe-Block (HTML-Kommentare)</h3>
+						<pre class="code-block" data-lang="markdown"><code>&lt;!--
+ postctl Editor Help (TWITTER)
+ ==================================
+ [Zeichen-Lineal (max. 280 Zeichen pro Tweet)]
+ 000      030      060      090      120      150      180      210      240      270 280!
+ |--------|--------|--------|--------|--------|--------|--------|--------|--------|-|
+
+ Aktueller Thread-Status:
+   Tweet 1: 220 Zeichen (60 übrig) [✓]
+   Tweet 2: 110 Zeichen (170 übrig) [✓]
+
+ HINWEIS: Dieser Hilfe-Block wird beim Speichern automatisch entfernt.
+ Schreibe deinen Beitragstext unterhalb dieses Kommentars:
+--&gt;</code></pre>
+						<p>Dieser Block aktualisiert sich dynamisch nach den Limits deiner Zielplattform (280 für Twitter, 300 für Bluesky, 500 für Mastodon). Er wird beim Speichern automatisch entfernt.</p>
+
+						<h3>2. YAML-Frontmatter-Block</h3>
+						<pre class="code-block" data-lang="yaml"><code>---
+platform: twitter
+campaign: launch-2026
+schedule: 2026-06-25 15:00:00
+images: ["logo.png"]
+---</code></pre>
+						<p><strong>Bidirektionale Synchronisierung:</strong> Du kannst diese Werte direkt in Vim bearbeiten. Änderungen an Kampagnenname, Zielplattform, Zeitstempel oder Bilderliste aktualisieren beim Zurückkehren sofort die TUI-Formularfelder.</p>
+
+						<h3>3. Inhaltskörper</h3>
+						<p>Der Beitragstext beginnt nach dem abschließenden <code>---</code>-Frontmatter-Trenner. Schreibe deinen Beitrag in Standard-Markdown.</p>
+						<p>Für mehrteilige Beiträge trenne jeden Abschnitt mit einer Zeile, die nur <code>---</code> enthält.</p>
+					</div>
+					</div>
 				</section>
 
 				<!-- Tab 4: Image Resolution -->
 				<section class="doc-section" id="doc-image-resolution">
 					<div class="doc-body markdown-content">
+					<div class="lang-en">
 						<h1>🖼️ Image Path Resolution & Platform Uploads</h1>
 						<p>Manage and attach media assets seamlessly using local file references.</p>
 
@@ -300,6 +358,29 @@ images: ["logo.png"]
 							<li><strong>Mastodon / Bluesky (Native):</strong> Media files are uploaded to platform attachment endpoints (or blob records for Bluesky AT Protocol) and linked to the status.</li>
 							<li><strong>Threads (Meta HTTPS Requirement):</strong> The Threads API does not allow binary local uploads. Instead, it expects a public HTTPS URL (e.g. <code>https://yourdomain.com/assets/screenshot.png</code>) from which the Meta crawler fetches the image. If publishing to Threads, host your images on an external cloud (S3, R2, Imgur) and reference that HTTPS URL in the frontmatter.</li>
 						</ul>
+					</div>
+					<div class="lang-de">
+						<h1>🖼️ Bildpfad-Auflösung & Plattform-Uploads</h1>
+						<p>Verwalte und binde Medien-Assets nahtlos über lokale Dateireferenzen ein.</p>
+
+						<h2>Wie Bildpfade aufgelöst werden</h2>
+						<p>Wenn du in deinem Beitrags-Frontmatter einen Dateinamen oder Pfad angibst (z. B. <code>images: ["dashboard-screenshot.png"]</code>), führt <code>postctl</code> eine Fallback-Suche in folgender Reihenfolge durch:</p>
+						<ol>
+							<li><strong>Absolutpfad-Prüfung:</strong> Ist es ein literaler Pfad auf deinem System? (z. B. <code>/Users/user/Pictures/screenshot.png</code>)</li>
+							<li><strong>Relativ zum Markdown-Dokument:</strong> Wenn du eine Datei aus <code>/code/posts/announcement.md</code> importiert hast, wird <code>/code/posts/dashboard-screenshot.png</code> geprüft.</li>
+							<li><strong>Aktuelles Arbeitsverzeichnis (CWD):</strong> Prüft den Ordner, aus dem heraus du den <code>postctl</code>-Befehl gestartet hast.</li>
+							<li><strong>Globales Standard-Bildverzeichnis:</strong> Prüft das in <code>defaults.image_dir</code> in deiner <code>~/.config/postctl/config.yaml</code> angegebene Verzeichnis.</li>
+						</ol>
+
+						<h2>Plattformspezifisches Upload-Verhalten</h2>
+						<p>Jede Plattform-API handhabt Medien-Uploads unterschiedlich, was durch die Treiber-Schichten automatisch abstrahiert wird:</p>
+						<ul>
+							<li><strong>LinkedIn (natives Hosting):</strong> Bilder werden als rohe Binär-Assets zu LinkedIn hochgeladen. Die API registriert den Upload, führt ein <code>PUT</code> aus und verknüpft die resultierende URN (z. B. <code>urn:li:digitalmediaAsset:...</code>) mit deinem Beitrag.</li>
+							<li><strong>Twitter / X (natives Hosting):</strong> Bilder werden an den Twitter-v1.1-Media-Upload-Endpunkt hochgeladen, um eine <code>media_id</code> zu erhalten, die dem v2-Tweet angehängt wird.</li>
+							<li><strong>Mastodon / Bluesky (nativ):</strong> Mediendateien werden zu Plattform-Attachment-Endpunkten hochgeladen (oder als Blob-Records bei Bluesky AT Protocol) und mit dem Status verknüpft.</li>
+							<li><strong>Threads (Meta-HTTPS-Anforderung):</strong> Die Threads-API erlaubt keine binären lokalen Uploads. Stattdessen erwartet sie eine öffentliche HTTPS-URL (z. B. <code>https://yourdomain.com/assets/screenshot.png</code>), von der der Meta-Crawler das Bild abruft. Beim Veröffentlichen auf Threads hoste deine Bilder in einer externen Cloud (S3, R2, Imgur) und referenziere diese HTTPS-URL im Frontmatter.</li>
+						</ul>
+					</div>
 					</div>
 				</section>
 
@@ -342,12 +423,13 @@ images: ["logo.png"]
 				<!-- Tab 8: Bluesky & Mastodon Setup -->
 				<section class="doc-section" id="doc-api-bluesky-mastodon">
 					<div class="doc-body markdown-content">
+					<div class="lang-en">
 						<h1>🦋 Bluesky & Mastodon Setup Guide</h1>
 						<p>Learn how to connect <code>postctl</code> to Bluesky (via the AT Protocol) and Mastodon instances.</p>
 
 						<h2>1. Bluesky Integration</h2>
 						<p>Bluesky uses the decentralized AT Protocol. Instead of complex OAuth, it uses secure App Passwords.</p>
-						
+
 						<h3>Step A: Create an App Password</h3>
 						<ol>
 							<li>Log in to your Bluesky account in your browser.</li>
@@ -371,7 +453,7 @@ images: ["logo.png"]
 
 						<h2>2. Mastodon Integration</h2>
 						<p>Mastodon supports federated instances and uses client credentials registration per instance.</p>
-						
+
 						<h3>Step A: Configure Instance URL</h3>
 						<p>By default, <code>postctl</code> connects to <code>https://mastodon.social</code>. If you are on a different instance, configure it first:</p>
 						<pre class="code-block" data-lang="bash"><code>./postctl config set mastodon.instance_url "https://fosstodon.org"</code></pre>
@@ -386,11 +468,58 @@ images: ["logo.png"]
 							<li>The tokens are retrieved and securely stored in your local DB. Mastodon posts support up to <strong>500 characters</strong>.</li>
 						</ol>
 					</div>
+					<div class="lang-de">
+						<h1>🦋 Bluesky- & Mastodon-Einrichtungsanleitung</h1>
+						<p>Erfahre, wie du <code>postctl</code> mit Bluesky (über das AT Protocol) und Mastodon-Instanzen verbindest.</p>
+
+						<h2>1. Bluesky-Integration</h2>
+						<p>Bluesky nutzt das dezentrale AT Protocol. Statt komplexem OAuth kommen sichere App-Passwörter zum Einsatz.</p>
+
+						<h3>Schritt A: App-Passwort erstellen</h3>
+						<ol>
+							<li>Melde dich in deinem Browser bei deinem Bluesky-Konto an.</li>
+							<li>Gehe zu <strong>Settings</strong> ➔ <strong>App Passwords</strong>.</li>
+							<li>Klicke auf <strong>Create App Password</strong>, gib ihm einen Namen (z. B. <code>postctl-cli</code>) und kopiere das generierte Passwort (sieht meist aus wie <code>xxxx-xxxx-xxxx-xxxx</code>).</li>
+						</ol>
+
+						<h3>Schritt B: postctl konfigurieren</h3>
+						<p>Konfiguriere deinen Handle und dein App-Passwort:</p>
+						<pre class="code-block" data-lang="bash"><code># Handle konfigurieren
+./postctl config set bluesky.handle "yourname.bsky.social"
+
+# App-Passwort konfigurieren
+./postctl config set bluesky.app_password "xxxx-xxxx-xxxx-xxxx"</code></pre>
+
+						<h3>Schritt C: Authentifizieren</h3>
+						<pre class="code-block" data-lang="bash"><code>./postctl auth bluesky</code></pre>
+						<p>Das CLI testet die Verbindung, ruft dein Profil ab und speichert die Sitzungs-Tokens in deiner SQLite-Datenbank. Bluesky-Beiträge unterstützen bis zu <strong>300 Zeichen</strong>.</p>
+
+						<hr />
+
+						<h2>2. Mastodon-Integration</h2>
+						<p>Mastodon unterstützt föderierte Instanzen und registriert Client-Zugangsdaten pro Instanz.</p>
+
+						<h3>Schritt A: Instanz-URL konfigurieren</h3>
+						<p>Standardmäßig verbindet sich <code>postctl</code> mit <code>https://mastodon.social</code>. Bist du auf einer anderen Instanz, konfiguriere sie zuerst:</p>
+						<pre class="code-block" data-lang="bash"><code>./postctl config set mastodon.instance_url "https://fosstodon.org"</code></pre>
+
+						<h3>Schritt B: Authentifizieren</h3>
+						<p>Starte den Login-Ablauf:</p>
+						<pre class="code-block" data-lang="bash"><code>./postctl auth mastodon</code></pre>
+						<ol>
+							<li>Das CLI prüft, ob auf dieser Instanz bereits eine Client-Anwendung existiert. Falls nicht, registriert es automatisch eine neue App namens <code>postctl</code> auf deiner Instanz.</li>
+							<li>Ein Browserfenster öffnet sich und bittet dich, die App zu autorisieren.</li>
+							<li>Melde dich an und klicke auf <strong>Authorize</strong>.</li>
+							<li>Die Tokens werden abgerufen und sicher in deiner lokalen DB gespeichert. Mastodon-Beiträge unterstützen bis zu <strong>500 Zeichen</strong>.</li>
+						</ol>
+					</div>
+					</div>
 				</section>
 
 				<!-- Tab 9: Facebook Setup -->
 				<section class="doc-section" id="doc-api-facebook">
 					<div class="doc-body markdown-content">
+					<div class="lang-en">
 						<h1>🤖 Facebook Setup Guide</h1>
 						<p>Configure automated publication to Facebook business/creator Pages using Meta Graph API tokens.</p>
 
@@ -414,6 +543,32 @@ images: ["logo.png"]
 						<h3>Step C: Run Authentication</h3>
 						<pre class="code-block" data-lang="bash"><code>./postctl auth facebook</code></pre>
 						<p>Accept the prompt to authorize managing and publishing pages. The access token is exchanged for a permanent page access token and saved securely.</p>
+					</div>
+					<div class="lang-de">
+						<h1>🤖 Facebook-Einrichtungsanleitung</h1>
+						<p>Konfiguriere die automatisierte Veröffentlichung auf Facebook-Business-/Creator-Seiten über Meta-Graph-API-Tokens.</p>
+
+						<h2>Facebook-Integration</h2>
+						<p>Facebook-Beiträge werden über Meta-Graph-API-Tokens direkt an Business-/Creator-Seiten gesendet.</p>
+
+						<h3>Schritt A: App im Meta-Portal erstellen</h3>
+						<ol>
+							<li>Gehe zum <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer">Meta Developer Portal</a>.</li>
+							<li>Erstelle eine App vom Typ <strong>Business</strong> oder <strong>Other</strong>.</li>
+							<li>Konfiguriere die OAuth-Redirect-URL: <code>http://localhost:8753/callback</code></li>
+							<li>Gehe zu Settings ➔ Basic und kopiere deine <strong>App ID</strong> und dein <strong>App Secret</strong>.</li>
+							<li>Ermittle die Ziel-Facebook-Page-ID (zu finden in den "Info"-Angaben deiner Facebook-Seite).</li>
+						</ol>
+
+						<h3>Schritt B: In der Konfiguration speichern</h3>
+						<pre class="code-block" data-lang="bash"><code>./postctl config set facebook.app_id "YOUR_FB_APP_ID"
+./postctl config set facebook.app_secret "YOUR_FB_APP_SECRET"
+./postctl config set facebook.page_id "YOUR_FB_PAGE_ID"</code></pre>
+
+						<h3>Schritt C: Authentifizierung ausführen</h3>
+						<pre class="code-block" data-lang="bash"><code>./postctl auth facebook</code></pre>
+						<p>Bestätige die Anfrage, um das Verwalten und Veröffentlichen von Seiten zu autorisieren. Das Zugriffs-Token wird gegen ein dauerhaftes Seiten-Zugriffs-Token eingetauscht und sicher gespeichert.</p>
+					</div>
 					</div>
 				</section>
 

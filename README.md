@@ -360,6 +360,54 @@ SQLite  (~/.local/share/postctl/postctl.db)
 
 ---
 
+## Profiles — separate accounts for Work / Private / per-project
+
+By default postctl uses a single config and database. To keep entirely separate sets of credentials, posts, and scheduling — e.g. a private and a work Twitter account, or one set per client project — pass `--profile <name>` (or set `POSTCTL_PROFILE`) on any command:
+
+```bash
+postctl --profile work config set twitter.client_id "..."
+postctl --profile work config set twitter.client_secret "..."
+postctl --profile work tui
+
+postctl --profile privat config set twitter.client_id "..."
+postctl --profile privat tui
+```
+
+A profile is created automatically the first time you use its name — there's no separate "create" step. Each profile gets its own config file (`~/.config/postctl/profiles/<name>/config.yaml`) and its own database (`~/.local/share/postctl/profiles/<name>/postctl.db`), completely independent of the default profile and of each other — no shared credentials file, no mixed post history.
+
+```bash
+postctl profile list      # see every profile that's been used, and which is active
+postctl profile           # show just the currently active profile
+```
+
+Running with no `--profile` always uses the original default (`~/.config/postctl/config.yaml`) — existing setups are unaffected. Each profile can also be synced across devices independently via its own `data_dir` (see below) — e.g. sync "work" to a work Dropbox and "privat" to your personal iCloud Drive.
+
+---
+
+## Sharing your data directory across devices
+
+By default postctl's database lives at `~/.local/share/postctl/postctl.db`, local to this machine. To share it across devices, set `data_dir` (in `~/.config/postctl/config.yaml`) to a folder you already sync yourself — iCloud Drive, Dropbox, Syncthing, etc:
+
+```yaml
+data_dir: "~/Library/Mobile Documents/com~apple~CloudDocs/postctl"
+```
+
+Once set, postctl automatically switches its SQLite journal mode from WAL to rollback-journal — WAL splits the database across multiple files that a folder-sync client can't update atomically together, so this switch keeps the directory down to a single consistent file whenever postctl isn't actively writing. A same-machine lock also prevents two postctl processes from opening the database at once (run `postctl doctor` to see the current mode and path). This only protects against the same-machine and stale-snapshot failure modes, not two machines editing at the exact same instant; an undownloaded iCloud file is reported explicitly rather than as a bare error.
+
+(This is separate from `postctl config export`/`import`, which packages your config and database into one encrypted file for a manual one-time transfer — the setting above is for keeping them continuously in sync instead.)
+
+---
+
+## Pricing
+
+The core of postctl is free and open-source (MIT) — unlimited posts and drafts on up to 2 connected accounts. A Pro lifetime license removes the account limit and supports development; buy it on [Polar.sh](https://polar.sh) and activate with:
+
+```bash
+postctl license activate <key>
+```
+
+**🎉 Launch special:** use code `POSTCTL2026` for 37% off — through October 31, 2026.
+
 ## License
 
 See [LICENSE](LICENSE).

@@ -1,6 +1,8 @@
 ---
 platform: threads
 campaign: missionctl-tutorial
+joplin_id: cd51502c08324843a0ee1d8177e2a68b
+updated_at: '2026-08-07T19:27:11.414Z'
 ---
 🎓 Want to master Golang and build beautiful, keyboard-driven Terminal UIs (TUIs)? 
 
