@@ -2,73 +2,73 @@
 joplin_id: 8b2dcaf743c64c17b95f710ea59f73f8
 updated_at: '2026-08-07T19:51:55.745Z'
 ---
-# postctl — Specification
+# postctl — Spezifikation
 
-## Overview
+## Überblick
 
-**postctl** is a TUI CLI tool written in Go that manages social media postings and blogs across Twitter/X, LinkedIn, Threads, Mastodon, Bluesky, Facebook, Telegram, Discord, Reddit, Dev.to, Hashnode, and Medium. Posts are authored as Markdown files, imported into a local SQLite database, previewed in a terminal UI, and published via platform APIs — immediately or on a schedule.
+**postctl** ist ein in Go geschriebenes TUI-CLI-Tool, das Social-Media-Beiträge und Blogartikel über Twitter/X, LinkedIn, Threads, Mastodon, Bluesky, Facebook, Telegram, Discord, Reddit, Dev.to, Hashnode und Medium hinweg verwaltet. Beiträge werden als Markdown-Dateien verfasst, in eine lokale SQLite-Datenbank importiert, in einer Terminal-UI vorgeschaut und über Plattform-APIs veröffentlicht — sofort oder nach Zeitplan.
 
 ## User Stories
 
-### As a solo developer / indie hacker:
-- I want to write posts as Markdown files in my repo
-- I want to preview how a Twitter thread will look before posting
-- I want to schedule posts for optimal timing across time zones
-- I want to post the same content to multiple platforms with one command
-- I want to see what I've posted and when
-- I want character count validation before posting (280 chars per tweet)
+### Als Solo-Entwickler / Indie Hacker:
+- Ich will Beiträge als Markdown-Dateien in meinem Repo schreiben
+- Ich will vorschauen, wie ein Twitter-Thread aussehen wird, bevor ich poste
+- Ich will Beiträge für optimales Timing über Zeitzonen hinweg einplanen
+- Ich will denselben Inhalt mit einem Befehl auf mehreren Plattformen posten
+- Ich will sehen, was ich wann gepostet habe
+- Ich will eine Zeichenzahl-Prüfung vor dem Posten (280 Zeichen pro Tweet)
 
-### As an AI assistant (Claude, GPT, Antigravity):
-- I want to create properly formatted Markdown posts
-- I want to trigger posting via CLI commands
-- I want to check post status and history
-- I want to run the full workflow end-to-end without human intervention (except approval)
-- I want structured JSON output for all commands so I can parse results
-- I want dry-run mode to preview everything before committing
+### Als KI-Assistent (Claude, GPT, Antigravity):
+- Ich will korrekt formatierte Markdown-Beiträge erstellen
+- Ich will das Posten über CLI-Befehle auslösen
+- Ich will Beitragsstatus und -verlauf prüfen können
+- Ich will den kompletten Workflow durchgängig ohne menschliches Eingreifen ausführen (außer Freigabe)
+- Ich will strukturierte JSON-Ausgabe für alle Befehle, um Ergebnisse zu parsen
+- Ich will einen Dry-Run-Modus, um alles zu prüfen, bevor es verbindlich wird
 
-## AI-as-Operator Principle
+## Prinzip: KI als Operator
 
-**postctl is designed for AI to operate, not just to generate text.**
+**postctl ist darauf ausgelegt, dass KI es bedient — nicht nur Text generiert.**
 
-Most social media tools treat AI as a copywriting feature — "AI writes your caption." postctl treats AI as the operator of the entire tool. The human sets the strategy and approves; the AI executes.
+Die meisten Social-Media-Tools behandeln KI als Copywriting-Feature — "KI schreibt deine Bildunterschrift". postctl behandelt KI als Operator des gesamten Tools. Der Mensch legt die Strategie fest und gibt frei; die KI führt aus.
 
-### Workflow: AI operates, human approves
+### Workflow: KI bedient, Mensch gibt frei
 
 ```
-Human: "Post the new Orbiter v0.3.66 release"
+Mensch: "Poste den neuen Orbiter-v0.3.66-Release"
    ↓
-AI (Claude/GPT):
-   1. Writes posts as Markdown files (all platforms, EN+DE)
+KI (Claude/GPT):
+   1. Schreibt Beiträge als Markdown-Dateien (alle Plattformen, DE+EN)
    2. postctl import ./posts/
-   3. postctl list --format json          → shows draft posts
-   4. "Here are 8 posts ready. Review?"
+   3. postctl list --format json          → zeigt Entwürfe
+   4. "Hier sind 8 fertige Beiträge. Prüfen?"
    ↓
-Human: "LinkedIn DE ändern, sonst passt"
+Mensch: "LinkedIn DE ändern, sonst passt es"
    ↓
-AI:
-   5. Edits the file, re-imports
+KI:
+   5. Bearbeitet die Datei, importiert neu
    6. postctl campaign post orbiter-v0366 --dry-run
-   7. "Dry run passed. Post?"
+   7. "Dry Run erfolgreich. Posten?"
    ↓
-Human: "go"
+Mensch: "go"
    ↓
-AI:
+KI:
    8. postctl campaign post orbiter-v0366
-   9. "Posted. 4/4 Twitter, 2/2 LinkedIn, 2/2 Threads. IDs: ..."
+   9. "Gepostet. 4/4 Twitter, 2/2 LinkedIn, 2/2 Threads. IDs: ..."
 ```
 
-### Design requirements for AI operation
+### Designanforderungen für den KI-Betrieb
 
-1. **All commands must work non-interactively** — no prompts, no "are you sure?", no interactive menus. Flags control everything.
-2. **`--format json`** on all commands — structured output that AI can parse. Default is human-readable, `--format json` returns machine-readable.
-3. **`--dry-run`** on all mutation commands — AI can preview without side effects. Human approves, then AI runs without `--dry-run`.
-4. **Exit codes** — 0 = success, 1 = validation error, 2 = API error, 3 = auth error. AI reads exit codes, not just output.
-5. **Idempotent imports** — running `postctl import` twice doesn't duplicate posts. AI can re-import after edits without cleanup.
-6. **Partial failure recovery** — if tweet 3/5 fails, `postctl post <id> --resume` continues from where it stopped. AI doesn't need to track state manually.
-7. **No browser required** — OAuth flow uses localhost callback, but once authenticated, everything is CLI-only. AI never needs to open a browser.
-8. **Batch operations** — `postctl campaign post <name>` posts all posts in a campaign. AI doesn't need to loop over individual posts.
+1. **Alle Befehle müssen nicht-interaktiv funktionieren** — keine Prompts, kein "bist du sicher?", keine interaktiven Menüs. Flags steuern alles.
+2. **`--format json`** bei allen Befehlen — strukturierte Ausgabe, die KI parsen kann. Standard ist menschenlesbar, `--format json` liefert maschinenlesbar.
+3. **`--dry-run`** bei allen verändernden Befehlen — KI kann ohne Nebenwirkungen vorschauen. Mensch gibt frei, dann führt KI ohne `--dry-run` aus.
+4. **Exit-Codes** — 0 = Erfolg, 1 = Validierungsfehler, 2 = API-Fehler, 3 = Auth-Fehler. KI liest Exit-Codes, nicht nur die Ausgabe.
+5. **Idempotente Importe** — `postctl import` zweimal auszuführen dupliziert keine Beiträge. KI kann nach Bearbeitungen ohne Aufräumen neu importieren.
+6. **Wiederherstellung nach Teilfehlern** — schlägt Tweet 3/5 fehl, setzt `postctl post <id> --resume` dort fort, wo es aufgehört hat. KI muss den Zustand nicht manuell verfolgen.
+7. **Kein Browser nötig** — der OAuth-Flow nutzt einen Localhost-Callback, aber nach der Authentifizierung läuft alles rein über die CLI. KI muss nie einen Browser öffnen.
+8. **Batch-Operationen** — `postctl campaign post <name>` postet alle Beiträge einer Kampagne. KI muss nicht über einzelne Beiträge loopen.
 
-### JSON output example
+### Beispiel für JSON-Ausgabe
 
 ```bash
 $ postctl list --format json
@@ -101,114 +101,114 @@ $ postctl post orbiter-v0366-twitter-en --format json
 }
 ```
 
-## Core Workflows
+## Kern-Workflows
 
-### 1. Import Workflow
+### 1. Import-Workflow
 ```
-Markdown files → postctl import → SQLite DB
+Markdown-Dateien → postctl import → SQLite-DB
                                     ↓
-                              Posts with status "draft"
+                              Beiträge mit Status "draft"
 ```
 
-**Input**: Directory of `.md` files with YAML frontmatter
-**Processing**:
-- Parse frontmatter (platform, type, language, campaign, schedule, images)
-- Parse body into tweets (split on `## Tweet N` headers)
-- Detect reply section (`## Reply`)
-- Validate: character count per tweet (≤280), image paths exist
-- Generate deterministic ID from filename + platform
-- Insert/update in SQLite (upsert on ID)
+**Eingabe**: Verzeichnis mit `.md`-Dateien mit YAML-Frontmatter
+**Verarbeitung**:
+- Frontmatter parsen (platform, type, language, campaign, schedule, images)
+- Body in Tweets zerlegen (Trennung bei `## Tweet N`-Überschriften)
+- Reply-Abschnitt erkennen (`## Reply`)
+- Validieren: Zeichenzahl pro Tweet (≤280), Bildpfade existieren
+- Deterministische ID aus Dateiname + Plattform erzeugen
+- In SQLite einfügen/aktualisieren (Upsert auf ID)
 
-**Output**: Posts in DB with status `draft` or `scheduled` (if `schedule:` frontmatter present)
+**Ausgabe**: Beiträge in der DB mit Status `draft` oder `scheduled` (falls `schedule:`-Frontmatter vorhanden)
 
-### 2. Preview Workflow
+### 2. Vorschau-Workflow
 ```
-postctl (no args) → TUI
+postctl (ohne Argumente) → TUI
                       ↓
-              Dashboard → Post list → Detail view
+              Dashboard → Beitragsliste → Detailansicht
                                         ↓
-                                   Tweet-by-tweet preview
-                                   with char count + image indicators
+                                   Tweet-für-Tweet-Vorschau
+                                   mit Zeichenzahl + Bildindikatoren
 ```
 
-### 3. Post Workflow
+### 3. Post-Workflow
 ```
-postctl post <id> → Load from DB → Validate → API Call → Update status
+postctl post <id> → Aus DB laden → Validieren → API-Aufruf → Status aktualisieren
                                                 ↓
-                                          Upload images first
-                                          Then post text with media IDs
-                                          For threads: post sequentially,
-                                          reply to previous tweet ID
+                                          Zuerst Bilder hochladen
+                                          Dann Text mit Media-IDs posten
+                                          Bei Threads: sequenziell posten,
+                                          als Antwort auf vorherige Tweet-ID
 ```
 
-**Thread posting sequence**:
-1. Upload all images → get media IDs
-2. Post Tweet 1 → get tweet ID
-3. Post Tweet 2 as reply to Tweet 1 → get tweet ID
-4. Post Tweet 3 as reply to Tweet 2 → ...
-5. Post Reply tweet as reply to last tweet
-6. Update DB: status = "posted", platform_id = first tweet ID
+**Ablauf beim Thread-Posten**:
+1. Alle Bilder hochladen → Media-IDs erhalten
+2. Tweet 1 posten → Tweet-ID erhalten
+3. Tweet 2 als Antwort auf Tweet 1 posten → Tweet-ID erhalten
+4. Tweet 3 als Antwort auf Tweet 2 posten → ...
+5. Reply-Tweet als Antwort auf den letzten Tweet posten
+6. DB aktualisieren: status = "posted", platform_id = erste Tweet-ID
 
-**Error handling**:
-- If tweet N fails: mark post as "partial", store last successful tweet ID
-- Retry: resume from the failed tweet (don't re-post successful ones)
-- Rate limit hit: wait and retry with exponential backoff
+**Fehlerbehandlung**:
+- Schlägt Tweet N fehl: Beitrag als "partial" markieren, letzte erfolgreiche Tweet-ID speichern
+- Wiederholung: ab dem fehlgeschlagenen Tweet fortsetzen (erfolgreiche nicht erneut posten)
+- Bei Rate-Limit: warten und mit exponentiellem Backoff wiederholen
 
-### 4. Schedule Workflow
+### 4. Zeitplan-Workflow
 ```
 postctl schedule <id> "2026-06-23 09:00"
        ↓
-  Update DB: status = "scheduled", scheduled_at = datetime
+  DB aktualisieren: status = "scheduled", scheduled_at = Zeitstempel
        ↓
-  Scheduler daemon picks it up at the right time
+  Scheduler-Daemon greift zur richtigen Zeit
        ↓
-  Same as Post Workflow
+  Wie der Post-Workflow
 ```
 
 **Scheduler**:
-- Runs as background goroutine when TUI is open
-- Also runs as `postctl daemon` for headless mode
-- Checks every 30 seconds for due posts
-- Posts in order of scheduled_at
+- Läuft als Hintergrund-Goroutine, während die TUI offen ist
+- Läuft auch als `postctl daemon` im Headless-Modus
+- Prüft alle 30 Sekunden auf fällige Beiträge
+- Postet in Reihenfolge von scheduled_at
 
-### 5. Auth Workflow
+### 5. Auth-Workflow
 ```
 postctl auth twitter
        ↓
-  Open browser → Twitter OAuth consent page
+  Browser öffnen → Twitter-OAuth-Zustimmungsseite
        ↓
-  Local HTTP server on :8753 catches callback
+  Lokaler HTTP-Server auf :8753 fängt den Callback ab
        ↓
-  Exchange code for token
+  Code gegen Token tauschen
        ↓
-  Store encrypted token in SQLite
+  Verschlüsseltes Token in SQLite speichern
 ```
 
-## Markdown Format Spec
+## Markdown-Formatspezifikation
 
-### Frontmatter Fields
+### Frontmatter-Felder
 
-| Field | Required | Type | Values | Default |
-|-------|----------|------|--------|---------|
-| `platform` | yes | string | `twitter`, `linkedin`, `threads`, `all` | — |
-| `type` | yes | string | `thread`, `single`, `article` | — |
-| `language` | no | string | ISO 639-1 (`en`, `de`) | `en` |
-| `campaign` | no | string | freeform slug | — |
-| `schedule` | no | datetime | ISO 8601 local | — |
-| `images` | no | list | relative file paths | — |
-| `tags` | no | list | hashtags without # | — |
+| Feld | Pflicht | Typ | Werte | Standard |
+|------|---------|-----|-------|----------|
+| `platform` | ja | String | `twitter`, `linkedin`, `threads`, `all` | — |
+| `type` | ja | String | `thread`, `single`, `article` | — |
+| `language` | nein | String | ISO 639-1 (`en`, `de`) | `en` |
+| `campaign` | nein | String | freier Slug | — |
+| `schedule` | nein | Datum/Zeit | ISO 8601 lokal | — |
+| `images` | nein | Liste | relative Dateipfade | — |
+| `tags` | nein | Liste | Hashtags ohne # | — |
 
-### Body Format
+### Body-Format
 
-**Single post** (LinkedIn, Threads):
+**Einzelbeitrag** (LinkedIn, Threads):
 ```markdown
 ---
 platform: linkedin
 type: single
 ---
 
-The entire post body goes here.
-Multiple paragraphs supported.
+Der gesamte Beitragstext kommt hierher.
+Mehrere Absätze werden unterstützt.
 ```
 
 **Thread** (Twitter):
@@ -222,36 +222,36 @@ images:
 
 ## Tweet 1
 
-First tweet content. No links here for algorithmic reach.
+Inhalt des ersten Tweets. Keine Links hier, wegen algorithmischer Reichweite.
 
 ## Tweet 2
 
-Second tweet. Attach image: screenshots/01-dashboard.png
+Zweiter Tweet. Bild anhängen: screenshots/01-dashboard.png
 
 ## Tweet 3
 
-Third tweet content.
+Inhalt des dritten Tweets.
 
 ## Reply
 
-Links and hashtags go in the self-reply.
+Links und Hashtags kommen in den Selbst-Reply.
 github.com/aeon022/orbiter
 
 #opensource #webdev
 ```
 
-**Rules**:
-- `## Tweet N` splits into individual tweets
-- `## Reply` is posted as a reply to the last tweet
-- Image assignment: first image in `images:` list goes to Tweet 2, second to Tweet 3, etc. Or use `<!-- image: filename.png -->` inline
-- Character count: ≤280 per tweet (URLs count as 23 chars per Twitter's t.co)
-- Empty tweets are skipped
+**Regeln**:
+- `## Tweet N` trennt in einzelne Tweets
+- `## Reply` wird als Antwort auf den letzten Tweet gepostet
+- Bildzuordnung: erstes Bild in der `images:`-Liste geht an Tweet 2, zweites an Tweet 3, usw. Alternativ inline mit `<!-- image: filename.png -->`
+- Zeichenzahl: ≤280 pro Tweet (URLs zählen als 23 Zeichen, nach Twitters t.co)
+- Leere Tweets werden übersprungen
 
-## Platform API Details
+## Plattform-API-Details
 
 ### Twitter/X v2
 
-**Auth**: OAuth 2.0 with PKCE
+**Auth**: OAuth 2.0 mit PKCE
 ```
 GET https://twitter.com/i/oauth2/authorize
   ?client_id=...
@@ -263,7 +263,7 @@ GET https://twitter.com/i/oauth2/authorize
   &state=...
 ```
 
-**Post tweet**:
+**Tweet posten**:
 ```
 POST https://api.twitter.com/2/tweets
 Authorization: Bearer <token>
@@ -272,7 +272,7 @@ Content-Type: application/json
 {"text": "...", "media": {"media_ids": ["..."]}, "reply": {"in_reply_to_tweet_id": "..."}}
 ```
 
-**Upload media** (v1.1 — still required):
+**Medien hochladen** (v1.1 — weiterhin erforderlich):
 ```
 POST https://upload.twitter.com/1.1/media/upload.json
 Content-Type: multipart/form-data
@@ -282,7 +282,7 @@ media_data=<base64>
 
 ### LinkedIn v2
 
-**Post**:
+**Beitrag**:
 ```
 POST https://api.linkedin.com/v2/ugcPosts
 Authorization: Bearer <token>
@@ -301,13 +301,13 @@ Authorization: Bearer <token>
 }
 ```
 
-**Image upload** (2-step):
-1. Register: `POST /v2/assets?action=registerUpload` → get upload URL + asset URN
-2. Upload: `PUT <upload-url>` with binary image data
+**Bild-Upload** (2 Schritte):
+1. Registrieren: `POST /v2/assets?action=registerUpload` → liefert Upload-URL + Asset-URN
+2. Hochladen: `PUT <upload-url>` mit binären Bilddaten
 
 ### Threads (Meta Graph API)
 
-**Create container**:
+**Container erstellen**:
 ```
 POST https://graph.threads.net/v1.0/<user_id>/threads
   ?media_type=TEXT
@@ -315,97 +315,71 @@ POST https://graph.threads.net/v1.0/<user_id>/threads
   &access_token=...
 ```
 
-**Publish**:
+**Veröffentlichen**:
 ```
 POST https://graph.threads.net/v1.0/<user_id>/threads_publish
   ?creation_id=<container_id>
   &access_token=...
 ```
 
-## Error Handling Strategy
+## Fehlerbehandlungs-Strategie
 
-| Error | Action |
-|-------|--------|
-| Rate limit (429) | Wait `retry-after` header, then retry |
-| Auth expired (401) | Attempt token refresh, if fails prompt re-auth |
-| Network error | Retry 3x with exponential backoff (1s, 4s, 16s) |
-| Partial thread | Mark as "partial", store progress, allow resume |
-| Invalid content | Validation error before API call, show in TUI |
-| Image too large | Resize with Go image library before upload |
+| Fehler | Aktion |
+|--------|--------|
+| Rate-Limit (429) | `retry-after`-Header abwarten, dann wiederholen |
+| Auth abgelaufen (401) | Token-Refresh versuchen, bei Fehlschlag erneute Anmeldung anfordern |
+| Netzwerkfehler | 3x wiederholen mit exponentiellem Backoff (1s, 4s, 16s) |
+| Teilweiser Thread | Als "partial" markieren, Fortschritt speichern, Fortsetzung erlauben |
+| Ungültiger Inhalt | Validierungsfehler vor dem API-Aufruf, Anzeige in der TUI |
+| Bild zu groß | Mit Go-Bildbibliothek vor dem Upload verkleinern |
 
-## Non-Goals (v1)
+## Nicht-Ziele (v1)
 
-- No web dashboard
-- No multi-user / team features
-- No built-in image generation
-- No automatic cross-posting (explicit per platform)
+- Kein Web-Dashboard
+- Keine Mehrbenutzer-/Team-Funktionen
+- Keine eingebaute Bildgenerierung
+- Kein automatisches Cross-Posting (explizit pro Plattform)
 
-## Success Metrics
+## Erfolgsmetriken
 
-- Import 20 Markdown posts in <1 second
-- Post a 6-tweet thread with 2 images in <10 seconds
-- TUI renders at 60fps on standard terminal
-- Single binary, <20MB, no runtime dependencies
-- Works on macOS, Linux, Windows
+- 20 Markdown-Beiträge in <1 Sekunde importieren
+- Einen 6-Tweet-Thread mit 2 Bildern in <10 Sekunden posten
+- TUI rendert mit 60fps im Standard-Terminal
+- Einzelnes Binary, <20MB, keine Laufzeit-Abhängigkeiten
+- Läuft unter macOS, Linux, Windows
 
 ---
 
-## Future Features (v2+)
+## Zukünftige Features (v2+)
+
+> **Hinweis:** Alles in diesem Abschnitt ist eine zukunftsgerichtete Idee, keine Zusage und kein aktuell verkauftes Produkt. postctls tatsächliches Preismodell ist heute die einmalige missionctl-Bundle-Lizenz (Polar.sh), beschrieben auf der [Preise-Seite](/#pricing) — nicht die Abo-Stufen, die unten skizziert sind.
 
 ### `postctl generate`
-AI generiert Posts aus einer URL oder einem Markdown-Artikel.
-- Input: URL, Markdown-Datei, oder freier Text
-- Output: Thread-Draft + LinkedIn-Post + Threads-Post als Markdown
-- Nutzt Claude API, OpenAI API, oder Ollama (lokal)
-- User reviewt und editiert vor dem Posten
+KI generiert Beiträge aus einer URL oder einem Markdown-Artikel.
+- Eingabe: URL, Markdown-Datei oder freier Text
+- Ausgabe: Thread-Entwurf + LinkedIn-Beitrag + Threads-Beitrag als Markdown
+- Nutzt die Claude-API, OpenAI-API oder Ollama (lokal)
+- Nutzer prüft und bearbeitet vor dem Posten
 
 ### `postctl repurpose`
-Nimmt einen bestehenden Post und konvertiert ihn für andere Plattformen.
-- Dev.to Artikel → Twitter Thread + LinkedIn + Threads
-- Twitter Thread → LinkedIn Langpost
-- Passt Länge, Ton, Hashtags automatisch an
+Nimmt einen bestehenden Beitrag und konvertiert ihn für andere Plattformen.
+- Dev.to-Artikel → Twitter-Thread + LinkedIn + Threads
+- Twitter-Thread → LinkedIn-Langbeitrag
+- Passt Länge, Ton und Hashtags automatisch an
 
 ### `postctl analytics`
-Engagement-Daten von den APIs nach dem Posten holen.
+Holt Engagement-Daten von den APIs nach dem Posten.
 - Likes, Retweets, Impressions (Twitter)
-- Reactions, Comments (LinkedIn)
-- Beste Posting-Zeiten ermitteln
+- Reaktionen, Kommentare (LinkedIn)
+- Ermittelt beste Posting-Zeiten
 - Terminal-Dashboard mit Sparklines
 
 ### `postctl template`
-Vorgefertigte Post-Strukturen.
-- `postctl template launch` — Product Launch Announcement
-- `postctl template feature` — Feature Update Thread
-- `postctl template thought` — Thought Leadership Post
-- Generiert Markdown-Datei mit Platzhaltern
-
----
-
-## Monetarisierung
-
-### postctl (Open Source, gratis)
-Das CLI-Tool ist MIT-lizenziert. Baut Reputation und Community.
-
-### postctl pro ($9/Monat oder $79/Jahr)
-Premium-Features als bezahlte Erweiterung:
-- **Analytics-Dashboard** — Engagement pro Post, beste Posting-Zeiten, Wachstum über Zeit
-- **AI-Optimierung** — Claude/GPT rewritet Posts für maximale Reichweite (A/B-Vorschläge)
-- **Team-Mode** — mehrere Leute posten unter einem Account, Approval-Workflow
-- **Priority Support** — GitHub Issues mit SLA
-- Implementierung: License Key in `~/.config/postctl/config.yaml`, Feature-Gates im Code
-
-### postctl cloud (Future — $19/Monat)
-Gehostete Version für Nicht-Entwickler.
-- Web-UI statt Terminal
-- Managed Scheduling (kein eigener Rechner muss laufen)
-- Status: niedrige Priorität, nur wenn Nachfrage da ist
-
-### Go Tutorial als Kurs ($49-79 einmalig)
-Das Tutorial das wir parallel schreiben wird zum bezahlten Produkt:
-- "Build a real CLI tool in Go" — Video-Serie
-- postctl als Projekt-Basis, 7 Phasen
-- Plattform: eigene Seite, Udemy, oder Lemon Squeezy
-- Gratis-Teaser: erste 2 Phasen als Blog-Posts auf Dev.to
+Vorgefertigte Beitragsstrukturen.
+- `postctl template launch` — Produkt-Launch-Ankündigung
+- `postctl template feature` — Feature-Update-Thread
+- `postctl template thought` — Thought-Leadership-Beitrag
+- Erzeugt eine Markdown-Datei mit Platzhaltern
 
 ---
 
@@ -414,14 +388,14 @@ Das Tutorial das wir parallel schreiben wird zum bezahlten Produkt:
 postctl ist Teil eines Content-Loops:
 
 ```
-Orbiter (Create) → postctl (Distribute) → Analytics (Learn) → Orbiter (Improve)
+Orbiter (Erstellen) → postctl (Verteilen) → Analytics (Lernen) → Orbiter (Verbessern)
 ```
 
-1. Content in Orbiter schreiben (Blog Posts, Pages)
-2. Posts als Markdown exportieren / generieren
+1. Content in Orbiter schreiben (Blogbeiträge, Seiten)
+2. Beiträge als Markdown exportieren/generieren
 3. postctl verteilt auf Twitter, LinkedIn, Threads
-4. Analytics zeigt was funktioniert
-5. Insights fließen in nächsten Content-Zyklus
+4. Analytics zeigt, was funktioniert
+5. Erkenntnisse fließen in den nächsten Content-Zyklus
 
 Langfristig: `orbiter export --to-postctl` als Integration.
 

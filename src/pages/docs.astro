@@ -9,7 +9,8 @@ import * as LinkedinDocDe from '../../docs/api-linkedin.md';
 import * as LinkedinDocEn from '../../docs/api-linkedin-en.md';
 import * as ThreadsDocDe from '../../docs/api-threads.md';
 import * as ThreadsDocEn from '../../docs/api-threads-en.md';
-import * as SpecDoc from '../../documents/SPEC.md';
+import * as SpecDocDe from '../../documents/SPEC.md';
+import * as SpecDocEn from '../../documents/SPEC-en.md';
 import * as TutorialDocDe from '../../documents/TUTORIAL.md';
 import * as TutorialDocEn from '../../documents/TUTORIAL-en.md';
 import LangToggle from '../components/LangToggle.astro';
@@ -575,7 +576,12 @@ images: ["logo.png"]
 				<!-- Tab 10: System Spec -->
 				<section class="doc-section" id="doc-system-spec">
 					<div class="doc-body markdown-content">
-						<SpecDoc.Content />
+						<div class="lang-en">
+							<SpecDocEn.Content />
+						</div>
+						<div class="lang-de">
+							<SpecDocDe.Content />
+						</div>
 					</div>
 				</section>
 
