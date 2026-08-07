@@ -1931,7 +1931,7 @@ Twitter/X no longer offers free write access (Free Tier) for newly created devel
 ./postctl config set facebook.app_secret "YOUR_FB_APP_SECRET"
 ./postctl config set facebook.page_id "YOUR_FB_PAGE_ID"</code></pre><h3>Step C: Run Authentication</h3><pre class="code-block" data-lang="bash"><code>./postctl auth facebook</code></pre><p>Accept the prompt to authorize managing and publishing pages. The access token is exchanged for a permanent page access token and saved securely.</p></div><div class="lang-de"><h1>🤖 Facebook-Einrichtungsanleitung</h1><p>Konfiguriere die automatisierte Veröffentlichung auf Facebook-Business-/Creator-Seiten über Meta-Graph-API-Tokens.</p><h2>Facebook-Integration</h2><p>Facebook-Beiträge werden über Meta-Graph-API-Tokens direkt an Business-/Creator-Seiten gesendet.</p><h3>Schritt A: App im Meta-Portal erstellen</h3><ol><li>Gehe zum <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer">Meta Developer Portal</a>.</li><li>Erstelle eine App vom Typ <strong>Business</strong> oder <strong>Other</strong>.</li><li>Konfiguriere die OAuth-Redirect-URL: <code>http://localhost:8753/callback</code></li><li>Gehe zu Settings ➔ Basic und kopiere deine <strong>App ID</strong> und dein <strong>App Secret</strong>.</li><li>Ermittle die Ziel-Facebook-Page-ID (zu finden in den "Info"-Angaben deiner Facebook-Seite).</li></ol><h3>Schritt B: In der Konfiguration speichern</h3><pre class="code-block" data-lang="bash"><code>./postctl config set facebook.app_id "YOUR_FB_APP_ID"
 ./postctl config set facebook.app_secret "YOUR_FB_APP_SECRET"
-./postctl config set facebook.page_id "YOUR_FB_PAGE_ID"</code></pre><h3>Schritt C: Authentifizierung ausführen</h3><pre class="code-block" data-lang="bash"><code>./postctl auth facebook</code></pre><p>Bestätige die Anfrage, um das Verwalten und Veröffentlichen von Seiten zu autorisieren. Das Zugriffs-Token wird gegen ein dauerhaftes Seiten-Zugriffs-Token eingetauscht und sicher gespeichert.</p></div></div></section><!-- Tab 10: System Spec --><section class="doc-section" id="doc-system-spec"><div class="doc-body markdown-content"><h1 id="postctl--specification">postctl — Specification</h1>
+./postctl config set facebook.page_id "YOUR_FB_PAGE_ID"</code></pre><h3>Schritt C: Authentifizierung ausführen</h3><pre class="code-block" data-lang="bash"><code>./postctl auth facebook</code></pre><p>Bestätige die Anfrage, um das Verwalten und Veröffentlichen von Seiten zu autorisieren. Das Zugriffs-Token wird gegen ein dauerhaftes Seiten-Zugriffs-Token eingetauscht und sicher gespeichert.</p></div></div></section><!-- Tab 10: System Spec --><section class="doc-section" id="doc-system-spec"><div class="doc-body markdown-content"><div class="lang-en"><h1 id="postctl--specification">postctl — Specification</h1>
 <h2 id="overview">Overview</h2>
 <p><strong>postctl</strong> is a TUI CLI tool written in Go that manages social media postings and blogs across Twitter/X, LinkedIn, Threads, Mastodon, Bluesky, Facebook, Telegram, Discord, Reddit, Dev.to, Hashnode, and Medium. Posts are authored as Markdown files, imported into a local SQLite database, previewed in a terminal UI, and published via platform APIs — immediately or on a schedule.</p>
 <h2 id="user-stories">User Stories</h2>
@@ -1965,7 +1965,7 @@ Twitter/X no longer offers free write access (Free Tier) for newly created devel
 <span class="line"><span>   3. postctl list --format json          → shows draft posts</span></span>
 <span class="line"><span>   4. "Here are 8 posts ready. Review?"</span></span>
 <span class="line"><span>   ↓</span></span>
-<span class="line"><span>Human: "LinkedIn DE ändern, sonst passt"</span></span>
+<span class="line"><span>Human: "Change the LinkedIn DE version, rest is fine"</span></span>
 <span class="line"><span>   ↓</span></span>
 <span class="line"><span>AI:</span></span>
 <span class="line"><span>   5. Edits the file, re-imports</span></span>
@@ -2297,75 +2297,467 @@ Twitter/X no longer offers free write access (Free Tier) for newly created devel
 </ul>
 <hr>
 <h2 id="future-features-v2">Future Features (v2+)</h2>
+<blockquote>
+<p><strong>Note:</strong> everything in this section is a forward-looking idea, not a commitment or a currently sold product. postctl’s actual pricing today is the one-time missionctl Bundle license (Polar.sh) described on the <a href="/#pricing">pricing page</a> — not the subscription tiers sketched out below.</p>
+</blockquote>
 <h3 id="postctl-generate"><code>postctl generate</code></h3>
-<p>AI generiert Posts aus einer URL oder einem Markdown-Artikel.</p>
+<p>AI generates posts from a URL or a Markdown article.</p>
 <ul>
-<li>Input: URL, Markdown-Datei, oder freier Text</li>
-<li>Output: Thread-Draft + LinkedIn-Post + Threads-Post als Markdown</li>
-<li>Nutzt Claude API, OpenAI API, oder Ollama (lokal)</li>
-<li>User reviewt und editiert vor dem Posten</li>
+<li>Input: URL, Markdown file, or free text</li>
+<li>Output: thread draft + LinkedIn post + Threads post as Markdown</li>
+<li>Uses the Claude API, OpenAI API, or Ollama (local)</li>
+<li>User reviews and edits before posting</li>
 </ul>
 <h3 id="postctl-repurpose"><code>postctl repurpose</code></h3>
-<p>Nimmt einen bestehenden Post und konvertiert ihn für andere Plattformen.</p>
+<p>Takes an existing post and converts it for other platforms.</p>
 <ul>
-<li>Dev.to Artikel → Twitter Thread + LinkedIn + Threads</li>
-<li>Twitter Thread → LinkedIn Langpost</li>
-<li>Passt Länge, Ton, Hashtags automatisch an</li>
+<li>Dev.to article → Twitter thread + LinkedIn + Threads</li>
+<li>Twitter thread → LinkedIn long-form post</li>
+<li>Automatically adapts length, tone, and hashtags</li>
 </ul>
 <h3 id="postctl-analytics"><code>postctl analytics</code></h3>
-<p>Engagement-Daten von den APIs nach dem Posten holen.</p>
+<p>Fetches engagement data from the APIs after posting.</p>
+<ul>
+<li>Likes, retweets, impressions (Twitter)</li>
+<li>Reactions, comments (LinkedIn)</li>
+<li>Determines best posting times</li>
+<li>Terminal dashboard with sparklines</li>
+</ul>
+<h3 id="postctl-template"><code>postctl template</code></h3>
+<p>Pre-built post structures.</p>
+<ul>
+<li><code>postctl template launch</code> — product launch announcement</li>
+<li><code>postctl template feature</code> — feature update thread</li>
+<li><code>postctl template thought</code> — thought leadership post</li>
+<li>Generates a Markdown file with placeholders</li>
+</ul>
+<hr>
+<h2 id="ecosystem-vision">Ecosystem Vision</h2>
+<p>postctl is part of a content loop:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Orbiter (Create) → postctl (Distribute) → Analytics (Learn) → Orbiter (Improve)</span></span></code></pre>
+<ol>
+<li>Write content in Orbiter (blog posts, pages)</li>
+<li>Export/generate posts as Markdown</li>
+<li>postctl distributes to Twitter, LinkedIn, Threads</li>
+<li>Analytics shows what’s working</li>
+<li>Insights feed into the next content cycle</li>
+</ol>
+<p>Long-term: <code>orbiter export --to-postctl</code> as an integration.</p>
+<hr>
+<h2 id="project-setup">Project Setup</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Repository: ~/Developing/Projects/postctl</span></span>
+<span class="line"><span>Module:     github.com/aeon022/postctl</span></span>
+<span class="line"><span>License:    MIT</span></span></code></pre>
+</div><div class="lang-de"><h1 id="postctl--spezifikation">postctl — Spezifikation</h1>
+<h2 id="überblick">Überblick</h2>
+<p><strong>postctl</strong> ist ein in Go geschriebenes TUI-CLI-Tool, das Social-Media-Beiträge und Blogartikel über Twitter/X, LinkedIn, Threads, Mastodon, Bluesky, Facebook, Telegram, Discord, Reddit, Dev.to, Hashnode und Medium hinweg verwaltet. Beiträge werden als Markdown-Dateien verfasst, in eine lokale SQLite-Datenbank importiert, in einer Terminal-UI vorgeschaut und über Plattform-APIs veröffentlicht — sofort oder nach Zeitplan.</p>
+<h2 id="user-stories">User Stories</h2>
+<h3 id="als-solo-entwickler--indie-hacker">Als Solo-Entwickler / Indie Hacker:</h3>
+<ul>
+<li>Ich will Beiträge als Markdown-Dateien in meinem Repo schreiben</li>
+<li>Ich will vorschauen, wie ein Twitter-Thread aussehen wird, bevor ich poste</li>
+<li>Ich will Beiträge für optimales Timing über Zeitzonen hinweg einplanen</li>
+<li>Ich will denselben Inhalt mit einem Befehl auf mehreren Plattformen posten</li>
+<li>Ich will sehen, was ich wann gepostet habe</li>
+<li>Ich will eine Zeichenzahl-Prüfung vor dem Posten (280 Zeichen pro Tweet)</li>
+</ul>
+<h3 id="als-ki-assistent-claude-gpt-antigravity">Als KI-Assistent (Claude, GPT, Antigravity):</h3>
+<ul>
+<li>Ich will korrekt formatierte Markdown-Beiträge erstellen</li>
+<li>Ich will das Posten über CLI-Befehle auslösen</li>
+<li>Ich will Beitragsstatus und -verlauf prüfen können</li>
+<li>Ich will den kompletten Workflow durchgängig ohne menschliches Eingreifen ausführen (außer Freigabe)</li>
+<li>Ich will strukturierte JSON-Ausgabe für alle Befehle, um Ergebnisse zu parsen</li>
+<li>Ich will einen Dry-Run-Modus, um alles zu prüfen, bevor es verbindlich wird</li>
+</ul>
+<h2 id="prinzip-ki-als-operator">Prinzip: KI als Operator</h2>
+<p><strong>postctl ist darauf ausgelegt, dass KI es bedient — nicht nur Text generiert.</strong></p>
+<p>Die meisten Social-Media-Tools behandeln KI als Copywriting-Feature — “KI schreibt deine Bildunterschrift”. postctl behandelt KI als Operator des gesamten Tools. Der Mensch legt die Strategie fest und gibt frei; die KI führt aus.</p>
+<h3 id="workflow-ki-bedient-mensch-gibt-frei">Workflow: KI bedient, Mensch gibt frei</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Mensch: "Poste den neuen Orbiter-v0.3.66-Release"</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>KI (Claude/GPT):</span></span>
+<span class="line"><span>   1. Schreibt Beiträge als Markdown-Dateien (alle Plattformen, DE+EN)</span></span>
+<span class="line"><span>   2. postctl import ./posts/</span></span>
+<span class="line"><span>   3. postctl list --format json          → zeigt Entwürfe</span></span>
+<span class="line"><span>   4. "Hier sind 8 fertige Beiträge. Prüfen?"</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>Mensch: "LinkedIn DE ändern, sonst passt es"</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>KI:</span></span>
+<span class="line"><span>   5. Bearbeitet die Datei, importiert neu</span></span>
+<span class="line"><span>   6. postctl campaign post orbiter-v0366 --dry-run</span></span>
+<span class="line"><span>   7. "Dry Run erfolgreich. Posten?"</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>Mensch: "go"</span></span>
+<span class="line"><span>   ↓</span></span>
+<span class="line"><span>KI:</span></span>
+<span class="line"><span>   8. postctl campaign post orbiter-v0366</span></span>
+<span class="line"><span>   9. "Gepostet. 4/4 Twitter, 2/2 LinkedIn, 2/2 Threads. IDs: ..."</span></span></code></pre>
+<h3 id="designanforderungen-für-den-ki-betrieb">Designanforderungen für den KI-Betrieb</h3>
+<ol>
+<li><strong>Alle Befehle müssen nicht-interaktiv funktionieren</strong> — keine Prompts, kein “bist du sicher?”, keine interaktiven Menüs. Flags steuern alles.</li>
+<li><strong><code>--format json</code></strong> bei allen Befehlen — strukturierte Ausgabe, die KI parsen kann. Standard ist menschenlesbar, <code>--format json</code> liefert maschinenlesbar.</li>
+<li><strong><code>--dry-run</code></strong> bei allen verändernden Befehlen — KI kann ohne Nebenwirkungen vorschauen. Mensch gibt frei, dann führt KI ohne <code>--dry-run</code> aus.</li>
+<li><strong>Exit-Codes</strong> — 0 = Erfolg, 1 = Validierungsfehler, 2 = API-Fehler, 3 = Auth-Fehler. KI liest Exit-Codes, nicht nur die Ausgabe.</li>
+<li><strong>Idempotente Importe</strong> — <code>postctl import</code> zweimal auszuführen dupliziert keine Beiträge. KI kann nach Bearbeitungen ohne Aufräumen neu importieren.</li>
+<li><strong>Wiederherstellung nach Teilfehlern</strong> — schlägt Tweet 3/5 fehl, setzt <code>postctl post &lt;id&gt; --resume</code> dort fort, wo es aufgehört hat. KI muss den Zustand nicht manuell verfolgen.</li>
+<li><strong>Kein Browser nötig</strong> — der OAuth-Flow nutzt einen Localhost-Callback, aber nach der Authentifizierung läuft alles rein über die CLI. KI muss nie einen Browser öffnen.</li>
+<li><strong>Batch-Operationen</strong> — <code>postctl campaign post &lt;name&gt;</code> postet alle Beiträge einer Kampagne. KI muss nicht über einzelne Beiträge loopen.</li>
+</ol>
+<h3 id="beispiel-für-json-ausgabe">Beispiel für JSON-Ausgabe</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> postctl</span><span style="color:#9ECBFF"> list</span><span style="color:#79B8FF"> --format</span><span style="color:#9ECBFF"> json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">  "posts"</span><span style="color:#79B8FF">:</span><span style="color:#E1E4E8"> [</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#B392F0">      "id"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "orbiter-v0366-twitter-en",</span></span>
+<span class="line"><span style="color:#B392F0">      "platform"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "twitter",</span></span>
+<span class="line"><span style="color:#B392F0">      "type"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "thread",</span></span>
+<span class="line"><span style="color:#B392F0">      "status"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "draft",</span></span>
+<span class="line"><span style="color:#B392F0">      "tweets"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> 5,</span></span>
+<span class="line"><span style="color:#B392F0">      "images"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> 2,</span></span>
+<span class="line"><span style="color:#B392F0">      "chars"</span><span style="color:#79B8FF">:</span><span style="color:#E1E4E8"> [245, </span><span style="color:#9ECBFF">220,</span><span style="color:#9ECBFF"> 180,</span><span style="color:#9ECBFF"> 260,</span><span style="color:#9ECBFF"> 190],</span></span>
+<span class="line"><span style="color:#B392F0">      "valid"</span><span style="color:#79B8FF">:</span><span style="color:#79B8FF"> true</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">  ],</span></span>
+<span class="line"><span style="color:#B392F0">  "total"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> 8,</span></span>
+<span class="line"><span style="color:#B392F0">  "by_status"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> {"draft":</span><span style="color:#9ECBFF"> 8,</span><span style="color:#9ECBFF"> "posted":</span><span style="color:#9ECBFF"> 0,</span><span style="color:#9ECBFF"> "scheduled":</span><span style="color:#79B8FF"> 0</span><span style="color:#9ECBFF">}</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> postctl</span><span style="color:#9ECBFF"> post</span><span style="color:#9ECBFF"> orbiter-v0366-twitter-en</span><span style="color:#79B8FF"> --format</span><span style="color:#9ECBFF"> json</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#B392F0">  "ok"</span><span style="color:#79B8FF">:</span><span style="color:#79B8FF"> true</span><span style="color:#9ECBFF">,</span></span>
+<span class="line"><span style="color:#B392F0">  "platform"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "twitter",</span></span>
+<span class="line"><span style="color:#B392F0">  "tweets_posted"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> 5,</span></span>
+<span class="line"><span style="color:#B392F0">  "thread_id"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "1234567890",</span></span>
+<span class="line"><span style="color:#B392F0">  "urls"</span><span style="color:#79B8FF">:</span><span style="color:#E1E4E8"> [</span><span style="color:#9ECBFF">"https://x.com/gerwinweiher/status/1234567890"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="kern-workflows">Kern-Workflows</h2>
+<h3 id="1-import-workflow">1. Import-Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Markdown-Dateien → postctl import → SQLite-DB</span></span>
+<span class="line"><span>                                    ↓</span></span>
+<span class="line"><span>                              Beiträge mit Status "draft"</span></span></code></pre>
+<p><strong>Eingabe</strong>: Verzeichnis mit <code>.md</code>-Dateien mit YAML-Frontmatter
+<strong>Verarbeitung</strong>:</p>
+<ul>
+<li>Frontmatter parsen (platform, type, language, campaign, schedule, images)</li>
+<li>Body in Tweets zerlegen (Trennung bei <code>## Tweet N</code>-Überschriften)</li>
+<li>Reply-Abschnitt erkennen (<code>## Reply</code>)</li>
+<li>Validieren: Zeichenzahl pro Tweet (≤280), Bildpfade existieren</li>
+<li>Deterministische ID aus Dateiname + Plattform erzeugen</li>
+<li>In SQLite einfügen/aktualisieren (Upsert auf ID)</li>
+</ul>
+<p><strong>Ausgabe</strong>: Beiträge in der DB mit Status <code>draft</code> oder <code>scheduled</code> (falls <code>schedule:</code>-Frontmatter vorhanden)</p>
+<h3 id="2-vorschau-workflow">2. Vorschau-Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl (ohne Argumente) → TUI</span></span>
+<span class="line"><span>                      ↓</span></span>
+<span class="line"><span>              Dashboard → Beitragsliste → Detailansicht</span></span>
+<span class="line"><span>                                        ↓</span></span>
+<span class="line"><span>                                   Tweet-für-Tweet-Vorschau</span></span>
+<span class="line"><span>                                   mit Zeichenzahl + Bildindikatoren</span></span></code></pre>
+<h3 id="3-post-workflow">3. Post-Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl post &#x3C;id> → Aus DB laden → Validieren → API-Aufruf → Status aktualisieren</span></span>
+<span class="line"><span>                                                ↓</span></span>
+<span class="line"><span>                                          Zuerst Bilder hochladen</span></span>
+<span class="line"><span>                                          Dann Text mit Media-IDs posten</span></span>
+<span class="line"><span>                                          Bei Threads: sequenziell posten,</span></span>
+<span class="line"><span>                                          als Antwort auf vorherige Tweet-ID</span></span></code></pre>
+<p><strong>Ablauf beim Thread-Posten</strong>:</p>
+<ol>
+<li>Alle Bilder hochladen → Media-IDs erhalten</li>
+<li>Tweet 1 posten → Tweet-ID erhalten</li>
+<li>Tweet 2 als Antwort auf Tweet 1 posten → Tweet-ID erhalten</li>
+<li>Tweet 3 als Antwort auf Tweet 2 posten → …</li>
+<li>Reply-Tweet als Antwort auf den letzten Tweet posten</li>
+<li>DB aktualisieren: status = “posted”, platform_id = erste Tweet-ID</li>
+</ol>
+<p><strong>Fehlerbehandlung</strong>:</p>
+<ul>
+<li>Schlägt Tweet N fehl: Beitrag als “partial” markieren, letzte erfolgreiche Tweet-ID speichern</li>
+<li>Wiederholung: ab dem fehlgeschlagenen Tweet fortsetzen (erfolgreiche nicht erneut posten)</li>
+<li>Bei Rate-Limit: warten und mit exponentiellem Backoff wiederholen</li>
+</ul>
+<h3 id="4-zeitplan-workflow">4. Zeitplan-Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl schedule &#x3C;id> "2026-06-23 09:00"</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  DB aktualisieren: status = "scheduled", scheduled_at = Zeitstempel</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Scheduler-Daemon greift zur richtigen Zeit</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Wie der Post-Workflow</span></span></code></pre>
+<p><strong>Scheduler</strong>:</p>
+<ul>
+<li>Läuft als Hintergrund-Goroutine, während die TUI offen ist</li>
+<li>Läuft auch als <code>postctl daemon</code> im Headless-Modus</li>
+<li>Prüft alle 30 Sekunden auf fällige Beiträge</li>
+<li>Postet in Reihenfolge von scheduled_at</li>
+</ul>
+<h3 id="5-auth-workflow">5. Auth-Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl auth twitter</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Browser öffnen → Twitter-OAuth-Zustimmungsseite</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Lokaler HTTP-Server auf :8753 fängt den Callback ab</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Code gegen Token tauschen</span></span>
+<span class="line"><span>       ↓</span></span>
+<span class="line"><span>  Verschlüsseltes Token in SQLite speichern</span></span></code></pre>
+<h2 id="markdown-formatspezifikation">Markdown-Formatspezifikation</h2>
+<h3 id="frontmatter-felder">Frontmatter-Felder</h3>
+<table>
+<thead>
+<tr>
+<th>Feld</th>
+<th>Pflicht</th>
+<th>Typ</th>
+<th>Werte</th>
+<th>Standard</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>platform</code></td>
+<td>ja</td>
+<td>String</td>
+<td><code>twitter</code>, <code>linkedin</code>, <code>threads</code>, <code>all</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>ja</td>
+<td>String</td>
+<td><code>thread</code>, <code>single</code>, <code>article</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>language</code></td>
+<td>nein</td>
+<td>String</td>
+<td>ISO 639-1 (<code>en</code>, <code>de</code>)</td>
+<td><code>en</code></td>
+</tr>
+<tr>
+<td><code>campaign</code></td>
+<td>nein</td>
+<td>String</td>
+<td>freier Slug</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>schedule</code></td>
+<td>nein</td>
+<td>Datum/Zeit</td>
+<td>ISO 8601 lokal</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>images</code></td>
+<td>nein</td>
+<td>Liste</td>
+<td>relative Dateipfade</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>nein</td>
+<td>Liste</td>
+<td>Hashtags ohne #</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="body-format">Body-Format</h3>
+<p><strong>Einzelbeitrag</strong> (LinkedIn, Threads):</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="color:#E1E4E8">---</span></span>
+<span class="line"><span style="color:#85E89D">platform</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">linkedin</span></span>
+<span class="line"><span style="color:#85E89D">type</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">single</span></span>
+<span class="line"><span style="color:#E1E4E8">---</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">Der gesamte Beitragstext kommt hierher.</span></span>
+<span class="line"><span style="color:#E1E4E8">Mehrere Absätze werden unterstützt.</span></span></code></pre>
+<p><strong>Thread</strong> (Twitter):</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="color:#E1E4E8">---</span></span>
+<span class="line"><span style="color:#85E89D">platform</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">twitter</span></span>
+<span class="line"><span style="color:#85E89D">type</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">thread</span></span>
+<span class="line"><span style="color:#85E89D">images</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">  - </span><span style="color:#9ECBFF">screenshots/01-dashboard.png</span></span>
+<span class="line"><span style="color:#E1E4E8">---</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF;font-weight:bold">## Tweet 1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">Inhalt des ersten Tweets. Keine Links hier, wegen algorithmischer Reichweite.</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF;font-weight:bold">## Tweet 2</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">Zweiter Tweet. Bild anhängen: screenshots/01-dashboard.png</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF;font-weight:bold">## Tweet 3</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">Inhalt des dritten Tweets.</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF;font-weight:bold">## Reply</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">Links und Hashtags kommen in den Selbst-Reply.</span></span>
+<span class="line"><span style="color:#E1E4E8">github.com/aeon022/orbiter</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">#opensource #webdev</span></span></code></pre>
+<p><strong>Regeln</strong>:</p>
+<ul>
+<li><code>## Tweet N</code> trennt in einzelne Tweets</li>
+<li><code>## Reply</code> wird als Antwort auf den letzten Tweet gepostet</li>
+<li>Bildzuordnung: erstes Bild in der <code>images:</code>-Liste geht an Tweet 2, zweites an Tweet 3, usw. Alternativ inline mit <code>&lt;!-- image: filename.png --&gt;</code></li>
+<li>Zeichenzahl: ≤280 pro Tweet (URLs zählen als 23 Zeichen, nach Twitters t.co)</li>
+<li>Leere Tweets werden übersprungen</li>
+</ul>
+<h2 id="plattform-api-details">Plattform-API-Details</h2>
+<h3 id="twitterx-v2">Twitter/X v2</h3>
+<p><strong>Auth</strong>: OAuth 2.0 mit PKCE</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>GET https://twitter.com/i/oauth2/authorize</span></span>
+<span class="line"><span>  ?client_id=...</span></span>
+<span class="line"><span>  &#x26;redirect_uri=http://localhost:8753/callback</span></span>
+<span class="line"><span>  &#x26;scope=tweet.read+tweet.write+users.read+offline.access</span></span>
+<span class="line"><span>  &#x26;response_type=code</span></span>
+<span class="line"><span>  &#x26;code_challenge=...</span></span>
+<span class="line"><span>  &#x26;code_challenge_method=S256</span></span>
+<span class="line"><span>  &#x26;state=...</span></span></code></pre>
+<p><strong>Tweet posten</strong>:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://api.twitter.com/2/tweets</span></span>
+<span class="line"><span>Authorization: Bearer &#x3C;token></span></span>
+<span class="line"><span>Content-Type: application/json</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>{"text": "...", "media": {"media_ids": ["..."]}, "reply": {"in_reply_to_tweet_id": "..."}}</span></span></code></pre>
+<p><strong>Medien hochladen</strong> (v1.1 — weiterhin erforderlich):</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://upload.twitter.com/1.1/media/upload.json</span></span>
+<span class="line"><span>Content-Type: multipart/form-data</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>media_data=&#x3C;base64></span></span></code></pre>
+<h3 id="linkedin-v2">LinkedIn v2</h3>
+<p><strong>Beitrag</strong>:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://api.linkedin.com/v2/ugcPosts</span></span>
+<span class="line"><span>Authorization: Bearer &#x3C;token></span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>  "author": "urn:li:person:&#x3C;id>",</span></span>
+<span class="line"><span>  "lifecycleState": "PUBLISHED",</span></span>
+<span class="line"><span>  "specificContent": {</span></span>
+<span class="line"><span>    "com.linkedin.ugc.ShareContent": {</span></span>
+<span class="line"><span>      "shareCommentary": {"text": "..."},</span></span>
+<span class="line"><span>      "shareMediaCategory": "IMAGE",</span></span>
+<span class="line"><span>      "media": [{"status": "READY", "media": "&#x3C;asset-urn>"}]</span></span>
+<span class="line"><span>    }</span></span>
+<span class="line"><span>  },</span></span>
+<span class="line"><span>  "visibility": {"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"}</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p><strong>Bild-Upload</strong> (2 Schritte):</p>
+<ol>
+<li>Registrieren: <code>POST /v2/assets?action=registerUpload</code> → liefert Upload-URL + Asset-URN</li>
+<li>Hochladen: <code>PUT &lt;upload-url&gt;</code> mit binären Bilddaten</li>
+</ol>
+<h3 id="threads-meta-graph-api">Threads (Meta Graph API)</h3>
+<p><strong>Container erstellen</strong>:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://graph.threads.net/v1.0/&#x3C;user_id>/threads</span></span>
+<span class="line"><span>  ?media_type=TEXT</span></span>
+<span class="line"><span>  &#x26;text=...</span></span>
+<span class="line"><span>  &#x26;access_token=...</span></span></code></pre>
+<p><strong>Veröffentlichen</strong>:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://graph.threads.net/v1.0/&#x3C;user_id>/threads_publish</span></span>
+<span class="line"><span>  ?creation_id=&#x3C;container_id></span></span>
+<span class="line"><span>  &#x26;access_token=...</span></span></code></pre>
+<h2 id="fehlerbehandlungs-strategie">Fehlerbehandlungs-Strategie</h2>
+<table>
+<thead>
+<tr>
+<th>Fehler</th>
+<th>Aktion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rate-Limit (429)</td>
+<td><code>retry-after</code>-Header abwarten, dann wiederholen</td>
+</tr>
+<tr>
+<td>Auth abgelaufen (401)</td>
+<td>Token-Refresh versuchen, bei Fehlschlag erneute Anmeldung anfordern</td>
+</tr>
+<tr>
+<td>Netzwerkfehler</td>
+<td>3x wiederholen mit exponentiellem Backoff (1s, 4s, 16s)</td>
+</tr>
+<tr>
+<td>Teilweiser Thread</td>
+<td>Als “partial” markieren, Fortschritt speichern, Fortsetzung erlauben</td>
+</tr>
+<tr>
+<td>Ungültiger Inhalt</td>
+<td>Validierungsfehler vor dem API-Aufruf, Anzeige in der TUI</td>
+</tr>
+<tr>
+<td>Bild zu groß</td>
+<td>Mit Go-Bildbibliothek vor dem Upload verkleinern</td>
+</tr>
+</tbody>
+</table>
+<h2 id="nicht-ziele-v1">Nicht-Ziele (v1)</h2>
+<ul>
+<li>Kein Web-Dashboard</li>
+<li>Keine Mehrbenutzer-/Team-Funktionen</li>
+<li>Keine eingebaute Bildgenerierung</li>
+<li>Kein automatisches Cross-Posting (explizit pro Plattform)</li>
+</ul>
+<h2 id="erfolgsmetriken">Erfolgsmetriken</h2>
+<ul>
+<li>20 Markdown-Beiträge in &lt;1 Sekunde importieren</li>
+<li>Einen 6-Tweet-Thread mit 2 Bildern in &lt;10 Sekunden posten</li>
+<li>TUI rendert mit 60fps im Standard-Terminal</li>
+<li>Einzelnes Binary, &lt;20MB, keine Laufzeit-Abhängigkeiten</li>
+<li>Läuft unter macOS, Linux, Windows</li>
+</ul>
+<hr>
+<h2 id="zukünftige-features-v2">Zukünftige Features (v2+)</h2>
+<blockquote>
+<p><strong>Hinweis:</strong> Alles in diesem Abschnitt ist eine zukunftsgerichtete Idee, keine Zusage und kein aktuell verkauftes Produkt. postctls tatsächliches Preismodell ist heute die einmalige missionctl-Bundle-Lizenz (Polar.sh), beschrieben auf der <a href="/#pricing">Preise-Seite</a> — nicht die Abo-Stufen, die unten skizziert sind.</p>
+</blockquote>
+<h3 id="postctl-generate"><code>postctl generate</code></h3>
+<p>KI generiert Beiträge aus einer URL oder einem Markdown-Artikel.</p>
+<ul>
+<li>Eingabe: URL, Markdown-Datei oder freier Text</li>
+<li>Ausgabe: Thread-Entwurf + LinkedIn-Beitrag + Threads-Beitrag als Markdown</li>
+<li>Nutzt die Claude-API, OpenAI-API oder Ollama (lokal)</li>
+<li>Nutzer prüft und bearbeitet vor dem Posten</li>
+</ul>
+<h3 id="postctl-repurpose"><code>postctl repurpose</code></h3>
+<p>Nimmt einen bestehenden Beitrag und konvertiert ihn für andere Plattformen.</p>
+<ul>
+<li>Dev.to-Artikel → Twitter-Thread + LinkedIn + Threads</li>
+<li>Twitter-Thread → LinkedIn-Langbeitrag</li>
+<li>Passt Länge, Ton und Hashtags automatisch an</li>
+</ul>
+<h3 id="postctl-analytics"><code>postctl analytics</code></h3>
+<p>Holt Engagement-Daten von den APIs nach dem Posten.</p>
 <ul>
 <li>Likes, Retweets, Impressions (Twitter)</li>
-<li>Reactions, Comments (LinkedIn)</li>
-<li>Beste Posting-Zeiten ermitteln</li>
+<li>Reaktionen, Kommentare (LinkedIn)</li>
+<li>Ermittelt beste Posting-Zeiten</li>
 <li>Terminal-Dashboard mit Sparklines</li>
 </ul>
 <h3 id="postctl-template"><code>postctl template</code></h3>
-<p>Vorgefertigte Post-Strukturen.</p>
+<p>Vorgefertigte Beitragsstrukturen.</p>
 <ul>
-<li><code>postctl template launch</code> — Product Launch Announcement</li>
-<li><code>postctl template feature</code> — Feature Update Thread</li>
-<li><code>postctl template thought</code> — Thought Leadership Post</li>
-<li>Generiert Markdown-Datei mit Platzhaltern</li>
-</ul>
-<hr>
-<h2 id="monetarisierung">Monetarisierung</h2>
-<h3 id="postctl-open-source-gratis">postctl (Open Source, gratis)</h3>
-<p>Das CLI-Tool ist MIT-lizenziert. Baut Reputation und Community.</p>
-<h3 id="postctl-pro-9monat-oder-79jahr">postctl pro ($9/Monat oder $79/Jahr)</h3>
-<p>Premium-Features als bezahlte Erweiterung:</p>
-<ul>
-<li><strong>Analytics-Dashboard</strong> — Engagement pro Post, beste Posting-Zeiten, Wachstum über Zeit</li>
-<li><strong>AI-Optimierung</strong> — Claude/GPT rewritet Posts für maximale Reichweite (A/B-Vorschläge)</li>
-<li><strong>Team-Mode</strong> — mehrere Leute posten unter einem Account, Approval-Workflow</li>
-<li><strong>Priority Support</strong> — GitHub Issues mit SLA</li>
-<li>Implementierung: License Key in <code>~/.config/postctl/config.yaml</code>, Feature-Gates im Code</li>
-</ul>
-<h3 id="postctl-cloud-future--19monat">postctl cloud (Future — $19/Monat)</h3>
-<p>Gehostete Version für Nicht-Entwickler.</p>
-<ul>
-<li>Web-UI statt Terminal</li>
-<li>Managed Scheduling (kein eigener Rechner muss laufen)</li>
-<li>Status: niedrige Priorität, nur wenn Nachfrage da ist</li>
-</ul>
-<h3 id="go-tutorial-als-kurs-49-79-einmalig">Go Tutorial als Kurs ($49-79 einmalig)</h3>
-<p>Das Tutorial das wir parallel schreiben wird zum bezahlten Produkt:</p>
-<ul>
-<li>“Build a real CLI tool in Go” — Video-Serie</li>
-<li>postctl als Projekt-Basis, 7 Phasen</li>
-<li>Plattform: eigene Seite, Udemy, oder Lemon Squeezy</li>
-<li>Gratis-Teaser: erste 2 Phasen als Blog-Posts auf Dev.to</li>
+<li><code>postctl template launch</code> — Produkt-Launch-Ankündigung</li>
+<li><code>postctl template feature</code> — Feature-Update-Thread</li>
+<li><code>postctl template thought</code> — Thought-Leadership-Beitrag</li>
+<li>Erzeugt eine Markdown-Datei mit Platzhaltern</li>
 </ul>
 <hr>
 <h2 id="ökosystem-vision">Ökosystem-Vision</h2>
 <p>postctl ist Teil eines Content-Loops:</p>
-<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Orbiter (Create) → postctl (Distribute) → Analytics (Learn) → Orbiter (Improve)</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Orbiter (Erstellen) → postctl (Verteilen) → Analytics (Lernen) → Orbiter (Verbessern)</span></span></code></pre>
 <ol>
-<li>Content in Orbiter schreiben (Blog Posts, Pages)</li>
-<li>Posts als Markdown exportieren / generieren</li>
+<li>Content in Orbiter schreiben (Blogbeiträge, Seiten)</li>
+<li>Beiträge als Markdown exportieren/generieren</li>
 <li>postctl verteilt auf Twitter, LinkedIn, Threads</li>
-<li>Analytics zeigt was funktioniert</li>
-<li>Insights fließen in nächsten Content-Zyklus</li>
+<li>Analytics zeigt, was funktioniert</li>
+<li>Erkenntnisse fließen in den nächsten Content-Zyklus</li>
 </ol>
 <p>Langfristig: <code>orbiter export --to-postctl</code> als Integration.</p>
 <hr>
@@ -2373,7 +2765,7 @@ Twitter/X no longer offers free write access (Free Tier) for newly created devel
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Repository: ~/Developing/Projects/postctl</span></span>
 <span class="line"><span>Module:     github.com/aeon022/postctl</span></span>
 <span class="line"><span>License:    MIT</span></span></code></pre>
-</div></section><!-- Tab 11: Go Tutorial --><section class="doc-section" id="doc-go-tutorial"><div class="doc-body markdown-content"><div class="lang-de"><h1 id="go-tutorial--postctl">Go Tutorial — postctl</h1>
+</div></div></section><!-- Tab 11: Go Tutorial --><section class="doc-section" id="doc-go-tutorial"><div class="doc-body markdown-content"><div class="lang-de"><h1 id="go-tutorial--postctl">Go Tutorial — postctl</h1>
 <p>Dieses Tutorial führt dich durch Go anhand des postctl-Projekts. Jede Phase baut ein Feature und lehrt neue Go-Konzepte.</p>
 <h2 id="kurs-konzept">Kurs-Konzept</h2>
 <p>Dieses Tutorial wird parallel zum Projekt geschrieben und kann als bezahlter Kurs veröffentlicht werden:</p>
