@@ -119,7 +119,6 @@ var ActiveConfig Config
 // (config set, config import) get picked back up for the same profile.
 var ActiveProfile string
 
-// IsPro prüft, ob eine gültige Pro-Lizenz aktiv ist
 // IsPro prüft, ob eine gültige Pro-Lizenz aktiv ist. Polars echte
 // License-Key-Ressource nutzt "granted" als Status (gegen die Live-API
 // bestätigt) — "active" wird zusätzlich akzeptiert für den lokalen
