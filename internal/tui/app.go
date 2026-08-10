@@ -864,6 +864,11 @@ func (m Model) loadAnalyticsCmd() tea.Msg {
 	}
 }
 
+// dbSettleQuiet is how long the local DB file must have been unmodified
+// before the TUI trusts it enough to auto-publish due posts — see
+// config.DBSettled.
+const dbSettleQuiet = 45 * time.Second
+
 // publishDuePostsCmd prüft und veröffentlicht fällige Posts im TUI-Hintergrund
 func (m Model) publishDuePostsCmd() tea.Msg {
 	ctx := context.Background()
@@ -1015,12 +1020,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 		
 	case tickMsg:
-		return m, tea.Batch(
-			m.publishDuePostsCmd,
+		cmds := []tea.Cmd{
 			tea.Tick(10*time.Second, func(t time.Time) tea.Msg {
 				return tickMsg{}
 			}),
-		)
+		}
+		// Only this machine's designated publisher auto-fires the
+		// scheduler, and only once its local (possibly Dropbox-synced) DB
+		// copy has gone quiet for a bit — see config.AutoPublishEnabled
+		// and config.DBSettled for why: otherwise two machines can each
+		// see the same post as still due and both publish it.
+		if config.AutoPublishEnabled() && config.DBSettled(dbSettleQuiet) {
+			cmds = append(cmds, m.publishDuePostsCmd)
+		}
+		return m, tea.Batch(cmds...)
 		
 	case analyticsLoadedMsg:
 		m.analyticsLoading = false

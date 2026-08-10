@@ -82,6 +82,8 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Defaults.DryRun = (value == "true" || value == "1")
 	case "defaults.image_dir":
 		config.ActiveConfig.Defaults.ImageDir = value
+	case "scheduler.auto_publish":
+		config.ActiveConfig.Scheduler.AutoPublish = (value == "true" || value == "1")
 	case "ai.provider":
 		config.ActiveConfig.AI.Provider = value
 	case "ai.model":

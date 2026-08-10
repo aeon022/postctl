@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	coreconfig "github.com/aeon022/missionctl-core/config"
 	"gopkg.in/yaml.v3"
@@ -89,6 +90,16 @@ type Config struct {
 	} `mapstructure:"ai" yaml:"ai"`
 	Scheduler struct {
 		Slots []string `mapstructure:"slots" yaml:"slots"`
+		// AutoPublish gates the TUI's background scheduler (the 10s tick
+		// that checks for and publishes due posts). Defaults to false —
+		// with data_dir pointed at a Dropbox-synced folder, two machines
+		// each running their own local SQLite copy can both see the same
+		// post as still "scheduled" before Dropbox has synced the other
+		// machine's "posted" update, and both publish it. Enable this on
+		// exactly one machine (the one that should actually publish);
+		// leave it off everywhere else so opening the TUI there is always
+		// safe to just browse/edit.
+		AutoPublish bool `mapstructure:"auto_publish" yaml:"auto_publish"`
 	} `mapstructure:"scheduler" yaml:"scheduler"`
 	DBPath        string   `mapstructure:"db_path" yaml:"db_path"`
 	DataDir       string   `mapstructure:"data_dir" yaml:"data_dir"`
@@ -111,6 +122,28 @@ var ActiveProfile string
 // IsPro prüft, ob eine gültige Pro-Lizenz aktiv ist
 func IsPro() bool {
 	return ActiveConfig.LicenseStatus == "active"
+}
+
+// AutoPublishEnabled reports whether this machine is allowed to
+// automatically publish due posts in the background (see Scheduler.AutoPublish).
+func AutoPublishEnabled() bool {
+	return ActiveConfig.Scheduler.AutoPublish
+}
+
+// DBSettled reports whether the SQLite database at GetDBPath hasn't been
+// written to in at least quiet — i.e. it looks like a Dropbox/iCloud sync
+// in progress has finished, not still mid-flight. Used to hold off
+// auto-publishing until the local copy is likely caught up with any other
+// machine's more recent writes, rather than trusting a possibly-stale
+// "scheduled" status. Best-effort: a sync that's paused, offline, or just
+// slower than quiet will still look settled — this narrows the race, it
+// doesn't close it.
+func DBSettled(quiet time.Duration) bool {
+	info, err := os.Stat(GetDBPath())
+	if err != nil {
+		return false
+	}
+	return time.Since(info.ModTime()) >= quiet
 }
 
 // configDir returns the config directory for the given profile: the
