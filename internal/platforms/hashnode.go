@@ -208,7 +208,10 @@ func (h *HashnodePlatform) FetchAnalytics(ctx context.Context, platformID string
 	return models.AnalyticsData{}, nil
 }
 
-// Delete is a stub for Hashnode delete method
+// Delete is not implemented for Hashnode yet. Returning an honest error
+// instead of nil matters: callers use this result to decide whether the
+// local post record is safe to remove, and a lying nil made postctl believe
+// a still-live Hashnode post had been deleted.
 func (h *HashnodePlatform) Delete(ctx context.Context, platformID string) error {
-	return nil
+	return fmt.Errorf("hashnode: delete not implemented — post %s was not removed from Hashnode", platformID)
 }

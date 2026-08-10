@@ -363,9 +363,18 @@ func (m Model) deletePostCmd(id string) tea.Cmd {
 		ctx := context.Background()
 		post, err := m.store.GetPost(ctx, id)
 		if err == nil && post != nil && post.Status == models.StatusPosted && post.PlatformID != "" {
+			// Real platform delete must succeed before the local record
+			// goes away — used to discard this error and delete the local
+			// row regardless, which on a failure (or on one of the several
+			// platforms whose Delete is still an unimplemented stub) left
+			// the post live and untracked while postctl believed it gone.
+			// Same bug class fixed in calctl's DeleteEvent on 2026-08-01.
 			plat, err := platforms.GetPlatform(post.Platform, m.store, false)
-			if err == nil {
-				_ = plat.Delete(ctx, post.PlatformID)
+			if err != nil {
+				return errorMsg{fmt.Errorf("resolve platform %q: %w", post.Platform, err)}
+			}
+			if err := plat.Delete(ctx, post.PlatformID); err != nil {
+				return errorMsg{err}
 			}
 		}
 		if err := m.store.DeletePost(ctx, id); err != nil {
@@ -382,9 +391,14 @@ func (m Model) deletePostsCmd(ids []string) tea.Cmd {
 		for _, id := range ids {
 			post, err := m.store.GetPost(ctx, id)
 			if err == nil && post != nil && post.Status == models.StatusPosted && post.PlatformID != "" {
+				// Same real-delete-before-local-delete ordering as
+				// deletePostCmd above.
 				plat, err := platforms.GetPlatform(post.Platform, m.store, false)
-				if err == nil {
-					_ = plat.Delete(ctx, post.PlatformID)
+				if err != nil {
+					return errorMsg{fmt.Errorf("resolve platform %q: %w", post.Platform, err)}
+				}
+				if err := plat.Delete(ctx, post.PlatformID); err != nil {
+					return errorMsg{err}
 				}
 			}
 			if err := m.store.DeletePost(ctx, id); err != nil {

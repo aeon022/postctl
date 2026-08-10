@@ -35,19 +35,25 @@ var deleteCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		// Real platform delete must succeed before the local record goes
+		// away — used to only print a warning on failure and delete the
+		// local row regardless, which left the post live and untracked on
+		// the remote platform while postctl believed it gone. Same bug
+		// class fixed in calctl's DeleteEvent on 2026-08-01.
 		if post.Status == models.StatusPosted && post.PlatformID != "" {
 			fmt.Printf("Deleting post %q from remote platform %s...\n", postID, post.Platform)
 			plat, err := platforms.GetPlatform(post.Platform, s, false)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Warning: failed to get platform instance: %v\n", err)
-			} else {
-				err = plat.Delete(ctx, post.PlatformID)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Warning: failed to delete post from remote platform: %v\n", err)
-				} else {
-					fmt.Println("Successfully deleted post from remote platform.")
-				}
+				fmt.Fprintf(os.Stderr, "Error: failed to get platform instance: %v\n", err)
+				fmt.Fprintln(os.Stderr, "Local record kept — rerun once the platform is reachable.")
+				os.Exit(1)
 			}
+			if err := plat.Delete(ctx, post.PlatformID); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: failed to delete post from remote platform: %v\n", err)
+				fmt.Fprintln(os.Stderr, "Local record kept — the post is still live remotely.")
+				os.Exit(1)
+			}
+			fmt.Println("Successfully deleted post from remote platform.")
 		}
 
 		if err := s.DeletePost(ctx, postID); err != nil {

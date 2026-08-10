@@ -1,3 +1,7 @@
+---
+joplin_id: 844ea262aecc4b88bf34b16015b8d82b
+updated_at: '2026-08-02T17:41:21.447Z'
+---
 # Strategic Marketing Plan: The Agent-Native Knowledge Stack
 ## Connecting Orbiter & Dual Render
 
