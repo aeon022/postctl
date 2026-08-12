@@ -8,10 +8,17 @@ import (
 	"sort"
 	"time"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/platforms"
 	"github.com/aeon022/postctl/internal/store"
 )
+
+// dbSettleQuiet mirrors internal/tui's own const of the same name and
+// purpose — see config.DBSettled's doc comment. Duplicated rather than
+// shared to avoid tui depending on scheduler (or vice versa) just for one
+// constant; both packages import config, neither imports the other.
+const dbSettleQuiet = 45 * time.Second
 
 // isOnline prüft, ob eine Internetverbindung besteht.
 func isOnline() bool {
@@ -95,7 +102,7 @@ func RunDaemon(ctx context.Context, s *store.SQLiteStore, checkInterval time.Dur
 	defer ticker.Stop()
 
 	// Initialer Check beim Start
-	checkAndPublishDue(ctx, s, dryRun)
+	runIfDesignated(ctx, s, dryRun)
 
 	for {
 		select {
@@ -103,7 +110,7 @@ func RunDaemon(ctx context.Context, s *store.SQLiteStore, checkInterval time.Dur
 			fmt.Fprintln(os.Stderr, "Scheduler-Daemon wird heruntergefahren...")
 			return nil
 		case <-ticker.C:
-			checkAndPublishDue(ctx, s, dryRun)
+			runIfDesignated(ctx, s, dryRun)
 		}
 	}
 }
@@ -159,6 +166,25 @@ func RescheduleOverdue(ctx context.Context, s *store.SQLiteStore) error {
 	}
 
 	return nil
+}
+
+// runIfDesignated is checkAndPublishDue's daemon-mode gate — the same one
+// internal/tui's own background tick already applies via
+// config.AutoPublishEnabled + config.DBSettled (see that package's
+// publishDuePostsCmd call site) before this daemon got one of its own.
+// Without it, `postctl daemon` running on a machine that ISN'T this
+// profile's designated publisher — because its own local (Dropbox-synced)
+// DB copy hasn't caught up yet, or simply because auto_publish was left
+// on there too — would rescheduled-and-republish the same due post a
+// second time. dryRun always runs regardless: it never actually posts or
+// writes scheduling changes tied to a real publish, so it's safe to preview
+// on any machine.
+func runIfDesignated(ctx context.Context, s *store.SQLiteStore, dryRun bool) {
+	if !dryRun && !(config.AutoPublishEnabled() && config.DBSettled(dbSettleQuiet)) {
+		platforms.Log("[SCHEDULER] Diese Maschine ist nicht der designierte Publisher (auto_publish aus) oder die lokale DB-Kopie ist noch nicht \"settled\" — überspringe diesen Check.")
+		return
+	}
+	checkAndPublishDue(ctx, s, dryRun)
 }
 
 // checkAndPublishDue prüft die DB auf fällige geplante Posts und veröffentlicht sie

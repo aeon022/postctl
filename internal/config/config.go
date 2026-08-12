@@ -367,14 +367,22 @@ youtube:
 const legacyDefaultDBPath = "~/.config/postctl/postctl.db"
 
 // GetDBPath returns the expanded path to the SQLite database, resolved
-// with this precedence: data_dir (new, directory-shaped — the supported
-// way to point this profile at a folder you sync yourself, e.g. iCloud
-// Drive or Dropbox) > a customized legacy db_path (a full file path,
-// meaningful only for the original default profile) > this profile's own
-// default data directory (see defaultDataDir).
+// with this precedence: the POSTCTL_DATA_DIR env var, then data_dir
+// (directory-shaped — the supported way to point this profile at a folder
+// you sync yourself, e.g. iCloud Drive or Dropbox) from config.yaml > a
+// customized legacy db_path (a full file path, meaningful only for the
+// original default profile) > this profile's own default data directory
+// (see defaultDataDir). The env var is every other missionctl-suite tool's
+// convention (NOTECTL_DATA_DIR, MAILCTL_DATA_DIR, ...) — postctl only had
+// the config-file key, so a machine could be brought into a shared data_dir
+// without editing config.yaml on every tool but this one.
 func GetDBPath() string {
-	if dir := strings.TrimSpace(ActiveConfig.DataDir); dir != "" {
-		resolved, _ := coreconfig.ResolveDir("postctl", dir)
+	dataDir := strings.TrimSpace(os.Getenv("POSTCTL_DATA_DIR"))
+	if dataDir == "" {
+		dataDir = strings.TrimSpace(ActiveConfig.DataDir)
+	}
+	if dataDir != "" {
+		resolved, _ := coreconfig.ResolveDir("postctl", dataDir)
 		return filepath.Join(resolved, "postctl.db")
 	}
 
@@ -391,9 +399,10 @@ func GetDBPath() string {
 }
 
 // Shared reports whether GetDBPath currently resolves to a user-configured
-// directory (data_dir) rather than this profile's own default/legacy path.
+// directory (data_dir, or its POSTCTL_DATA_DIR env var equivalent) rather
+// than this profile's own default/legacy path.
 func Shared() bool {
-	return strings.TrimSpace(ActiveConfig.DataDir) != ""
+	return strings.TrimSpace(os.Getenv("POSTCTL_DATA_DIR")) != "" || strings.TrimSpace(ActiveConfig.DataDir) != ""
 }
 
 // defaultDataDir returns the active profile's own private data directory.
