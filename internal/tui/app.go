@@ -34,10 +34,10 @@ type PostStats struct {
 
 // Model repräsentiert den Zustand der Bubbletea-Anwendung
 type Model struct {
-	store         *store.SQLiteStore
-	activeTab     int // 0: Dashboard, 1: Posts, 2: Schedule, 3: History
-	cursor        int
-	
+	store     *store.SQLiteStore
+	activeTab int // 0: Dashboard, 1: Posts, 2: Schedule, 3: History
+	cursor    int
+
 	// Geladene Daten
 	posts     []models.Post
 	history   []models.HistoryEntry
@@ -45,19 +45,19 @@ type Model struct {
 	campaigns []models.Campaign
 	platforms map[string]bool
 	nextUp    []models.Post
-	
+
 	// UI Zustand
-	selectedPost     *models.Post
-	selectedHistory  *models.HistoryEntry
-	filterCampaign   string
-	isEditing        bool
-	showHelp         bool
-	err              error
-	loading          bool
-	repurposing      bool
+	selectedPost       *models.Post
+	selectedHistory    *models.HistoryEntry
+	filterCampaign     string
+	isEditing          bool
+	showHelp           bool
+	err                error
+	loading            bool
+	repurposing        bool
 	statusMessage      string
 	detailScrollOffset int
-	
+
 	// Editor Zustand
 	editorPostID      string
 	editorPlatform    string
@@ -68,7 +68,7 @@ type Model struct {
 	editorFocus       int
 	showDatePicker    bool
 	datePickerDate    time.Time
-	
+
 	// README Viewer Zustand
 	showReadme   bool
 	readmeLines  []string
@@ -76,7 +76,7 @@ type Model struct {
 	readmeScroll int
 	tocCursor    int
 	readmeFocus  int // 0: TOC, 1: Content
-	
+
 	// Terminal Dimensionen
 	width  int
 	height int
@@ -225,21 +225,21 @@ func (m Model) Init() tea.Cmd {
 // loadDataCmd lädt alle relevanten Daten asynchron aus der DB
 func (m Model) loadDataCmd() tea.Msg {
 	ctx := context.Background()
-	
+
 	posts, err := m.store.ListPosts(ctx, "all", "all", "")
 	if err != nil {
 		return errorMsg{err}
 	}
-	
+
 	hist, err := m.store.GetHistory(ctx, 20)
 	if err != nil {
 		return errorMsg{err}
 	}
-	
+
 	var stats PostStats
 	campaignMap := make(map[string]*models.Campaign)
 	var nextUp []models.Post
-	
+
 	for _, p := range posts {
 		switch p.Status {
 		case models.StatusPosted:
@@ -252,7 +252,7 @@ func (m Model) loadDataCmd() tea.Msg {
 		case models.StatusFailed:
 			stats.failed++
 		}
-		
+
 		if p.Campaign != "" {
 			c, ok := campaignMap[p.Campaign]
 			if !ok {
@@ -270,12 +270,12 @@ func (m Model) loadDataCmd() tea.Msg {
 			}
 		}
 	}
-	
+
 	var campaigns []models.Campaign
 	for _, c := range campaignMap {
 		campaigns = append(campaigns, *c)
 	}
-	
+
 	// Sortieren von nextUp nach schedule time (ASC)
 	slices.SortFunc(nextUp, func(a, b models.Post) int {
 		if a.ScheduledAt == nil && b.ScheduledAt == nil {
@@ -325,7 +325,6 @@ func (m Model) loadDataCmd() tea.Msg {
 		nextUp = groupedNextUp
 	}
 
-	
 	platforms := map[string]bool{
 		models.PlatformTwitter:  false,
 		models.PlatformLinkedIn: false,
@@ -346,7 +345,7 @@ func (m Model) loadDataCmd() tea.Msg {
 			platforms[p] = true
 		}
 	}
-	
+
 	return dataLoadedMsg{
 		posts:     posts,
 		history:   hist,
@@ -625,7 +624,7 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 			return externalEditorFinishedMsg{err: err}
 		}
 	}
-	
+
 	// Hilfetext generieren
 	var helper strings.Builder
 	var limit int
@@ -633,15 +632,15 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 	switch m.editorPlatform {
 	case "twitter":
 		limit = 280
-		rulerNum =  " 000      030      060      090      120      150      180      210      240      270 280!\n"
+		rulerNum = " 000      030      060      090      120      150      180      210      240      270 280!\n"
 		rulerLine = " |--------|--------|--------|--------|--------|--------|--------|--------|--------|-|\n"
 	case "bluesky":
 		limit = 300
-		rulerNum =  " 000      030      060      090      120      150      180      210      240      270      300!\n"
+		rulerNum = " 000      030      060      090      120      150      180      210      240      270      300!\n"
 		rulerLine = " |--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|\n"
 	case "mastodon":
 		limit = 500
-		rulerNum =  " 000      050      100      150      200      250      300      350      400      450      500!\n"
+		rulerNum = " 000      050      100      150      200      250      300      350      400      450      500!\n"
 		rulerLine = " |--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|\n"
 	}
 
@@ -651,7 +650,7 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 		helper.WriteString(Tr("editor_helper_ruler_twitter"))
 		helper.WriteString(rulerNum)
 		helper.WriteString(rulerLine + "\n")
-		
+
 		bodyText := m.editorBody.Value()
 		if strings.Contains(bodyText, "\n---\n") {
 			tweets := strings.Split(bodyText, "\n---\n")
@@ -680,7 +679,7 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 			}
 			helper.WriteString(fmt.Sprintf(Tr("editor_helper_status_single"), charCount, remaining, status))
 		}
-		
+
 		helper.WriteString(Tr("editor_helper_note_strip"))
 		helper.WriteString("-->\n\n")
 	} else {
@@ -690,7 +689,7 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 		trimmed := strings.TrimSpace(bodyText)
 		charCount := len([]rune(trimmed))
 		helper.WriteString(fmt.Sprintf(Tr("editor_helper_status_other"), charCount))
-		
+
 		helper.WriteString(Tr("editor_helper_note_strip"))
 		helper.WriteString("-->\n\n")
 	}
@@ -729,14 +728,14 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 			_ = os.Remove(tmpFile.Name())
 			return externalEditorFinishedMsg{err: err}
 		}
-		
+
 		// Datei wieder einlesen
 		data, readErr := os.ReadFile(tmpFile.Name())
 		_ = os.Remove(tmpFile.Name())
 		if readErr != nil {
 			return externalEditorFinishedMsg{err: readErr}
 		}
-		
+
 		// Hilfetext wieder entfernen
 		contentStr := string(data)
 		if strings.HasPrefix(contentStr, "<!--") {
@@ -768,7 +767,7 @@ func (m Model) runExternalEditorCmd() tea.Cmd {
 				}
 			}
 		}
-		
+
 		return externalEditorFinishedMsg{
 			content:  contentStr,
 			platform: platform,
@@ -829,7 +828,7 @@ func (m Model) loadAnalyticsCmd() tea.Msg {
 		postedAtStr := ""
 		if p.PostedAt != nil {
 			postedAtStr = p.PostedAt.Format("02.01. 15:04")
-			
+
 			// Tägliche Interaktionen berechnen
 			postDate := time.Date(p.PostedAt.Year(), p.PostedAt.Month(), p.PostedAt.Day(), 0, 0, 0, 0, time.Local)
 			nowDate := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local)
@@ -886,14 +885,14 @@ const dbSettleQuiet = 45 * time.Second
 // publishDuePostsCmd prüft und veröffentlicht fällige Posts im TUI-Hintergrund
 func (m Model) publishDuePostsCmd() tea.Msg {
 	ctx := context.Background()
-	
+
 	// Sicherheits-Rescheduling für überfällige Beiträge durchführen
 	if err := scheduler.RescheduleOverdue(ctx, m.store); err != nil {
 		platforms.Log("[SCHEDULER FEHLER] Sicherheits-Rescheduling fehlgeschlagen: %v", err)
 	}
 
 	now := time.Now()
-	
+
 	posts, err := m.store.ListPosts(ctx, "all", models.StatusScheduled, "")
 	if err == nil {
 		for _, p := range posts {
@@ -908,7 +907,7 @@ func (m Model) publishDuePostsCmd() tea.Msg {
 			}
 		}
 	}
-	
+
 	return m.loadDataCmd()
 }
 
@@ -1027,12 +1026,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	switch msg := msg.(type) {
-	
+
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
 		return m, nil
-		
+
 	case tickMsg:
 		cmds := []tea.Cmd{
 			tea.Tick(10*time.Second, func(t time.Time) tea.Msg {
@@ -1048,7 +1047,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds = append(cmds, m.publishDuePostsCmd)
 		}
 		return m, tea.Batch(cmds...)
-		
+
 	case analyticsLoadedMsg:
 		m.analyticsLoading = false
 		if msg.err != nil {
@@ -1173,39 +1172,39 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.loading = false
 		m.err = nil
 		return m, nil
-		
+
 	case errorMsg:
 		m.err = msg.err
 		m.loading = false
 		return m, nil
-		
+
 	case postDeletedMsg:
 		m.selectedPost = nil
 		m.cursor = 0
 		return m, m.loadDataCmd
-		
+
 	case tea.MouseMsg:
 		if m.showReadme {
 			if m.readmeFocus == 0 {
 				switch msg.Button {
 				case tea.MouseButtonWheelUp:
-					m.tocCursor = max(0, m.tocCursor - 1)
+					m.tocCursor = max(0, m.tocCursor-1)
 					return m, nil
 				case tea.MouseButtonWheelDown:
-					m.tocCursor = min(len(m.readmeTOC) - 1, m.tocCursor + 1)
+					m.tocCursor = min(len(m.readmeTOC)-1, m.tocCursor+1)
 					return m, nil
 				}
 			} else {
 				switch msg.Button {
 				case tea.MouseButtonWheelUp:
-					m.readmeScroll = max(0, m.readmeScroll - 1)
+					m.readmeScroll = max(0, m.readmeScroll-1)
 					return m, nil
 				case tea.MouseButtonWheelDown:
 					maxScroll := len(m.readmeLines) - m.getReadmeViewportHeight()
 					if maxScroll < 0 {
 						maxScroll = 0
 					}
-					m.readmeScroll = min(maxScroll, m.readmeScroll + 1)
+					m.readmeScroll = min(maxScroll, m.readmeScroll+1)
 					return m, nil
 				}
 			}
@@ -1264,21 +1263,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			case key.Matches(msg, Keys.Up):
 				if m.readmeFocus == 0 {
-					m.tocCursor = max(0, m.tocCursor - 1)
+					m.tocCursor = max(0, m.tocCursor-1)
 				} else {
-					m.readmeScroll = max(0, m.readmeScroll - 1)
+					m.readmeScroll = max(0, m.readmeScroll-1)
 				}
 				return m, nil
 
 			case key.Matches(msg, Keys.Down):
 				if m.readmeFocus == 0 {
-					m.tocCursor = min(len(m.readmeTOC) - 1, m.tocCursor + 1)
+					m.tocCursor = min(len(m.readmeTOC)-1, m.tocCursor+1)
 				} else {
 					maxScroll := len(m.readmeLines) - m.getReadmeViewportHeight()
 					if maxScroll < 0 {
 						maxScroll = 0
 					}
-					m.readmeScroll = min(maxScroll, m.readmeScroll + 1)
+					m.readmeScroll = min(maxScroll, m.readmeScroll+1)
 				}
 				return m, nil
 
@@ -1410,7 +1409,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, Keys.Quit):
 			return m, tea.Quit
-			
+
 		case key.Matches(msg, Keys.Tab):
 			m.activeTab = (m.activeTab + 1) % 7
 			m.cursor = 0
@@ -1419,7 +1418,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, m.loadAnalyticsCmd
 			}
 			return m, nil
-			
+
 		case key.Matches(msg, Keys.ShiftTab):
 			m.activeTab = (m.activeTab - 1 + 7) % 7
 			m.cursor = 0
@@ -1428,11 +1427,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, m.loadAnalyticsCmd
 			}
 			return m, nil
-			
+
 		case key.Matches(msg, Keys.Up):
 			if m.cursor > 0 {
 				m.cursor--
-				if m.activeTab == 5 && m.cursor == 5 {
+				if m.activeTab == 5 && m.settingsOptions()[m.cursor].kind == settingDisplay {
 					m.cursor--
 				}
 			}
@@ -1442,67 +1441,43 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			maxItems := m.maxCursorItems()
 			if m.cursor < maxItems-1 {
 				m.cursor++
-				if m.activeTab == 5 && m.cursor == 5 {
+				if m.activeTab == 5 && m.settingsOptions()[m.cursor].kind == settingDisplay {
 					m.cursor++
 				}
 			}
 			return m, nil
 
 		case key.Matches(msg, Keys.Left), key.Matches(msg, Keys.Right):
-			if m.activeTab == 5 && m.cursor < 5 {
+			if m.activeTab == 5 && m.settingsOptions()[m.cursor].kind == settingCyclable {
 				m.cycleSetting()
 				return m, nil
 			}
 			return m, nil
-			
+
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 5 {
-				if m.cursor >= 6 && m.cursor <= 17 {
-					var platName string
-					switch m.cursor {
-					case 6:
-						platName = models.PlatformTwitter
-					case 7:
-						platName = models.PlatformLinkedIn
-					case 8:
-						platName = models.PlatformThreads
-					case 9:
-						platName = models.PlatformMastodon
-					case 10:
-						platName = models.PlatformBluesky
-					case 11:
-						platName = models.PlatformFacebook
-					case 12:
-						platName = models.PlatformTelegram
-					case 13:
-						platName = models.PlatformDiscord
-					case 14:
-						platName = models.PlatformDevTo
-					case 15:
-						platName = models.PlatformReddit
-					case 16:
-						platName = models.PlatformHashnode
-					case 17:
-						platName = models.PlatformMedium
-					}
+				opt := m.settingsOptions()[m.cursor]
+				switch opt.kind {
+				case settingPlatformAuth:
+					platName := opt.platform
 					if platformNeedsSetup(platName) || (platName == models.PlatformTwitter && config.ActiveConfig.Twitter.AuthMode == "cookie") {
 						return m, m.runSetupWizardCmd(platName)
 					}
 					m.loading = true
 					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
 					return m, m.runAuthCmd(platName)
-				}
-				if m.cursor == 18 {
-					return m, m.runBackupExportCmd()
-				}
-				if m.cursor == 19 {
-					return m, m.runBackupImportCmd()
-				}
-				if m.cursor == 20 {
-					m.editingQueueSlots = true
-					m.queueSlotsInput.SetValue(strings.Join(config.ActiveConfig.Scheduler.Slots, ", "))
-					m.queueSlotsInput.Focus()
-					return m, nil
+				case settingAction:
+					switch opt.action {
+					case actionExport:
+						return m, m.runBackupExportCmd()
+					case actionImport:
+						return m, m.runBackupImportCmd()
+					case actionEditSlots:
+						m.editingQueueSlots = true
+						m.queueSlotsInput.SetValue(strings.Join(config.ActiveConfig.Scheduler.Slots, ", "))
+						m.queueSlotsInput.Focus()
+						return m, nil
+					}
 				}
 				m.cycleSetting()
 				return m, nil
@@ -1550,37 +1525,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, m.deletePostCmd(idToDelete)
 				}
 			} else if m.activeTab == 5 { // Settings
-				if m.cursor >= 6 && m.cursor <= 17 {
-					var platName string
-					switch m.cursor {
-					case 6:
-						platName = models.PlatformTwitter
-					case 7:
-						platName = models.PlatformLinkedIn
-					case 8:
-						platName = models.PlatformThreads
-					case 9:
-						platName = models.PlatformMastodon
-					case 10:
-						platName = models.PlatformBluesky
-					case 11:
-						platName = models.PlatformFacebook
-					case 12:
-						platName = models.PlatformTelegram
-					case 13:
-						platName = models.PlatformDiscord
-					case 14:
-						platName = models.PlatformDevTo
-					case 15:
-						platName = models.PlatformReddit
-					case 16:
-						platName = models.PlatformHashnode
-					case 17:
-						platName = models.PlatformMedium
-					}
+				opt := m.settingsOptions()[m.cursor]
+				if opt.kind == settingPlatformAuth {
 					m.loading = true
-					m.statusMessage = fmt.Sprintf("Setze %s zurück...", platName)
-					return m, m.clearPlatformCmd(platName)
+					m.statusMessage = fmt.Sprintf("Setze %s zurück...", opt.platform)
+					return m, m.clearPlatformCmd(opt.platform)
 				}
 			}
 			return m, nil
@@ -1723,7 +1672,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 	}
-	
+
 	return m, nil
 }
 
@@ -1739,7 +1688,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 5: // Settings
-		return 21
+		return len(m.settingsOptions())
 	default:
 		return 0
 	}
@@ -1767,7 +1716,7 @@ func (m Model) View() string {
 		}
 		return "\n  Lade Daten aus SQLite Store...\n"
 	}
-	
+
 	if m.err != nil {
 		return fmt.Sprintf("\n  [FEHLER]: %v\n\n  Drücke ESC zum Schließen.\n", m.err)
 	}
@@ -1875,9 +1824,14 @@ func (m Model) repurposePostCmd(p *models.Post, targets []string) tea.Cmd {
 }
 
 // cycleSetting ändert den Wert der aktuell ausgewählten Einstellung und speichert sie
+// cycleSetting changes the currently selected cyclable setting's value and
+// persists it. Keyed by settingOption.settingKey (that row's stable i18n
+// label key — see settingsOptions' doc comment) rather than m.cursor
+// directly, so this stays correct regardless of where a row sits in the
+// list.
 func (m *Model) cycleSetting() {
-	switch m.cursor {
-	case 0: // AI Provider
+	switch m.settingsOptions()[m.cursor].settingKey {
+	case "settings_ai_provider":
 		current := strings.ToLower(config.ActiveConfig.AI.Provider)
 		next := "openai"
 		switch current {
@@ -1897,7 +1851,7 @@ func (m *Model) cycleSetting() {
 		} else {
 			config.ActiveConfig.AI.Model = "llama3"
 		}
-	case 1: // AI Model
+	case "settings_ai_model":
 		provider := strings.ToLower(config.ActiveConfig.AI.Provider)
 		model := config.ActiveConfig.AI.Model
 		if provider == "openai" {
@@ -1919,17 +1873,18 @@ func (m *Model) cycleSetting() {
 				config.ActiveConfig.AI.Model = "llama3"
 			}
 		}
-	case 2: // Dry Run
+	case "settings_dry_run":
 		config.ActiveConfig.Defaults.DryRun = !config.ActiveConfig.Defaults.DryRun
-	case 3: // Auto-Publish — gates the TUI's own 10s background-tick
-		// publisher (see publishDuePostsCmd/tickMsg), off by default so a
-		// second Dropbox-synced machine running postctl doesn't also see
-		// the same post as due and double-publish it. Toggling this here
-		// is meant for deciding, per machine, which one auto-fires the
-		// scheduler — see DBSettled's doc comment for the other half of
-		// that safety net.
+	case "settings_auto_publish":
+		// Gates the TUI's own 10s background-tick publisher (see
+		// publishDuePostsCmd/tickMsg), off by default so a second
+		// Dropbox-synced machine running postctl doesn't also see the same
+		// post as due and double-publish it. Toggling this here is meant
+		// for deciding, per machine, which one auto-fires the scheduler —
+		// see DBSettled's doc comment for the other half of that safety
+		// net.
 		config.ActiveConfig.Scheduler.AutoPublish = !config.ActiveConfig.Scheduler.AutoPublish
-	case 4: // Language
+	case "settings_language":
 		current := strings.ToLower(config.ActiveConfig.Defaults.Language)
 		if current == "en" || current == "" {
 			config.ActiveConfig.Defaults.Language = "de"
@@ -1945,7 +1900,7 @@ func (m *Model) cycleSetting() {
 func (m Model) getReadmeViewportHeight() int {
 	outerHeight := 22
 	if m.height > 10 {
-		outerHeight = max(22, m.height - 4)
+		outerHeight = max(22, m.height-4)
 	}
 	innerHeight := outerHeight - 4
 	return innerHeight - 2
@@ -2010,6 +1965,3 @@ func (m Model) exportHistoryEntryCmd(entry *models.HistoryEntry) tea.Cmd {
 		return exportFinishedMsg{filename: filename}
 	}
 }
-
-
-

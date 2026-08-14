@@ -30,7 +30,7 @@ func TestSettingsEnterKeyWithConfig(t *testing.T) {
 	// Test case for Bluesky (cursor 10)
 	m.cursor = 10
 	msg := tea.KeyMsg{Type: tea.KeyEnter}
-	
+
 	newModel, cmd := m.Update(msg)
 	updatedModel := newModel.(Model)
 
@@ -79,7 +79,7 @@ func TestSettingsEnterKeyNeedsSetup(t *testing.T) {
 	// Test case for Bluesky (cursor 10)
 	m.cursor = 10
 	msg := tea.KeyMsg{Type: tea.KeyEnter}
-	
+
 	newModel, cmd := m.Update(msg)
 	updatedModel := newModel.(Model)
 
@@ -159,3 +159,63 @@ func TestSettingsAutoPublishToggle(t *testing.T) {
 	}
 }
 
+// TestSettingsOptions_Shape pins settingsOptions' row order and kind/
+// platform/action assignments — the single source of truth Up/Down/Left/
+// Right/Enter/Delete and the render loop all now derive from (see its doc
+// comment for why: this replaced seven separately hardcoded cursor-index
+// literals across app.go/settings_view.go that the Auto-Publish row
+// addition had to update by hand, any one of which silently breaking
+// navigation if missed). A regression here — a reordered or
+// wrongly-classified row — would silently misroute a key press to the
+// wrong platform/action instead of failing loudly, so it's worth pinning
+// directly rather than only through the existing cursor-position tests.
+func TestSettingsOptions_Shape(t *testing.T) {
+	s, err := store.NewSQLiteStore(":memory:", false)
+	if err != nil {
+		t.Fatalf("sqlite memory store error: %v", err)
+	}
+	defer s.Close()
+	m := NewModel(s)
+
+	opts := m.settingsOptions()
+	if len(opts) != 21 {
+		t.Fatalf("len(settingsOptions()) = %d, want 21", len(opts))
+	}
+
+	wantCyclable := []string{"settings_ai_provider", "settings_ai_model", "settings_dry_run", "settings_auto_publish", "settings_language"}
+	for i, key := range wantCyclable {
+		if opts[i].kind != settingCyclable || opts[i].settingKey != key {
+			t.Errorf("opts[%d] = {kind:%v settingKey:%q}, want {settingCyclable %q}", i, opts[i].kind, opts[i].settingKey, key)
+		}
+	}
+
+	if opts[5].kind != settingDisplay {
+		t.Errorf("opts[5] (License) kind = %v, want settingDisplay", opts[5].kind)
+	}
+
+	wantPlatforms := []string{
+		models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon,
+		models.PlatformBluesky, models.PlatformFacebook, models.PlatformTelegram, models.PlatformDiscord,
+		models.PlatformDevTo, models.PlatformReddit, models.PlatformHashnode, models.PlatformMedium,
+	}
+	for i, p := range wantPlatforms {
+		idx := 6 + i
+		if opts[idx].kind != settingPlatformAuth || opts[idx].platform != p {
+			t.Errorf("opts[%d] = {kind:%v platform:%q}, want {settingPlatformAuth %q}", idx, opts[idx].kind, opts[idx].platform, p)
+		}
+	}
+	if opts[6].separatorBefore == "" {
+		t.Error(`opts[6] (first platform row) missing separatorBefore ("PLATFORM ACCOUNTS")`)
+	}
+
+	wantActions := []settingActionID{actionExport, actionImport, actionEditSlots}
+	for i, a := range wantActions {
+		idx := 18 + i
+		if opts[idx].kind != settingAction || opts[idx].action != a {
+			t.Errorf("opts[%d] = {kind:%v action:%v}, want {settingAction %v}", idx, opts[idx].kind, opts[idx].action, a)
+		}
+	}
+	if opts[18].separatorBefore == "" {
+		t.Error(`opts[18] (Export) missing separatorBefore ("BACKUP & SYNC")`)
+	}
+}
