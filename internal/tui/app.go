@@ -1432,24 +1432,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, Keys.Up):
 			if m.cursor > 0 {
 				m.cursor--
-				if m.activeTab == 5 && m.cursor == 4 {
+				if m.activeTab == 5 && m.cursor == 5 {
 					m.cursor--
 				}
 			}
 			return m, nil
-			
+
 		case key.Matches(msg, Keys.Down):
 			maxItems := m.maxCursorItems()
 			if m.cursor < maxItems-1 {
 				m.cursor++
-				if m.activeTab == 5 && m.cursor == 4 {
+				if m.activeTab == 5 && m.cursor == 5 {
 					m.cursor++
 				}
 			}
 			return m, nil
 
 		case key.Matches(msg, Keys.Left), key.Matches(msg, Keys.Right):
-			if m.activeTab == 5 && m.cursor < 4 {
+			if m.activeTab == 5 && m.cursor < 5 {
 				m.cycleSetting()
 				return m, nil
 			}
@@ -1457,32 +1457,32 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			
 		case key.Matches(msg, Keys.Enter):
 			if m.activeTab == 5 {
-				if m.cursor >= 5 && m.cursor <= 16 {
+				if m.cursor >= 6 && m.cursor <= 17 {
 					var platName string
 					switch m.cursor {
-					case 5:
-						platName = models.PlatformTwitter
 					case 6:
-						platName = models.PlatformLinkedIn
+						platName = models.PlatformTwitter
 					case 7:
-						platName = models.PlatformThreads
+						platName = models.PlatformLinkedIn
 					case 8:
-						platName = models.PlatformMastodon
+						platName = models.PlatformThreads
 					case 9:
-						platName = models.PlatformBluesky
+						platName = models.PlatformMastodon
 					case 10:
-						platName = models.PlatformFacebook
+						platName = models.PlatformBluesky
 					case 11:
-						platName = models.PlatformTelegram
+						platName = models.PlatformFacebook
 					case 12:
-						platName = models.PlatformDiscord
+						platName = models.PlatformTelegram
 					case 13:
-						platName = models.PlatformDevTo
+						platName = models.PlatformDiscord
 					case 14:
-						platName = models.PlatformReddit
+						platName = models.PlatformDevTo
 					case 15:
-						platName = models.PlatformHashnode
+						platName = models.PlatformReddit
 					case 16:
+						platName = models.PlatformHashnode
+					case 17:
 						platName = models.PlatformMedium
 					}
 					if platformNeedsSetup(platName) || (platName == models.PlatformTwitter && config.ActiveConfig.Twitter.AuthMode == "cookie") {
@@ -1492,13 +1492,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
 					return m, m.runAuthCmd(platName)
 				}
-				if m.cursor == 17 {
+				if m.cursor == 18 {
 					return m, m.runBackupExportCmd()
 				}
-				if m.cursor == 18 {
+				if m.cursor == 19 {
 					return m, m.runBackupImportCmd()
 				}
-				if m.cursor == 19 {
+				if m.cursor == 20 {
 					m.editingQueueSlots = true
 					m.queueSlotsInput.SetValue(strings.Join(config.ActiveConfig.Scheduler.Slots, ", "))
 					m.queueSlotsInput.Focus()
@@ -1550,32 +1550,32 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, m.deletePostCmd(idToDelete)
 				}
 			} else if m.activeTab == 5 { // Settings
-				if m.cursor >= 5 && m.cursor <= 16 {
+				if m.cursor >= 6 && m.cursor <= 17 {
 					var platName string
 					switch m.cursor {
-					case 5:
-						platName = models.PlatformTwitter
 					case 6:
-						platName = models.PlatformLinkedIn
+						platName = models.PlatformTwitter
 					case 7:
-						platName = models.PlatformThreads
+						platName = models.PlatformLinkedIn
 					case 8:
-						platName = models.PlatformMastodon
+						platName = models.PlatformThreads
 					case 9:
-						platName = models.PlatformBluesky
+						platName = models.PlatformMastodon
 					case 10:
-						platName = models.PlatformFacebook
+						platName = models.PlatformBluesky
 					case 11:
-						platName = models.PlatformTelegram
+						platName = models.PlatformFacebook
 					case 12:
-						platName = models.PlatformDiscord
+						platName = models.PlatformTelegram
 					case 13:
-						platName = models.PlatformDevTo
+						platName = models.PlatformDiscord
 					case 14:
-						platName = models.PlatformReddit
+						platName = models.PlatformDevTo
 					case 15:
-						platName = models.PlatformHashnode
+						platName = models.PlatformReddit
 					case 16:
+						platName = models.PlatformHashnode
+					case 17:
 						platName = models.PlatformMedium
 					}
 					m.loading = true
@@ -1739,7 +1739,7 @@ func (m Model) maxCursorItems() int {
 	case 3: // History
 		return len(m.history)
 	case 5: // Settings
-		return 20
+		return 21
 	default:
 		return 0
 	}
@@ -1921,7 +1921,15 @@ func (m *Model) cycleSetting() {
 		}
 	case 2: // Dry Run
 		config.ActiveConfig.Defaults.DryRun = !config.ActiveConfig.Defaults.DryRun
-	case 3: // Language
+	case 3: // Auto-Publish — gates the TUI's own 10s background-tick
+		// publisher (see publishDuePostsCmd/tickMsg), off by default so a
+		// second Dropbox-synced machine running postctl doesn't also see
+		// the same post as due and double-publish it. Toggling this here
+		// is meant for deciding, per machine, which one auto-fires the
+		// scheduler — see DBSettled's doc comment for the other half of
+		// that safety net.
+		config.ActiveConfig.Scheduler.AutoPublish = !config.ActiveConfig.Scheduler.AutoPublish
+	case 4: // Language
 		current := strings.ToLower(config.ActiveConfig.Defaults.Language)
 		if current == "en" || current == "" {
 			config.ActiveConfig.Defaults.Language = "de"

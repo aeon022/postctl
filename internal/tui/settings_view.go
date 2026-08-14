@@ -58,6 +58,7 @@ func (m Model) renderSettings() string {
 		{Tr("settings_ai_provider"), config.ActiveConfig.AI.Provider, false},
 		{Tr("settings_ai_model"), config.ActiveConfig.AI.Model, false},
 		{Tr("settings_dry_run"), fmt.Sprintf("%t", config.ActiveConfig.Defaults.DryRun), false},
+		{Tr("settings_auto_publish"), fmt.Sprintf("%t", config.ActiveConfig.Scheduler.AutoPublish), false},
 		{Tr("settings_language"), config.ActiveConfig.Defaults.Language, false},
 		{Tr("settings_license"), licenseStatus, false},
 		{Tr("settings_auth_twitter"), getPlatformStatus(models.PlatformTwitter), true},
@@ -79,18 +80,18 @@ func (m Model) renderSettings() string {
 
 	for i, opt := range options {
 		cursorStr := "  "
-		// i == 4 ist Lizenztyp (nicht auswählbar)
-		if i == m.cursor && i != 4 {
+		// i == 5 ist Lizenztyp (nicht auswählbar)
+		if i == m.cursor && i != 5 {
 			cursorStr = "> "
 		}
 
 		labelStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
-		if i == m.cursor && i != 4 {
+		if i == m.cursor && i != 5 {
 			labelStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 		}
 
 		valStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
-		if i == 4 { // Lizenztyp
+		if i == 5 { // Lizenztyp
 			if config.IsPro() {
 				valStyle = lipgloss.NewStyle().Foreground(ColorPosted).Bold(true)
 			} else {
@@ -113,11 +114,11 @@ func (m Model) renderSettings() string {
 		builder.WriteString(fmt.Sprintf("%s%s: %s\n", cursorStr, labelStyle.Render(opt.label), valStyle.Render(opt.value)))
 
 		// Einen kleinen visuellen Trenner vor den Plattformen einfügen
-		if i == 4 {
+		if i == 5 {
 			builder.WriteString("\n" + StyleHeader.Render("PLATFORM ACCOUNTS") + "\n")
 		}
 		// Einen kleinen visuellen Trenner vor Backup & Sync einfügen
-		if i == 16 {
+		if i == 17 {
 			builder.WriteString("\n" + StyleHeader.Render("BACKUP & SYNC") + "\n")
 		}
 	}

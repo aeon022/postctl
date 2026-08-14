@@ -175,6 +175,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Dry Run      ",
 		"en": "Dry Run      ",
 	},
+	"settings_auto_publish": {
+		"de": "Auto-Publish ",
+		"en": "Auto-Publish ",
+	},
 	"settings_language": {
 		"de": "Sprache      ",
 		"en": "Language     ",
