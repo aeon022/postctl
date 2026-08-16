@@ -1,6 +1,6 @@
 ---
 joplin_id: 20a1dab748a346d7a7796ee86160238e
-updated_at: '2026-08-02T17:41:22.515Z'
+updated_at: '2026-08-07T19:51:55.874Z'
 ---
 # postctl — Projekt-Fahrplan & Umsetzungskonzept
 

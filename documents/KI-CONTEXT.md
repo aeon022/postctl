@@ -1,6 +1,6 @@
 ---
 joplin_id: d2d2e6ca607e4c73b916ddeed169ef71
-updated_at: '2026-08-02T17:41:21.360Z'
+updated_at: '2026-08-07T19:51:55.679Z'
 ---
 # KI-CONTEXT.md — postctl
 

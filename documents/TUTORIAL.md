@@ -1,6 +1,6 @@
 ---
 joplin_id: 423547a973a7438289115e9edea51398
-updated_at: '2026-08-02T17:41:21.386Z'
+updated_at: '2026-08-07T19:51:55.762Z'
 ---
 # Go Tutorial — postctl
 

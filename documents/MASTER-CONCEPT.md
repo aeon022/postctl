@@ -1,6 +1,6 @@
 ---
 joplin_id: 162f3120cc08497b88158558d778366e
-updated_at: '2026-08-02T17:41:21.368Z'
+updated_at: '2026-08-07T19:51:55.714Z'
 ---
 # postctl — Master Concept
 
