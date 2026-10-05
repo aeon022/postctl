@@ -320,9 +320,3 @@ func createTweet(index int, content string, images []string) models.Tweet {
 	}
 }
 
-// TwitterLength berechnet die Twitter-Länge (inklusive 23 Zeichen für URLs)
-func TwitterLength(text string) int {
-	// URLs finden und durch 23-Zeichen-Platzhalter ersetzen
-	processed := urlRegex.ReplaceAllString(text, "12345678901234567890123")
-	return len([]rune(processed))
-}
