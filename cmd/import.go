@@ -46,7 +46,7 @@ var importCmd = &cobra.Command{
 
 			fmt.Scanln(&targetPath)
 			targetPath = strings.TrimSpace(targetPath)
-			
+
 			// Anführungszeichen entfernen, die Terminals bei Drag & Drop um Pfade mit Leerzeichen setzen
 			targetPath = strings.ReplaceAll(targetPath, "\"", "")
 			targetPath = strings.ReplaceAll(targetPath, "'", "")

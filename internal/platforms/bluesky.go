@@ -69,7 +69,7 @@ func (b *BlueskyPlatform) Auth(ctx context.Context) error {
 	}
 
 	sessionURL := "https://bsky.social/xrpc/com.atproto.server.createSession"
-	
+
 	reqBody, err := json.Marshal(map[string]string{
 		"identifier": b.handle,
 		"password":   b.appPassword,
@@ -341,7 +341,7 @@ func (b *BlueskyPlatform) Post(ctx context.Context, post *models.Post) (string, 
 			for idx, blobStr := range currentBlobs {
 				var blobObj interface{}
 				_ = json.Unmarshal([]byte(blobStr), &blobObj)
-				
+
 				// Alt-Text automatisch generieren falls möglich
 				altText := ""
 				if idx < len(originalPaths) {

@@ -28,7 +28,7 @@ var installHookCmd = &cobra.Command{
 		}
 
 		hookPath := filepath.Join(".git", "hooks", "post-commit")
-		
+
 		scriptContent := fmt.Sprintf(`#!/bin/sh
 # postctl auto-import git hook
 # Automatisch generiert von postctl

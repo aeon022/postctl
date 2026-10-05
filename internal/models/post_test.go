@@ -111,4 +111,3 @@ func TestPrepareTweets(t *testing.T) {
 		}
 	})
 }
-

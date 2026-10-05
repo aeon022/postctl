@@ -20,7 +20,7 @@ var postCmd = &cobra.Command{
 	Aliases: []string{"publish"},
 	Short:   "Publish a post immediately",
 	Long:    `Publish the post with the given ID immediately to its configured platform.`,
-	Args:  cobra.ExactArgs(1),
+	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		postID := args[0]
 		ctx := context.Background()

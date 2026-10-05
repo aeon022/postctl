@@ -63,17 +63,17 @@ func (m Model) renderHistoryDetailView() string {
 	boxHeight := m.getBoxHeight()
 	lines := strings.Split(builder.String(), "\n")
 	totalLines := len(lines)
-	
+
 	visibleLines := boxHeight - 4
 	if visibleLines < 5 {
 		visibleLines = 5
 	}
-	
+
 	maxOffset := totalLines - visibleLines
 	if maxOffset < 0 {
 		maxOffset = 0
 	}
-	
+
 	offset := m.detailScrollOffset
 	if offset > maxOffset {
 		offset = maxOffset

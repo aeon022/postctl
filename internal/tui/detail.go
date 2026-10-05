@@ -46,7 +46,7 @@ func (m Model) renderDetailView() string {
 		for i, tweet := range p.Tweets {
 			charCount := tweet.CharCount()
 			charLimitOk := tweet.IsValid()
-			
+
 			// Charakter-Info
 			charStyle := lipgloss.NewStyle().Foreground(ColorPosted)
 			charText := fmt.Sprintf("[%d / 280 chars ✓]", charCount)
@@ -54,7 +54,7 @@ func (m Model) renderDetailView() string {
 				charStyle = lipgloss.NewStyle().Foreground(ColorFailed).Bold(true)
 				charText = fmt.Sprintf("[%d / 280 chars ✗ - TOO LONG]", charCount)
 			}
-			
+
 			titleLine := fmt.Sprintf("Tweet %d/%d", i+1, len(p.Tweets))
 			if tweet.IsReply {
 				titleLine += " (Reply)"
@@ -109,17 +109,17 @@ func (m Model) renderDetailView() string {
 	boxHeight := m.getBoxHeight()
 	lines := strings.Split(builder.String(), "\n")
 	totalLines := len(lines)
-	
+
 	visibleLines := boxHeight - 4
 	if visibleLines < 5 {
 		visibleLines = 5
 	}
-	
+
 	maxOffset := totalLines - visibleLines
 	if maxOffset < 0 {
 		maxOffset = 0
 	}
-	
+
 	offset := m.detailScrollOffset
 	if offset > maxOffset {
 		offset = maxOffset

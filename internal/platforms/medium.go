@@ -15,10 +15,10 @@ import (
 )
 
 type MediumPlatform struct {
-	store    *store.SQLiteStore
-	token    string
-	client   *http.Client
-	apiURL   string // defaults to https://api.medium.com/v1
+	store  *store.SQLiteStore
+	token  string
+	client *http.Client
+	apiURL string // defaults to https://api.medium.com/v1
 }
 
 func NewMediumPlatform(s *store.SQLiteStore, token string) *MediumPlatform {

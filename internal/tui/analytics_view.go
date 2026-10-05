@@ -76,7 +76,7 @@ func (m Model) renderAnalytics() string {
 		if filledCount > barWidth {
 			filledCount = barWidth
 		}
-		
+
 		barStr := strings.Repeat("█", filledCount) + strings.Repeat("░", barWidth-filledCount)
 		// Einfärben des Balkens
 		styledBar := lipgloss.NewStyle().Foreground(ColorSecondary).Render(barStr)
@@ -138,15 +138,15 @@ func renderTrendChart(engagement []int) string {
 		var line strings.Builder
 		valAtStep := int(float64(maxVal) * float64(r) / float64(chartHeight))
 		line.WriteString(fmt.Sprintf("%3d │ ", valAtStep))
-		
+
 		for _, val := range engagement {
 			fraction := float64(val) / float64(maxVal)
 			threshold := float64(r) / float64(chartHeight)
 			prevThreshold := float64(r-1) / float64(chartHeight)
-			
+
 			if fraction >= threshold {
 				line.WriteString("█ ")
-			} else if fraction >= prevThreshold + (threshold-prevThreshold)/2 {
+			} else if fraction >= prevThreshold+(threshold-prevThreshold)/2 {
 				line.WriteString("▄ ")
 			} else {
 				line.WriteString("  ")

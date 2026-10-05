@@ -118,11 +118,11 @@ func reportTemplateError(err error, exitCode int) {
 
 func init() {
 	templateCmd.PersistentFlags().StringVarP(&templateOutputFile, "output", "o", "", "Output file path (defaults to <type>.md)")
-	
+
 	templateCmd.AddCommand(templateLaunchCmd)
 	templateCmd.AddCommand(templateFeatureCmd)
 	templateCmd.AddCommand(templateThoughtCmd)
-	
+
 	rootCmd.AddCommand(templateCmd)
 }
 

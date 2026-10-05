@@ -17,7 +17,7 @@ func RenderTabs(activeTab int) string {
 		Tr("tab_settings"),
 		Tr("tab_logs"),
 	}
-	
+
 	var renderedTabs []string
 	for i, name := range tabs {
 		label := " " + strings.ToUpper(name) + " "
@@ -38,7 +38,7 @@ func RenderTabs(activeTab int) string {
 	// Trennzeichen
 	divider := lipgloss.NewStyle().Foreground(ColorDarkGray).Render("│")
 	tabRow := strings.Join(renderedTabs, divider)
-	
+
 	// Horizontale Trennlinie passend zur Boxbreite (78 Zeichen)
 	bottomLine := lipgloss.NewStyle().Foreground(ColorPrimary).Render(strings.Repeat("─", 78))
 

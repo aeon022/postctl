@@ -102,8 +102,6 @@ var campaignPostCmd = &cobra.Command{
 			return
 		}
 
-
-
 		var triggeredCount int
 		var successCount int
 		var failedCount int
@@ -113,7 +111,7 @@ var campaignPostCmd = &cobra.Command{
 			// Nur posten, wenn nicht bereits gepostet
 			if p.Status != models.StatusPosted {
 				triggeredCount++
-				
+
 				_, err := scheduler.PublishPost(ctx, s, &p, DryRunFlag)
 				if err != nil {
 					failedCount++
@@ -223,9 +221,9 @@ func reportCampaignPublishResult(campaign string, triggered, success, failed int
 		if DryRunFlag {
 			action = "validated"
 		}
-		fmt.Printf("%sCampaign %q: Successfully %s %d/%d posts. (%d failed)\n", 
+		fmt.Printf("%sCampaign %q: Successfully %s %d/%d posts. (%d failed)\n",
 			prefix, campaign, action, success, triggered, failed)
-		
+
 		if failed > 0 {
 			fmt.Fprintln(os.Stderr, "Errors:")
 			for _, f := range failedInfos {

@@ -12,29 +12,29 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aeon022/postctl/internal/config"
-	"github.com/aeon022/postctl/internal/models"
 	"charm.land/bubbles/v2/textarea"
 	"charm.land/bubbles/v2/textinput"
 	"charm.land/lipgloss/v2"
+	"github.com/aeon022/postctl/internal/config"
+	"github.com/aeon022/postctl/internal/models"
 )
 
 // initEditor initialisiert die Eingabefelder des Editors mit Werten eines bestehenden Beitrags oder leer
 func (m *Model) initEditor(p *models.Post) {
 	campaignInput := textinput.New()
 	campaignInput.Placeholder = "z.B. launch-2026"
-	
+
 	schedInput := textinput.New()
 	schedInput.Placeholder = "leer für Entwurf, 'now' für sofort, oder 'TT.MM.JJJJ HH:MM' [ctrl+d für Kalender]"
-	
+
 	imagesInput := textinput.New()
 	imagesInput.Placeholder = "z.B. bild1.png, bild2.png (Komma-separiert)"
-	
+
 	bodyArea := textarea.New()
 	bodyArea.Placeholder = "Schreibe deinen Beitrag hier..."
 	bodyArea.SetWidth(70)
 	bodyArea.SetHeight(8)
-	
+
 	if p == nil {
 		m.editorPostID = ""
 		m.editorPlatform = "twitter"
@@ -46,15 +46,15 @@ func (m *Model) initEditor(p *models.Post) {
 		m.editorPostID = p.ID
 		m.editorPlatform = p.Platform
 		campaignInput.SetValue(p.Campaign)
-		
+
 		if p.ScheduledAt != nil {
 			schedInput.SetValue(p.ScheduledAt.Format("02.01.2006 15:04"))
 		} else {
 			schedInput.SetValue("")
 		}
-		
+
 		imagesInput.SetValue(strings.Join(p.Images, ", "))
-		
+
 		if p.Type == "thread" && len(p.Tweets) > 0 {
 			var sb strings.Builder
 			for i, tweet := range p.Tweets {
@@ -68,14 +68,14 @@ func (m *Model) initEditor(p *models.Post) {
 			bodyArea.SetValue(p.Body)
 		}
 	}
-	
+
 	m.editorCampaign = campaignInput
 	m.editorScheduledAt = schedInput
 	m.editorImages = imagesInput
 	m.editorBody = bodyArea
 	m.editorFocus = 0
 	m.isEditing = true
-	
+
 	m.updateEditorFocus()
 }
 
@@ -85,7 +85,7 @@ func (m *Model) updateEditorFocus() {
 	m.editorScheduledAt.Blur()
 	m.editorImages.Blur()
 	m.editorBody.Blur()
-	
+
 	switch m.editorFocus {
 	case 1:
 		m.editorCampaign.Focus()
@@ -106,7 +106,7 @@ func (m *Model) saveEditedPost() error {
 	if campaign == "" {
 		campaign = "default"
 	}
-	
+
 	schedStr := strings.TrimSpace(strings.ToLower(m.editorScheduledAt.Value()))
 	var scheduledAt *time.Time
 	status := "draft"
@@ -124,7 +124,7 @@ func (m *Model) saveEditedPost() error {
 			status = "scheduled"
 		}
 	}
-	
+
 	// Parse Bilder
 	imagesStr := m.editorImages.Value()
 	var images []string
@@ -137,9 +137,9 @@ func (m *Model) saveEditedPost() error {
 			}
 		}
 	}
-	
+
 	body := m.editorBody.Value()
-	
+
 	// ID beibehalten oder neu generieren
 	id := m.editorPostID
 	if id == "" {
@@ -156,7 +156,7 @@ func (m *Model) saveEditedPost() error {
 	if title == "" {
 		title = models.DeriveTitle(body)
 	}
-	
+
 	post := models.Post{
 		ID:          id,
 		Platform:    platform,
@@ -170,7 +170,7 @@ func (m *Model) saveEditedPost() error {
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
-	
+
 	// Falls Plattform Twitter/X, Mastodon oder Bluesky ist und '---' vorkommt, in Thread aufspalten
 	if (platform == "twitter" || platform == "mastodon" || platform == "bluesky") && strings.Contains(body, "\n---\n") {
 		post.Type = "thread"
@@ -188,12 +188,11 @@ func (m *Model) saveEditedPost() error {
 
 	post.PrepareTweets()
 
-	
 	// In SQLite speichern
 	if err := m.store.SavePost(ctx, &post); err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -221,7 +220,7 @@ func (m Model) renderEditor() string {
 		platStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 	}
 	platformLabel := platPrefix + Tr("editor_label_platform")
-	
+
 	platSelect := ""
 	platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord", "devto", "reddit", "hashnode", "medium"}
 	for i, p := range platformsList {
@@ -316,7 +315,7 @@ func (m Model) renderEditor() string {
 		bodyPrefix = "➔ "
 		bodyStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
 	}
-	builder.WriteString(bodyStyle.Render(bodyPrefix + bodyLabel) + "\n" + m.editorBody.View() + "\n")
+	builder.WriteString(bodyStyle.Render(bodyPrefix+bodyLabel) + "\n" + m.editorBody.View() + "\n")
 
 	// Live Längen-Validierung
 	charLimitMsg, _ := m.checkCharacterLimits()
@@ -329,19 +328,19 @@ func (m Model) renderEditor() string {
 	// 6. Action-Buttons
 	saveLabel := Tr("editor_save")
 	cancelLabel := Tr("editor_cancel")
-	
+
 	if m.editorFocus == 5 {
 		saveLabel = lipgloss.NewStyle().Bold(true).Foreground(ColorBgFg).Background(ColorPosted).Render(saveLabel)
 	} else {
 		saveLabel = lipgloss.NewStyle().Foreground(ColorPosted).Render(saveLabel)
 	}
-	
+
 	if m.editorFocus == 6 {
 		cancelLabel = lipgloss.NewStyle().Bold(true).Foreground(ColorBgFg).Background(ColorFailed).Render(cancelLabel)
 	} else {
 		cancelLabel = lipgloss.NewStyle().Foreground(ColorFailed).Render(cancelLabel)
 	}
-	
+
 	builder.WriteString("  " + saveLabel + "     " + cancelLabel + "\n\n")
 
 	// Help footer
@@ -364,33 +363,33 @@ func (m Model) renderEditor() string {
 func (m Model) renderCalendar(selectedDate time.Time) string {
 	year := selectedDate.Year()
 	month := selectedDate.Month()
-	
+
 	firstDay := time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
 	lastDay := time.Date(year, month+1, 0, 0, 0, 0, 0, time.Local)
-	
+
 	startOffset := int(firstDay.Weekday()) - 1
 	if startOffset < 0 {
 		startOffset = 6
 	}
-	
+
 	numDays := lastDay.Day()
-	
+
 	var sb strings.Builder
 	header := fmt.Sprintf("  <<< %s %d >>>  ", month.String(), year)
-	
+
 	sb.WriteString("  " + lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true).Render(header) + "\n")
 	sb.WriteString("   Mo Di Mi Do Fr Sa So\n")
 	sb.WriteString("   ")
-	
+
 	for i := 0; i < startOffset; i++ {
 		sb.WriteString("   ")
 	}
-	
+
 	for day := 1; day <= numDays; day++ {
 		if (startOffset+day-1)%7 == 0 && day > 1 {
 			sb.WriteString("\n   ")
 		}
-		
+
 		dayStr := fmt.Sprintf("%2d", day)
 		if day == selectedDate.Day() {
 			sb.WriteString(lipgloss.NewStyle().
@@ -402,7 +401,7 @@ func (m Model) renderCalendar(selectedDate time.Time) string {
 			sb.WriteString(dayStr + " ")
 		}
 	}
-	
+
 	sb.WriteString("\n  (Pfeiltasten: Tag | p/n: Monat | Enter: Wählen | Esc: Schließen)")
 	return sb.String()
 }
@@ -446,7 +445,7 @@ func (m Model) checkCharacterLimits() (string, bool) {
 		parts := strings.Split(body, "\n---\n")
 		var overflowIndices []int
 		var counts []string
-		
+
 		for idx, part := range parts {
 			var count int
 			if platform == "twitter" {
@@ -455,13 +454,13 @@ func (m Model) checkCharacterLimits() (string, bool) {
 			} else {
 				count = len([]rune(strings.TrimSpace(part)))
 			}
-			
+
 			counts = append(counts, fmt.Sprintf("%d", count))
 			if count > limit {
 				overflowIndices = append(overflowIndices, idx+1)
 			}
 		}
-		
+
 		countsStr := strings.Join(counts, " | ")
 		if len(overflowIndices) > 0 {
 			var errParts []string
@@ -476,7 +475,7 @@ func (m Model) checkCharacterLimits() (string, bool) {
 			}
 			return lipgloss.NewStyle().Foreground(ColorFailed).Render(errMsg), false
 		}
-		
+
 		var successMsg string
 		if config.ActiveConfig.Defaults.Language == "de" {
 			successMsg = fmt.Sprintf("✓ Thread-Längen okay (%s, Max: %d)", countsStr, limit)
@@ -492,7 +491,7 @@ func (m Model) checkCharacterLimits() (string, bool) {
 		} else {
 			count = len([]rune(strings.TrimSpace(body)))
 		}
-		
+
 		if count > limit {
 			var errMsg string
 			if config.ActiveConfig.Defaults.Language == "de" {
@@ -502,7 +501,7 @@ func (m Model) checkCharacterLimits() (string, bool) {
 			}
 			return lipgloss.NewStyle().Foreground(ColorFailed).Render(errMsg), false
 		}
-		
+
 		var successMsg string
 		if config.ActiveConfig.Defaults.Language == "de" {
 			successMsg = fmt.Sprintf("✓ Länge okay. Zeichen: %d/%d", count, limit)

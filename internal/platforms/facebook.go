@@ -20,20 +20,20 @@ import (
 )
 
 type FacebookPlatform struct {
-	store        *store.SQLiteStore
-	appID        string
-	appSecret    string
-	pageID       string
-	client       *http.Client
+	store     *store.SQLiteStore
+	appID     string
+	appSecret string
+	pageID    string
+	client    *http.Client
 }
 
 func NewFacebookPlatform(s *store.SQLiteStore, appID, appSecret, pageID string) *FacebookPlatform {
 	return &FacebookPlatform{
-		store:        s,
-		appID:        appID,
-		appSecret:    appSecret,
-		pageID:       pageID,
-		client:       &http.Client{Timeout: 20 * time.Second},
+		store:     s,
+		appID:     appID,
+		appSecret: appSecret,
+		pageID:    pageID,
+		client:    &http.Client{Timeout: 20 * time.Second},
 	}
 }
 
@@ -312,10 +312,10 @@ func (f *FacebookPlatform) Post(ctx context.Context, post *models.Post) (string,
 		defer file.Close()
 
 		photoURL := fmt.Sprintf("https://graph.facebook.com/v19.0/%s/photos", f.pageID)
-		
+
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
-		
+
 		part, err := writer.CreateFormFile("source", filepath.Base(imgPath))
 		if err != nil {
 			return "", err

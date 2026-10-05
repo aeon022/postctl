@@ -44,10 +44,10 @@ type Frontmatter struct {
 }
 
 var (
-	headerRegex = regexp.MustCompile(`(?m)^##\s+(Tweet\s+\d+|Reply)\s*$`)
-	tweetNumRegex = regexp.MustCompile(`\d+`)
+	headerRegex      = regexp.MustCompile(`(?m)^##\s+(Tweet\s+\d+|Reply)\s*$`)
+	tweetNumRegex    = regexp.MustCompile(`\d+`)
 	inlineImageRegex = regexp.MustCompile(`<!--\s*image:\s*([^\s-]+.*?)\s*-->`)
-	urlRegex = regexp.MustCompile(`https?://[^\s]+`)
+	urlRegex         = regexp.MustCompile(`https?://[^\s]+`)
 )
 
 // ParseFile liest eine Markdown-Datei ein und gibt eine Liste von Posts zurück
@@ -167,7 +167,7 @@ func ParseContent(content, sourcePath string) ([]models.Post, error) {
 			if len(post.Tweets) > 1 {
 				post.Type = "thread"
 			}
-			
+
 			// Titel aus erstem Tweet generieren, falls leer
 			if post.Title == "" && len(post.Tweets) > 0 {
 				lines := strings.Split(post.Tweets[0].Content, "\n")
@@ -257,7 +257,7 @@ func parseTweets(body string, images []string) []models.Tweet {
 		if content == "" {
 			return nil
 		}
-		
+
 		return []models.Tweet{
 			createTweet(1, content, images),
 		}
@@ -281,7 +281,7 @@ func parseTweets(body string, images []string) []models.Tweet {
 		}
 
 		lastEnd = headerEnd
-		
+
 		// Falls dies der letzte Header ist, müssen wir den Rest des Bodys verarbeiten
 		if i == len(matches)-1 {
 			blockContent := strings.TrimSpace(normalizedBody[lastEnd:])
@@ -319,4 +319,3 @@ func createTweet(index int, content string, images []string) models.Tweet {
 		Image:   inlineImage,
 	}
 }
-

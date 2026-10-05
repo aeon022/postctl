@@ -256,7 +256,7 @@ func reportConfigShow(cmd *cobra.Command) {
 		fmt.Fprintf(out, "    app_id:          %s\n", masked.Facebook.AppID)
 		fmt.Fprintf(out, "    app_secret:      %s\n", masked.Facebook.AppSecret)
 		fmt.Fprintf(out, "    page_id:         %s\n\n", masked.Facebook.PageID)
-		
+
 		statusStr := "CORE (MIT)"
 		if config.IsPro() {
 			statusStr = "PRO ACTIVE (Polar.sh)"
@@ -462,10 +462,10 @@ var configSetupCmd = &cobra.Command{
 			fmt.Println("✔ Twitter/X wurde erfolgreich über Flags im Cookie-Modus verbunden!")
 			return
 		}
-		
+
 		// Terminal komplett leeren
 		fmt.Print("\033[H\033[2J\033[3J")
-		
+
 		// Titel ausgeben
 		fmt.Printf("=== postctl CONFIGURATION ASSISTANT: %s ===\n", strings.ToUpper(platform))
 		fmt.Println("Beschreibung: Dieser Assistent hilft dir, die nötigen API-Schlüssel für die")
@@ -487,7 +487,7 @@ var configSetupCmd = &cobra.Command{
 
 			if choice == "2" {
 				config.ActiveConfig.Twitter.AuthMode = "cookie"
-				
+
 				fmt.Println()
 				fmt.Println("⚠️ WARNUNG & SICHERHEITSHINWEIS:")
 				fmt.Println("Die Cookie-basierte Methode ist ein inoffizieller Umgehungsversuch. Sie simuliert")
@@ -537,7 +537,7 @@ var configSetupCmd = &cobra.Command{
 				fmt.Println("✔ Twitter/X wurde erfolgreich im Cookie-Modus verbunden!")
 			} else {
 				config.ActiveConfig.Twitter.AuthMode = "api"
-				
+
 				fmt.Println()
 				fmt.Println("Schritt 1: Gehe zum Twitter Developer Portal unter https://developer.twitter.com")
 				fmt.Println("Schritt 2: Erstelle ein Projekt und eine App mit OAuth 2.0 PKCE (App-Typ: Web/Native App)")
@@ -559,7 +559,7 @@ var configSetupCmd = &cobra.Command{
 				if clientSecret != "" {
 					config.ActiveConfig.Twitter.ClientSecret = clientSecret
 				}
-				
+
 				// Wenn API gewählt, Token löschen falls Cookie-basierte Reste vorhanden waren
 				dbPath := config.ActiveConfig.DBPath
 				s, err := store.NewSQLiteStore(dbPath, config.Shared())

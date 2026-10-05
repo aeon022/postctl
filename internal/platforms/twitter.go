@@ -117,7 +117,7 @@ func (t *TwitterPlatform) Auth(ctx context.Context) error {
 
 func (t *TwitterPlatform) exchangeCodeForToken(ctx context.Context, code, verifier, redirectURI string) error {
 	tokenURL := "https://api.twitter.com/2/oauth2/token"
-	
+
 	data := url.Values{}
 	data.Set("code", code)
 	data.Set("grant_type", "authorization_code")
@@ -259,7 +259,7 @@ func (t *TwitterPlatform) UploadImage(ctx context.Context, path string) (string,
 	defer file.Close()
 
 	uploadURL := "https://upload.twitter.com/1.1/media/upload.json"
-	
+
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("media", filepath.Base(path))
@@ -452,7 +452,7 @@ func (t *TwitterPlatform) uploadImageCookieBased(ctx context.Context, path strin
 	defer file.Close()
 
 	uploadURL := "https://upload.twitter.com/1.1/media/upload.json"
-	
+
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("media", filepath.Base(path))
@@ -471,7 +471,7 @@ func (t *TwitterPlatform) uploadImageCookieBased(ctx context.Context, path strin
 
 	req.Header.Set("Authorization", twitterStaticBearer)
 	req.Header.Set("X-Csrf-Token", csrfToken)
-	
+
 	cookieStr := fmt.Sprintf("auth_token=%s; ct0=%s", authToken, csrfToken)
 	if strings.Contains(authToken, "=") || strings.Contains(authToken, ";") {
 		cookieStr = authToken
@@ -576,8 +576,8 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 		}
 
 		vars := map[string]interface{}{
-			"tweet_text":              tweet.Content,
-			"dark_request":            false,
+			"tweet_text":   tweet.Content,
+			"dark_request": false,
 			"media": map[string]interface{}{
 				"media_entities":     mediaEntities,
 				"possibly_sensitive": false,
@@ -603,26 +603,26 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 				"responsive_web_jetfuel_frame":                                            false,
 				"responsive_web_grok_share_attachment_enabled":                            true,
 				"responsive_web_edit_tweet_api_enabled":                                   true,
-				"graphql_is_translatable_rweb_tweet_is_translatable_enabled":               true,
-				"view_counts_everywhere_api_enabled":                                       true,
-				"longform_notetweets_consumption_enabled":                                  true,
-				"responsive_web_twitter_article_tweet_consumption_enabled":                 true,
-				"tweet_awards_web_tipping_enabled":                                         false,
-				"creator_subscriptions_quote_tweet_preview_enabled":                        false,
-				"longform_notetweets_rich_text_read_enabled":                               true,
-				"longform_notetweets_inline_media_enabled":                                 true,
+				"graphql_is_translatable_rweb_tweet_is_translatable_enabled":              true,
+				"view_counts_everywhere_api_enabled":                                      true,
+				"longform_notetweets_consumption_enabled":                                 true,
+				"responsive_web_twitter_article_tweet_consumption_enabled":                true,
+				"tweet_awards_web_tipping_enabled":                                        false,
+				"creator_subscriptions_quote_tweet_preview_enabled":                       false,
+				"longform_notetweets_rich_text_read_enabled":                              true,
+				"longform_notetweets_inline_media_enabled":                                true,
 				"profile_label_improvements_pcf_label_in_post_enabled":                    true,
 				"rweb_tipjar_consumption_enabled":                                         true,
-				"responsive_web_graphql_exclude_directive_enabled":                         true,
-				"verified_phone_label_enabled":                                             false,
-				"articles_preview_enabled":                                                 true,
-				"rweb_video_timestamps_enabled":                                            true,
-				"responsive_web_graphql_skip_user_profile_image_extensions_enabled":        false,
-				"freedom_of_speech_not_reach_fetch_enabled":                                true,
-				"standardized_nudges_misinfo":                                              true,
+				"responsive_web_graphql_exclude_directive_enabled":                        true,
+				"verified_phone_label_enabled":                                            false,
+				"articles_preview_enabled":                                                true,
+				"rweb_video_timestamps_enabled":                                           true,
+				"responsive_web_graphql_skip_user_profile_image_extensions_enabled":       false,
+				"freedom_of_speech_not_reach_fetch_enabled":                               true,
+				"standardized_nudges_misinfo":                                             true,
 				"tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled": true,
 				"responsive_web_grok_image_annotation_enabled":                            false,
-				"responsive_web_graphql_timeline_navigation_enabled":                       true,
+				"responsive_web_graphql_timeline_navigation_enabled":                      true,
 				"responsive_web_enhance_cards_enabled":                                    false,
 			},
 			"fieldToggles": map[string]interface{}{},
@@ -646,7 +646,7 @@ func (t *TwitterPlatform) postCookieBased(ctx context.Context, post *models.Post
 		req.Header.Set("X-Twitter-Active-User", "yes")
 		req.Header.Set("X-Twitter-Client-Language", "en")
 		req.Header.Set("X-Csrf-Token", csrfToken)
-		
+
 		cookieStr := fmt.Sprintf("auth_token=%s; ct0=%s", authToken, csrfToken)
 		if strings.Contains(authToken, "=") || strings.Contains(authToken, ";") {
 			cookieStr = authToken
@@ -941,4 +941,3 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 func (t *TwitterPlatform) Delete(ctx context.Context, platformID string) error {
 	return nil
 }
-

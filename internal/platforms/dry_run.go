@@ -96,4 +96,3 @@ func (d *DryRunPlatform) Delete(ctx context.Context, platformID string) error {
 	time.Sleep(200 * time.Millisecond)
 	return nil
 }
-

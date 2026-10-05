@@ -134,7 +134,7 @@ func (d *DiscordPlatform) sendMultipartMessage(ctx context.Context, imgPaths []s
 		if err != nil {
 			return "", fmt.Errorf("open image file %s: %w", path, err)
 		}
-		
+
 		part, err := writer.CreateFormFile(fmt.Sprintf("files[%d]", i), filepath.Base(path))
 		if err != nil {
 			file.Close()

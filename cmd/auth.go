@@ -42,7 +42,7 @@ var authCmd = &cobra.Command{
 		}
 
 		platformName := args[0]
-		
+
 		// Platform-Instanz holen (dry-run ist bei Auth nicht aktiv)
 		plat, err := platforms.GetPlatform(platformName, s, false)
 		if err != nil {

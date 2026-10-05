@@ -42,7 +42,7 @@ var daemonCmd = &cobra.Command{
 		defer s.Close()
 
 		interval := time.Duration(checkIntervalSec) * time.Second
-		
+
 		// Daemon starten
 		return scheduler.RunDaemon(ctx, s, interval, DryRunFlag)
 	},

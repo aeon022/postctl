@@ -19,7 +19,7 @@ func TestIsJWTExpired(t *testing.T) {
 			Exp: exp.Unix(),
 		}
 		claimsBytes, _ := json.Marshal(claims)
-		
+
 		var claimsB64 string
 		if rawUrlEncode {
 			claimsB64 = base64.RawURLEncoding.EncodeToString(claimsBytes)

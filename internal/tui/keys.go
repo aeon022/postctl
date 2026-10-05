@@ -4,16 +4,16 @@ import "charm.land/bubbles/v2/key"
 
 // KeyMap definiert alle verfügbaren Tastaturbelegungen
 type KeyMap struct {
-	Up       key.Binding
-	Down     key.Binding
-	Left     key.Binding
-	Right    key.Binding
-	Tab      key.Binding
-	ShiftTab key.Binding
-	Enter    key.Binding
-	Esc      key.Binding
-	Post     key.Binding
-	Schedule key.Binding
+	Up        key.Binding
+	Down      key.Binding
+	Left      key.Binding
+	Right     key.Binding
+	Tab       key.Binding
+	ShiftTab  key.Binding
+	Enter     key.Binding
+	Esc       key.Binding
+	Post      key.Binding
+	Schedule  key.Binding
 	Edit      key.Binding
 	NewPost   key.Binding
 	Delete    key.Binding
@@ -109,4 +109,3 @@ var Keys = KeyMap{
 		key.WithHelp("f", "filter campaign"),
 	),
 }
-

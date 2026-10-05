@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aeon022/postctl/internal/config"
 	"charm.land/lipgloss/v2"
+	"github.com/aeon022/postctl/internal/config"
 )
 
 // renderHistory rendert den History-Tab (Tab 3)
@@ -47,7 +47,7 @@ func (m Model) renderHistory() string {
 		}
 
 		timeStr := entry.CreatedAt.Format("02.01.2006 15:04:05")
-		
+
 		// Status Aktion formatieren (posted = grün, failed = rot)
 		actionFormatted := fmt.Sprintf("%-8s", entry.Action)
 		actionStr := actionFormatted
@@ -80,7 +80,7 @@ func (m Model) renderHistory() string {
 			itemStyle = lipgloss.NewStyle().Foreground(ColorSecondary)
 		}
 
-		builder.WriteString(fmt.Sprintf("%s%s  %s %s\n", 
+		builder.WriteString(fmt.Sprintf("%s%s  %s %s\n",
 			cursor,
 			timeStr,
 			actionStr,

@@ -102,7 +102,7 @@ It can have multiple paragraphs.
 	if post.ScheduledAt == nil {
 		t.Fatalf("expected ScheduledAt to be set")
 	}
-	
+
 	expectedTime := time.Date(2026, 6, 23, 9, 0, 0, 0, time.Local)
 	if !post.ScheduledAt.Equal(expectedTime) {
 		t.Errorf("expected schedule time %v, got %v", expectedTime, *post.ScheduledAt)

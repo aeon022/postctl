@@ -83,11 +83,11 @@ func reportPostsList(posts []models.Post) {
 				titlePreview = titlePreview[:37] + "..."
 			}
 
-			fmt.Printf(" - (ID: %-25s) [%s] %-8s %-2s : %q\n", 
-				p.ID, 
-				statusText, 
-				strings.ToUpper(p.Platform), 
-				strings.ToUpper(p.Language), 
+			fmt.Printf(" - (ID: %-25s) [%s] %-8s %-2s : %q\n",
+				p.ID,
+				statusText,
+				strings.ToUpper(p.Platform),
+				strings.ToUpper(p.Language),
 				titlePreview,
 			)
 		}

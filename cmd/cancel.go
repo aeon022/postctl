@@ -42,7 +42,7 @@ var cancelCmd = &cobra.Command{
 		post.Status = models.StatusDraft
 		post.ScheduledAt = nil
 		post.Error = ""
-		
+
 		if err := s.SavePost(ctx, post); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: failed to cancel post: %v\n", err)
 			os.Exit(1)

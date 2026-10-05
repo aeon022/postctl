@@ -24,7 +24,7 @@ func TestGenerateCmdInvalidURL(t *testing.T) {
 
 	// Invoke generate with an invalid URL
 	rootCmd.SetArgs([]string{"generate", "not-a-valid-url"})
-	
+
 	// Execute via rootCmd so that SetArgs overrides os.Args correctly
 	rootCmd.Execute()
 

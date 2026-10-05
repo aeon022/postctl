@@ -244,7 +244,7 @@ func callClaude(ctx context.Context, cfg GeneratorConfig, sysPrompt, userPrompt 
 	}
 
 	payload := ClaudeRequest{
-		Model: model,
+		Model:  model,
 		System: sysPrompt,
 		Messages: []ClaudeMessage{
 			{Role: "user", Content: userPrompt},
@@ -345,10 +345,10 @@ func CleanSlug(s string) string {
 }
 
 type FileFrontmatter struct {
-	Platform string   `yaml:"platform"`
-	Type     string   `yaml:"type"`
-	Title    string   `yaml:"title,omitempty"`
-	Campaign string   `yaml:"campaign,omitempty"`
+	Platform string `yaml:"platform"`
+	Type     string `yaml:"type"`
+	Title    string `yaml:"title,omitempty"`
+	Campaign string `yaml:"campaign,omitempty"`
 }
 
 // SaveToMarkdownFiles writes the generated posts into three separate markdown files in the specified directory.
@@ -597,4 +597,3 @@ func callClaudeVision(ctx context.Context, cfg GeneratorConfig, base64Data, mime
 
 	return strings.TrimSpace(claudeResp.Content[0].Text), nil
 }
-

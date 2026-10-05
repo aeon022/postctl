@@ -32,7 +32,7 @@ type LicenseValidateRequest struct {
 }
 
 type PolarError struct {
-	Error  string `json:"error"`
+	Error  string      `json:"error"`
 	Detail interface{} `json:"detail"`
 }
 

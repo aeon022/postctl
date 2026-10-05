@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aeon022/postctl/internal/config"
 	"charm.land/lipgloss/v2"
+	"github.com/aeon022/postctl/internal/config"
 )
 
 // renderSchedule rendert den Schedule-Tab (Tab 2) mit Kampagnen-Gruppierung und Scroll-Unterstützung
@@ -119,7 +119,7 @@ func (m Model) renderSchedule() string {
 
 			platformStr := fmt.Sprintf("%-8s", strings.ToUpper(p.Platform))
 
-			builder.WriteString(fmt.Sprintf("%s◷ %-17s %s %-2s  %s\n", 
+			builder.WriteString(fmt.Sprintf("%s◷ %-17s %s %-2s  %s\n",
 				cursor,
 				timeStr,
 				itemStyle.Render(platformStr),

@@ -84,7 +84,7 @@ var scheduleCmd = &cobra.Command{
 		post.Status = models.StatusScheduled
 		post.ScheduledAt = &parsedTime
 		post.Error = ""
-		
+
 		if err := s.SavePost(ctx, post); err != nil {
 			reportScheduleError(fmt.Errorf("save scheduled post: %w", err), 2)
 			return

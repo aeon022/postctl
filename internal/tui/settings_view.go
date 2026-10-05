@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"charm.land/lipgloss/v2"
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
-	"charm.land/lipgloss/v2"
 )
 
 // settingKind classifies a settingsOptions() row for cursor movement and

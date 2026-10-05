@@ -67,7 +67,7 @@ func (l *LinkedInPlatform) Auth(ctx context.Context) error {
 
 	state := fmt.Sprintf("state-%d", time.Now().UnixNano())
 	redirectURI := "http://localhost:8753/callback"
-	
+
 	// Scopes für LinkedIn Posting und OIDC Profil
 	scopes := "w_member_social openid profile"
 
@@ -173,7 +173,7 @@ func (l *LinkedInPlatform) getMeURN(ctx context.Context, token string) (string, 
 // Register und Upload für Bilder
 func (l *LinkedInPlatform) registerUpload(ctx context.Context, token, authorURN string) (uploadURL, assetURN string, err error) {
 	regURL := "https://api.linkedin.com/v2/assets?action=registerUpload"
-	
+
 	reqBody := map[string]interface{}{
 		"registerUploadRequest": map[string]interface{}{
 			"recipes":                  []string{"urn:li:digitalmediaRecipe:feedshare-image"},
@@ -394,4 +394,3 @@ func (l *LinkedInPlatform) FetchAnalytics(ctx context.Context, platformID string
 func (l *LinkedInPlatform) Delete(ctx context.Context, platformID string) error {
 	return fmt.Errorf("linkedin: delete not implemented — post %s was not removed from LinkedIn", platformID)
 }
-

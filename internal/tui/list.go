@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aeon022/postctl/internal/models"
 	"charm.land/lipgloss/v2"
+	"github.com/aeon022/postctl/internal/models"
 )
 
 // renderDashboard rendert die Dashboard-Ansicht (Tab 0)
@@ -44,7 +44,7 @@ func (m Model) renderDashboard() string {
 			if m.activeTab == 0 && i == m.cursor {
 				cursor = "> "
 			}
-			col1.WriteString(fmt.Sprintf("%s● %s\n"+Tr("dash_campaign_format"), 
+			col1.WriteString(fmt.Sprintf("%s● %s\n"+Tr("dash_campaign_format"),
 				cursor, c.Slug, len(c.Posts), c.Posted, c.Scheduled))
 		}
 	}
@@ -69,7 +69,7 @@ func (m Model) renderDashboard() string {
 			if len(titlePreview) > 16 {
 				titlePreview = titlePreview[:13] + "..."
 			}
-			col1.WriteString(fmt.Sprintf("◷ %-11s %-8s %-2s  %s\n", 
+			col1.WriteString(fmt.Sprintf("◷ %-11s %-8s %-2s  %s\n",
 				timeStr, strings.ToUpper(p.Platform), strings.ToUpper(p.Language), titlePreview))
 		}
 	}
@@ -219,7 +219,7 @@ func (m Model) renderPostList() string {
 			checked = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true).Render("[x] ")
 		}
 
-		builder.WriteString(fmt.Sprintf("%s%s%s / %s %s\n", 
+		builder.WriteString(fmt.Sprintf("%s%s%s / %s %s\n",
 			cursor, checked, strings.ToUpper(p.Platform), strings.ToUpper(p.Language), statusStr))
 		builder.WriteString(itemStyle.Render(fmt.Sprintf("    %q", titlePreview)) + "\n")
 		builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render(fmt.Sprintf("    %s", metaInfo)) + "\n\n")
@@ -234,7 +234,7 @@ func (m Model) getBoxHeight() int {
 	if m.showHelp {
 		overhead = 26
 	}
-	
+
 	h := m.height - overhead
 	if h < 10 {
 		return 12 // Mindesthöhe

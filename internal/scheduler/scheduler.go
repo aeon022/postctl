@@ -43,7 +43,7 @@ func PublishPost(ctx context.Context, s *store.SQLiteStore, post *models.Post, d
 		post.Status = models.StatusFailed
 		post.Error = err.Error()
 		_ = s.SavePost(ctx, post)
-		
+
 		_ = s.AddHistoryEntry(ctx, &models.HistoryEntry{
 			PostID: post.ID,
 			Action: "failed",
@@ -156,11 +156,11 @@ func RescheduleOverdue(ctx context.Context, s *store.SQLiteStore) error {
 			newScheduled := now.Add(time.Duration(i) * 20 * time.Minute)
 			p.ScheduledAt = &newScheduled
 			p.UpdatedAt = now
-			
+
 			if err := s.SavePost(ctx, &p); err != nil {
 				return fmt.Errorf("reschedule post %s failed: %w", p.ID, err)
 			}
-			platforms.Log("[SAFETY] Überfälliger Post %s (%s) wurde auf %s verschoben, um Spam/Sperren zu vermeiden.", 
+			platforms.Log("[SAFETY] Überfälliger Post %s (%s) wurde auf %s verschoben, um Spam/Sperren zu vermeiden.",
 				p.ID, platform, newScheduled.Format("15:04:05"))
 		}
 	}
@@ -195,7 +195,7 @@ func checkAndPublishDue(ctx context.Context, s *store.SQLiteStore, dryRun bool) 
 	}
 
 	now := time.Now()
-	
+
 	// Hole alle geplanten Posts erneut (nach potentiellem Rescheduling)
 	posts, err := s.ListPosts(ctx, "all", models.StatusScheduled, "")
 	if err != nil {
@@ -234,7 +234,7 @@ func checkAndPublishDue(ctx context.Context, s *store.SQLiteStore, dryRun bool) 
 			}
 
 			fmt.Fprintf(os.Stderr, "[SCHEDULER] Veröffentliche fälligen Post %s (%s)...\n", p.ID, p.Platform)
-			
+
 			_, err := PublishPost(ctx, s, &p, dryRun)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "[SCHEDULER FEHLER] Posten von %s fehlgeschlagen: %v\n", p.ID, err)

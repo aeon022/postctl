@@ -11,16 +11,16 @@ import (
 	"strings"
 	"time"
 
+	"charm.land/bubbles/v2/key"
+	"charm.land/bubbles/v2/textarea"
+	"charm.land/bubbles/v2/textinput"
+	tea "charm.land/bubbletea/v2"
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/generator"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/platforms"
 	"github.com/aeon022/postctl/internal/scheduler"
 	"github.com/aeon022/postctl/internal/store"
-	"charm.land/bubbles/v2/key"
-	"charm.land/bubbles/v2/textarea"
-	"charm.land/bubbles/v2/textinput"
-	tea "charm.land/bubbletea/v2"
 	"gopkg.in/yaml.v3"
 )
 

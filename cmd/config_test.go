@@ -100,4 +100,3 @@ func TestConfigTestCmd(t *testing.T) {
 		t.Errorf("expected output to contain 'CONNECTION DIAGNOSTIC', got:\n%s", output)
 	}
 }
-

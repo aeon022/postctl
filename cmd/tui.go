@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
+	tea "charm.land/bubbletea/v2"
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/store"
 	"github.com/aeon022/postctl/internal/tui"
-	tea "charm.land/bubbletea/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -55,7 +55,7 @@ func runTUI() error {
 
 	model := tui.NewModel(s)
 	p := tea.NewProgram(model)
-	
+
 	if _, err := p.Run(); err != nil {
 		return fmt.Errorf("run bubbletea program: %w", err)
 	}

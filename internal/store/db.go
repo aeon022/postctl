@@ -14,7 +14,6 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-
 // SQLiteStore ist die konkrete Implementierung des Store-Interfaces mit SQLite
 type SQLiteStore struct {
 	db   *sql.DB
@@ -166,7 +165,7 @@ func expandPath(path string) (string, error) {
 func (s *SQLiteStore) migrate() error {
 	queries := []string{
 		`PRAGMA foreign_keys = ON;`,
-		
+
 		`CREATE TABLE IF NOT EXISTS posts (
 			id          TEXT PRIMARY KEY,
 			platform    TEXT NOT NULL,

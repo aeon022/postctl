@@ -215,9 +215,9 @@ func TestSaveToMarkdownFiles(t *testing.T) {
 	}
 
 	expectedFiles := map[string]string{
-		filepath.Join(tempDir, "test-repurpose-twitter.md"):   "platform: twitter\ntype: thread\ntitle: Twitter Title\ncampaign: test-campaign\n---\n## Tweet 1\nHello X!\n",
-		filepath.Join(tempDir, "test-repurpose-linkedin.md"):  "platform: linkedin\ntype: single\ntitle: LinkedIn Title\ncampaign: test-campaign\n---\nHello LinkedIn!\n",
-		filepath.Join(tempDir, "test-repurpose-threads.md"):   "platform: threads\ntype: single\ntitle: Threads Title\ncampaign: test-campaign\n---\nHello Threads!\n",
+		filepath.Join(tempDir, "test-repurpose-twitter.md"):  "platform: twitter\ntype: thread\ntitle: Twitter Title\ncampaign: test-campaign\n---\n## Tweet 1\nHello X!\n",
+		filepath.Join(tempDir, "test-repurpose-linkedin.md"): "platform: linkedin\ntype: single\ntitle: LinkedIn Title\ncampaign: test-campaign\n---\nHello LinkedIn!\n",
+		filepath.Join(tempDir, "test-repurpose-threads.md"):  "platform: threads\ntype: single\ntitle: Threads Title\ncampaign: test-campaign\n---\nHello Threads!\n",
 	}
 
 	for path, expectedContent := range expectedFiles {
@@ -233,4 +233,3 @@ func TestSaveToMarkdownFiles(t *testing.T) {
 		}
 	}
 }
-

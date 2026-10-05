@@ -106,7 +106,7 @@ func (t *TelegramPlatform) FetchAnalytics(ctx context.Context, platformID string
 
 func (t *TelegramPlatform) sendTextMessage(ctx context.Context, text string) (string, error) {
 	url := fmt.Sprintf("%s/bot%s/sendMessage", t.apiURL, t.botToken)
-	
+
 	payload := map[string]interface{}{
 		"chat_id":    t.chatID,
 		"text":       text,
@@ -144,7 +144,7 @@ func (t *TelegramPlatform) sendPhotoMessage(ctx context.Context, imgPath string,
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	
+
 	_ = writer.WriteField("chat_id", t.chatID)
 	_ = writer.WriteField("caption", caption)
 	_ = writer.WriteField("parse_mode", "Markdown")
@@ -194,7 +194,7 @@ func (t *TelegramPlatform) sendMediaGroupMessage(ctx context.Context, imgPaths [
 		if err != nil {
 			return "", err
 		}
-		
+
 		file, err := os.Open(path)
 		if err != nil {
 			return "", err
@@ -255,7 +255,7 @@ func parseTelegramResponse(resp *http.Response) (string, error) {
 // Delete löscht eine gesendete Nachricht aus dem Telegram Chat
 func (t *TelegramPlatform) Delete(ctx context.Context, platformID string) error {
 	url := fmt.Sprintf("%s/bot%s/deleteMessage", t.apiURL, t.botToken)
-	
+
 	var msgID int
 	_, err := fmt.Sscanf(platformID, "%d", &msgID)
 	if err != nil {

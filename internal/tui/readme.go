@@ -57,7 +57,7 @@ func wrapLine(line string, limit int) []string {
 
 	// Bullet or list marker check
 	rest := trimmed
-	
+
 	// Support double-digit numbered lists like "10. "
 	dotIdx := strings.Index(trimmed, ". ")
 	if strings.HasPrefix(trimmed, "* ") {
@@ -117,20 +117,20 @@ func getReadmeData() ([]string, []tocItem) {
 
 	for _, line := range rawLines {
 		trimmed := strings.TrimSpace(line)
-		
+
 		// If it's a header, record it in the TOC pointing to the exact current index in wrappedLines
 		if strings.HasPrefix(trimmed, "#") {
 			parts := strings.SplitN(trimmed, " ", 2)
 			if len(parts) == 2 && strings.HasPrefix(parts[0], "#") {
 				level := len(parts[0])
 				title := strings.TrimSpace(parts[1])
-				
+
 				// Clean formatting & strip emojis
 				title = strings.ReplaceAll(title, "`", "")
 				title = strings.ReplaceAll(title, "**", "")
 				title = strings.ReplaceAll(title, "*", "")
 				title = stripEmojis(title)
-				
+
 				toc = append(toc, tocItem{
 					title: title,
 					line:  len(wrappedLines), // line index in wrappedLines
@@ -158,10 +158,10 @@ func (m Model) renderReadmeTOC() string {
 	outerWidth := 78
 	outerHeight := 22
 	if m.width > 10 {
-		outerWidth = max(78, min(100, m.width - 4))
+		outerWidth = max(78, min(100, m.width-4))
 	}
 	if m.height > 10 {
-		outerHeight = max(22, m.height - 4)
+		outerHeight = max(22, m.height-4)
 	}
 
 	innerWidth := outerWidth - 6
@@ -190,7 +190,7 @@ func (m Model) renderReadmeTOC() string {
 		// Indentation based on heading level
 		indent := strings.Repeat("  ", max(0, item.level-1))
 		title := item.title
-		
+
 		// Limit length to fit in column
 		runes := []rune(title)
 		maxLen := (innerWidth - 6) - len(indent)
@@ -246,10 +246,10 @@ func (m Model) renderReadmeContent() string {
 	outerWidth := 78
 	outerHeight := 22
 	if m.width > 10 {
-		outerWidth = max(78, min(100, m.width - 4))
+		outerWidth = max(78, min(100, m.width-4))
 	}
 	if m.height > 10 {
-		outerHeight = max(22, m.height - 4)
+		outerHeight = max(22, m.height-4)
 	}
 
 	innerWidth := outerWidth - 6
@@ -268,9 +268,9 @@ func (m Model) renderReadmeContent() string {
 
 	// Content Viewport
 	var contentBuilder strings.Builder
-	
+
 	inCodeBlock := false
-	
+
 	// Determine code block state at m.readmeScroll
 	for i := 0; i < m.readmeScroll && i < len(m.readmeLines); i++ {
 		if strings.HasPrefix(strings.TrimSpace(m.readmeLines[i]), "```") {

@@ -140,4 +140,3 @@ func (p *Post) PrepareTweets() {
 		}
 	}
 }
-

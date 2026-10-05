@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
+	tea "charm.land/bubbletea/v2"
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
-	tea "charm.land/bubbletea/v2"
 )
 
 func TestTUIBulkActions(t *testing.T) {
