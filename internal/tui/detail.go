@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 )
 
 // renderDetailView rendert die Detail- bzw. Previewansicht eines Posts
@@ -138,5 +138,5 @@ func (m Model) renderDetailView() string {
 		visibleContent.WriteString(lines[i] + "\n")
 	}
 
-	return StyleBox.Width(78).Height(boxHeight).Render(visibleContent.String())
+	return StyleBox.Width(78 + 2).Height(boxHeight + 2).Render(visibleContent.String())
 }

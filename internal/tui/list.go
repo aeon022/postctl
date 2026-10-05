@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/aeon022/postctl/internal/models"
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 )
 
 // renderDashboard rendert die Dashboard-Ansicht (Tab 0)
@@ -109,8 +109,8 @@ func (m Model) renderDashboard() string {
 	}
 
 	// Beider Spalten in Boxen verpacken
-	box1 := StyleBox.Width(50).Height(boxHeight).Render(col1.String())
-	box2 := StyleBox.Width(34).Height(boxHeight).Render(col2.String())
+	box1 := StyleBox.Width(50 + 2).Height(boxHeight + 2).Render(col1.String())
+	box2 := StyleBox.Width(34 + 2).Height(boxHeight + 2).Render(col2.String())
 
 	return lipgloss.JoinHorizontal(lipgloss.Top, box1, "   ", box2)
 }
@@ -127,13 +127,13 @@ func (m Model) renderPostList() string {
 
 	if len(m.posts) == 0 {
 		builder.WriteString(Tr("posts_none_found"))
-		return StyleBox.Width(78).Height(12).Render(builder.String())
+		return StyleBox.Width(78 + 2).Height(12 + 2).Render(builder.String())
 	}
 
 	filtered := m.getFilteredPosts()
 	if len(filtered) == 0 {
 		builder.WriteString(fmt.Sprintf(Tr("posts_none_found_campaign"), m.filterCampaign))
-		return StyleBox.Width(78).Height(12).Render(builder.String())
+		return StyleBox.Width(78 + 2).Height(12 + 2).Render(builder.String())
 	}
 
 	boxHeight := m.getBoxHeight()
@@ -225,7 +225,7 @@ func (m Model) renderPostList() string {
 		builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render(fmt.Sprintf("    %s", metaInfo)) + "\n\n")
 	}
 
-	return StyleBox.Width(84).Height(boxHeight).Render(builder.String())
+	return StyleBox.Width(84 + 2).Height(boxHeight + 2).Render(builder.String())
 }
 
 // getBoxHeight berechnet die dynamische Höhe für die TUI-Boxen basierend auf der Terminal-Höhe

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/aeon022/postctl/internal/config"
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 )
 
 // renderSchedule rendert den Schedule-Tab (Tab 2) mit Kampagnen-Gruppierung und Scroll-Unterstützung
@@ -15,7 +15,7 @@ func (m Model) renderSchedule() string {
 	builder.WriteString(StyleHeader.Render("SCHEDULED POSTS") + "\n")
 	if len(m.nextUp) == 0 {
 		builder.WriteString("No posts currently scheduled.\n")
-		return StyleBox.Width(84).Height(12).Render(builder.String())
+		return StyleBox.Width(84 + 2).Height(12 + 2).Render(builder.String())
 	}
 
 	type lineItem struct {
@@ -129,5 +129,5 @@ func (m Model) renderSchedule() string {
 		}
 	}
 
-	return StyleBox.Width(84).Height(boxHeight).Render(builder.String())
+	return StyleBox.Width(84 + 2).Height(boxHeight + 2).Render(builder.String())
 }

@@ -14,9 +14,9 @@ import (
 
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
-	"github.com/charmbracelet/bubbles/textarea"
-	"github.com/charmbracelet/bubbles/textinput"
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/bubbles/v2/textarea"
+	"charm.land/bubbles/v2/textinput"
+	"charm.land/lipgloss/v2"
 )
 
 // initEditor initialisiert die Eingabefelder des Editors mit Werten eines bestehenden Beitrags oder leer
@@ -357,7 +357,7 @@ func (m Model) renderEditor() string {
 	} else if m.editorFocus == 2 {
 		height = 25
 	}
-	return StyleBox.Width(78).Height(height).Render(builder.String())
+	return StyleBox.Width(78 + 2).Height(height + 2).Render(builder.String())
 }
 
 // renderCalendar zeichnet den interaktiven Kalender

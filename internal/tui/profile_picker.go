@@ -3,8 +3,8 @@ package tui
 import (
 	"strings"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
 
 var styleProfilePickerRow = lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary)
@@ -24,7 +24,7 @@ type profilePickerModel struct {
 func (m profilePickerModel) Init() tea.Cmd { return nil }
 
 func (m profilePickerModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	keyMsg, ok := msg.(tea.KeyMsg)
+	keyMsg, ok := msg.(tea.KeyPressMsg)
 	if !ok {
 		return m, nil
 	}
@@ -54,7 +54,11 @@ func profileLabel(p string) string {
 	return p
 }
 
-func (m profilePickerModel) View() string {
+func (m profilePickerModel) View() tea.View {
+	return tea.NewView(m.viewContent())
+}
+
+func (m profilePickerModel) viewContent() string {
 	var b strings.Builder
 	b.WriteString(StyleTitle.Render("postctl") + "\n\n")
 	b.WriteString("Choose a profile:\n\n")

@@ -17,10 +17,10 @@ import (
 	"github.com/aeon022/postctl/internal/platforms"
 	"github.com/aeon022/postctl/internal/scheduler"
 	"github.com/aeon022/postctl/internal/store"
-	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/textarea"
-	"github.com/charmbracelet/bubbles/textinput"
-	tea "github.com/charmbracelet/bubbletea"
+	"charm.land/bubbles/v2/key"
+	"charm.land/bubbles/v2/textarea"
+	"charm.land/bubbles/v2/textinput"
+	tea "charm.land/bubbletea/v2"
 	"gopkg.in/yaml.v3"
 )
 
@@ -198,7 +198,7 @@ func NewModel(s *store.SQLiteStore) Model {
 	qInput := textinput.New()
 	qInput.Placeholder = "Mon 09:00, Wed 14:00, Fri 17:30"
 	qInput.CharLimit = 150
-	qInput.Width = 60
+	qInput.SetWidth(60)
 
 	return Model{
 		store:             s,
@@ -914,7 +914,7 @@ func (m Model) publishDuePostsCmd() tea.Msg {
 // Update reagiert auf Events und aktualisiert den Zustand
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.isEditing {
-		if keyMsg, ok := msg.(tea.KeyMsg); ok {
+		if keyMsg, ok := msg.(tea.KeyPressMsg); ok {
 			if m.showDatePicker {
 				switch keyMsg.String() {
 				case "esc", "ctrl+d":
@@ -1183,23 +1183,23 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.cursor = 0
 		return m, m.loadDataCmd
 
-	case tea.MouseMsg:
+	case tea.MouseWheelMsg:
 		if m.showReadme {
 			if m.readmeFocus == 0 {
 				switch msg.Button {
-				case tea.MouseButtonWheelUp:
+				case tea.MouseWheelUp:
 					m.tocCursor = max(0, m.tocCursor-1)
 					return m, nil
-				case tea.MouseButtonWheelDown:
+				case tea.MouseWheelDown:
 					m.tocCursor = min(len(m.readmeTOC)-1, m.tocCursor+1)
 					return m, nil
 				}
 			} else {
 				switch msg.Button {
-				case tea.MouseButtonWheelUp:
+				case tea.MouseWheelUp:
 					m.readmeScroll = max(0, m.readmeScroll-1)
 					return m, nil
-				case tea.MouseButtonWheelDown:
+				case tea.MouseWheelDown:
 					maxScroll := len(m.readmeLines) - m.getReadmeViewportHeight()
 					if maxScroll < 0 {
 						maxScroll = 0
@@ -1211,7 +1211,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		// Wenn wir die Queue Slots bearbeiten, verarbeite nur diese Tasten
 		if m.editingQueueSlots {
 			var cmd tea.Cmd
@@ -1316,7 +1316,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		// Leertaste wählt Post aus / wählt Post ab im Posts-Tab (Massenaktionen)
-		if m.activeTab == 1 && m.selectedPost == nil && !m.showReadme && msg.String() == " " {
+		if m.activeTab == 1 && m.selectedPost == nil && !m.showReadme && msg.String() == "space" {
 			filtered := m.getFilteredPosts()
 			if len(filtered) > 0 && m.cursor < len(filtered) {
 				p := filtered[m.cursor]
@@ -1709,7 +1709,16 @@ func (m Model) getFilteredPosts() []models.Post {
 }
 
 // View rendert den Bildschirm als Zeichenkette
-func (m Model) View() string {
+func (m Model) View() tea.View {
+	v := tea.NewView(m.viewContent())
+	// v1's WithAltScreen()/WithMouseCellMotion() Program options are gone in
+	// v2 — they are per-View fields now.
+	v.AltScreen = true
+	v.MouseMode = tea.MouseModeCellMotion
+	return v
+}
+
+func (m Model) viewContent() string {
 	if m.loading {
 		if m.statusMessage != "" {
 			return fmt.Sprintf("\n  ⏳ %s\n", m.statusMessage)

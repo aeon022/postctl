@@ -7,7 +7,7 @@ import (
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/store"
 	"github.com/aeon022/postctl/internal/tui"
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -54,7 +54,7 @@ func runTUI() error {
 	defer s.Close()
 
 	model := tui.NewModel(s)
-	p := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
+	p := tea.NewProgram(model)
 	
 	if _, err := p.Run(); err != nil {
 		return fmt.Errorf("run bubbletea program: %w", err)

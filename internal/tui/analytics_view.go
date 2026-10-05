@@ -5,7 +5,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 )
 
 // renderAnalytics rendert die Analytics-Ansicht (Tab 4)
@@ -84,15 +84,15 @@ func (m Model) renderAnalytics() string {
 	}
 
 	// Beides in Boxen verpacken (37 + 3 + 38 = 78)
-	box1 := StyleBox.Width(37).Height(7).Render(strings.TrimRight(sumCol.String(), "\n"))
-	box2 := StyleBox.Width(38).Height(7).Render(strings.TrimRight(chartCol.String(), "\n"))
+	box1 := StyleBox.Width(37 + 2).Height(7 + 2).Render(strings.TrimRight(sumCol.String(), "\n"))
+	box2 := StyleBox.Width(38 + 2).Height(7 + 2).Render(strings.TrimRight(chartCol.String(), "\n"))
 	builder.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, box1, "   ", box2) + "\n\n")
 
 	// 3b. Trend Chart (Letzte 30 Tage)
 	var trendCol strings.Builder
 	trendCol.WriteString(StyleHeader.Render("ENGAGEMENT-TREND (LETZTE 30 TAGE - Likes/Shares/Comments)") + "\n\n")
 	trendCol.WriteString(renderTrendChart(data.dailyEngagement) + "\n")
-	boxTrend := StyleBox.Width(78).Render(strings.TrimRight(trendCol.String(), "\n"))
+	boxTrend := StyleBox.Width(78 + 2).Render(strings.TrimRight(trendCol.String(), "\n"))
 	builder.WriteString(boxTrend + "\n\n")
 
 	// 4. Tabellen-Breakdown pro Plattform
@@ -114,7 +114,7 @@ func (m Model) renderAnalytics() string {
 		breakdown.WriteString("  Keine Beitragsdetails vorhanden.\n")
 	}
 
-	builder.WriteString(StyleBox.Width(78).Render(strings.TrimRight(breakdown.String(), "\n")))
+	builder.WriteString(StyleBox.Width(78 + 2).Render(strings.TrimRight(breakdown.String(), "\n")))
 
 	return builder.String()
 }

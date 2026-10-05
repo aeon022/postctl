@@ -8,7 +8,7 @@ import (
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
 func TestTUIBulkActions(t *testing.T) {
@@ -63,7 +63,7 @@ func TestTUIBulkActions(t *testing.T) {
 
 	// 3. Select first post (Space key)
 	m.cursor = 0
-	resModel, _ = m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune(" ")})
+	resModel, _ = m.Update(tea.KeyPressMsg{Code: tea.KeySpace, Text: " "})
 	m = resModel.(Model)
 
 	if !m.selectedPosts["post-1"] {
@@ -72,7 +72,7 @@ func TestTUIBulkActions(t *testing.T) {
 
 	// 4. Select second post (Space key)
 	m.cursor = 1
-	resModel, _ = m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune(" ")})
+	resModel, _ = m.Update(tea.KeyPressMsg{Code: tea.KeySpace, Text: " "})
 	m = resModel.(Model)
 
 	if !m.selectedPosts["post-2"] {
@@ -81,7 +81,7 @@ func TestTUIBulkActions(t *testing.T) {
 
 	// 5. Test Bulk Schedule
 	config.ActiveConfig.Scheduler.Slots = []string{"Mon 09:00", "Wed 14:00"}
-	resModel, cmd := m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("s")})
+	resModel, cmd := m.Update(tea.KeyPressMsg{Text: "s", Code: []rune("s")[0]})
 	m = resModel.(Model)
 
 	if cmd == nil {
@@ -119,7 +119,7 @@ func TestTUIBulkActions(t *testing.T) {
 	m.selectedPosts["post-1"] = true
 	m.selectedPosts["post-2"] = true
 
-	resModel, cmd = m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("d")})
+	resModel, cmd = m.Update(tea.KeyPressMsg{Text: "d", Code: []rune("d")[0]})
 	m = resModel.(Model)
 
 	if cmd == nil {

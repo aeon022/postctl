@@ -6,7 +6,7 @@ import (
 
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 )
 
 // settingKind classifies a settingsOptions() row for cursor movement and
@@ -114,7 +114,7 @@ func (m Model) renderSettings() string {
 			keysText = "Enter: Save  ·  Esc: Cancel"
 		}
 		builder.WriteString(StyleHelp.Render(keysText))
-		return StyleBox.Width(78).Height(21).Render(builder.String())
+		return StyleBox.Width(78 + 2).Height(21 + 2).Render(builder.String())
 	}
 
 	var builder strings.Builder
@@ -177,5 +177,5 @@ func (m Model) renderSettings() string {
 	}
 	builder.WriteString(StyleHelp.Render(Tr("settings_help_footer")))
 
-	return StyleBox.Width(78).Height(21).Render(builder.String())
+	return StyleBox.Width(78 + 2).Height(21 + 2).Render(builder.String())
 }

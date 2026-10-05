@@ -9,7 +9,7 @@ import (
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/store"
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
 func TestSettingsEnterKeyWithConfig(t *testing.T) {
@@ -29,7 +29,7 @@ func TestSettingsEnterKeyWithConfig(t *testing.T) {
 
 	// Test case for Bluesky (cursor 10)
 	m.cursor = 10
-	msg := tea.KeyMsg{Type: tea.KeyEnter}
+	msg := tea.KeyPressMsg{Code: tea.KeyEnter}
 
 	newModel, cmd := m.Update(msg)
 	updatedModel := newModel.(Model)
@@ -78,7 +78,7 @@ func TestSettingsEnterKeyNeedsSetup(t *testing.T) {
 
 	// Test case for Bluesky (cursor 10)
 	m.cursor = 10
-	msg := tea.KeyMsg{Type: tea.KeyEnter}
+	msg := tea.KeyPressMsg{Code: tea.KeyEnter}
 
 	newModel, cmd := m.Update(msg)
 	updatedModel := newModel.(Model)
@@ -133,14 +133,14 @@ func TestSettingsAutoPublishToggle(t *testing.T) {
 	m.loading = false
 	m.cursor = 3 // Auto-Publish
 
-	newModel, _ := m.Update(tea.KeyMsg{Type: tea.KeyRight})
+	newModel, _ := m.Update(tea.KeyPressMsg{Code: tea.KeyRight})
 	m = newModel.(Model)
 
 	if !config.ActiveConfig.Scheduler.AutoPublish {
 		t.Error("expected Scheduler.AutoPublish to flip to true after Right on cursor 3, stayed false")
 	}
 
-	newModel, _ = m.Update(tea.KeyMsg{Type: tea.KeyLeft})
+	newModel, _ = m.Update(tea.KeyPressMsg{Code: tea.KeyLeft})
 	m = newModel.(Model)
 
 	if config.ActiveConfig.Scheduler.AutoPublish {
@@ -152,7 +152,7 @@ func TestSettingsAutoPublishToggle(t *testing.T) {
 	// item is inserted before them — verify both landed correctly rather
 	// than trusting the arithmetic.
 	m.cursor = 4 // Language
-	newModel, _ = m.Update(tea.KeyMsg{Type: tea.KeyDown})
+	newModel, _ = m.Update(tea.KeyPressMsg{Code: tea.KeyDown})
 	m = newModel.(Model)
 	if m.cursor != 6 {
 		t.Errorf("Down from Language (cursor 4) = %d, want 6 (License at 5 must be skipped)", m.cursor)
