@@ -81,8 +81,11 @@ func (d *DevToPlatform) UploadImage(ctx context.Context, path string) (string, e
 }
 
 func (d *DevToPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
+	// Dev.to has no scheduling API: a post whose time is still in the future is
+	// saved as a draft. The scheduler calls Post when the time is DUE, with
+	// ScheduledAt still set (in the past) — that must publish, not draft.
 	published := true
-	if post.ScheduledAt != nil {
+	if post.ScheduledAt != nil && post.ScheduledAt.After(time.Now()) {
 		published = false
 	}
 

@@ -120,8 +120,11 @@ func (m *MediumPlatform) Post(ctx context.Context, post *models.Post) (string, e
 		return "", fmt.Errorf("get medium user ID: %w", err)
 	}
 
+	// Medium has no scheduling API: a post whose time is still in the future
+	// is saved as a draft. The scheduler calls Post when the time is DUE, with
+	// ScheduledAt still set (in the past) — that must publish, not draft.
 	publishStatus := "public"
-	if post.ScheduledAt != nil {
+	if post.ScheduledAt != nil && post.ScheduledAt.After(time.Now()) {
 		publishStatus = "draft"
 	}
 

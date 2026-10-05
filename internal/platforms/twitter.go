@@ -28,6 +28,8 @@ type TwitterPlatform struct {
 	clientID     string
 	clientSecret string
 	client       *http.Client
+	apiURL       string // API host; tests point it at httptest
+	uploadURL    string // media upload host; tests point it at httptest
 }
 
 func NewTwitterPlatform(s *store.SQLiteStore, clientID, clientSecret string) *TwitterPlatform {
@@ -36,6 +38,8 @@ func NewTwitterPlatform(s *store.SQLiteStore, clientID, clientSecret string) *Tw
 		clientID:     clientID,
 		clientSecret: clientSecret,
 		client:       &http.Client{Timeout: 15 * time.Second},
+		apiURL:       "https://api.twitter.com",
+		uploadURL:    "https://upload.twitter.com",
 	}
 }
 
@@ -116,7 +120,7 @@ func (t *TwitterPlatform) Auth(ctx context.Context) error {
 }
 
 func (t *TwitterPlatform) exchangeCodeForToken(ctx context.Context, code, verifier, redirectURI string) error {
-	tokenURL := "https://api.twitter.com/2/oauth2/token"
+	tokenURL := t.apiURL + "/2/oauth2/token"
 
 	data := url.Values{}
 	data.Set("code", code)
@@ -169,7 +173,7 @@ func (t *TwitterPlatform) exchangeCodeForToken(ctx context.Context, code, verifi
 
 // refreshToken aktualisiert das abgelaufene Access Token mittels Refresh Token
 func (t *TwitterPlatform) refreshToken(ctx context.Context, refreshToken string) (string, error) {
-	tokenURL := "https://api.twitter.com/2/oauth2/token"
+	tokenURL := t.apiURL + "/2/oauth2/token"
 
 	data := url.Values{}
 	data.Set("grant_type", "refresh_token")
@@ -258,7 +262,7 @@ func (t *TwitterPlatform) UploadImage(ctx context.Context, path string) (string,
 	}
 	defer file.Close()
 
-	uploadURL := "https://upload.twitter.com/1.1/media/upload.json"
+	uploadURL := t.uploadURL + "/1.1/media/upload.json"
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
@@ -393,7 +397,7 @@ func (t *TwitterPlatform) Post(ctx context.Context, post *models.Post) (string, 
 			return "", err
 		}
 
-		postURL := "https://api.twitter.com/2/tweets"
+		postURL := t.apiURL + "/2/tweets"
 		req, err := http.NewRequestWithContext(ctx, "POST", postURL, bytes.NewReader(tweetJSON))
 		if err != nil {
 			return "", err
@@ -451,7 +455,7 @@ func (t *TwitterPlatform) uploadImageCookieBased(ctx context.Context, path strin
 	}
 	defer file.Close()
 
-	uploadURL := "https://upload.twitter.com/1.1/media/upload.json"
+	uploadURL := t.uploadURL + "/1.1/media/upload.json"
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
@@ -937,7 +941,10 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 	}
 }
 
-// Delete is a stub for Twitter delete method
+// Delete is not implemented for Twitter yet. Returning an honest error
+// instead of nil matters: callers use this result to decide whether the
+// local post record is safe to remove, and a lying nil made postctl believe
+// a still-live tweet had been deleted (same fix as the other platforms).
 func (t *TwitterPlatform) Delete(ctx context.Context, platformID string) error {
-	return nil
+	return fmt.Errorf("twitter: delete not implemented — post %s was not removed from Twitter", platformID)
 }

@@ -12,6 +12,7 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
+	"html"
 	"io"
 	"log"
 	"math/big"
@@ -78,7 +79,7 @@ func StartCallbackServer(expectedState string, timeout time.Duration) (string, e
 			errChan <- fmt.Errorf("oauth error from provider: %s", authErr)
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("<h1>Authentifizierung fehlgeschlagen</h1><p>Fehler: " + authErr + "</p>"))
+			w.Write([]byte("<h1>Authentifizierung fehlgeschlagen</h1><p>Fehler: " + html.EscapeString(authErr) + "</p>"))
 			return
 		}
 

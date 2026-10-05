@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/aeon022/postctl/internal/config"
@@ -75,6 +76,16 @@ func (d *DiscordPlatform) Auth(ctx context.Context) error {
 	return nil
 }
 
+// postURL is the webhook URL with wait=true: without it Discord answers 204
+// and never reveals the message id, so the post could not be deleted later.
+func (d *DiscordPlatform) postURL() string {
+	sep := "?"
+	if strings.Contains(d.webhookURL, "?") {
+		sep = "&"
+	}
+	return d.webhookURL + sep + "wait=true"
+}
+
 func (d *DiscordPlatform) UploadImage(ctx context.Context, path string) (string, error) {
 	// Discord lädt Bilder direkt beim Posten hoch, daher geben wir einfach den Pfad zurück
 	return path, nil
@@ -102,7 +113,7 @@ func (d *DiscordPlatform) sendTextMessage(ctx context.Context, text string) (str
 		return "", err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", d.webhookURL, bytes.NewBuffer(jsonBytes))
+	req, err := http.NewRequestWithContext(ctx, "POST", d.postURL(), bytes.NewBuffer(jsonBytes))
 	if err != nil {
 		return "", err
 	}
@@ -145,7 +156,7 @@ func (d *DiscordPlatform) sendMultipartMessage(ctx context.Context, imgPaths []s
 	}
 	writer.Close()
 
-	req, err := http.NewRequestWithContext(ctx, "POST", d.webhookURL, body)
+	req, err := http.NewRequestWithContext(ctx, "POST", d.postURL(), body)
 	if err != nil {
 		return "", err
 	}
@@ -184,7 +195,10 @@ func parseDiscordResponse(resp *http.Response) (string, error) {
 // Delete löscht eine gesendete Webhook-Nachricht von Discord
 func (d *DiscordPlatform) Delete(ctx context.Context, platformID string) error {
 	if platformID == "webhook-posted" || platformID == "" {
-		return nil
+		// No message id was recorded (post predates wait=true), so there is
+		// nothing addressable to delete. Returning nil here made postctl drop
+		// the local record while the message stayed live in the channel.
+		return fmt.Errorf("discord: message id unknown — post was not removed from Discord (delete it in the channel manually)")
 	}
 
 	deleteURL := d.webhookURL + "/messages/" + platformID
