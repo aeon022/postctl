@@ -10,6 +10,9 @@ import (
 	"github.com/aeon022/postctl/internal/models"
 )
 
+// dryRunSleep paces the simulated calls; tests replace it with a no-op.
+var dryRunSleep = time.Sleep
+
 // DryRunPlatform ist eine Mock-Plattform für Test- und Simulationszwecke
 type DryRunPlatform struct {
 	platformName string
@@ -28,14 +31,14 @@ func (d *DryRunPlatform) Name() string {
 // Auth simuliert eine erfolgreiche Authentifizierung
 func (d *DryRunPlatform) Auth(ctx context.Context) error {
 	fmt.Fprintf(os.Stderr, "[DRY RUN] Authentifizierung für %s wird simuliert...\n", d.platformName)
-	time.Sleep(200 * time.Millisecond)
+	dryRunSleep(200 * time.Millisecond)
 	return nil
 }
 
 // Post simuliert die Veröffentlichung eines Beitrags (Ausgabe auf Stderr, damit Stdout frei für JSON bleibt)
 func (d *DryRunPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
 	fmt.Fprintf(os.Stderr, "[DRY RUN] Veröffentliche Beitrag auf %s...\n", d.platformName)
-	time.Sleep(500 * time.Millisecond)
+	dryRunSleep(500 * time.Millisecond)
 
 	if post.Type == "thread" {
 		fmt.Fprintf(os.Stderr, "[DRY RUN] Thread gepostet (%d Tweets):\n", len(post.Tweets))
@@ -62,7 +65,7 @@ func (d *DryRunPlatform) Post(ctx context.Context, post *models.Post) (string, e
 // UploadImage simuliert den Upload eines Bildes
 func (d *DryRunPlatform) UploadImage(ctx context.Context, path string) (string, error) {
 	fmt.Fprintf(os.Stderr, "[DRY RUN] Lade Bild hoch: %s...\n", path)
-	time.Sleep(300 * time.Millisecond)
+	dryRunSleep(300 * time.Millisecond)
 	fakeMediaID := fmt.Sprintf("dryrun-media-%d", rand.Int63n(100000))
 	return fakeMediaID, nil
 }
@@ -93,6 +96,6 @@ func (d *DryRunPlatform) FetchAnalytics(ctx context.Context, platformID string) 
 // Delete simuliert das Löschen eines Beitrags
 func (d *DryRunPlatform) Delete(ctx context.Context, platformID string) error {
 	fmt.Fprintf(os.Stderr, "[DRY RUN] Lösche Beitrag auf %s (ID: %s)...\n", d.platformName, platformID)
-	time.Sleep(200 * time.Millisecond)
+	dryRunSleep(200 * time.Millisecond)
 	return nil
 }

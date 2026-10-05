@@ -22,6 +22,8 @@ type LinkedInPlatform struct {
 	clientID     string
 	clientSecret string
 	client       *http.Client
+	authURL      string // OAuth host; tests point it at httptest
+	apiURL       string // REST API host; tests point it at httptest
 }
 
 func NewLinkedInPlatform(s *store.SQLiteStore, clientID, clientSecret string) *LinkedInPlatform {
@@ -30,6 +32,8 @@ func NewLinkedInPlatform(s *store.SQLiteStore, clientID, clientSecret string) *L
 		clientID:     clientID,
 		clientSecret: clientSecret,
 		client:       &http.Client{Timeout: 15 * time.Second},
+		authURL:      "https://www.linkedin.com",
+		apiURL:       "https://api.linkedin.com",
 	}
 }
 
@@ -95,7 +99,7 @@ func (l *LinkedInPlatform) Auth(ctx context.Context) error {
 }
 
 func (l *LinkedInPlatform) exchangeCodeForToken(ctx context.Context, code, redirectURI string) error {
-	tokenURL := "https://www.linkedin.com/oauth/v2/accessToken"
+	tokenURL := l.authURL + "/oauth/v2/accessToken"
 
 	data := url.Values{}
 	data.Set("grant_type", "authorization_code")
@@ -143,7 +147,7 @@ func (l *LinkedInPlatform) exchangeCodeForToken(ctx context.Context, code, redir
 
 // getMe urn liest den URN des angemeldeten Benutzers aus (z. B. urn:li:person:12345)
 func (l *LinkedInPlatform) getMeURN(ctx context.Context, token string) (string, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", "https://api.linkedin.com/v2/userinfo", nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", l.apiURL+"/v2/userinfo", nil)
 	if err != nil {
 		return "", err
 	}
@@ -172,7 +176,7 @@ func (l *LinkedInPlatform) getMeURN(ctx context.Context, token string) (string, 
 
 // Register und Upload für Bilder
 func (l *LinkedInPlatform) registerUpload(ctx context.Context, token, authorURN string) (uploadURL, assetURN string, err error) {
-	regURL := "https://api.linkedin.com/v2/assets?action=registerUpload"
+	regURL := l.apiURL + "/v2/assets?action=registerUpload"
 
 	reqBody := map[string]interface{}{
 		"registerUploadRequest": map[string]interface{}{
@@ -345,7 +349,7 @@ func (l *LinkedInPlatform) Post(ctx context.Context, post *models.Post) (string,
 		return "", err
 	}
 
-	postURL := "https://api.linkedin.com/v2/ugcPosts"
+	postURL := l.apiURL + "/v2/ugcPosts"
 	req, err := http.NewRequestWithContext(ctx, "POST", postURL, bytes.NewReader(jsonBytes))
 	if err != nil {
 		return "", err

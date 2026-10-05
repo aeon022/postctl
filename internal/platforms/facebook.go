@@ -25,6 +25,7 @@ type FacebookPlatform struct {
 	appSecret string
 	pageID    string
 	client    *http.Client
+	baseURL   string // Graph API root; tests point it at httptest
 }
 
 func NewFacebookPlatform(s *store.SQLiteStore, appID, appSecret, pageID string) *FacebookPlatform {
@@ -34,6 +35,7 @@ func NewFacebookPlatform(s *store.SQLiteStore, appID, appSecret, pageID string) 
 		appSecret: appSecret,
 		pageID:    pageID,
 		client:    &http.Client{Timeout: 20 * time.Second},
+		baseURL:   "https://graph.facebook.com/v19.0",
 	}
 }
 
@@ -136,7 +138,7 @@ func (f *FacebookPlatform) Auth(ctx context.Context) error {
 func (f *FacebookPlatform) exchangeCodeForPageToken(ctx context.Context, code, redirectURI string) error {
 	// 1. User Access Token holen
 	tokenURL := fmt.Sprintf(
-		"https://graph.facebook.com/v19.0/oauth/access_token?client_id=%s&redirect_uri=%s&client_secret=%s&code=%s",
+		f.baseURL+"/oauth/access_token?client_id=%s&redirect_uri=%s&client_secret=%s&code=%s",
 		url.QueryEscape(f.appID),
 		url.QueryEscape(redirectURI),
 		url.QueryEscape(f.appSecret),
@@ -164,7 +166,7 @@ func (f *FacebookPlatform) exchangeCodeForPageToken(ctx context.Context, code, r
 
 	// 2. Long-lived User Access Token generieren
 	longLivedUserURL := fmt.Sprintf(
-		"https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s",
+		f.baseURL+"/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s",
 		url.QueryEscape(f.appID),
 		url.QueryEscape(f.appSecret),
 		url.QueryEscape(userTokenResp.AccessToken),
@@ -191,7 +193,7 @@ func (f *FacebookPlatform) exchangeCodeForPageToken(ctx context.Context, code, r
 
 	// 3. Page Access Token für pageID holen
 	accountsURL := fmt.Sprintf(
-		"https://graph.facebook.com/v19.0/me/accounts?access_token=%s",
+		f.baseURL+"/me/accounts?access_token=%s",
 		url.QueryEscape(llUserTokenResp.AccessToken),
 	)
 
@@ -311,7 +313,7 @@ func (f *FacebookPlatform) Post(ctx context.Context, post *models.Post) (string,
 		}
 		defer file.Close()
 
-		photoURL := fmt.Sprintf("https://graph.facebook.com/v19.0/%s/photos", f.pageID)
+		photoURL := fmt.Sprintf(f.baseURL+"/%s/photos", f.pageID)
 
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
@@ -361,7 +363,7 @@ func (f *FacebookPlatform) Post(ctx context.Context, post *models.Post) (string,
 	}
 
 	// Standard-Textpost
-	feedURL := fmt.Sprintf("https://graph.facebook.com/v19.0/%s/feed", f.pageID)
+	feedURL := fmt.Sprintf(f.baseURL+"/%s/feed", f.pageID)
 	data := url.Values{}
 	data.Set("message", postBody)
 	data.Set("access_token", token)
@@ -402,7 +404,7 @@ func (f *FacebookPlatform) FetchAnalytics(ctx context.Context, platformID string
 	}
 
 	analyticsURL := fmt.Sprintf(
-		"https://graph.facebook.com/v19.0/%s?fields=likes.summary(true),comments.summary(true),shares&access_token=%s",
+		f.baseURL+"/%s?fields=likes.summary(true),comments.summary(true),shares&access_token=%s",
 		platformID,
 		token,
 	)

@@ -24,6 +24,7 @@ type BlueskyPlatform struct {
 	handle      string
 	appPassword string
 	client      *http.Client
+	baseURL     string // defaults to https://bsky.social; tests point it at httptest
 }
 
 func NewBlueskyPlatform(s *store.SQLiteStore, handle, appPassword string) *BlueskyPlatform {
@@ -35,6 +36,7 @@ func NewBlueskyPlatform(s *store.SQLiteStore, handle, appPassword string) *Blues
 		handle:      handle,
 		appPassword: appPassword,
 		client:      &http.Client{Timeout: 15 * time.Second},
+		baseURL:     "https://bsky.social",
 	}
 }
 
@@ -68,7 +70,7 @@ func (b *BlueskyPlatform) Auth(ctx context.Context) error {
 			"  4. Run the authentication command again.")
 	}
 
-	sessionURL := "https://bsky.social/xrpc/com.atproto.server.createSession"
+	sessionURL := b.baseURL + "/xrpc/com.atproto.server.createSession"
 
 	reqBody, err := json.Marshal(map[string]string{
 		"identifier": b.handle,
@@ -245,7 +247,7 @@ func (b *BlueskyPlatform) UploadImage(ctx context.Context, path string) (string,
 		contentType = "image/gif"
 	}
 
-	uploadURL := "https://bsky.social/xrpc/com.atproto.repo.uploadBlob"
+	uploadURL := b.baseURL + "/xrpc/com.atproto.repo.uploadBlob"
 	resp, body, err := b.doRequest(ctx, "POST", uploadURL, fileBytes, contentType)
 	if err != nil {
 		return "", err
@@ -391,7 +393,7 @@ func (b *BlueskyPlatform) Post(ctx context.Context, post *models.Post) (string, 
 			return "", err
 		}
 
-		postURL := "https://bsky.social/xrpc/com.atproto.repo.createRecord"
+		postURL := b.baseURL + "/xrpc/com.atproto.repo.createRecord"
 		resp, body, err := b.doRequest(ctx, "POST", postURL, reqBody, "application/json")
 		if err != nil {
 			return "", err
@@ -428,7 +430,7 @@ func (b *BlueskyPlatform) Post(ctx context.Context, post *models.Post) (string, 
 // FetchAnalytics frägt Interaktionen über den com.atproto/app.bsky Thread-Endpoint ab
 func (b *BlueskyPlatform) FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error) {
 	// platformID ist der URI-String, z.B. at://did:plc:xxx/app.bsky.feed.post/yyy
-	threadURL := fmt.Sprintf("https://bsky.social/xrpc/app.bsky.feed.getPostThread?uri=%s", url.QueryEscape(platformID))
+	threadURL := fmt.Sprintf("%s/xrpc/app.bsky.feed.getPostThread?uri=%s", b.baseURL, url.QueryEscape(platformID))
 	resp, body, err := b.doRequest(ctx, "GET", threadURL, nil, "")
 	if err != nil {
 		return models.AnalyticsData{}, err
@@ -489,7 +491,7 @@ func (b *BlueskyPlatform) Delete(ctx context.Context, platformID string) error {
 		return err
 	}
 
-	deleteURL := "https://bsky.social/xrpc/com.atproto.repo.deleteRecord"
+	deleteURL := b.baseURL + "/xrpc/com.atproto.repo.deleteRecord"
 	resp, body, err := b.doRequest(ctx, "POST", deleteURL, reqBody, "application/json")
 	if err != nil {
 		return err

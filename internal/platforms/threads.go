@@ -24,7 +24,14 @@ type ThreadsPlatform struct {
 	appID     string
 	appSecret string
 	client    *http.Client
+	baseURL   string // Graph host; tests point it at httptest
 }
+
+// Pauses between Threads API calls (publish retry, thread items); tests zero them.
+var (
+	threadsRetryDelay = 3 * time.Second
+	threadsPostGap    = 1 * time.Second
+)
 
 func NewThreadsPlatform(s *store.SQLiteStore, appID, appSecret string) *ThreadsPlatform {
 	return &ThreadsPlatform{
@@ -32,6 +39,7 @@ func NewThreadsPlatform(s *store.SQLiteStore, appID, appSecret string) *ThreadsP
 		appID:     appID,
 		appSecret: appSecret,
 		client:    &http.Client{Timeout: 15 * time.Second},
+		baseURL:   "https://graph.threads.net",
 	}
 }
 
@@ -132,7 +140,7 @@ func (t *ThreadsPlatform) Auth(ctx context.Context) error {
 
 func (t *ThreadsPlatform) exchangeCodeForToken(ctx context.Context, code, redirectURI string) error {
 	// 1. Short-Lived Access Token anfordern
-	shortLivedURL := "https://graph.threads.net/oauth/access_token"
+	shortLivedURL := t.baseURL + "/oauth/access_token"
 
 	data := url.Values{}
 	data.Set("client_id", t.appID)
@@ -169,7 +177,7 @@ func (t *ThreadsPlatform) exchangeCodeForToken(ctx context.Context, code, redire
 
 	// 2. Short-Lived Token in Long-Lived Token (60 Tage) umtauschen
 	longLivedURL := fmt.Sprintf(
-		"https://graph.threads.net/access_token?grant_type=th_exchange_token&client_secret=%s&access_token=%s",
+		t.baseURL+"/access_token?grant_type=th_exchange_token&client_secret=%s&access_token=%s",
 		url.QueryEscape(t.appSecret),
 		url.QueryEscape(shortLivedResp.AccessToken),
 	)
@@ -323,7 +331,7 @@ func (t *ThreadsPlatform) UploadImage(ctx context.Context, path string) (string,
 // Falls replyToID angegeben ist, wird der Beitrag als Antwort auf diesen deklariert.
 func (t *ThreadsPlatform) createAndPublishContainer(ctx context.Context, userID, token, text, imgPath, replyToID string) (string, error) {
 	// 1. Container erstellen
-	createURL := fmt.Sprintf("https://graph.threads.net/v1.0/%s/threads", userID)
+	createURL := fmt.Sprintf(t.baseURL+"/v1.0/%s/threads", userID)
 
 	params := url.Values{}
 	params.Set("text", text)
@@ -367,7 +375,7 @@ func (t *ThreadsPlatform) createAndPublishContainer(ctx context.Context, userID,
 	}
 
 	// 2. Container publizieren
-	publishURL := fmt.Sprintf("https://graph.threads.net/v1.0/%s/threads_publish", userID)
+	publishURL := fmt.Sprintf(t.baseURL+"/v1.0/%s/threads_publish", userID)
 
 	publishParams := url.Values{}
 	publishParams.Set("creation_id", createResp.ID)
@@ -383,7 +391,7 @@ func (t *ThreadsPlatform) createAndPublishContainer(ctx context.Context, userID,
 
 	for i := 0; i < maxRetries; i++ {
 		if i > 0 {
-			time.Sleep(3 * time.Second)
+			time.Sleep(threadsRetryDelay)
 		}
 
 		req, err = http.NewRequestWithContext(ctx, "POST", publishURL+"?"+publishParams.Encode(), nil)
@@ -456,7 +464,7 @@ func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, 
 
 		// Meta empfiehlt eine kurze Pause zwischen Veröffentlichungen, um Index-Konflikte zu vermeiden
 		if i > 0 {
-			time.Sleep(1 * time.Second)
+			time.Sleep(threadsPostGap)
 		}
 
 		postID, err := t.createAndPublishContainer(ctx, userID, token, content, imgPath, lastPostID)
@@ -493,7 +501,7 @@ func (t *ThreadsPlatform) Delete(ctx context.Context, platformID string) error {
 	}
 	// Meta Threads API delete endpoint: DELETE /{threads-media-id}
 	// Da der API-Endpunkt über graph.threads.net/v1.0 läuft, nutzen wir diese Basis
-	deleteURL := fmt.Sprintf("https://graph.threads.net/v1.0/%s", platformID)
+	deleteURL := fmt.Sprintf(t.baseURL+"/v1.0/%s", platformID)
 
 	params := url.Values{}
 	params.Set("access_token", token)
