@@ -89,6 +89,7 @@ func PublishPost(ctx context.Context, s *store.SQLiteStore, post *models.Post, d
 		Action:     "posted",
 		PlatformID: platformID,
 	})
+	LogPost("published", post)
 
 	return platformID, nil
 }

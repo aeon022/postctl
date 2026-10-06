@@ -438,6 +438,7 @@ func (m Model) bulkSchedulePostsCmd(ids []string) tea.Cmd {
 			if err := m.store.SavePost(ctx, post); err != nil {
 				return errorMsg{err}
 			}
+			scheduler.LogPost("scheduled", post)
 		}
 		return m.loadDataCmd()
 	}

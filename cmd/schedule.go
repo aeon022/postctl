@@ -89,6 +89,7 @@ var scheduleCmd = &cobra.Command{
 			reportScheduleError(fmt.Errorf("save scheduled post: %w", err), 2)
 			return
 		}
+		scheduler.LogPost("scheduled", post)
 
 		reportScheduleSuccess(post)
 	},

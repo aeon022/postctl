@@ -213,6 +213,9 @@ func handleCreatePost(_ context.Context, req mcp.CallToolRequest) (*mcp.CallTool
 	if err := s.SavePost(context.Background(), post); err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
+	if post.Status == models.StatusScheduled {
+		scheduler.LogPost("scheduled", post)
+	}
 	return jsonResult(map[string]any{"ok": true, "id": post.ID, "status": post.Status})
 }
 
@@ -269,6 +272,7 @@ func handleSchedulePost(_ context.Context, req mcp.CallToolRequest) (*mcp.CallTo
 	if err := s.SavePost(context.Background(), post); err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
 	}
+	scheduler.LogPost("scheduled", post)
 	return jsonResult(map[string]any{"ok": true, "id": id, "scheduled_at": t.Format(time.RFC3339)})
 }
 

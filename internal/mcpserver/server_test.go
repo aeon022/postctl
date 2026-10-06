@@ -3,8 +3,10 @@ package mcpserver
 import (
 	"context"
 	"encoding/json"
+	"github.com/aeon022/missionctl-core/activity"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/mark3labs/mcp-go/mcp"
 )
@@ -134,5 +136,33 @@ func TestListCampaignsEmpty(t *testing.T) {
 	isolate(t)
 	if text, isErr := call(t, handleListCampaigns, nil); isErr {
 		t.Errorf("list_campaigns on empty DB errored: %s", text)
+	}
+}
+
+func TestSchedulePostLogsOneScheduledEvent(t *testing.T) {
+	isolate(t)
+	t.Setenv("MISSIONCTL_DATA_DIR", t.TempDir())
+	id := create(t, map[string]any{"platform": "mastodon", "body": "entwurf", "title": "Mein Beitrag"})
+	if _, isErr := call(t, handleSchedulePost, map[string]any{"id": id, "schedule": "2026-12-24T18:00:00Z"}); isErr {
+		t.Fatal("schedule_post failed")
+	}
+	from, to := activity.Day(time.Now())
+	evs, err := activity.Read(from, to)
+	if err != nil || len(evs) != 1 || evs[0].Action != "scheduled" || !strings.HasPrefix(evs[0].Title, "Mein Beitrag → mastodon (2026-12-24 ") {
+		t.Fatalf("events = %+v, %v; want exactly one scheduled event", evs, err)
+	}
+}
+
+func TestCreateWithScheduleLogsAndPlainDraftDoesNot(t *testing.T) {
+	isolate(t)
+	t.Setenv("MISSIONCTL_DATA_DIR", t.TempDir())
+	create(t, map[string]any{"platform": "bluesky", "body": "nur ein Entwurf"})
+	from, to := activity.Day(time.Now())
+	if evs, _ := activity.Read(from, to); len(evs) != 0 {
+		t.Fatalf("a draft is not an activity: %+v", evs)
+	}
+	create(t, map[string]any{"platform": "bluesky", "body": "geplant", "schedule": "2026-12-01T09:00:00+01:00"})
+	if evs, _ := activity.Read(from, to); len(evs) != 1 || evs[0].Action != "scheduled" {
+		t.Errorf("scheduled create must log once: %+v", evs)
 	}
 }
