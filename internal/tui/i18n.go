@@ -137,6 +137,23 @@ var translationsMap = map[string]map[string]string{
 		"de": "STATISTIKEN",
 		"en": "STATS",
 	},
+	// Dashboard stats labels (value follows directly, so each ends in padding)
+	"stats_posted": {
+		"de": "Veröffentlicht: ",
+		"en": "Posted:       ",
+	},
+	"stats_scheduled": {
+		"de": "Geplant:        ",
+		"en": "Scheduled:    ",
+	},
+	"stats_drafts": {
+		"de": "Entwürfe:       ",
+		"en": "Drafts:       ",
+	},
+	"stats_failed": {
+		"de": "Fehlgeschlagen: ",
+		"en": "Failed:       ",
+	},
 	"dash_platforms": {
 		"de": "PLATTFORMEN",
 		"en": "PLATFORMS",
