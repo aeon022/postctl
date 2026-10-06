@@ -339,6 +339,20 @@ Twitter threads have no hard post count limit, but keep threads focused. Other p
 
 ---
 
+## Recent changes (October 2026)
+
+- **Scheduled posts.** On Dev.to and Medium a post whose scheduled time has arrived is now published; a draft is only created when the scheduled time is still in the future (before, due posts were saved as drafts while postctl showed them as posted).
+
+- **Discord.** Posts now return the real message ID (the webhook is called with `?wait=true`), so they can be deleted later.
+
+- **`postctl delete`.** It removes the post on the platform first and only then the local record. Twitter deletion is not implemented, and old Discord posts stored with the placeholder ID `webhook-posted` cannot be deleted remotely — in both cases it now stops with an error and keeps the local record instead of pretending success.
+
+- **OAuth callback.** The local callback page HTML-escapes the `error` text it shows.
+
+- **Tests.** The platform clients are covered by tests against mock HTTP servers (no network, no tokens needed).
+
+---
+
 ## Architecture
 
 ```
