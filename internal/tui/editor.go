@@ -356,7 +356,7 @@ func (m Model) renderEditor() string {
 	} else if m.editorFocus == 2 {
 		height = 25
 	}
-	return StyleBox.Width(78 + 2).Height(height + 2).Render(builder.String())
+	return StyleBox.Width(m.boxW(78)).Height(height + 2).Render(builder.String())
 }
 
 // renderCalendar zeichnet den interaktiven Kalender
@@ -413,29 +413,8 @@ func (m Model) checkCharacterLimits() (string, bool) {
 	platform := m.editorPlatform
 	body := m.editorBody.Value()
 
-	var limit int
-	switch platform {
-	case "twitter":
-		limit = 280
-	case "bluesky":
-		limit = 300
-	case "mastodon", "threads":
-		limit = 500
-	case "linkedin":
-		limit = 3000
-	case "telegram":
-		limit = 4096
-	case "discord":
-		limit = 2000
-	case "devto":
-		limit = 100000
-	case "reddit":
-		limit = 40000
-	case "hashnode":
-		limit = 100000
-	case "medium":
-		limit = 100000
-	default:
+	limit := platformLimit(platform)
+	if limit == 0 {
 		return "", true
 	}
 

@@ -1,45 +1,29 @@
 package tui
 
 import (
-	"image/color"
-	"os"
-
 	"charm.land/lipgloss/v2"
+	"github.com/aeon022/missionctl-core/theme"
 )
 
-// adaptive resolves a light/dark ANSI color pair once, at startup — v2 dropped
-// AdaptiveColor, and these package-level styles are built once, not per render.
-var adaptive = func() func(light, dark string) color.Color {
-	pick := lipgloss.LightDark(lipgloss.HasDarkBackground(os.Stdin, os.Stdout))
-	return func(light, dark string) color.Color { return pick(lipgloss.Color(light), lipgloss.Color(dark)) }
-}()
-
-// Palette — aligned with missionctl design system
+// Palette — theme-based, so the default `terminal` preset (and any other
+// preset) applies; see missionctl-core/theme.
 var (
-	ColorPrimary   = adaptive("25", "33")   // blue (header, borders)
-	ColorSecondary = adaptive("30", "43")   // teal (active/selected)
-	ColorDarkGray  = adaptive("250", "244") // subtle (inactive borders)
-	ColorLightGray = adaptive("243", "246") // muted (metadata, help)
-	ColorBgFg      = adaptive("232", "255") // badge foreground (dark/light swap)
+	ColorPrimary   = theme.BlueV2   // header, borders
+	ColorSecondary = theme.GreenV2  // active/selected
+	ColorDarkGray  = theme.SubtleV2 // inactive borders
+	ColorLightGray = theme.MutedV2  // metadata, help
+	ColorBgFg      = theme.OnAccentV2
 
 	// Status colors
-	ColorDraft     = adaptive("250", "239") // subtle gray
-	ColorScheduled = adaptive("214", "220") // amber
-	ColorPosted    = adaptive("28", "42")   // green
-	ColorFailed    = adaptive("160", "203") // red
+	ColorDraft     = theme.SubtleV2
+	ColorScheduled = theme.AmberV2
+	ColorPosted    = theme.GreenV2
+	ColorFailed    = theme.RedV2
 
-	// Per-status badge foregrounds. ColorBgFg (black in light mode, white in
-	// dark mode) only works for Draft, whose background follows the same
-	// light/dark split. Scheduled's amber is bright in *both* modes (214
-	// and 220 are both high-luminance yellow/orange — dark 220 in
-	// particular is close to pure yellow), so white text on it in dark mode
-	// was nearly invisible. Posted's and Failed's Light/Dark background
-	// values are inverted relative to Draft's (the light-mode green/red are
-	// the darker of their pair), so they need ColorBgFg's swap flipped, not
-	// dropped.
-	ColorOnScheduled = adaptive("232", "232") // always dark text — amber is light in both modes
-	ColorOnPosted    = adaptive("255", "232") // inverted: light-mode green is dark, dark-mode green is bright
-	ColorOnFailed    = adaptive("255", "255") // always light text — both reds are mid-dark
+	// Text on a status background (theme's "on accent" works for all of them).
+	ColorOnScheduled = theme.OnAccentV2
+	ColorOnPosted    = theme.OnAccentV2
+	ColorOnFailed    = theme.OnAccentV2
 )
 
 // Styles

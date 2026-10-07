@@ -114,7 +114,7 @@ func (m Model) renderSettings() string {
 			keysText = "Enter: Save  ·  Esc: Cancel"
 		}
 		builder.WriteString(StyleHelp.Render(keysText))
-		return StyleBox.Width(78 + 2).Height(21 + 2).Render(builder.String())
+		return StyleBox.Width(m.boxW(78)).Height(21 + 2).Render(builder.String())
 	}
 
 	var builder strings.Builder
@@ -177,5 +177,5 @@ func (m Model) renderSettings() string {
 	}
 	builder.WriteString(StyleHelp.Render(Tr("settings_help_footer")))
 
-	return StyleBox.Width(78 + 2).Height(21 + 2).Render(builder.String())
+	return StyleBox.Width(m.boxW(78)).Height(21 + 2).Render(builder.String())
 }

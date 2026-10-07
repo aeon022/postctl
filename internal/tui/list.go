@@ -3,244 +3,268 @@ package tui
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"charm.land/lipgloss/v2"
+	"github.com/aeon022/missionctl-core/theme"
+	"github.com/aeon022/missionctl-core/ui"
 	"github.com/aeon022/postctl/internal/models"
+	"github.com/charmbracelet/x/ansi"
 )
 
-// renderDashboard rendert die Dashboard-Ansicht (Tab 0)
-func (m Model) renderDashboard() string {
-	boxHeight := m.getBoxHeight()
+// ── dashboard (tab 0) ─────────────────────────────────────────────────────────
 
-	// Spalte 1: Campaigns & Next Up
-	var col1 strings.Builder
+var dashPlatforms = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads,
+	models.PlatformMastodon, models.PlatformBluesky, models.PlatformFacebook}
 
-	col1.WriteString(StyleHeader.Render(Tr("dash_campaigns")) + "\n")
-	if len(m.campaigns) == 0 {
-		col1.WriteString(Tr("dash_no_campaigns"))
-	} else {
-		innerCampaignsHeight := boxHeight - 14
-		visibleCampaigns := innerCampaignsHeight / 2
-		if visibleCampaigns < 2 {
-			visibleCampaigns = 2
-		}
-
-		startIdx := 0
-		endIdx := len(m.campaigns)
-		if len(m.campaigns) > visibleCampaigns {
-			startIdx = m.cursor - visibleCampaigns/2
-			if startIdx < 0 {
-				startIdx = 0
-			}
-			if startIdx+visibleCampaigns > len(m.campaigns) {
-				startIdx = len(m.campaigns) - visibleCampaigns
-			}
-			endIdx = startIdx + visibleCampaigns
-		}
-
-		for i := startIdx; i < endIdx; i++ {
-			c := m.campaigns[i]
-			cursor := "  "
-			if m.activeTab == 0 && i == m.cursor {
-				cursor = "> "
-			}
-			col1.WriteString(fmt.Sprintf("%s● %s\n"+Tr("dash_campaign_format"),
-				cursor, c.Slug, len(c.Posts), c.Posted, c.Scheduled))
-		}
+// window returns the [start,end) slice of n items that fits cap rows and keeps
+// cursor roughly centered.
+func window(n, cursor, capacity int) (int, int) {
+	capacity = max(capacity, 1)
+	if n <= capacity {
+		return 0, n
 	}
-	col1.WriteString("\n")
-
-	col1.WriteString(StyleHeader.Render(Tr("dash_next_up")) + "\n")
-	if len(m.nextUp) == 0 {
-		col1.WriteString(Tr("dash_no_schedules"))
-	} else {
-		// Maximal 5 anstehende Posts anzeigen
-		limit := 5
-		if len(m.nextUp) < limit {
-			limit = len(m.nextUp)
-		}
-		for i := 0; i < limit; i++ {
-			p := m.nextUp[i]
-			timeStr := ""
-			if p.ScheduledAt != nil {
-				timeStr = p.ScheduledAt.Format("Mon 15:04")
-			}
-			titlePreview := p.Title
-			if len(titlePreview) > 16 {
-				titlePreview = titlePreview[:13] + "..."
-			}
-			col1.WriteString(fmt.Sprintf("◷ %-11s %-8s %-2s  %s\n",
-				timeStr, strings.ToUpper(p.Platform), strings.ToUpper(p.Language), titlePreview))
-		}
-	}
-
-	// Spalte 2: Stats & Platforms
-	var col2 strings.Builder
-
-	col2.WriteString(StyleHeader.Render(Tr("dash_stats")) + "\n")
-	col2.WriteString(fmt.Sprintf("%s%d\n", Tr("stats_posted"), m.stats.posted))
-	col2.WriteString(fmt.Sprintf("%s%d\n", Tr("stats_scheduled"), m.stats.scheduled))
-	col2.WriteString(fmt.Sprintf("%s%d\n", Tr("stats_drafts"), m.stats.drafts))
-	col2.WriteString(fmt.Sprintf("%s%d\n", Tr("stats_failed"), m.stats.failed))
-	col2.WriteString("\n\n")
-
-	col2.WriteString(StyleHeader.Render(Tr("dash_platforms")) + "\n")
-	platforms := []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon, models.PlatformBluesky, models.PlatformFacebook}
-	for _, p := range platforms {
-		status := Tr("dash_not_auth")
-		if m.platforms[p] {
-			status = Tr("dash_connected")
-		}
-		name := p
-		if p == models.PlatformTwitter {
-			name = "Twitter/X"
-		} else if p == models.PlatformLinkedIn {
-			name = "LinkedIn"
-		} else if p == models.PlatformThreads {
-			name = "Threads"
-		} else if p == models.PlatformMastodon {
-			name = "Mastodon"
-		} else if p == models.PlatformBluesky {
-			name = "Bluesky"
-		} else if p == models.PlatformFacebook {
-			name = "Facebook"
-		}
-		col2.WriteString(fmt.Sprintf("%-10s %s\n", name+":", status))
-	}
-
-	// Beider Spalten in Boxen verpacken
-	box1 := StyleBox.Width(50 + 2).Height(boxHeight + 2).Render(col1.String())
-	box2 := StyleBox.Width(34 + 2).Height(boxHeight + 2).Render(col2.String())
-
-	return lipgloss.JoinHorizontal(lipgloss.Top, box1, "   ", box2)
+	start := min(max(cursor-capacity/2, 0), n-capacity)
+	return start, start + capacity
 }
 
-// renderPostList rendert die Liste aller Posts (Tab 1)
-func (m Model) renderPostList() string {
-	var builder strings.Builder
+// panelRowW is the usable text width inside a ui.Panel of the given width.
+func panelRowW(w int) int { return max(w-3, 4) }
 
-	headerText := Tr("header_posts")
+func (m Model) campaignLines(w, capacity int) []string {
+	if len(m.campaigns) == 0 {
+		return []string{dimStyle.Render(Tr("dash_no_campaigns"))}
+	}
+	start, end := window(len(m.campaigns), m.cursor, capacity)
+	var out []string
+	for i := start; i < end; i++ {
+		c := m.campaigns[i]
+		counts := fmt.Sprintf(Tr("dash_campaign_counts"), len(c.Posts), c.Posted, c.Scheduled)
+		out = append(out, ui.Row(w, m.activeTab == 0 && i == m.cursor, "● "+c.Slug+"  "+dimStyle.Render(counts)))
+	}
+	return out
+}
+
+func (m Model) nextUpLines(w, capacity int, now time.Time) []string {
+	if len(m.nextUp) == 0 {
+		return []string{dimStyle.Render(Tr("dash_no_schedules"))}
+	}
+	var out []string
+	for i := 0; i < len(m.nextUp) && i < capacity; i++ {
+		p := m.nextUp[i]
+		when := ""
+		if p.ScheduledAt != nil {
+			when = ui.RelTime(*p.ScheduledAt, now) + " " + p.ScheduledAt.Format("15:04")
+		}
+		title := ansi.Truncate(stripEmojis(p.Title), max(w-lipgloss.Width(when)-14, 6), "…")
+		out = append(out, "  "+dimStyle.Render(padRight(when, 15))+platformPill(p.Platform)+" "+title)
+	}
+	return out
+}
+
+func (m Model) statsLines() []string {
+	label := func(k string) string { return strings.TrimSpace(strings.TrimSuffix(strings.TrimSpace(Tr(k)), ":")) }
+	pill := func(k, trKey string, n int, kind ui.Kind) string {
+		if n == 0 && kind == ui.Err {
+			kind = ui.Muted
+		}
+		return ui.Pill(fmt.Sprintf("%s %d", label(trKey), n), kind)
+	}
+	return []string{
+		pill("", "stats_posted", m.stats.posted, ui.OK) + " " + pill("", "stats_scheduled", m.stats.scheduled, ui.Info),
+		pill("", "stats_drafts", m.stats.drafts, ui.Muted) + " " + pill("", "stats_failed", m.stats.failed, ui.Err),
+	}
+}
+
+func (m Model) platformLines() []string {
+	var out []string
+	for _, p := range dashPlatforms {
+		kind, status := ui.Muted, Tr("dash_not_auth")
+		if m.platforms[p] {
+			kind, status = ui.OK, Tr("dash_connected")
+		}
+		out = append(out, ui.Dot(kind)+" "+padRight(platformName(p), 12)+dimStyle.Render(status))
+	}
+	out = append(out, "", dimStyle.Render(Tr("dash_connect_hint")))
+	return out
+}
+
+// renderDashboard lays the four panels out responsively: two columns from
+// dashTwoCol, one below; sizes follow the terminal instead of fixed boxes.
+func (m Model) renderDashboard(w, h int) string {
+	now := time.Now()
+	focus := m.activeTab == 0
+	statsH := 4
+
+	if w >= dashTwoCol {
+		lw := (w - 1) * 11 / 20
+		rw := w - 1 - lw
+		hc := max(h/2, 5)
+		hn := max(h-hc, 5)
+		left := ui.Panel(lw, hc, Tr("dash_campaigns"), strings.Join(m.campaignLines(panelRowW(lw), hc-2), "\n"), focus) + "\n" +
+			ui.Panel(lw, hn, Tr("dash_next_up"), strings.Join(m.nextUpLines(panelRowW(lw), hn-2, now), "\n"), false)
+		right := ui.Panel(rw, statsH, Tr("dash_stats"), strings.Join(m.statsLines(), "\n"), false) + "\n" +
+			ui.Panel(rw, max(h-statsH, 6), Tr("dash_platforms"), strings.Join(m.platformLines(), "\n"), false)
+		return joinColumns(left, right, lw, 1)
+	}
+
+	rest := max(h-statsH, 6)
+	hc, hn := max(rest/3, 4), max(rest/3, 4)
+	hp := max(rest-hc-hn, 4)
+	return strings.Join([]string{
+		ui.Panel(w, statsH, Tr("dash_stats"), strings.Join(m.statsLines(), "\n"), false),
+		ui.Panel(w, hc, Tr("dash_campaigns"), strings.Join(m.campaignLines(panelRowW(w), hc-2), "\n"), focus),
+		ui.Panel(w, hn, Tr("dash_next_up"), strings.Join(m.nextUpLines(panelRowW(w), hn-2, now), "\n"), false),
+		ui.Panel(w, hp, Tr("dash_platforms"), strings.Join(m.platformLines(), "\n"), false),
+	}, "\n")
+}
+
+// joinColumns places two multi-line blocks side by side, padding the left one
+// to leftW so the right block lines up.
+func joinColumns(left, right string, leftW, gap int) string {
+	l, r := strings.Split(left, "\n"), strings.Split(right, "\n")
+	n := max(len(l), len(r))
+	var out []string
+	for i := 0; i < n; i++ {
+		a, b := "", ""
+		if i < len(l) {
+			a = l[i]
+		}
+		if i < len(r) {
+			b = r[i]
+		}
+		out = append(out, padRight(a, leftW)+strings.Repeat(" ", gap)+b)
+	}
+	return strings.Join(out, "\n")
+}
+
+// ── posts (tab 1) ─────────────────────────────────────────────────────────────
+
+// postRow is one post as a single selectable line: checkbox, platform pill,
+// status pill, title, and campaign/when on the right.
+func (m Model) postRow(p models.Post, w int, selected bool, now time.Time) string {
+	chk := "[ ] "
+	if m.selectedPosts[p.ID] {
+		chk = lipgloss.NewStyle().Foreground(theme.BlueV2).Bold(true).Render("[x] ")
+	}
+	left := chk + padRight(platformPill(p.Platform), 11) + statusPill(p.Status) + " "
+	right := whenText(p, now)
+	if p.Campaign != "" && w >= 90 {
+		right = strings.TrimSpace("📁 " + p.Campaign + "  " + right)
+	}
+	if right != "" {
+		right = " " + dimStyle.Render(right)
+	}
+	title := stripEmojis(p.Title)
+	if title == "" {
+		title = "(no title)"
+	}
+	titleW := max(w-2-lipgloss.Width(left)-lipgloss.Width(right), 4)
+	title = ansi.Truncate(title, titleW, "…")
+	pad := strings.Repeat(" ", max(titleW-lipgloss.Width(title), 0))
+	return ui.Row(w, selected, left+title+pad+right)
+}
+
+func (m Model) postsTitle() string {
 	if m.filterCampaign != "" {
-		headerText = fmt.Sprintf(Tr("posts_header_filtered"), m.filterCampaign)
+		return fmt.Sprintf(Tr("posts_header_filtered"), m.filterCampaign)
 	}
-	builder.WriteString(StyleHeader.Render(headerText) + "\n")
+	return Tr("header_posts")
+}
 
+// previewPanel shows the selected post: pills, schedule, campaign, the body
+// and — where the platform has a known limit — a character-limit bar.
+func (m Model) previewPanel(p *models.Post, w, h int) string {
+	var b strings.Builder
+	if p == nil {
+		return ui.Panel(w, h, "Preview", dimStyle.Render("—"), false)
+	}
+	cw := panelRowW(w)
+	b.WriteString(platformPill(p.Platform) + " " + statusPill(p.Status) + "\n")
+	if t := stripEmojis(p.Title); t != "" {
+		b.WriteString("\n" + ansi.Truncate(t, cw, "…") + "\n")
+	}
+	now := time.Now()
+	meta := []string{}
+	if wt := whenText(*p, now); wt != "" {
+		meta = append(meta, wt)
+	}
+	if p.Campaign != "" {
+		meta = append(meta, "📁 "+p.Campaign)
+	}
+	if p.Type == "thread" {
+		meta = append(meta, fmt.Sprintf(Tr("meta_thread"), len(p.Tweets)))
+	}
+	if len(p.Images) > 0 {
+		meta = append(meta, fmt.Sprintf(Tr("meta_images"), len(p.Images)))
+	}
+	if len(meta) > 0 {
+		b.WriteString(dimStyle.Render(strings.Join(meta, " · ")) + "\n")
+	}
+	if bar := limitBar(*p, min(cw-9, 24)); bar != "" {
+		b.WriteString(bar + "\n")
+	}
+	b.WriteString("\n")
+	body := p.Body
+	if p.Type == "thread" {
+		var parts []string
+		for i, t := range p.Tweets {
+			parts = append(parts, fmt.Sprintf("%d/%d  %s", i+1, len(p.Tweets), t.Content))
+		}
+		body = strings.Join(parts, "\n\n")
+	}
+	b.WriteString(ansi.Wrap(body, cw, " -"))
+	if p.Error != "" {
+		b.WriteString("\n\n" + ui.Toast(ui.Err, ansi.Truncate(p.Error, cw-2, "…")))
+	}
+	return ui.Panel(w, h, "Preview", strings.TrimRight(b.String(), "\n"), false)
+}
+
+// renderPostList renders the posts tab: single-line rows, and from wideBreak
+// columns a Preview panel for the selected post.
+func (m Model) renderPostList(w, h int) string {
 	if len(m.posts) == 0 {
-		builder.WriteString(Tr("posts_none_found"))
-		return StyleBox.Width(78 + 2).Height(12 + 2).Render(builder.String())
+		return emptyBody(w, h, Tr("posts_none_found"), Tr("posts_empty_hint"))
 	}
-
 	filtered := m.getFilteredPosts()
 	if len(filtered) == 0 {
-		builder.WriteString(fmt.Sprintf(Tr("posts_none_found_campaign"), m.filterCampaign))
-		return StyleBox.Width(78 + 2).Height(12 + 2).Render(builder.String())
+		return emptyBody(w, h, fmt.Sprintf(Tr("posts_none_found_campaign"), m.filterCampaign), Tr("posts_empty_hint"))
+	}
+	now := time.Now()
+	var sel *models.Post
+	if m.cursor >= 0 && m.cursor < len(filtered) {
+		sel = &filtered[m.cursor]
 	}
 
-	boxHeight := m.getBoxHeight()
-	windowSize := (boxHeight - 6) / 4
-	if windowSize < 2 {
-		windowSize = 2
-	}
-	startIdx := 0
-	endIdx := len(filtered)
-
-	if len(filtered) > windowSize {
-		startIdx = m.cursor - windowSize/2
-		if startIdx < 0 {
-			startIdx = 0
+	if w >= wideBreak {
+		lw := (w - 1) * 58 / 100
+		rw := w - 1 - lw
+		start, end := window(len(filtered), m.cursor, h-2)
+		var rows []string
+		for i := start; i < end; i++ {
+			rows = append(rows, m.postRow(filtered[i], panelRowW(lw), m.activeTab == 1 && i == m.cursor, now))
 		}
-		if startIdx+windowSize > len(filtered) {
-			startIdx = len(filtered) - windowSize
-		}
-		endIdx = startIdx + windowSize
+		left := ui.Panel(lw, h, m.postsTitle(), strings.Join(rows, "\n"), true)
+		return joinColumns(left, m.previewPanel(sel, rw, h), lw, 1)
 	}
 
-	for i := startIdx; i < endIdx; i++ {
-		p := filtered[i]
-		cursor := "  "
-		selected := false
-		if m.activeTab == 1 && i == m.cursor {
-			cursor = "> "
-			selected = true
-		}
-
-		// Status Badge rendern
-		var statusStr string
-		switch p.Status {
-		case models.StatusDraft:
-			statusStr = StyleStatusDraft.Render(" DRAFT ")
-		case models.StatusScheduled:
-			timeStr := ""
-			if p.ScheduledAt != nil {
-				timeStr = p.ScheduledAt.Format(" 02.01. 15:04")
-			}
-			statusStr = StyleStatusScheduled.Render(" SCHED" + timeStr + " ")
-		case models.StatusPosted:
-			timeStr := ""
-			if p.PostedAt != nil {
-				timeStr = p.PostedAt.Format(" 02.01. 15:04")
-			}
-			statusStr = StyleStatusPosted.Render(" POSTED" + timeStr + " ")
-		case models.StatusFailed:
-			statusStr = StyleStatusFailed.Render(" FAILED ")
-		}
-
-		// Metadata Info
-		metaInfo := ""
-		if p.Type == "thread" {
-			metaInfo = fmt.Sprintf(Tr("meta_thread"), len(p.Tweets))
-		} else {
-			metaInfo = Tr("meta_single")
-		}
-		if len(p.Images) > 0 {
-			metaInfo += " · " + fmt.Sprintf(Tr("meta_images"), len(p.Images))
-		}
-		if p.Campaign != "" {
-			metaInfo += " · 📁 " + p.Campaign
-		}
-
-		titlePreview := stripEmojis(p.Title)
-		if titlePreview == "" {
-			titlePreview = "(no title)"
-		}
-		if len(titlePreview) > 45 {
-			titlePreview = titlePreview[:42] + "..."
-		}
-
-		// Listeneintrag gestalten
-		lineColor := ColorLightGray
-		if selected {
-			lineColor = ColorSecondary
-		}
-		itemStyle := lipgloss.NewStyle().Foreground(lineColor)
-
-		checked := "[ ] "
-		if m.selectedPosts[p.ID] {
-			checked = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true).Render("[x] ")
-		}
-
-		builder.WriteString(fmt.Sprintf("%s%s%s / %s %s\n",
-			cursor, checked, strings.ToUpper(p.Platform), strings.ToUpper(p.Language), statusStr))
-		builder.WriteString(itemStyle.Render(fmt.Sprintf("    %q", titlePreview)) + "\n")
-		builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render(fmt.Sprintf("    %s", metaInfo)) + "\n\n")
+	start, end := window(len(filtered), m.cursor, h-1)
+	rows := []string{ui.Divider(w, m.postsTitle())}
+	for i := start; i < end; i++ {
+		rows = append(rows, m.postRow(filtered[i], w, m.activeTab == 1 && i == m.cursor, now))
 	}
-
-	return StyleBox.Width(84 + 2).Height(boxHeight + 2).Render(builder.String())
+	return strings.Join(rows, "\n")
 }
 
-// getBoxHeight berechnet die dynamische Höhe für die TUI-Boxen basierend auf der Terminal-Höhe
+// getBoxHeight is the height for the legacy fixed-size boxes: the body room
+// left by the header (4 rows), footer (1) and the spare row.
 func (m Model) getBoxHeight() int {
-	overhead := 12
-	if m.showHelp {
-		overhead = 26
-	}
-
-	h := m.height - overhead
+	h := m.height - 8
 	if h < 10 {
-		return 12 // Mindesthöhe
+		return 12 // minimum height
 	}
-	if h > 24 {
-		return 24 // Maximale Standardhöhe für Listenboxen
+	if h > 30 {
+		return 30
 	}
 	return h
 }

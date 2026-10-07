@@ -55,6 +55,90 @@ var translationsMap = map[string]map[string]string{
 		"de": "▤ LOGS",
 		"en": "▤ LOGS",
 	},
+	"hint_close": {
+		"de": "schließen",
+		"en": "close",
+	},
+	"hint_quit": {
+		"de": "beenden",
+		"en": "quit",
+	},
+	"hint_open": {
+		"de": "öffnen",
+		"en": "open",
+	},
+	"hint_new": {
+		"de": "neu",
+		"en": "new",
+	},
+	"hint_help": {
+		"de": "Hilfe",
+		"en": "help",
+	},
+	"hint_edit": {
+		"de": "bearbeiten",
+		"en": "edit",
+	},
+	"hint_delete": {
+		"de": "löschen",
+		"en": "delete",
+	},
+	"hint_schedule": {
+		"de": "einplanen",
+		"en": "schedule",
+	},
+	"hint_post": {
+		"de": "jetzt posten",
+		"en": "post now",
+	},
+	"hint_select": {
+		"de": "markieren",
+		"en": "select",
+	},
+	"hint_filter": {
+		"de": "Filter",
+		"en": "filter",
+	},
+	"hint_repurpose": {
+		"de": "umschreiben",
+		"en": "repurpose",
+	},
+	"hint_import": {
+		"de": "Import",
+		"en": "import",
+	},
+	"hint_tab": {
+		"de": "nächster Tab",
+		"en": "next tab",
+	},
+	"hint_manual": {
+		"de": "Handbuch",
+		"en": "manual",
+	},
+	"hint_clear": {
+		"de": "Filter löschen",
+		"en": "clear filter",
+	},
+	"hint_export": {
+		"de": "exportieren",
+		"en": "export",
+	},
+	"dash_campaign_counts": {
+		"de": "%d Beiträge · %d gepostet · %d geplant",
+		"en": "%d posts · %d posted · %d scheduled",
+	},
+	"dash_connect_hint": {
+		"de": "Plattformen im Tab SETTINGS verbinden",
+		"en": "Connect platforms in the SETTINGS tab",
+	},
+	"posts_empty_hint": {
+		"de": "Mit n einen Beitrag anlegen oder mit i importieren",
+		"en": "Press n to create a post, or i to import",
+	},
+	"queue_empty_hint": {
+		"de": "Mit s einen Beitrag einplanen",
+		"en": "Press s on a post to schedule it",
+	},
 	"header_logs": {
 		"de": "HINTERGRUND-LOGS (SYSTEMVERLAUF)",
 		"en": "BACKGROUND LOGS (SYSTEM ACTIVITY)",
@@ -163,8 +247,8 @@ var translationsMap = map[string]map[string]string{
 		"en": "Connected ✓",
 	},
 	"dash_not_auth": {
-		"de": "Nicht verbunden (Enter drücken)",
-		"en": "Not connected (Press Enter)",
+		"de": "Nicht verbunden",
+		"en": "Not connected",
 	},
 	"dash_no_campaigns": {
 		"de": "Keine Kampagnen gefunden.",

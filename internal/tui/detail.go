@@ -138,5 +138,5 @@ func (m Model) renderDetailView() string {
 		visibleContent.WriteString(lines[i] + "\n")
 	}
 
-	return StyleBox.Width(78 + 2).Height(boxHeight + 2).Render(visibleContent.String())
+	return StyleBox.Width(m.boxW(78)).Height(boxHeight + 2).Render(visibleContent.String())
 }

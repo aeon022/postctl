@@ -35,5 +35,5 @@ func (m Model) renderLogs() string {
 		}
 	}
 
-	return StyleBox.Width(84 + 2).Height(boxHeight + 2).Render(builder.String())
+	return StyleBox.Width(m.boxW(84)).Height(boxHeight + 2).Render(builder.String())
 }

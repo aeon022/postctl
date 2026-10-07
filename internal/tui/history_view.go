@@ -15,7 +15,7 @@ func (m Model) renderHistory() string {
 	builder.WriteString(StyleHeader.Render(Tr("header_history")) + "\n")
 	if len(m.history) == 0 {
 		builder.WriteString(Tr("history_none_found"))
-		return StyleBox.Width(84 + 2).Height(14 + 2).Render(builder.String())
+		return StyleBox.Width(m.boxW(84)).Height(14 + 2).Render(builder.String())
 	}
 
 	boxHeight := m.getBoxHeight()
@@ -88,7 +88,7 @@ func (m Model) renderHistory() string {
 		))
 	}
 
-	return StyleBox.Width(84 + 2).Height(boxHeight + 2).Render(builder.String())
+	return StyleBox.Width(m.boxW(84)).Height(boxHeight + 2).Render(builder.String())
 }
 
 // renderHelp rendert die Tastaturbefehle am unteren Bildschirmrand

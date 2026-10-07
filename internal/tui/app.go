@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/aeon022/missionctl-core/ui"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -1184,6 +1185,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.cursor = 0
 		return m, m.loadDataCmd
 
+	case tea.MouseClickMsg:
+		if msg.Button == tea.MouseLeft && msg.Y == tabsRow && !m.loading && m.err == nil && !m.isEditing &&
+			m.selectedPost == nil && m.selectedHistory == nil && !m.showReadme && !m.showHelp {
+			if i := m.tabAt(msg.X); i >= 0 && i != m.activeTab {
+				return m.switchTab(i)
+			}
+		}
+		return m, nil
+
 	case tea.MouseWheelMsg:
 		if m.showReadme {
 			if m.readmeFocus == 0 {
@@ -1412,22 +1422,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case key.Matches(msg, Keys.Tab):
-			m.activeTab = (m.activeTab + 1) % 7
-			m.cursor = 0
-			if m.activeTab == 4 {
-				m.analyticsLoading = true
-				return m, m.loadAnalyticsCmd
-			}
-			return m, nil
+			return m.switchTab(m.activeTab + 1)
 
 		case key.Matches(msg, Keys.ShiftTab):
-			m.activeTab = (m.activeTab - 1 + 7) % 7
-			m.cursor = 0
-			if m.activeTab == 4 {
-				m.analyticsLoading = true
-				return m, m.loadAnalyticsCmd
-			}
-			return m, nil
+			return m.switchTab(m.activeTab - 1)
 
 		case key.Matches(msg, Keys.Up):
 			if m.cursor > 0 {
@@ -1735,49 +1733,11 @@ func (m Model) viewContent() string {
 		return m.renderEditor()
 	}
 
-	var builder strings.Builder
-
-	// Header
-	builder.WriteString(StyleTitle.Render(" postctl — Social Media CLI "))
-	builder.WriteString("\n\n")
-
-	// Tabs
-	builder.WriteString(RenderTabs(m.activeTab))
-	builder.WriteString("\n")
-
-	// Inhalt je nach Tab / Zustand
-	var tabContent string
-	if m.selectedPost != nil {
-		tabContent = m.renderDetailView()
-	} else if m.selectedHistory != nil {
-		tabContent = m.renderHistoryDetailView()
-	} else if m.showReadme {
-		tabContent = m.renderReadme()
-	} else {
-		switch m.activeTab {
-		case 0:
-			tabContent = m.renderDashboard()
-		case 1:
-			tabContent = m.renderPostList()
-		case 2:
-			tabContent = m.renderSchedule()
-		case 3:
-			tabContent = m.renderHistory()
-		case 4:
-			tabContent = m.renderAnalytics()
-		case 5:
-			tabContent = m.renderSettings()
-		case 6:
-			tabContent = m.renderLogs()
-		}
-	}
-	builder.WriteString(tabContent)
-	builder.WriteString("\n\n")
-
-	// Hilfetext / Keybindings
-	builder.WriteString(m.renderHelp())
-
-	return builder.String()
+	w, h := m.bodyDims()
+	body := m.indentLines(m.tabBody(w, h))
+	header := m.indentLines(strings.Join(m.headerLines(), "\n"))
+	footer := m.indentLines(m.footerLine())
+	return ui.Frame(m.frameHeight(), header, body, footer)
 }
 
 func (m Model) repurposePostCmd(p *models.Post, targets []string) tea.Cmd {

@@ -236,7 +236,7 @@ func (m Model) renderReadmeTOC() string {
 	helpStr := "↑/↓/j/k: Navigation  ·  enter: Auswählen/Springen  ·  esc/q: Schließen"
 	builder.WriteString(StyleHelp.Render(helpStr))
 
-	return StyleBox.Width(outerWidth + 2).Height(outerHeight + 2).Render(builder.String())
+	return StyleBox.Width(m.boxW(outerWidth)).Height(outerHeight + 2).Render(builder.String())
 }
 
 func (m Model) renderReadmeContent() string {
@@ -365,7 +365,7 @@ func (m Model) renderReadmeContent() string {
 	helpStr := "↑/↓/j/k: Scrollen  ·  t/backspace: Zum Inhaltsverzeichnis  ·  esc/q: Schließen"
 	builder.WriteString(StyleHelp.Render(helpStr))
 
-	return StyleBox.Width(outerWidth + 2).Height(outerHeight + 2).Render(builder.String())
+	return StyleBox.Width(m.boxW(outerWidth)).Height(outerHeight + 2).Render(builder.String())
 }
 
 func (m Model) renderReadme() string {

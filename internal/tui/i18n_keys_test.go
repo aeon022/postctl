@@ -11,7 +11,8 @@ import (
 // English text — a missing key otherwise renders as the raw key (the
 // dashboard once showed "stats_posted0").
 func TestEveryTrKeyIsTranslated(t *testing.T) {
-	re := regexp.MustCompile(`\bTr\("([a-zA-Z0-9_]+)"\)`)
+	// Tr("key"), hint("k", "hint_key") and the {"k", "help_key"} rows of the help panel
+	re := regexp.MustCompile(`\bTr\("([a-zA-Z0-9_]+)"\)|\bhint\("[^"]*", "([a-zA-Z0-9_]+)"\)|\{"[^"]*", "((?:help|hint)_[a-zA-Z0-9_]+)"\}`)
 	entries, err := os.ReadDir(".")
 	if err != nil {
 		t.Fatal(err)
@@ -23,7 +24,11 @@ func TestEveryTrKeyIsTranslated(t *testing.T) {
 		}
 		b, _ := os.ReadFile(e.Name())
 		for _, m := range re.FindAllStringSubmatch(string(b), -1) {
-			used[m[1]] = e.Name()
+			for _, k := range m[1:] {
+				if k != "" {
+					used[k] = e.Name()
+				}
+			}
 		}
 	}
 	if len(used) < 20 {

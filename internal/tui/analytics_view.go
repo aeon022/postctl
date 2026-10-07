@@ -84,15 +84,19 @@ func (m Model) renderAnalytics() string {
 	}
 
 	// Beides in Boxen verpacken (37 + 3 + 38 = 78)
-	box1 := StyleBox.Width(37 + 2).Height(7 + 2).Render(strings.TrimRight(sumCol.String(), "\n"))
-	box2 := StyleBox.Width(38 + 2).Height(7 + 2).Render(strings.TrimRight(chartCol.String(), "\n"))
-	builder.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, box1, "   ", box2) + "\n\n")
+	box1 := StyleBox.Width(m.boxW(37)).Height(7 + 2).Render(strings.TrimRight(sumCol.String(), "\n"))
+	box2 := StyleBox.Width(m.boxW(38)).Height(7 + 2).Render(strings.TrimRight(chartCol.String(), "\n"))
+	if m.termW()-2*indent >= 82 {
+		builder.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, box1, "   ", box2) + "\n\n")
+	} else { // too narrow for two columns: stack them
+		builder.WriteString(box1 + "\n" + box2 + "\n\n")
+	}
 
 	// 3b. Trend Chart (Letzte 30 Tage)
 	var trendCol strings.Builder
 	trendCol.WriteString(StyleHeader.Render("ENGAGEMENT-TREND (LETZTE 30 TAGE - Likes/Shares/Comments)") + "\n\n")
 	trendCol.WriteString(renderTrendChart(data.dailyEngagement) + "\n")
-	boxTrend := StyleBox.Width(78 + 2).Render(strings.TrimRight(trendCol.String(), "\n"))
+	boxTrend := StyleBox.Width(m.boxW(78)).Render(strings.TrimRight(trendCol.String(), "\n"))
 	builder.WriteString(boxTrend + "\n\n")
 
 	// 4. Tabellen-Breakdown pro Plattform
@@ -114,7 +118,7 @@ func (m Model) renderAnalytics() string {
 		breakdown.WriteString("  Keine Beitragsdetails vorhanden.\n")
 	}
 
-	builder.WriteString(StyleBox.Width(78 + 2).Render(strings.TrimRight(breakdown.String(), "\n")))
+	builder.WriteString(StyleBox.Width(m.boxW(78)).Render(strings.TrimRight(breakdown.String(), "\n")))
 
 	return builder.String()
 }
