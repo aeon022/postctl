@@ -4,139 +4,66 @@ import (
 	"fmt"
 	"strings"
 
-	"charm.land/lipgloss/v2"
+	"github.com/aeon022/missionctl-core/ui"
 )
 
-// renderDetailView rendert die Detail- bzw. Previewansicht eines Posts
-func (m Model) renderDetailView() string {
+// kv is one dimmed "label  value" metadata row.
+func kv(label, value string) string { return dimStyle.Render(padRight(label, 13)) + value }
+
+// renderDetailView is the post preview: a scrollable focused panel.
+func (m Model) renderDetailView(w, h int) string {
 	if m.selectedPost == nil {
 		return ""
 	}
-
 	p := m.selectedPost
-	var builder strings.Builder
+	iw := panelRowW(w)
 
-	// Header der Detailansicht
-	titleStr := fmt.Sprintf(" PREVIEW: %s %s ", strings.ToUpper(p.Platform), strings.ToUpper(p.Language))
-	builder.WriteString(lipgloss.NewStyle().
-		Bold(true).
-		Foreground(ColorBgFg).
-		Background(ColorSecondary).
-		Padding(0, 1).
-		Render(titleStr))
-	builder.WriteString("\n\n")
-
-	// Metadaten
-	builder.WriteString(fmt.Sprintf("Campaign: %s\n", p.Campaign))
-	builder.WriteString(fmt.Sprintf("Type:     %s\n", p.Type))
-	statusStr := strings.ToUpper(p.Status)
+	lines := []string{platformPill(p.Platform) + " " + statusPill(p.Status), ""}
+	lines = append(lines, kv(Tr("detail_campaign"), p.Campaign), kv(Tr("detail_type"), p.Type))
+	status := strings.ToUpper(p.Status)
 	if p.ScheduledAt != nil {
-		statusStr += fmt.Sprintf(" (Scheduled at: %s)", p.ScheduledAt.Format("02.01.2006 15:04"))
+		status += " · " + Tr("detail_sched_at") + " " + p.ScheduledAt.Format("02.01.2006 15:04")
 	}
-	builder.WriteString(fmt.Sprintf("Status:   %s\n", statusStr))
+	lines = append(lines, kv(Tr("detail_status"), status))
 	if p.Error != "" {
-		builder.WriteString(lipgloss.NewStyle().Foreground(ColorFailed).Render(fmt.Sprintf("Error:    %s\n", p.Error)))
+		lines = append(lines, kv(Tr("detail_error"), ui.Pill(p.Error, ui.Err)))
 	}
-	builder.WriteString(fmt.Sprintf("File:     %s\n", p.SourceFile))
-	builder.WriteString("\n")
+	lines = append(lines, kv(Tr("detail_file"), p.SourceFile), "")
 
-	// Post Inhalt rendern
 	if p.Type == "thread" {
-		// Thread Tweets nacheinander auflisten
 		for i, tweet := range p.Tweets {
-			charCount := tweet.CharCount()
-			charLimitOk := tweet.IsValid()
-
-			// Charakter-Info
-			charStyle := lipgloss.NewStyle().Foreground(ColorPosted)
-			charText := fmt.Sprintf("[%d / 280 chars ✓]", charCount)
-			if !charLimitOk {
-				charStyle = lipgloss.NewStyle().Foreground(ColorFailed).Bold(true)
-				charText = fmt.Sprintf("[%d / 280 chars ✗ - TOO LONG]", charCount)
-			}
-
-			titleLine := fmt.Sprintf("Tweet %d/%d", i+1, len(p.Tweets))
+			title := fmt.Sprintf("%d/%d", i+1, len(p.Tweets))
 			if tweet.IsReply {
-				titleLine += " (Reply)"
+				title += " · " + Tr("detail_reply")
 			}
-
-			// Header Zeile des einzelnen Tweets
-			builder.WriteString(lipgloss.JoinHorizontal(lipgloss.Top,
-				StyleHeader.Render(titleLine),
-				" ",
-				charStyle.Render(charText),
-			) + "\n")
-
-			// Box für Tweet-Inhalt
-			tweetBoxStyle := lipgloss.NewStyle().
-				Border(lipgloss.RoundedBorder()).
-				BorderForeground(ColorDarkGray).
-				Width(65).
-				Padding(0, 1)
-			builder.WriteString(tweetBoxStyle.Render(tweet.Content) + "\n")
-
-			// Bilder-Info
+			count := fmt.Sprintf("%d/280", tweet.CharCount())
+			counter := ui.Pill(count+" ✓", ui.OK)
+			if !tweet.IsValid() {
+				counter = ui.Pill(count+" ✗ "+Tr("detail_too_long"), ui.Err)
+			}
+			lines = append(lines, ui.Divider(iw, title), counter)
+			for _, l := range wrapLines(tweet.Content, iw-2) {
+				lines = append(lines, "  "+l)
+			}
 			if tweet.Image != "" {
-				builder.WriteString(lipgloss.NewStyle().Foreground(ColorSecondary).Render(fmt.Sprintf("📎 Image: %s\n", tweet.Image)))
+				lines = append(lines, dimStyle.Render("📎 "+tweet.Image))
 			} else {
-				builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render("📎 No image\n"))
+				lines = append(lines, dimStyle.Render("📎 "+Tr("detail_no_image")))
 			}
-			builder.WriteString("\n")
+			lines = append(lines, "")
 		}
 	} else {
-		// Single Post Body rendern
-		builder.WriteString(StyleHeader.Render("Post Body") + "\n")
-		bodyBoxStyle := lipgloss.NewStyle().
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(ColorDarkGray).
-			Width(65).
-			Padding(1, 2)
-		builder.WriteString(bodyBoxStyle.Render(p.Body) + "\n")
-
+		lines = append(lines, ui.Divider(iw, strings.TrimSpace(strings.TrimSuffix(strings.TrimSpace(Tr("editor_label_body")), ":"))))
+		for _, l := range wrapLines(p.Body, iw-2) {
+			lines = append(lines, "  "+l)
+		}
 		if len(p.Images) > 0 {
-			builder.WriteString(StyleHeader.Render("Images:") + "\n")
+			lines = append(lines, "", ui.Divider(iw, Tr("panel_images")))
 			for _, img := range p.Images {
-				builder.WriteString(lipgloss.NewStyle().Foreground(ColorSecondary).Render(fmt.Sprintf("📎 %s\n", img)))
+				lines = append(lines, "📎 "+img)
 			}
 		}
 	}
-
-	// Legend / Action-Guide für den Footer
-	builder.WriteString("\n")
-	builder.WriteString(StyleHelp.Render("esc: back  ·  e: edit  ·  d: delete  ·  p: post now  ·  r: repurpose via AI  ·  j/k: scroll"))
-
-	// Dynamic height bounding and scrolling
-	boxHeight := m.getBoxHeight()
-	lines := strings.Split(builder.String(), "\n")
-	totalLines := len(lines)
-
-	visibleLines := boxHeight - 4
-	if visibleLines < 5 {
-		visibleLines = 5
-	}
-
-	maxOffset := totalLines - visibleLines
-	if maxOffset < 0 {
-		maxOffset = 0
-	}
-
-	offset := m.detailScrollOffset
-	if offset > maxOffset {
-		offset = maxOffset
-	}
-	if offset < 0 {
-		offset = 0
-	}
-
-	endIdx := offset + visibleLines
-	if endIdx > totalLines {
-		endIdx = totalLines
-	}
-
-	var visibleContent strings.Builder
-	for i := offset; i < endIdx; i++ {
-		visibleContent.WriteString(lines[i] + "\n")
-	}
-
-	return StyleBox.Width(m.boxW(78)).Height(boxHeight + 2).Render(visibleContent.String())
+	return scrollPanel(w, h, fmt.Sprintf("%s · %s %s", Tr("panel_preview"), strings.ToUpper(p.Platform), strings.ToUpper(p.Language)),
+		lines, m.detailScrollOffset, true)
 }

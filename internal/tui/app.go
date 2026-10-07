@@ -1729,10 +1729,6 @@ func (m Model) viewContent() string {
 		return fmt.Sprintf("\n  [FEHLER]: %v\n\n  Drücke ESC zum Schließen.\n", m.err)
 	}
 
-	if m.isEditing {
-		return m.renderEditor()
-	}
-
 	w, h := m.bodyDims()
 	body := m.indentLines(m.tabBody(w, h))
 	header := m.indentLines(strings.Join(m.headerLines(), "\n"))
@@ -1867,13 +1863,10 @@ func (m *Model) cycleSetting() {
 	_ = config.SaveConfig()
 }
 
+// getReadmeViewportHeight is the number of README lines the panel shows.
 func (m Model) getReadmeViewportHeight() int {
-	outerHeight := 22
-	if m.height > 10 {
-		outerHeight = max(22, m.height-4)
-	}
-	innerHeight := outerHeight - 4
-	return innerHeight - 2
+	_, h := m.bodyDims()
+	return max(h-2, 1)
 }
 
 type StringOrSlice []string

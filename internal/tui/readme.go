@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"charm.land/lipgloss/v2"
+	"github.com/aeon022/missionctl-core/ui"
+	"github.com/charmbracelet/x/ansi"
 )
 
 var readmeContent string
@@ -151,228 +153,84 @@ func getReadmeData() ([]string, []tocItem) {
 	return wrappedLines, toc
 }
 
-func (m Model) renderReadmeTOC() string {
-	var builder strings.Builder
-
-	// Dynamic Sizing
-	outerWidth := 78
-	outerHeight := 22
-	if m.width > 10 {
-		outerWidth = max(78, min(100, m.width-4))
-	}
-	if m.height > 10 {
-		outerHeight = max(22, m.height-4)
-	}
-
-	innerWidth := outerWidth - 6
-	innerHeight := outerHeight - 4
-
-	// Header
-	headerStr := " SYSTEM DOKUMENTATION & README — INHALTSVERZEICHNIS "
-	builder.WriteString(lipgloss.NewStyle().
-		Bold(true).
-		Foreground(ColorBgFg).
-		Background(ColorSecondary).
-		Padding(0, 1).
-		Render(headerStr))
-	builder.WriteString("\n\n")
-
-	// TOC List
-	var tocBuilder strings.Builder
+// renderReadmeTOC is the table of contents: one focused panel with
+// selectable rows indented by heading level.
+func (m Model) renderReadmeTOC(w, h int) string {
+	rw := panelRowW(w)
+	var rows []string
 	for i, item := range m.readmeTOC {
-		cursor := "  "
-		selected := false
-		if i == m.tocCursor {
-			cursor = "> "
-			selected = true
+		pad := strings.Repeat("  ", max(0, item.level-1))
+		title := ansi.Truncate(item.title, max(rw-lipgloss.Width(pad)-2, 4), "…")
+		style := lipgloss.NewStyle()
+		if item.level == 1 {
+			style = style.Bold(true).Foreground(ColorPrimary)
 		}
-
-		// Indentation based on heading level
-		indent := strings.Repeat("  ", max(0, item.level-1))
-		title := item.title
-
-		// Limit length to fit in column
-		runes := []rune(title)
-		maxLen := (innerWidth - 6) - len(indent)
-		if len(runes) > maxLen {
-			if maxLen > 2 {
-				title = string(runes[:maxLen-2]) + ".."
-			} else {
-				title = ".."
-			}
-		}
-
-		lineStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
-		if selected {
-			lineStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
-		} else if item.level == 1 {
-			lineStyle = lipgloss.NewStyle().Foreground(ColorPrimary).Bold(true)
-		} else if item.level > 2 {
-			lineStyle = lipgloss.NewStyle().Foreground(ColorLightGray)
-		}
-
-		tocBuilder.WriteString(fmt.Sprintf("%s%s%s\n", cursor, indent, lineStyle.Render(title)))
+		rows = append(rows, ui.Row(rw, i == m.tocCursor, pad+style.Render(title)))
 	}
-
-	// Pad remaining height in TOC list
-	linesRendered := len(m.readmeTOC)
-	if linesRendered < innerHeight {
-		for k := 0; k < innerHeight-linesRendered; k++ {
-			tocBuilder.WriteString("\n")
-		}
-	}
-
-	tocBoxStyle := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(ColorSecondary).
-		Width(innerWidth).
-		Height(innerHeight)
-
-	tocBox := tocBoxStyle.Render(tocBuilder.String())
-	builder.WriteString(tocBox)
-	builder.WriteString("\n\n")
-
-	// Help bar
-	helpStr := "↑/↓/j/k: Navigation  ·  enter: Auswählen/Springen  ·  esc/q: Schließen"
-	builder.WriteString(StyleHelp.Render(helpStr))
-
-	return StyleBox.Width(m.boxW(outerWidth)).Height(outerHeight + 2).Render(builder.String())
+	start, end := window(len(rows), m.tocCursor, max(h-2, 1))
+	return ui.Panel(w, h, Tr("panel_readme")+" · "+Tr("panel_toc"), strings.Join(rows[start:end], "\n"), true)
 }
 
-func (m Model) renderReadmeContent() string {
-	var builder strings.Builder
+func (m Model) renderReadmeContent(w, h int) string {
+	rw := panelRowW(w)
+	viewport := max(h-2, 1)
+	back := dimStyle.Render("  " + Tr("readme_back_to_top"))
 
-	// Dynamic Sizing
-	outerWidth := 78
-	outerHeight := 22
-	if m.width > 10 {
-		outerWidth = max(78, min(100, m.width-4))
-	}
-	if m.height > 10 {
-		outerHeight = max(22, m.height-4)
-	}
-
-	innerWidth := outerWidth - 6
-	innerHeight := outerHeight - 4
-	viewportHeight := innerHeight - 2
-
-	// Header
-	headerStr := " SYSTEM DOKUMENTATION & README "
-	builder.WriteString(lipgloss.NewStyle().
-		Bold(true).
-		Foreground(ColorBgFg).
-		Background(ColorSecondary).
-		Padding(0, 1).
-		Render(headerStr))
-	builder.WriteString("\n\n")
-
-	// Content Viewport
-	var contentBuilder strings.Builder
-
+	var out []string
 	inCodeBlock := false
-
-	// Determine code block state at m.readmeScroll
+	// code block state at m.readmeScroll
 	for i := 0; i < m.readmeScroll && i < len(m.readmeLines); i++ {
 		if strings.HasPrefix(strings.TrimSpace(m.readmeLines[i]), "```") {
 			inCodeBlock = !inCodeBlock
 		}
 	}
-
-	endLine := m.readmeScroll + viewportHeight
-	if endLine > len(m.readmeLines) {
-		endLine = len(m.readmeLines)
-	}
-
-	for i := m.readmeScroll; i < endLine; i++ {
+	for i := m.readmeScroll; i < min(m.readmeScroll+viewport, len(m.readmeLines)); i++ {
 		line := m.readmeLines[i]
 		trimmed := strings.TrimSpace(line)
 
-		// Codeblock marker toggle (cleanly hidden, styled by indentation)
-		if strings.HasPrefix(trimmed, "```") {
+		switch {
+		case strings.HasPrefix(trimmed, "```"): // marker hidden, block styled by color
 			inCodeBlock = !inCodeBlock
-			continue
-		}
-
-		if inCodeBlock {
-			contentBuilder.WriteString("  " + lipgloss.NewStyle().Foreground(ColorPosted).Render(line) + "\n")
-			continue
-		}
-
-		// Horizontal rule divider
-		if trimmed == "---" {
-			contentBuilder.WriteString(lipgloss.NewStyle().Foreground(ColorDarkGray).Render(strings.Repeat("─", innerWidth-4)) + "\n")
-			continue
-		}
-
-		// Formatting headers without markdown hashes and strip emojis for border safety
-		if strings.HasPrefix(trimmed, "# ") {
-			title := strings.ToUpper(strings.TrimPrefix(trimmed, "# "))
-			title = stripEmojis(title)
+		case inCodeBlock:
+			out = append(out, "  "+lipgloss.NewStyle().Foreground(ColorPosted).Render(line))
+		case trimmed == "---":
+			out = append(out, ui.Divider(rw, ""))
+		case strings.HasPrefix(trimmed, "# "):
 			if i > 0 {
-				contentBuilder.WriteString(lipgloss.NewStyle().Foreground(ColorDarkGray).Render("  ▲ t: Zurück zum Inhaltsverzeichnis / Back to Top") + "\n")
+				out = append(out, back)
 			}
-			contentBuilder.WriteString(lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("█ "+title) + "\n")
-		} else if strings.HasPrefix(trimmed, "## ") {
-			title := strings.TrimPrefix(trimmed, "## ")
-			title = stripEmojis(title)
+			out = append(out, lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("█ "+strings.ToUpper(stripEmojis(strings.TrimPrefix(trimmed, "# ")))))
+		case strings.HasPrefix(trimmed, "## "):
 			if i > 0 {
-				contentBuilder.WriteString(lipgloss.NewStyle().Foreground(ColorDarkGray).Render("  ▲ t: Zurück zum Inhaltsverzeichnis / Back to Top") + "\n")
+				out = append(out, back)
 			}
-			contentBuilder.WriteString(lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("❯ "+title) + "\n")
-		} else if strings.HasPrefix(trimmed, "### ") {
-			title := strings.TrimPrefix(trimmed, "### ")
-			title = stripEmojis(title)
-			contentBuilder.WriteString(lipgloss.NewStyle().Bold(true).Foreground(ColorPrimary).Render("  "+title) + "\n")
-		} else if strings.HasPrefix(trimmed, "#### ") {
-			title := strings.TrimPrefix(trimmed, "#### ")
-			title = stripEmojis(title)
-			contentBuilder.WriteString(lipgloss.NewStyle().Bold(true).Underline(true).Foreground(ColorLightGray).Render("  "+title) + "\n")
-		} else {
-			// Format bullet points
-			if strings.HasPrefix(trimmed, "* ") || strings.HasPrefix(trimmed, "- ") {
-				bullet := "•"
-				var text string
-				if len(trimmed) > 2 {
-					text = trimmed[2:]
-				}
-				text = formatInlineMarkdown(text)
-				contentBuilder.WriteString(lipgloss.NewStyle().Foreground(ColorSecondary).Render(bullet) + " " + text + "\n")
-			} else {
-				contentBuilder.WriteString(formatInlineMarkdown(line) + "\n")
+			out = append(out, lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("❯ "+stripEmojis(strings.TrimPrefix(trimmed, "## "))))
+		case strings.HasPrefix(trimmed, "### "):
+			out = append(out, lipgloss.NewStyle().Bold(true).Foreground(ColorPrimary).Render("  "+stripEmojis(strings.TrimPrefix(trimmed, "### "))))
+		case strings.HasPrefix(trimmed, "#### "):
+			out = append(out, lipgloss.NewStyle().Bold(true).Underline(true).Render("  "+stripEmojis(strings.TrimPrefix(trimmed, "#### "))))
+		case strings.HasPrefix(trimmed, "* ") || strings.HasPrefix(trimmed, "- "):
+			text := ""
+			if len(trimmed) > 2 {
+				text = trimmed[2:]
 			}
+			out = append(out, lipgloss.NewStyle().Foreground(ColorSecondary).Render("•")+" "+formatInlineMarkdown(text))
+		default:
+			out = append(out, formatInlineMarkdown(line))
 		}
 	}
-
-	// Pad remaining height if text is shorter than viewport height
-	linesRendered := endLine - m.readmeScroll
-	if linesRendered < viewportHeight {
-		for k := 0; k < viewportHeight-linesRendered; k++ {
-			contentBuilder.WriteString("\n")
-		}
+	title := Tr("panel_readme")
+	if n := len(m.readmeLines); n > 0 {
+		title += fmt.Sprintf("  %d/%d", min(m.readmeScroll+1, n), n)
 	}
-
-	contentBoxStyle := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(ColorSecondary).
-		Width(innerWidth).
-		Height(innerHeight)
-
-	contentBox := contentBoxStyle.Render(contentBuilder.String())
-	builder.WriteString(contentBox)
-	builder.WriteString("\n\n")
-
-	// Help bar
-	helpStr := "↑/↓/j/k: Scrollen  ·  t/backspace: Zum Inhaltsverzeichnis  ·  esc/q: Schließen"
-	builder.WriteString(StyleHelp.Render(helpStr))
-
-	return StyleBox.Width(m.boxW(outerWidth)).Height(outerHeight + 2).Render(builder.String())
+	return ui.Panel(w, h, title, strings.Join(out, "\n"), true)
 }
 
-func (m Model) renderReadme() string {
+func (m Model) renderReadme(w, h int) string {
 	if m.readmeFocus == 0 {
-		return m.renderReadmeTOC()
+		return m.renderReadmeTOC(w, h)
 	}
-	return m.renderReadmeContent()
+	return m.renderReadmeContent(w, h)
 }
 
 // Simple inline markdown formatting (e.g. code -> cyan, bold -> bold)

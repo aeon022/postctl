@@ -15,6 +15,7 @@ import (
 	"charm.land/bubbles/v2/textarea"
 	"charm.land/bubbles/v2/textinput"
 	"charm.land/lipgloss/v2"
+	"github.com/aeon022/missionctl-core/ui"
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 )
@@ -197,169 +198,127 @@ func (m *Model) saveEditedPost() error {
 }
 
 // renderEditor zeichnet die Editor-Maske im Terminal
-func (m Model) renderEditor() string {
+func (m Model) renderEditor(w, h int) string {
 	var builder strings.Builder
+	var fieldAt [7]int // line where each focus target starts, to keep the focused one in view
+	mark := func(i int) { fieldAt[i] = strings.Count(builder.String(), "\n") }
+	label := func(focus int, text string) string {
+		if m.editorFocus == focus {
+			return lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true).Render("➔ " + text)
+		}
+		return lipgloss.NewStyle().Foreground(ColorLightGray).Render("  " + text)
+	}
+	iw := panelRowW(w)
 
 	titleText := Tr("editor_title_create")
 	if m.editorPostID != "" {
 		titleText = Tr("editor_title_edit")
 	}
 
-	// Same app badge as every other screen (title+tabs) instead of this
-	// view's own separate style — the editor is the one screen that
-	// otherwise shows no postctl branding at all (it returns before the
-	// shared header in View() ever renders).
-	builder.WriteString(StyleTitle.Render(" postctl — Social Media CLI · " + titleText + " "))
-	builder.WriteString("\n\n")
-
-	// 1. Plattform
-	platPrefix := "  "
-	platStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
-	if m.editorFocus == 0 {
-		platPrefix = "➔ "
-		platStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
-	}
-	platformLabel := platPrefix + Tr("editor_label_platform")
-
-	platSelect := ""
-	platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord", "devto", "reddit", "hashnode", "medium"}
-	for i, p := range platformsList {
+	// 1. Plattform (wrapped so the selected one never falls off a narrow terminal)
+	mark(0)
+	var platSelect []string
+	for _, p := range []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord", "devto", "reddit", "hashnode", "medium"} {
 		if p == m.editorPlatform {
-			platSelect += lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("[" + strings.ToUpper(p) + "]")
+			platSelect = append(platSelect, lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("["+strings.ToUpper(p)+"]"))
 		} else {
-			platSelect += strings.ToUpper(p)
-		}
-		if i < len(platformsList)-1 {
-			platSelect += "  "
+			platSelect = append(platSelect, strings.ToUpper(p))
 		}
 	}
-	builder.WriteString(platStyle.Render(platformLabel) + " " + platSelect + "\n\n")
+	builder.WriteString(label(0, Tr("editor_label_platform")) + "\n")
+	for _, l := range wrapLines(strings.Join(platSelect, "  "), iw-4) {
+		builder.WriteString("    " + l + "\n")
+	}
+	builder.WriteString("\n")
 
 	// 2. Kampagne
-	campPrefix := "  "
-	campStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
-	if m.editorFocus == 1 {
-		campPrefix = "➔ "
-		campStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
-	}
-	campLabel := campPrefix + Tr("editor_label_campaign")
-	builder.WriteString(campStyle.Render(campLabel) + m.editorCampaign.View() + "\n\n")
+	mark(1)
+	builder.WriteString(label(1, Tr("editor_label_campaign")) + m.editorCampaign.View() + "\n\n")
 
 	// 3. Geplantes Datum
-	schedPrefix := "  "
-	schedStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
-	if m.editorFocus == 2 {
-		schedPrefix = "➔ "
-		schedStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
-	}
-	schedLabel := schedPrefix + Tr("editor_label_schedule")
-	builder.WriteString(schedStyle.Render(schedLabel) + m.editorScheduledAt.View() + "\n")
-	if m.showDatePicker {
-		builder.WriteString(m.renderCalendar(m.datePickerDate) + "\n\n")
-	} else if m.editorFocus == 2 {
-		if config.ActiveConfig.Defaults.Language == "de" {
-			builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render("     (Tipp: Schreibe 'now' / 'jetzt' für sofortigen Versand oder drücke ctrl+d)") + "\n\n")
-		} else {
-			builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render("     (Tip: Type 'now' for immediate publication or press ctrl+d)") + "\n\n")
-		}
+	mark(2)
+	builder.WriteString(label(2, Tr("editor_label_schedule")) + m.editorScheduledAt.View() + "\n")
+	if m.editorFocus == 2 && !m.showDatePicker {
+		builder.WriteString(dimStyle.Render("     "+Tr("editor_tip_now")) + "\n\n")
 	} else {
 		builder.WriteString("\n")
 	}
 
 	// 4. Bilder
-	imgPrefix := "  "
-	imgStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
-	if m.editorFocus == 3 {
-		imgPrefix = "➔ "
-		imgStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
-	}
-	imgLabel := imgPrefix + Tr("editor_label_images")
-	builder.WriteString(imgStyle.Render(imgLabel) + m.editorImages.View() + "\n")
-
-	// Bild-Vorschau anzeigen
-	imagesStr := m.editorImages.Value()
-	if strings.TrimSpace(imagesStr) != "" {
-		parts := strings.Split(imagesStr, ",")
-		for _, part := range parts {
-			trimmed := strings.TrimSpace(part)
-			if trimmed != "" {
-				fullPath := trimmed
-				if _, err := os.Stat(fullPath); os.IsNotExist(err) {
-					fullPath = filepath.Join(config.ActiveConfig.Defaults.ImageDir, trimmed)
-				}
-				if _, err := os.Stat(fullPath); err == nil {
-					preview := renderImageANSI(fullPath, 40, 10)
-					if preview != "" {
-						builder.WriteString("     " + lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true).Render("Vorschau:") + "\n" + preview + "\n")
-						break
-					}
-				}
-			}
+	mark(3)
+	builder.WriteString(label(3, Tr("editor_label_images")) + m.editorImages.View() + "\n")
+	for _, part := range strings.Split(m.editorImages.Value(), ",") {
+		trimmed := strings.TrimSpace(part)
+		if trimmed == "" {
+			continue
+		}
+		fullPath := trimmed
+		if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+			fullPath = filepath.Join(config.ActiveConfig.Defaults.ImageDir, trimmed)
+		}
+		if _, err := os.Stat(fullPath); err != nil {
+			continue
+		}
+		if preview := renderImageANSI(fullPath, 40, 10); preview != "" {
+			builder.WriteString("     " + lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true).Render(Tr("editor_preview_label")) + "\n" + preview + "\n")
+			break
 		}
 	}
-
 	if m.editorFocus == 3 {
-		builder.WriteString(lipgloss.NewStyle().Foreground(ColorLightGray).Render(Tr("editor_images_help")) + "\n\n")
+		builder.WriteString(dimStyle.Render(Tr("editor_images_help")) + "\n\n")
 	} else {
 		builder.WriteString("\n")
 	}
 
-	// 5. Text-Inhalt
-	bodyPrefix := "  "
-	bodyStyle := lipgloss.NewStyle().Foreground(ColorLightGray)
+	// 5. Text-Inhalt (width follows the terminal; local copy, the model keeps its own)
+	mark(4)
 	bodyLabel := Tr("editor_label_body")
 	if m.editorPlatform == "twitter" || m.editorPlatform == "mastodon" || m.editorPlatform == "bluesky" {
 		bodyLabel += Tr("editor_twitter_thread_note")
 	}
-	if m.editorFocus == 4 {
-		bodyPrefix = "➔ "
-		bodyStyle = lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true)
-	}
-	builder.WriteString(bodyStyle.Render(bodyPrefix+bodyLabel) + "\n" + m.editorBody.View() + "\n")
-
-	// Live Längen-Validierung
-	charLimitMsg, _ := m.checkCharacterLimits()
-	if charLimitMsg != "" {
+	body := m.editorBody
+	body.SetWidth(min(max(iw-4, 20), 100))
+	builder.WriteString(label(4, bodyLabel) + "\n" + body.View() + "\n")
+	if charLimitMsg, _ := m.checkCharacterLimits(); charLimitMsg != "" {
 		builder.WriteString("     " + charLimitMsg + "\n\n")
 	} else {
 		builder.WriteString("\n")
 	}
 
 	// 6. Action-Buttons
-	saveLabel := Tr("editor_save")
-	cancelLabel := Tr("editor_cancel")
-
+	mark(5)
+	fieldAt[6] = fieldAt[5]
+	saveLabel, cancelLabel := Tr("editor_save"), Tr("editor_cancel")
 	if m.editorFocus == 5 {
 		saveLabel = lipgloss.NewStyle().Bold(true).Foreground(ColorBgFg).Background(ColorPosted).Render(saveLabel)
 	} else {
 		saveLabel = lipgloss.NewStyle().Foreground(ColorPosted).Render(saveLabel)
 	}
-
 	if m.editorFocus == 6 {
 		cancelLabel = lipgloss.NewStyle().Bold(true).Foreground(ColorBgFg).Background(ColorFailed).Render(cancelLabel)
 	} else {
 		cancelLabel = lipgloss.NewStyle().Foreground(ColorFailed).Render(cancelLabel)
 	}
+	builder.WriteString("  " + saveLabel + "     " + cancelLabel)
 
-	builder.WriteString("  " + saveLabel + "     " + cancelLabel + "\n\n")
-
-	// Help footer
-	helpStr := Tr("editor_help_footer")
-	if m.editorFocus == 2 {
-		helpStr += "  ·  ctrl+d: Kalender"
+	// scroll so the focused field (and, for the body, its text area) is visible
+	room, span := max(h-2, 1), 3
+	switch {
+	case m.editorFocus == 4:
+		span = body.Height() + 2
+	case m.editorFocus >= 5:
+		span = 1
 	}
-	builder.WriteString(StyleHelp.Render(helpStr))
+	off := max(fieldAt[m.editorFocus]+span-room, 0)
+	page := scrollPanel(w, h, strings.TrimSpace(titleText), strings.Split(builder.String(), "\n"), off, true)
 
-	height := 24
 	if m.showDatePicker {
-		height = 33
-	} else if m.editorFocus == 2 {
-		height = 25
+		cal := ui.Panel(min(w, 30), 11, Tr("panel_calendar"), m.renderCalendar(m.datePickerDate), true)
+		return popup(page, cal, w, h)
 	}
-	return StyleBox.Width(m.boxW(78)).Height(height + 2).Render(builder.String())
+	return page
 }
 
-// renderCalendar zeichnet den interaktiven Kalender
 func (m Model) renderCalendar(selectedDate time.Time) string {
 	year := selectedDate.Year()
 	month := selectedDate.Month()
@@ -378,7 +337,7 @@ func (m Model) renderCalendar(selectedDate time.Time) string {
 	header := fmt.Sprintf("  <<< %s %d >>>  ", month.String(), year)
 
 	sb.WriteString("  " + lipgloss.NewStyle().Foreground(ColorSecondary).Bold(true).Render(header) + "\n")
-	sb.WriteString("   Mo Di Mi Do Fr Sa So\n")
+	sb.WriteString("   " + Tr("cal_weekdays") + "\n")
 	sb.WriteString("   ")
 
 	for i := 0; i < startOffset; i++ {
@@ -402,7 +361,6 @@ func (m Model) renderCalendar(selectedDate time.Time) string {
 		}
 	}
 
-	sb.WriteString("\n  (Pfeiltasten: Tag | p/n: Monat | Enter: Wählen | Esc: Schließen)")
 	return sb.String()
 }
 

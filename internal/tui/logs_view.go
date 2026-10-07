@@ -1,39 +1,22 @@
 package tui
 
 import (
-	"strings"
-
 	"github.com/aeon022/postctl/internal/platforms"
 )
 
-// renderLogs rendert die Log-Ansicht (Tab 6)
-func (m Model) renderLogs() string {
-	var builder strings.Builder
-
-	builder.WriteString(StyleHeader.Render(Tr("header_logs")) + "\n")
-
+// renderLogs is the logs tab: the newest background log lines in one panel.
+func (m Model) renderLogs(w, h int) string {
 	platforms.LogMu.Lock()
 	logs := make([]string, len(platforms.LogBuffer))
 	copy(logs, platforms.LogBuffer)
 	platforms.LogMu.Unlock()
 
-	boxHeight := m.getBoxHeight()
-	maxLogLines := boxHeight - 6
-	if maxLogLines < 5 {
-		maxLogLines = 5
-	}
-
 	if len(logs) == 0 {
-		builder.WriteString("  Keine Logs vorhanden. Hintergrund-Aktivitäten werden hier protokolliert.\n")
-	} else {
-		startIdx := len(logs) - maxLogLines
-		if startIdx < 0 {
-			startIdx = 0
-		}
-		for i := startIdx; i < len(logs); i++ {
-			builder.WriteString("  " + logs[i] + "\n")
-		}
+		return emptyBody(w, h, Tr("panel_logs"), Tr("logs_empty"))
 	}
-
-	return StyleBox.Width(m.boxW(84)).Height(boxHeight + 2).Render(builder.String())
+	room := max(h-2, 1)
+	if len(logs) > room {
+		logs = logs[len(logs)-room:]
+	}
+	return scrollPanel(w, h, Tr("panel_logs"), logs, 0, true)
 }

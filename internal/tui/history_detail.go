@@ -1,96 +1,32 @@
 package tui
 
 import (
-	"fmt"
 	"strings"
 
-	"charm.land/lipgloss/v2"
+	"github.com/aeon022/missionctl-core/ui"
 )
 
-// renderHistoryDetailView rendert die Detailansicht eines History-Eintrags
-func (m Model) renderHistoryDetailView() string {
+// renderHistoryDetailView is the detail of one history entry: a scrollable
+// focused panel with the metadata and the full output / error text.
+func (m Model) renderHistoryDetailView(w, h int) string {
 	if m.selectedHistory == nil {
 		return ""
 	}
+	e := m.selectedHistory
+	iw := panelRowW(w)
 
-	h := m.selectedHistory
-	var builder strings.Builder
-
-	// Header der Detailansicht
-	titleStr := fmt.Sprintf(" HISTORY DETAIL: %s ", strings.ToUpper(h.Action))
-	headerBg := ColorSecondary
-	if h.Action == "posted" {
-		headerBg = ColorPosted
-	} else if h.Action == "failed" {
-		headerBg = ColorFailed
+	lines := []string{actionPill(e.Action), ""}
+	lines = append(lines, kv(Tr("hd_timestamp"), e.CreatedAt.Format("02.01.2006 15:04:05")), kv(Tr("hd_post_id"), e.PostID))
+	if e.PlatformID != "" {
+		lines = append(lines, kv(Tr("hd_platform_id"), e.PlatformID))
 	}
-
-	builder.WriteString(lipgloss.NewStyle().
-		Bold(true).
-		Foreground(ColorBgFg).
-		Background(headerBg).
-		Padding(0, 1).
-		Render(titleStr))
-	builder.WriteString("\n\n")
-
-	// Metadaten
-	builder.WriteString(fmt.Sprintf("Timestamp:   %s\n", h.CreatedAt.Format("02.01.2006 15:04:05")))
-	builder.WriteString(fmt.Sprintf("Post ID:     %s\n", h.PostID))
-	if h.PlatformID != "" {
-		builder.WriteString(fmt.Sprintf("Platform ID: %s\n", h.PlatformID))
+	lines = append(lines, "", ui.Divider(iw, Tr("panel_output")))
+	text := e.Error
+	if text == "" {
+		text = Tr("hd_no_error")
 	}
-	builder.WriteString("\n")
-
-	// Details / Fehlermeldung
-	builder.WriteString(StyleHeader.Render("Full Output / Error Message:") + "\n")
-	contentBoxStyle := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(ColorDarkGray).
-		Width(72).
-		Padding(1, 2)
-
-	errText := h.Error
-	if errText == "" {
-		errText = "(No error recorded - Post published successfully)"
+	for _, l := range wrapLines(text, iw-2) {
+		lines = append(lines, "  "+l)
 	}
-	builder.WriteString(contentBoxStyle.Render(errText) + "\n")
-
-	// Legend / Action-Guide für den Footer
-	builder.WriteString("\n")
-	builder.WriteString(StyleHelp.Render("esc: back  ·  x: export this entry to JSON  ·  j/k: scroll"))
-
-	// Dynamic height bounding and scrolling
-	boxHeight := m.getBoxHeight()
-	lines := strings.Split(builder.String(), "\n")
-	totalLines := len(lines)
-
-	visibleLines := boxHeight - 4
-	if visibleLines < 5 {
-		visibleLines = 5
-	}
-
-	maxOffset := totalLines - visibleLines
-	if maxOffset < 0 {
-		maxOffset = 0
-	}
-
-	offset := m.detailScrollOffset
-	if offset > maxOffset {
-		offset = maxOffset
-	}
-	if offset < 0 {
-		offset = 0
-	}
-
-	endIdx := offset + visibleLines
-	if endIdx > totalLines {
-		endIdx = totalLines
-	}
-
-	var visibleContent strings.Builder
-	for i := offset; i < endIdx; i++ {
-		visibleContent.WriteString(lines[i] + "\n")
-	}
-
-	return StyleBox.Width(m.boxW(78)).Height(boxHeight + 2).Render(visibleContent.String())
+	return scrollPanel(w, h, Tr("panel_hdetail")+" · "+strings.ToUpper(e.Action), lines, m.detailScrollOffset, true)
 }

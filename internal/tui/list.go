@@ -255,16 +255,3 @@ func (m Model) renderPostList(w, h int) string {
 	}
 	return strings.Join(rows, "\n")
 }
-
-// getBoxHeight is the height for the legacy fixed-size boxes: the body room
-// left by the header (4 rows), footer (1) and the spare row.
-func (m Model) getBoxHeight() int {
-	h := m.height - 8
-	if h < 10 {
-		return 12 // minimum height
-	}
-	if h > 30 {
-		return 30
-	}
-	return h
-}

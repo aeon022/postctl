@@ -9,6 +9,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/aeon022/missionctl-core/emptystate"
+	"github.com/aeon022/missionctl-core/overlay"
 	"github.com/aeon022/missionctl-core/statusbar"
 	"github.com/aeon022/missionctl-core/theme"
 	"github.com/aeon022/missionctl-core/ui"
@@ -37,10 +38,6 @@ func (m Model) termW() int {
 
 // innerW is the width available inside the 2-column indent.
 func (m Model) innerW() int { return max(m.termW()-2*indent, 20) }
-
-// boxW is the width of a legacy fixed-size box (want = its old inner size),
-// shrunk to the terminal so nothing overflows narrow windows.
-func (m Model) boxW(want int) int { return min(want+2, max(m.termW()-2*indent, 10)) }
 
 func (m Model) scopeText() string {
 	parts := []string{}
@@ -117,8 +114,31 @@ func hint(key, trKey string) [2]string { return [2]string{key, Tr(trKey)} }
 // hintsFor lists the keys valid in the current state in priority order: `?` and
 // `q` come early so they are the last to be dropped on a narrow terminal.
 func (m Model) hintsFor() [][2]string {
-	if m.showHelp {
+	switch {
+	case m.showHelp:
 		return [][2]string{hint("?", "hint_close"), hint("q", "hint_quit")}
+	case m.isEditing && m.showDatePicker:
+		return [][2]string{hint("esc", "hint_close"), hint("enter", "hint_pick"), hint("←↑↓→", "hint_day"), hint("p/n", "hint_month")}
+	case m.isEditing:
+		h := [][2]string{hint("esc", "hint_cancel"), hint("tab", "hint_next"), hint("shift+tab", "hint_prev"), hint("ctrl+v", "hint_nvim")}
+		if m.editorFocus == 2 {
+			h = append(h, hint("ctrl+d", "hint_calendar"))
+		}
+		if m.editorFocus >= 5 {
+			h = append(h[:1], append([][2]string{hint("enter", "hint_pick")}, h[1:]...)...)
+		}
+		return h
+	case m.editingQueueSlots:
+		return [][2]string{hint("esc", "hint_cancel"), hint("enter", "hint_save")}
+	case m.showReadme && m.readmeFocus == 0:
+		return [][2]string{hint("esc", "hint_back"), hint("enter", "hint_jump"), hint("↑↓", "hint_move"), hint("tab", "hint_tab")}
+	case m.showReadme:
+		return [][2]string{hint("esc", "hint_back"), hint("↑↓", "hint_scroll"), hint("t", "hint_toc"), hint("tab", "hint_tab")}
+	case m.selectedPost != nil:
+		return [][2]string{hint("esc", "hint_back"), hint("e", "hint_edit"), hint("d", "hint_delete"), hint("p", "hint_post"),
+			hint("r", "hint_repurpose"), hint("j/k", "hint_scroll")}
+	case m.selectedHistory != nil:
+		return [][2]string{hint("esc", "hint_back"), hint("x", "hint_export"), hint("j/k", "hint_scroll")}
 	}
 	switch m.activeTab {
 	case 1: // posts
@@ -139,6 +159,9 @@ func (m Model) hintsFor() [][2]string {
 	case 0: // dashboard
 		return [][2]string{hint("enter", "hint_open"), hint("?", "hint_help"), hint("q", "hint_quit"), hint("n", "hint_new"),
 			hint("tab", "hint_tab"), hint("i", "hint_import"), hint("f1", "hint_manual")}
+	case 5: // settings
+		return [][2]string{hint("←/→", "hint_change"), hint("?", "hint_help"), hint("q", "hint_quit"), hint("enter", "hint_open"),
+			hint("d", "hint_reset"), hint("tab", "hint_tab"), hint("f1", "hint_manual")}
 	}
 	return [][2]string{hint("?", "hint_help"), hint("q", "hint_quit"), hint("enter", "hint_open"),
 		hint("tab", "hint_tab"), hint("f1", "hint_manual")}
@@ -150,7 +173,8 @@ func (m Model) footerLine() string {
 	switch {
 	case m.statusMessage != "":
 		right = ui.Toast(ui.Info, m.statusMessage)
-	case m.maxCursorItems() > 0 && (m.activeTab == 1 || m.activeTab == 2):
+	case m.maxCursorItems() > 0 && m.selectedPost == nil && m.selectedHistory == nil && !m.showReadme && !m.isEditing && !m.editingQueueSlots &&
+		(m.activeTab == 1 || m.activeTab == 2 || m.activeTab == 3 || m.activeTab == 5):
 		right = dimStyle.Render(fmt.Sprintf("%d/%d", m.cursor+1, m.maxCursorItems()))
 	}
 	left := statusbar.Hints(max(w-lipgloss.Width(right)-2, 10), m.hintsFor()...)
@@ -202,14 +226,29 @@ func (m Model) helpBody(w, h int) string {
 
 func (m Model) tabBody(w, h int) string {
 	switch {
-	case m.selectedPost != nil:
-		return m.renderDetailView()
-	case m.selectedHistory != nil:
-		return m.renderHistoryDetailView()
+	case m.isEditing:
+		return m.renderEditor(w, h)
 	case m.showReadme:
-		return m.renderReadme()
+		return m.renderReadme(w, h)
 	case m.showHelp:
-		return m.helpBody(w, h)
+		return popup(m.pageBody(w, h), m.helpBody(min(w, 64), h), w, h)
+	}
+	return m.pageBody(w, h)
+}
+
+// popup dims the page and centers pop over it in the w×h body area.
+func popup(page, pop string, w, h int) string {
+	page += strings.Repeat("\n", max(h-strings.Count(page, "\n")-1, 0))
+	return overlay.CenterDim(page, pop, w, h, 0)
+}
+
+// pageBody is the body of the current page without popups on top.
+func (m Model) pageBody(w, h int) string {
+	switch {
+	case m.selectedPost != nil:
+		return m.renderDetailView(w, h)
+	case m.selectedHistory != nil:
+		return m.renderHistoryDetailView(w, h)
 	}
 	switch m.activeTab {
 	case 0:
@@ -219,15 +258,41 @@ func (m Model) tabBody(w, h int) string {
 	case 2:
 		return m.renderSchedule(w, h)
 	case 3:
-		return m.renderHistory()
+		return m.renderHistory(w, h)
 	case 4:
-		return m.renderAnalytics()
+		return m.renderAnalytics(w, h)
 	case 5:
-		return m.renderSettings()
+		return m.renderSettings(w, h)
 	case 6:
-		return m.renderLogs()
+		return m.renderLogs(w, h)
 	}
 	return ""
+}
+
+// ── scrolling panels ──────────────────────────────────────────────────────────
+
+// wrapLines word-wraps s to w cells and splits it into lines.
+func wrapLines(s string, w int) []string {
+	return strings.Split(ansi.Wrap(s, max(w, 1), ""), "\n")
+}
+
+// scrollPanel draws lines in a focused w×h panel scrolled to offset (clamped
+// to the content); when the content overflows the title shows "from–to/total".
+func scrollPanel(w, h int, title string, lines []string, offset int, focused bool) string {
+	room := max(h-2, 1)
+	offset = min(max(offset, 0), max(len(lines)-room, 0))
+	end := min(offset+room, len(lines))
+	if len(lines) > room {
+		title += fmt.Sprintf("  %d–%d/%d", offset+1, end, len(lines))
+	}
+	return ui.Panel(w, h, title, strings.Join(lines[offset:end], "\n"), focused)
+}
+
+// aroundLine is the offset that keeps line visible in a room-row viewport
+// (roughly centered), for panels that follow a cursor instead of an offset.
+func aroundLine(total, line, room int) int {
+	start, _ := window(total, line, room)
+	return start
 }
 
 // ── shared bits ───────────────────────────────────────────────────────────────

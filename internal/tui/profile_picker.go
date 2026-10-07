@@ -2,12 +2,12 @@ package tui
 
 import (
 	"strings"
+	"time"
 
 	tea "charm.land/bubbletea/v2"
-	"charm.land/lipgloss/v2"
+	"github.com/aeon022/missionctl-core/statusbar"
+	"github.com/aeon022/missionctl-core/ui"
 )
-
-var styleProfilePickerRow = lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary)
 
 // profilePickerModel is a small standalone Bubble Tea program shown before
 // the main app when postctl is launched interactively with no --profile
@@ -15,15 +15,20 @@ var styleProfilePickerRow = lipgloss.NewStyle().Bold(true).Foreground(ColorSecon
 // — otherwise there'd be no way to reach anything but the default profile
 // short of remembering the flag every time.
 type profilePickerModel struct {
-	profiles []string // "" = default, else the profile name
-	cursor   int
-	chosen   string
-	selected bool
+	profiles      []string // "" = default, else the profile name
+	cursor        int
+	chosen        string
+	selected      bool
+	width, height int
 }
 
 func (m profilePickerModel) Init() tea.Cmd { return nil }
 
 func (m profilePickerModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if ws, ok := msg.(tea.WindowSizeMsg); ok {
+		m.width, m.height = ws.Width, ws.Height
+		return m, nil
+	}
 	keyMsg, ok := msg.(tea.KeyPressMsg)
 	if !ok {
 		return m, nil
@@ -49,29 +54,40 @@ func (m profilePickerModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func profileLabel(p string) string {
 	if p == "" {
-		return "default"
+		return Tr("picker_default")
 	}
 	return p
 }
 
 func (m profilePickerModel) View() tea.View {
-	return tea.NewView(m.viewContent())
+	v := tea.NewView(m.viewContent())
+	v.AltScreen = true
+	return v
 }
 
+// viewContent uses the same chrome as the main app: header, divider, a panel
+// with selectable rows and a one-line footer, exactly the terminal height.
 func (m profilePickerModel) viewContent() string {
-	var b strings.Builder
-	b.WriteString(StyleTitle.Render("postctl") + "\n\n")
-	b.WriteString("Choose a profile:\n\n")
-	for i, p := range m.profiles {
-		label := profileLabel(p)
-		if i == m.cursor {
-			b.WriteString("  > " + styleProfilePickerRow.Render(label) + "\n")
-		} else {
-			b.WriteString("    " + label + "\n")
-		}
+	w := 100
+	if m.width > 0 {
+		w = max(m.width-2*indent, 20)
 	}
-	b.WriteString("\n↑/↓ navigate  ·  enter: select  ·  esc: quit\n")
-	return b.String()
+	pad := func(s string) string {
+		return strings.Repeat(" ", indent) + strings.ReplaceAll(s, "\n", "\n"+strings.Repeat(" ", indent))
+	}
+
+	pw := min(w, 50)
+	rows := make([]string, len(m.profiles))
+	for i, p := range m.profiles {
+		rows[i] = ui.Row(panelRowW(pw), i == m.cursor, profileLabel(p))
+	}
+	ph := min(len(rows)+2, max(m.height-5, 3))
+	start, end := window(len(rows), m.cursor, ph-2)
+
+	header := pad(ui.Header(w, "postctl · Social Media", "", time.Now().Format("Mon 02 Jan")) + "\n" + ui.Divider(w, "") + "\n")
+	body := pad(ui.Panel(pw, ph, Tr("picker_title"), strings.Join(rows[start:end], "\n"), true))
+	footer := pad(statusbar.Line(w, statusbar.Hints(w, hint("enter", "hint_open"), hint("esc", "hint_quit"), hint("↑↓", "hint_move")), ""))
+	return ui.Frame(max(m.height-1, 0), header, body, footer)
 }
 
 // RunProfilePicker shows the picker over profiles (already including ""
