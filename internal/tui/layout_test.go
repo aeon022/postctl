@@ -18,7 +18,7 @@ func layoutModel(t *testing.T, w, h int) Model {
 	m := smokeModel(t, false)
 	now := time.Now()
 	for _, p := range []*models.Post{
-		{ID: "a", Platform: "bluesky", Status: models.StatusScheduled, Title: "Launch day thread", Body: "We are live! Here is what we built.", Campaign: "launch", ScheduledAt: ptr(now.Add(26 * time.Hour)), CreatedAt: now, UpdatedAt: now},
+		{ID: "a", Platform: "bluesky", Status: models.StatusScheduled, Title: "Launch day thread", Body: "We are live! Here is what we built.", Campaign: "launch", ScheduledAt: ptr(time.Date(now.Year(), now.Month(), now.Day()+1, 12, 0, 0, 0, now.Location())), CreatedAt: now, UpdatedAt: now},
 		{ID: "b", Platform: "twitter", Status: models.StatusDraft, Title: "A second post with a rather long title to test truncation", Body: "Draft body text", Campaign: "launch", CreatedAt: now, UpdatedAt: now},
 		{ID: "c", Platform: "linkedin", Status: models.StatusPosted, Title: "Posted article", Body: "Long body", PostedAt: ptr(now.Add(-48 * time.Hour)), CreatedAt: now, UpdatedAt: now},
 		{ID: "d", Platform: "mastodon", Status: models.StatusFailed, Title: "Failed one", Body: "x", Error: "401 unauthorized", CreatedAt: now, UpdatedAt: now},
