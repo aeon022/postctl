@@ -27,7 +27,7 @@ func Tr(key string) string {
 
 var translationsMap = map[string]map[string]string{
 	"st_converted":      {"de": "Erfolgreich konvertiert: %s", "en": "Converted: %s"},
-	"st_open_browser":   {"de": "Öffne Browser für %s...", "en": "Opening browser for %s..."},
+	"st_open_browser":   {"de": "Verbinde mit %s (ggf. öffnet sich der Browser)...", "en": "Connecting to %s (your browser may open)..."},
 	"st_reset_done":     {"de": "Verbindung und Einstellungen für %s wurden zurückgesetzt.", "en": "Connection and settings for %s were reset."},
 	"st_connected":      {"de": "Erfolgreich mit %s verbunden!", "en": "Connected to %s!"},
 	"st_config_done":    {"de": "Konfiguration erfolgreich %s!", "en": "Configuration %s successfully!"},

@@ -100,3 +100,20 @@ func TestConfigTestCmd(t *testing.T) {
 		t.Errorf("expected output to contain 'CONNECTION DIAGNOSTIC', got:\n%s", output)
 	}
 }
+
+func TestNormalizePageRef(t *testing.T) {
+	for in, want := range map[string]string{
+		"https://www.facebook.com/brueckegraz": "brueckegraz",
+		"facebook.com/brueckegraz/":            "brueckegraz",
+		"@brueckegraz":                         "brueckegraz",
+		" brueckegraz ":                        "brueckegraz",
+		"325053024200355":                      "325053024200355",
+		"https://www.facebook.com/profile.php?id=325053024200355":    "325053024200355",
+		"https://www.facebook.com/pages/Die-Bruecke/325053024200355": "325053024200355",
+		"\"Die Brücke\"": "Die Brücke",
+	} {
+		if got := normalizePageRef(in); got != want {
+			t.Errorf("normalizePageRef(%q) = %q, want %q", in, got, want)
+		}
+	}
+}

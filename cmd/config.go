@@ -477,8 +477,8 @@ var configSetupCmd = &cobra.Command{
 
 		// Titel ausgeben
 		fmt.Printf("=== postctl CONFIGURATION ASSISTANT: %s ===\n", strings.ToUpper(platform))
-		fmt.Println("Beschreibung: Dieser Assistent hilft dir, die nötigen API-Schlüssel für die")
-		fmt.Printf("              Plattform %s zu hinterlegen.\n", strings.ToUpper(platform))
+		fmt.Println(wl("Beschreibung: Dieser Assistent hilft dir, die nötigen API-Schlüssel für die", "About: this assistant helps you store the API credentials for the"))
+		fmt.Printf(wl("              Plattform %s zu hinterlegen.\n", "       platform %s.\n"), strings.ToUpper(platform))
 		fmt.Println("==========================================================================")
 		fmt.Println()
 
@@ -681,44 +681,7 @@ var configSetupCmd = &cobra.Command{
 			}
 
 		case "facebook":
-			fmt.Println("Schritt 1: Gehe zum Meta Developer Portal unter https://developers.facebook.com")
-			fmt.Println("Schritt 2: Erstelle eine App und füge das Produkt 'Facebook Login' hinzu")
-			fmt.Println("           mit Redirect-URI: https://localhost:8753/callback")
-			fmt.Println("Schritt 3: Finde deine Facebook-Page-ID auf der Info-Seite deiner Facebook-Seite")
-			fmt.Println("Schritt 4: Trage unten App-ID, App Secret und die Page-ID ein:")
-			fmt.Println()
-
-			fmt.Print("➔ App-ID: ")
-			appID, _ := reader.ReadString('\n')
-			appID = strings.TrimSpace(appID)
-
-			fmt.Print("➔ App Secret: ")
-			appSecret, _ := reader.ReadString('\n')
-			appSecret = strings.TrimSpace(appSecret)
-
-			fmt.Print("➔ Facebook Page ID: ")
-			pageID, _ := reader.ReadString('\n')
-			pageID = strings.TrimSpace(pageID)
-
-			fmt.Println()
-			fmt.Println("Optional: Seiten-Access-Token (aus dem Graph API Explorer: me/accounts → access_token der Seite).")
-			fmt.Println("Damit entfällt die Weiterleitungs-URL und der Browser-Login. Leer lassen für den normalen Login.")
-			fmt.Print("➔ Seiten-Access-Token: ")
-			pageToken, _ := reader.ReadString('\n')
-			pageToken = strings.TrimSpace(pageToken)
-
-			if pageToken != "" {
-				config.ActiveConfig.Facebook.PageToken = pageToken
-			}
-			if appID != "" {
-				config.ActiveConfig.Facebook.AppID = appID
-			}
-			if appSecret != "" {
-				config.ActiveConfig.Facebook.AppSecret = appSecret
-			}
-			if pageID != "" {
-				config.ActiveConfig.Facebook.PageID = pageID
-			}
+			facebookWizard(reader)
 
 		case "instagram":
 			fmt.Println("Voraussetzung: Instagram Professional-Konto (Business/Creator). Ausführlich: docs/bruecke-profil-setup.md")
@@ -886,7 +849,7 @@ var configSetupCmd = &cobra.Command{
 		}
 
 		fmt.Println()
-		fmt.Println("✅ Konfiguration erfolgreich in config.yaml gespeichert!")
+		fmt.Println(wl("✅ Konfiguration erfolgreich in config.yaml gespeichert!", "✅ Configuration saved to config.yaml!"))
 		fmt.Println("\nDrücke Enter, um fortzufahren...")
 		_, _ = reader.ReadString('\n')
 	},
