@@ -222,3 +222,25 @@ func TestThreadsContainerErrorAndDelete(t *testing.T) {
 		t.Errorf("analytics = %+v %v", a, err)
 	}
 }
+
+func TestThreadsPostCarousel(t *testing.T) {
+	srv, reqs := qServer(t, func(r qReq, n int, w http.ResponseWriter) {
+		if strings.HasSuffix(r.Path, "/threads") {
+			_, _ = w.Write([]byte(fmt.Sprintf(`{"id":"c%d"}`, n)))
+			return
+		}
+		_, _ = w.Write([]byte(fmt.Sprintf(`{"id":"post-of-%s"}`, r.Q.Get("creation_id"))))
+	})
+	p := newThreads(t, srv.URL, "77:TOK")
+	id, err := p.Post(context.Background(), &models.Post{Type: "single", Body: "week", Images: []string{"https://x/1.png", "https://x/2.png"}})
+	if err != nil || id != "post-of-c3" {
+		t.Fatalf("id=%q err=%v", id, err)
+	}
+	r := *reqs
+	// two items, the carousel container, then publish
+	if len(r) != 4 || r[0].Q.Get("is_carousel_item") != "true" || r[1].Q.Get("image_url") != "https://x/2.png" ||
+		r[2].Q.Get("media_type") != "CAROUSEL" || r[2].Q.Get("children") != "c1,c2" || r[2].Q.Get("text") != "week" ||
+		r[3].Path != "/v1.0/77/threads_publish" || r[3].Q.Get("creation_id") != "c3" {
+		t.Errorf("unexpected requests: %+v", r)
+	}
+}

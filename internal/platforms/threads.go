@@ -375,10 +375,15 @@ func (t *ThreadsPlatform) createAndPublishContainer(ctx context.Context, userID,
 	}
 
 	// 2. Container publizieren
+	return t.publishContainer(ctx, userID, token, createResp.ID)
+}
+
+// publishContainer publishes a created container, retrying while Threads still indexes it.
+func (t *ThreadsPlatform) publishContainer(ctx context.Context, userID, token, creationID string) (string, error) {
 	publishURL := fmt.Sprintf(t.baseURL+"/v1.0/%s/threads_publish", userID)
 
 	publishParams := url.Values{}
-	publishParams.Set("creation_id", createResp.ID)
+	publishParams.Set("creation_id", creationID)
 	publishParams.Set("access_token", token)
 
 	var publishResp struct {
@@ -394,12 +399,12 @@ func (t *ThreadsPlatform) createAndPublishContainer(ctx context.Context, userID,
 			time.Sleep(threadsRetryDelay)
 		}
 
-		req, err = http.NewRequestWithContext(ctx, "POST", publishURL+"?"+publishParams.Encode(), nil)
+		req, err := http.NewRequestWithContext(ctx, "POST", publishURL+"?"+publishParams.Encode(), nil)
 		if err != nil {
 			return "", err
 		}
 
-		resp, err = t.client.Do(req)
+		resp, err := t.client.Do(req)
 		if err != nil {
 			lastErr = fmt.Errorf("publish threads container request: %w", err)
 			continue
@@ -429,6 +434,48 @@ func (t *ThreadsPlatform) createAndPublishContainer(ctx context.Context, userID,
 	return "", fmt.Errorf("after %d retries: %w", maxRetries, lastErr)
 }
 
+// postCarousel publishes 2-20 images as one carousel post.
+func (t *ThreadsPlatform) postCarousel(ctx context.Context, userID, token, text string, images []string) (string, error) {
+	create := func(params url.Values) (string, error) {
+		params.Set("access_token", token)
+		req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf(t.baseURL+"/v1.0/%s/threads?", userID)+params.Encode(), nil)
+		if err != nil {
+			return "", err
+		}
+		resp, err := t.client.Do(req)
+		if err != nil {
+			return "", err
+		}
+		defer resp.Body.Close()
+		b, _ := io.ReadAll(resp.Body)
+		var r struct {
+			ID string `json:"id"`
+		}
+		if resp.StatusCode != http.StatusOK || json.Unmarshal(b, &r) != nil || r.ID == "" {
+			return "", fmt.Errorf("threads container failed (status %d): %s", resp.StatusCode, b)
+		}
+		return r.ID, nil
+	}
+
+	var kids []string
+	for _, img := range images {
+		u, err := t.UploadImage(ctx, img)
+		if err != nil {
+			return "", err
+		}
+		id, err := create(url.Values{"media_type": {"IMAGE"}, "image_url": {u}, "is_carousel_item": {"true"}})
+		if err != nil {
+			return "", err
+		}
+		kids = append(kids, id)
+	}
+	parent, err := create(url.Values{"media_type": {"CAROUSEL"}, "children": {strings.Join(kids, ",")}, "text": {text}})
+	if err != nil {
+		return "", err
+	}
+	return t.publishContainer(ctx, userID, token, parent)
+}
+
 // Post veröffentlicht einen einzelnen Beitrag oder einen Thread auf Threads
 func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
 	userID, token, err := t.getUserIDAndToken(ctx)
@@ -445,6 +492,12 @@ func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, 
 			images = append(images, tw.Image)
 		}
 	} else {
+		if len(post.Images) > 1 {
+			if len(post.Images) > 20 {
+				return "", fmt.Errorf("threads: a carousel holds at most 20 images, got %d", len(post.Images))
+			}
+			return t.postCarousel(ctx, userID, token, post.Body, post.Images)
+		}
 		contents = []string{post.Body}
 		var img string
 		if len(post.Images) > 0 {
