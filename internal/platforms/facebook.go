@@ -476,9 +476,10 @@ func (f *FacebookPlatform) Delete(ctx context.Context, platformID string) error 
 	return doDelete(f.client, req, "facebook")
 }
 
-// useStaticPageToken accepts either a Page access token or a user token that manages the
-// page (then the page's own token is looked up via /me/accounts), resolves the numeric page
-// id (page_id may be the vanity name), verifies the result really is the page and stores it.
+// useStaticPageToken accepts a Page access token or a user token that manages the page
+// (the page's own token is then read from the page node, or from /me/accounts), resolves the
+// numeric page id (page_id may be the vanity name), verifies the final token really acts as
+// the page and stores it.
 func (f *FacebookPlatform) useStaticPageToken(ctx context.Context, token string) error {
 	get := func(path, tok string) (int, []byte, error) {
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, f.baseURL+path+"&access_token="+url.QueryEscape(tok), nil)
@@ -493,52 +494,66 @@ func (f *FacebookPlatform) useStaticPageToken(ctx context.Context, token string)
 		b, _ := io.ReadAll(resp.Body)
 		return resp.StatusCode, b, nil
 	}
-	same := func(id, username, name string) bool {
-		return id == f.pageID || strings.EqualFold(username, f.pageID) || strings.EqualFold(name, f.pageID)
-	}
 
-	// A user token lists its pages; take the matching page's own token.
-	if code, b, err := get("/me/accounts?fields=id,name,username,access_token", token); err == nil && code == http.StatusOK {
-		var accs struct {
-			Data []struct {
-				ID, Name, Username string
-				AccessToken        string `json:"access_token"`
-			} `json:"data"`
+	// 1. The page node: a user token with a role on the page gets the page token in access_token;
+	//    a page token gets no such field. Works also when /me/accounts is empty (business-owned pages).
+	pageID := f.pageID
+	if code, b, err := get("/"+url.PathEscape(f.pageID)+"?fields=id,name,access_token", token); err == nil && code == http.StatusOK {
+		var n struct {
+			ID          string `json:"id"`
+			AccessToken string `json:"access_token"`
 		}
-		if json.Unmarshal(b, &accs) == nil {
-			for _, a := range accs.Data {
-				if same(a.ID, a.Username, a.Name) && a.AccessToken != "" {
-					token = a.AccessToken
-					break
+		if json.Unmarshal(b, &n) == nil && n.ID != "" {
+			pageID = n.ID
+			if n.AccessToken != "" {
+				token = n.AccessToken
+			}
+		}
+	}
+	// 2. Fallback: pages listed by /me/accounts.
+	if token == config.ActiveConfig.Facebook.PageToken {
+		if code, b, err := get("/me/accounts?fields=id,name,access_token", token); err == nil && code == http.StatusOK {
+			var accs struct {
+				Data []struct {
+					ID          string `json:"id"`
+					Name        string `json:"name"`
+					AccessToken string `json:"access_token"`
+				} `json:"data"`
+			}
+			if json.Unmarshal(b, &accs) == nil {
+				for _, a := range accs.Data {
+					if (a.ID == pageID || strings.EqualFold(a.Name, pageID)) && a.AccessToken != "" {
+						token, pageID = a.AccessToken, a.ID
+						break
+					}
 				}
 			}
 		}
 	}
 
-	// A Page token's /me is the page itself.
-	code, b, err := get("/me?fields=id,name,username", token)
+	// 3. A Page token's /me is the page itself.
+	code, b, err := get("/me?fields=id,name", token)
 	if err != nil {
 		return err
 	}
-	var page struct {
-		ID       string `json:"id"`
-		Name     string `json:"name"`
-		Username string `json:"username"`
+	var me struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
 	}
-	if code != http.StatusOK || json.Unmarshal(b, &page) != nil || page.ID == "" {
+	if code != http.StatusOK || json.Unmarshal(b, &me) != nil || me.ID == "" {
 		return fmt.Errorf("facebook token rejected (status %d): %s", code, b)
 	}
-	if !same(page.ID, page.Username, page.Name) {
-		return fmt.Errorf("facebook: that is a user token and %q is not among the pages it manages (it identifies %q) — use the Page token (Graph Explorer: \"User or Page\" → pick the page, or me/accounts)", f.pageID, page.Name)
+	if me.ID != pageID {
+		return fmt.Errorf("facebook: this is a user token (it identifies %q) and no page token for %q could be derived from it — make sure you are admin of the page and picked it in the permission dialog, or use the Page token (Graph Explorer: \"User or Page\" → pick the page)", me.Name, f.pageID)
 	}
-	if page.ID != f.pageID {
-		f.pageID = page.ID
-		config.ActiveConfig.Facebook.PageID = page.ID
+	if me.ID != f.pageID {
+		f.pageID = me.ID
+		config.ActiveConfig.Facebook.PageID = me.ID
 		_ = config.SaveConfig()
 	}
 	if err := f.store.SaveToken(ctx, models.PlatformFacebook, token, "", nil); err != nil {
 		return fmt.Errorf("save page token: %w", err)
 	}
-	fmt.Printf("✓ Facebook-Seite %q (ID %s) verbunden.\n", page.Name, page.ID)
+	fmt.Printf("✓ Facebook-Seite %q (ID %s) verbunden.\n", me.Name, me.ID)
 	return nil
 }

@@ -218,18 +218,28 @@ func TestFacebookAuthWithStaticTokens(t *testing.T) {
 	prev := config.ActiveConfig
 	t.Cleanup(func() { config.ActiveConfig = prev })
 
-	run := func(token string, userToken bool) (*FacebookPlatform, error) {
+	// accounts: does /me/accounts list the page (a business-owned page is missing from it)?
+	// manages: does the user token have a role on the page (page node returns access_token)?
+	run := func(token string, accounts, manages bool) (*FacebookPlatform, error) {
 		config.ActiveConfig.Facebook.PageToken = token
 		srv, _ := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) {})
 		srv.Config.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tok := r.URL.Query().Get("access_token")
 			switch {
-			case r.URL.Path == "/me/accounts" && userToken:
-				_, _ = w.Write([]byte(`{"data":[{"id":"222","name":"Die Brücke","username":"brueckegraz","access_token":"PAGETOK"}]}`))
+			case r.URL.Path == "/222" || r.URL.Path == "/brueckegraz":
+				if manages && tok == "USERTOK" {
+					_, _ = w.Write([]byte(`{"id":"222","name":"Die Brücke","access_token":"PAGETOK"}`))
+				} else {
+					_, _ = w.Write([]byte(`{"id":"222","name":"Die Brücke"}`))
+				}
 			case r.URL.Path == "/me/accounts":
-				w.WriteHeader(400) // a page token cannot list accounts
+				if accounts && tok == "USERTOK" {
+					_, _ = w.Write([]byte(`{"data":[{"id":"222","name":"Die Brücke","access_token":"PAGETOK"}]}`))
+				} else {
+					_, _ = w.Write([]byte(`{"data":[]}`))
+				}
 			case r.URL.Path == "/me" && tok == "PAGETOK":
-				_, _ = w.Write([]byte(`{"id":"222","name":"Die Brücke","username":"brueckegraz"}`))
+				_, _ = w.Write([]byte(`{"id":"222","name":"Die Brücke"}`))
 			case r.URL.Path == "/me":
 				_, _ = w.Write([]byte(`{"id":"999","name":"Gerwin"}`)) // user token: /me is the person
 			}
@@ -238,21 +248,26 @@ func TestFacebookAuthWithStaticTokens(t *testing.T) {
 		f.appID, f.appSecret, f.pageID = "", "", "brueckegraz"
 		return f, f.Auth(context.Background())
 	}
-
-	// a user token is swapped for the page's own token
-	f, err := run("USERTOK", true)
-	if err != nil {
-		t.Fatal(err)
+	stored := func(f *FacebookPlatform) string {
+		tok, _, _, _ := f.store.GetToken(context.Background(), models.PlatformFacebook)
+		return tok
 	}
-	if tok, _, _, _ := f.store.GetToken(context.Background(), models.PlatformFacebook); tok != "PAGETOK" || f.pageID != "222" || config.ActiveConfig.Facebook.PageID != "222" {
-		t.Errorf("token=%q pageID=%q cfg=%q", tok, f.pageID, config.ActiveConfig.Facebook.PageID)
+
+	// user token, page found via the page node (business-owned page: /me/accounts is empty)
+	f, err := run("USERTOK", false, true)
+	if err != nil || stored(f) != "PAGETOK" || f.pageID != "222" || config.ActiveConfig.Facebook.PageID != "222" {
+		t.Fatalf("page node: err=%v token=%q id=%q", err, stored(f), f.pageID)
+	}
+	// user token, page found via /me/accounts only
+	if f, err = run("USERTOK", true, false); err != nil || stored(f) != "PAGETOK" {
+		t.Fatalf("me/accounts: err=%v token=%q", err, stored(f))
 	}
 	// a real page token is taken as is
-	if f, err = run("PAGETOK", false); err != nil {
-		t.Fatal(err)
+	if f, err = run("PAGETOK", false, false); err != nil || stored(f) != "PAGETOK" {
+		t.Fatalf("page token: err=%v token=%q", err, stored(f))
 	}
-	// a user token that does not manage the page is rejected with a clear message
-	if _, err = run("USERTOK", false); err == nil || !strings.Contains(err.Error(), "user token") {
+	// a user token without a role on the page is rejected with a clear message
+	if _, err = run("USERTOK", false, false); err == nil || !strings.Contains(err.Error(), "user token") {
 		t.Errorf("want user-token error, got %v", err)
 	}
 }
