@@ -106,6 +106,10 @@ func (m Model) renderSettings(w, h int) string {
 		return ui.Panel(w, h, Tr("panel_slots"), strings.Join(lines, "\n"), true)
 	}
 
+	if out, ok := m.renderSettingsPanels(w, h); ok {
+		return out
+	}
+
 	var lines []string
 	selLine := 0
 	for i, opt := range m.settingsOptions() {
@@ -161,4 +165,86 @@ func schedulerValue() string {
 		return Tr("settings_scheduler_on")
 	}
 	return Tr("settings_scheduler_off")
+}
+
+// settingsNotes are the support/license lines under the options (the first line holds key hints
+// that live in the footer now).
+func settingsNotes(rw int) []string {
+	_, notes, _ := strings.Cut(Tr("settings_help_footer"), "\n")
+	var out []string
+	for _, l := range strings.Split(notes, "\n") {
+		out = append(out, wrapLines(dimStyle.Render(l), rw)...)
+	}
+	return out
+}
+
+// renderSettingsPanels draws the settings as separate bordered areas — general, platform accounts,
+// backup, scheduler slots and notes — two columns on wide terminals. ok=false when they do not
+// fit the height; the caller then falls back to the single scrolling panel.
+func (m Model) renderSettingsPanels(w, h int) (string, bool) {
+	opts := m.settingsOptions()
+	type group struct {
+		title string
+		idx   []int
+	}
+	groups := []group{{title: Tr("panel_settings")}}
+	for i, opt := range opts {
+		if opt.separatorBefore != "" {
+			groups = append(groups, group{title: opt.separatorBefore})
+		}
+		g := &groups[len(groups)-1]
+		g.idx = append(g.idx, i)
+	}
+	if len(groups) != 3 { // general, platform accounts, backup & sync
+		return "", false
+	}
+
+	two := w >= 100
+	colW := w
+	if two {
+		colW = (w - 1) / 2
+	}
+	rowsOf := func(g group, cw int) []string {
+		rw := panelRowW(cw)
+		var rows []string
+		for _, i := range g.idx {
+			opt := opts[i]
+			sel := i == m.cursor && opt.kind != settingDisplay
+			rows = append(rows, ui.Row(rw, sel, padRight(opt.label, 26)+m.settingValue(opt)))
+		}
+		return rows
+	}
+	panel := func(cw int, title string, rows []string, focused bool) string {
+		return ui.Panel(cw, len(rows)+2, title, strings.Join(rows, "\n"), focused)
+	}
+	slots := strings.Join(config.ActiveConfig.Scheduler.Slots, ", ")
+	if slots == "" {
+		slots = Tr("settings_none")
+	}
+	focus := func(g group) bool { return m.cursor >= g.idx[0] && m.cursor <= g.idx[len(g.idx)-1] }
+
+	if two {
+		rwR := w - 1 - colW
+		left := panel(colW, groups[0].title, rowsOf(groups[0], colW), focus(groups[0])) + "\n" +
+			panel(colW, groups[2].title, rowsOf(groups[2], colW), focus(groups[2])) + "\n" +
+			panel(colW, Tr("settings_sec_slots"), []string{"  " + slots}, false)
+		right := panel(rwR, groups[1].title, rowsOf(groups[1], rwR), focus(groups[1])) + "\n" +
+			panel(rwR, Tr("panel_notes"), settingsNotes(panelRowW(rwR)), false)
+		if max(strings.Count(left, "\n"), strings.Count(right, "\n"))+1 > h {
+			return "", false
+		}
+		return joinColumns(left, right, colW, 1), true
+	}
+	stack := []string{
+		panel(w, groups[0].title, rowsOf(groups[0], w), focus(groups[0])),
+		panel(w, groups[1].title, rowsOf(groups[1], w), focus(groups[1])),
+		panel(w, groups[2].title, rowsOf(groups[2], w), focus(groups[2])),
+		panel(w, Tr("settings_sec_slots"), []string{"  " + slots}, false),
+		panel(w, Tr("panel_notes"), settingsNotes(panelRowW(w)), false),
+	}
+	out := strings.Join(stack, "\n")
+	if strings.Count(out, "\n")+1 > h {
+		return "", false
+	}
+	return out, true
 }

@@ -26,6 +26,7 @@ func Tr(key string) string {
 }
 
 var translationsMap = map[string]map[string]string{
+	"panel_notes":         {"de": "Hinweise", "en": "Notes"},
 	"help_search":         {"de": "Posts durchsuchen (Posts-Tab)", "en": "search posts (Posts tab)"},
 	"help_palette":        {"de": "Befehlspalette", "en": "command palette"},
 	"help_profile":        {"de": "Profil wechseln", "en": "switch profile"},

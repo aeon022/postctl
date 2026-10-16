@@ -39,6 +39,19 @@ func (m Model) renderHistory(w, h int) string {
 	if len(m.history) == 0 {
 		return emptyBody(w, h, Tr("history_none_found"), "")
 	}
+	if w >= wideBreak { // list on the left, the selected entry's details on the right
+		lw := w * 11 / 20
+		rw := w - lw - 1
+		sel := m.history[min(m.cursor, len(m.history)-1)]
+		detail := ui.Panel(rw, h, Tr("panel_hdetail")+" · "+strings.ToUpper(sel.Action),
+			strings.Join(historyDetailLines(&sel, panelRowW(rw))[:min(len(historyDetailLines(&sel, panelRowW(rw))), max(h-2, 1))], "\n"), false)
+		return joinColumns(m.historyList(lw, h), detail, lw, 1)
+	}
+	return m.historyList(w, h)
+}
+
+// historyList is the windowed list of selectable history rows in one panel.
+func (m Model) historyList(w, h int) string {
 	rw := panelRowW(w)
 	start, end := window(len(m.history), m.cursor, max(h-2, 1))
 	var rows []string
