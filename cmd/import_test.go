@@ -100,3 +100,10 @@ func TestResolveImagePath(t *testing.T) {
 		})
 	}
 }
+
+func TestResolveImagePathKeepsHTTPSURLs(t *testing.T) {
+	u := "https://example.test/a.png"
+	if got, ok := resolveImagePath(t.TempDir(), u, ""); !ok || got != u {
+		t.Errorf("got %q, %v", got, ok)
+	}
+}

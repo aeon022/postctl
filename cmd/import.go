@@ -235,6 +235,10 @@ var importCmd = &cobra.Command{
 
 // resolveImagePath prüft, ob das Bild an einem der erwarteten Orte existiert, und gibt den absoluten Pfad zurück
 func resolveImagePath(postDir, imagePath, configImageDir string) (string, bool) {
+	// Public image URLs (Instagram needs them) are used as-is.
+	if strings.HasPrefix(imagePath, "https://") {
+		return imagePath, true
+	}
 	var resolved string
 	if filepath.IsAbs(imagePath) {
 		resolved = imagePath
