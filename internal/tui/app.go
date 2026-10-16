@@ -78,6 +78,7 @@ type Model struct {
 	editorFocus       int
 	editorAlts        textinput.Model // alt text per image, separated by " | "
 	editorType        string          // kept when editing (e.g. "story")
+	editorTargets     map[string]bool // platforms selected for a new post (space toggles)
 	showDatePicker    bool
 	datePickerDate    time.Time
 
@@ -1040,6 +1041,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						currIdx = idx
 						break
 					}
+				}
+				if keyMsg.String() == "space" && m.editorPostID == "" { // pick several platforms for a new post
+					if m.editorTargets == nil {
+						m.editorTargets = map[string]bool{}
+					}
+					m.editorTargets[m.editorPlatform] = !m.editorTargets[m.editorPlatform]
+					return m, nil
 				}
 				if keyMsg.String() == "left" || keyMsg.String() == "h" {
 					if currIdx != -1 {

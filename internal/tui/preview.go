@@ -53,6 +53,10 @@ func localImage(src string) (string, bool) {
 func (m Model) previewContent(w, h int) string {
 	pf := m.editorPlatform
 	body := m.editorBody.Value()
+	targets := m.targetPlatforms()
+	if len(targets) > 1 {
+		body = adaptCaption(pf, body)
+	}
 	var b strings.Builder
 
 	head := platformPill(pf)
@@ -148,6 +152,16 @@ func (m Model) previewContent(w, h int) string {
 		}
 	}
 	b.WriteString("\n" + dimStyle.Render("⏱ ") + when)
+	if len(targets) > 1 {
+		b.WriteString("\n\n" + dimStyle.Render(fmt.Sprintf(Tr("prev_multi"), len(targets), staggerMinutes)) + "\n")
+		if t, err := time.ParseInLocation("02.01.2006 15:04", m.editorScheduledAt.Value(), time.Local); err == nil {
+			for i, p := range targets {
+				b.WriteString("  " + platformPill(p) + " " + t.Add(time.Duration(i)*staggerMinutes*time.Minute).Format("Mon 15:04") + "\n")
+			}
+		} else {
+			b.WriteString("  " + dimStyle.Render(strings.Join(targets, ", ")) + "\n")
+		}
+	}
 	return b.String()
 }
 

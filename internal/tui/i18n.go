@@ -26,6 +26,8 @@ func Tr(key string) string {
 }
 
 var translationsMap = map[string]map[string]string{
+	"editor_multi_hint":   {"de": "space: Plattform zusätzlich wählen (✓) – ein Text, mehrere Plattformen", "en": "space: also select this platform (✓) – one text, several platforms"},
+	"prev_multi":          {"de": "%d Plattformen, je %d Min. versetzt:", "en": "%d platforms, %d min apart:"},
 	"panel_top":           {"de": "Top-Posts", "en": "Top posts"},
 	"panel_heat":          {"de": "Wann gepostet (Interaktionen)", "en": "When posted (interactions)"},
 	"an_no_metrics":       {"de": "%d Post(s) ohne Metriken – die Plattform liefert keine Daten oder Rechte fehlen (z. B. threads_manage_insights).", "en": "%d post(s) without metrics – the platform returned no data or a permission is missing (e.g. threads_manage_insights)."},

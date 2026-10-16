@@ -99,6 +99,7 @@ func (m *Model) initEditor(p *models.Post) {
 	m.editorAlts = altsInput
 	m.editorBody = bodyArea
 	m.editorFocus = 0
+	m.editorTargets = map[string]bool{}
 	m.isEditing = true
 
 	m.updateEditorFocus()
@@ -128,8 +129,19 @@ func (m *Model) updateEditorFocus() {
 
 // saveEditedPost validiert die Formulareingaben und speichert den Beitrag in der SQLite-Datenbank
 func (m *Model) saveEditedPost() error {
+	targets := m.targetPlatforms()
+	for i, platform := range targets {
+		if err := m.saveEditedPostFor(platform, time.Duration(i)*staggerMinutes*time.Minute, len(targets) > 1); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// saveEditedPostFor saves the form as a post for one platform; with several targets the text is
+// adapted to the platform and the planned time is staggered.
+func (m *Model) saveEditedPostFor(platform string, stagger time.Duration, multi bool) error {
 	ctx := context.Background()
-	platform := m.editorPlatform
 	campaign := strings.TrimSpace(m.editorCampaign.Value())
 	if campaign == "" {
 		campaign = "default"
@@ -140,7 +152,7 @@ func (m *Model) saveEditedPost() error {
 	status := "draft"
 	if schedStr != "" {
 		if schedStr == "now" || schedStr == "jetzt" {
-			t := time.Now()
+			t := time.Now().Add(stagger)
 			scheduledAt = &t
 			status = "scheduled"
 		} else {
@@ -148,6 +160,7 @@ func (m *Model) saveEditedPost() error {
 			if err != nil {
 				return fmt.Errorf("ungültiges Datumformat. Bitte verwende 'DD.MM.YYYY HH:MM' oder 'now' / 'jetzt'")
 			}
+			t = t.Add(stagger)
 			scheduledAt = &t
 			status = "scheduled"
 		}
@@ -175,6 +188,9 @@ func (m *Model) saveEditedPost() error {
 	}
 
 	body := m.editorBody.Value()
+	if multi {
+		body = adaptCaption(platform, body)
+	}
 
 	// ID beibehalten oder neu generieren
 	id := m.editorPostID
@@ -258,15 +274,22 @@ func (m Model) renderEditorForm(w, h int) string {
 	mark(focusPlatform)
 	var platSelect []string
 	for _, p := range editorPlatforms {
+		name := strings.ToUpper(p)
+		if m.editorTargets[p] {
+			name = "✓" + name
+		}
 		if p == m.editorPlatform {
-			platSelect = append(platSelect, lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("["+strings.ToUpper(p)+"]"))
+			platSelect = append(platSelect, lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("["+name+"]"))
 		} else {
-			platSelect = append(platSelect, strings.ToUpper(p))
+			platSelect = append(platSelect, name)
 		}
 	}
 	builder.WriteString(label(focusPlatform, Tr("editor_label_platform")) + "\n")
 	for _, l := range wrapLines(strings.Join(platSelect, "  "), iw-4) {
 		builder.WriteString("    " + l + "\n")
+	}
+	if m.editorFocus == focusPlatform && m.editorPostID == "" {
+		builder.WriteString("    " + dimStyle.Render(Tr("editor_multi_hint")) + "\n")
 	}
 	builder.WriteString("\n")
 
