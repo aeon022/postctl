@@ -1588,7 +1588,11 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, Keys.Left), key.Matches(msg, Keys.Right):
 			if m.activeTab == tabSettings && m.settingsOptions()[m.cursor].kind == settingCyclable {
-				m.cycleSetting()
+				dir := 1
+				if key.Matches(msg, Keys.Left) {
+					dir = -1
+				}
+				m.cycleSettingDir(dir)
 				return m, nil
 			}
 			return m, nil
@@ -1939,8 +1943,28 @@ func (m Model) repurposePostCmd(p *models.Post, targets []string) tea.Cmd {
 // label key — see settingsOptions' doc comment) rather than m.cursor
 // directly, so this stays correct regardless of where a row sits in the
 // list.
-func (m *Model) cycleSetting() {
+func (m *Model) cycleSetting() { m.cycleSettingDir(1) }
+
+// cycleSettingDir cycles the selected setting; dir is -1 for ← and +1 for → / Enter
+// (only pickers with more than two values, like the theme, care about the direction).
+func (m *Model) cycleSettingDir(dir int) {
 	switch m.settingsOptions()[m.cursor].settingKey {
+	case "settings_theme":
+		names := theme.Presets()
+		idx := 0
+		for i, n := range names {
+			if n == theme.Current() {
+				idx = i
+			}
+		}
+		next := names[(idx+dir+len(names))%len(names)]
+		if err := theme.Apply(next); err != nil {
+			m.err = err
+			return
+		}
+		_ = theme.Save(next) // every tool of the suite starts with it next time
+		m.statusMessage = fmt.Sprintf(Tr("st_theme"), next)
+		return
 	case "settings_ai_provider":
 		current := strings.ToLower(config.ActiveConfig.AI.Provider)
 		next := "openai"

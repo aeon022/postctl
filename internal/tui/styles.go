@@ -18,6 +18,18 @@ var (
 	ColorFailed = theme.RedV2
 )
 
+func init() {
+	// live theme switching: rebuild everything that cached a color
+	theme.OnChange(refreshStyles)
+}
+
+func refreshStyles() {
+	ColorPrimary, ColorSecondary, ColorLightGray, ColorBgFg = theme.BlueV2, theme.GreenV2, theme.MutedV2, theme.OnAccentV2
+	ColorPosted, ColorFailed = theme.GreenV2, theme.RedV2
+	StyleTitle = lipgloss.NewStyle().Bold(true).Foreground(ColorBgFg).Background(ColorPrimary).Padding(0, 1)
+	dimStyle = lipgloss.NewStyle().Foreground(theme.MutedV2)
+}
+
 // Styles
 var StyleTitle = lipgloss.NewStyle().
 	Bold(true).

@@ -2,8 +2,10 @@ package tui
 
 import (
 	"fmt"
+	"github.com/aeon022/missionctl-core/theme"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	tea "charm.land/bubbletea/v2"
@@ -27,8 +29,8 @@ func TestSettingsEnterKeyWithConfig(t *testing.T) {
 	m.activeTab = tabSettings
 	m.loading = false
 
-	// Test case for Bluesky (cursor 10)
-	m.cursor = 10
+	// Test case for Bluesky
+	m.cursor = settingsIndex(t, m, models.PlatformBluesky)
 	msg := tea.KeyPressMsg{Code: tea.KeyEnter}
 
 	newModel, cmd := m.Update(msg)
@@ -75,8 +77,8 @@ func TestSettingsEnterKeyNeedsSetup(t *testing.T) {
 	m.activeTab = tabSettings
 	m.loading = false
 
-	// Test case for Bluesky (cursor 10)
-	m.cursor = 10
+	// Test case for Bluesky
+	m.cursor = settingsIndex(t, m, models.PlatformBluesky)
 	msg := tea.KeyPressMsg{Code: tea.KeyEnter}
 
 	newModel, cmd := m.Update(msg)
@@ -150,11 +152,11 @@ func TestSettingsAutoPublishToggle(t *testing.T) {
 	// starting at 6 (Enter) are the two other things that shift when an
 	// item is inserted before them — verify both landed correctly rather
 	// than trusting the arithmetic.
-	m.cursor = 4 // Language
+	m.cursor = 5 // Theme
 	newModel, _ = m.Update(tea.KeyPressMsg{Code: tea.KeyDown})
 	m = newModel.(Model)
-	if m.cursor != 6 {
-		t.Errorf("Down from Language (cursor 4) = %d, want 6 (License at 5 must be skipped)", m.cursor)
+	if m.cursor != 7 {
+		t.Errorf("Down from Theme (cursor 5) = %d, want 7 (License at 6 must be skipped)", m.cursor)
 	}
 }
 
@@ -177,19 +179,19 @@ func TestSettingsOptions_Shape(t *testing.T) {
 	m := NewModel(s)
 
 	opts := m.settingsOptions()
-	if len(opts) != 23 {
-		t.Fatalf("len(settingsOptions()) = %d, want 23", len(opts))
+	if len(opts) != 24 {
+		t.Fatalf("len(settingsOptions()) = %d, want 24", len(opts))
 	}
 
-	wantCyclable := []string{"settings_ai_provider", "settings_ai_model", "settings_dry_run", "settings_auto_publish", "settings_language"}
+	wantCyclable := []string{"settings_ai_provider", "settings_ai_model", "settings_dry_run", "settings_auto_publish", "settings_language", "settings_theme"}
 	for i, key := range wantCyclable {
 		if opts[i].kind != settingCyclable || opts[i].settingKey != key {
 			t.Errorf("opts[%d] = {kind:%v settingKey:%q}, want {settingCyclable %q}", i, opts[i].kind, opts[i].settingKey, key)
 		}
 	}
 
-	if opts[5].kind != settingDisplay {
-		t.Errorf("opts[5] (License) kind = %v, want settingDisplay", opts[5].kind)
+	if opts[6].kind != settingDisplay {
+		t.Errorf("opts[6] (License) kind = %v, want settingDisplay", opts[6].kind)
 	}
 
 	wantPlatforms := []string{
@@ -198,24 +200,24 @@ func TestSettingsOptions_Shape(t *testing.T) {
 		models.PlatformDevTo, models.PlatformReddit, models.PlatformHashnode, models.PlatformMedium,
 	}
 	for i, p := range wantPlatforms {
-		idx := 6 + i
+		idx := 7 + i
 		if opts[idx].kind != settingPlatformAuth || opts[idx].platform != p {
 			t.Errorf("opts[%d] = {kind:%v platform:%q}, want {settingPlatformAuth %q}", idx, opts[idx].kind, opts[idx].platform, p)
 		}
 	}
-	if opts[6].separatorBefore == "" {
-		t.Error(`opts[6] (first platform row) missing separatorBefore ("PLATFORM ACCOUNTS")`)
+	if opts[7].separatorBefore == "" {
+		t.Error(`opts[7] (first platform row) missing separatorBefore ("PLATFORM ACCOUNTS")`)
 	}
 
 	wantActions := []settingActionID{actionExport, actionImport, actionEditSlots, actionScheduler}
 	for i, a := range wantActions {
-		idx := 19 + i
+		idx := 20 + i
 		if opts[idx].kind != settingAction || opts[idx].action != a {
 			t.Errorf("opts[%d] = {kind:%v action:%v}, want {settingAction %v}", idx, opts[idx].kind, opts[idx].action, a)
 		}
 	}
-	if opts[19].separatorBefore == "" {
-		t.Error(`opts[19] (Export) missing separatorBefore ("BACKUP & SYNC")`)
+	if opts[20].separatorBefore == "" {
+		t.Error(`opts[20] (Export) missing separatorBefore ("BACKUP & SYNC")`)
 	}
 }
 
@@ -239,4 +241,54 @@ func firstMsg[T any](cmd tea.Cmd) (T, bool) {
 		return msg, true
 	}
 	return zero, false
+}
+
+// settingsIndex finds a platform's row by what it is, not by position: rows get added, and an
+// Enter on the wrong row would run a real login flow (network, browser, config writes).
+func settingsIndex(t *testing.T, m Model, platform string) int {
+	t.Helper()
+	for i, o := range m.settingsOptions() {
+		if o.kind == settingPlatformAuth && o.platform == platform {
+			return i
+		}
+	}
+	t.Fatalf("no settings row for %s", platform)
+	return -1
+}
+
+func TestThemeRowCyclesLiveAndSavesForTheSuite(t *testing.T) {
+	s, err := store.NewSQLiteStore(":memory:", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	orig := theme.Current()
+	t.Cleanup(func() { _ = theme.Apply(orig) })
+
+	m := NewModel(s)
+	m.activeTab = tabSettings
+	for i, o := range m.settingsOptions() {
+		if o.settingKey == "settings_theme" {
+			m.cursor = i
+		}
+	}
+	before := theme.Current()
+	right, _ := m.Update(tea.KeyPressMsg{Code: tea.KeyRight})
+	after := theme.Current()
+	if after == before {
+		t.Fatalf("→ must switch to the next preset (still %s)", after)
+	}
+	if got := right.(Model).statusMessage; !strings.Contains(got, after) {
+		t.Errorf("status message should name the new theme, got %q", got)
+	}
+	if b, err := os.ReadFile(filepath.Join(os.Getenv("HOME"), ".config", "missionctl", "theme.yaml")); err != nil || !strings.Contains(string(b), "preset: "+after) {
+		t.Errorf("the choice must be saved for every tool (err=%v file=%q)", err, b)
+	}
+	if _, _ = right.(Model).Update(tea.KeyPressMsg{Code: tea.KeyLeft}); theme.Current() != before {
+		t.Errorf("← goes back to %s, got %s", before, theme.Current())
+	}
+	// the colors cached by this package follow the switch
+	if ColorPrimary != theme.BlueV2 {
+		t.Error("ColorPrimary must be refreshed by the theme change")
+	}
 }

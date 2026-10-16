@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"github.com/aeon022/missionctl-core/theme"
 	"github.com/aeon022/postctl/internal/service"
 	"strings"
 
@@ -75,6 +76,7 @@ func (m Model) settingsOptions() []settingOption {
 		{label: Tr("settings_dry_run"), value: fmt.Sprintf("%t", config.ActiveConfig.Defaults.DryRun), kind: settingCyclable, settingKey: "settings_dry_run"},
 		{label: Tr("settings_auto_publish"), value: fmt.Sprintf("%t", config.ActiveConfig.Scheduler.AutoPublish), kind: settingCyclable, settingKey: "settings_auto_publish"},
 		{label: Tr("settings_language"), value: config.ActiveConfig.Defaults.Language, kind: settingCyclable, settingKey: "settings_language"},
+		{label: Tr("settings_theme"), value: theme.Current(), kind: settingCyclable, settingKey: "settings_theme"},
 		{label: Tr("settings_license"), value: licenseStatus, kind: settingDisplay},
 		{label: Tr("settings_auth_twitter"), value: platformStatus(models.PlatformTwitter), kind: settingPlatformAuth, platform: models.PlatformTwitter, separatorBefore: Tr("settings_sec_platforms")},
 		{label: Tr("settings_auth_linkedin"), value: platformStatus(models.PlatformLinkedIn), kind: settingPlatformAuth, platform: models.PlatformLinkedIn},

@@ -26,6 +26,8 @@ func Tr(key string) string {
 }
 
 var translationsMap = map[string]map[string]string{
+	"settings_theme":      {"de": "Theme                 ", "en": "Theme                 "},
+	"st_theme":            {"de": "Theme: %s (gilt für alle missionctl-Tools)", "en": "Theme: %s (applies to all missionctl tools)"},
 	"panel_logs_status":   {"de": "Status", "en": "Status"},
 	"logs_src_tui":        {"de": "TUI", "en": "TUI"},
 	"logs_src_daemon":     {"de": "Scheduler-Dienst", "en": "Scheduler service"},
