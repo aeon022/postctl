@@ -3,6 +3,8 @@ package platforms
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
@@ -54,4 +56,19 @@ func GetPlatform(name string, s *store.SQLiteStore, dryRun bool) (Platform, erro
 	default:
 		return nil, fmt.Errorf("unknown platform %q", name)
 	}
+}
+
+// doDelete sends a prepared DELETE request. 404/410 count as success: the post
+// is gone either way, and failing would block removing the local record.
+func doDelete(c *http.Client, req *http.Request, name string) error {
+	resp, err := c.Do(req)
+	if err != nil {
+		return fmt.Errorf("%s: delete request failed: %w", name, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode/100 == 2 || resp.StatusCode == http.StatusNotFound || resp.StatusCode == http.StatusGone {
+		return nil
+	}
+	body, _ := io.ReadAll(io.LimitReader(resp.Body, 1024))
+	return fmt.Errorf("%s: delete failed (status %d): %s", name, resp.StatusCode, body)
 }

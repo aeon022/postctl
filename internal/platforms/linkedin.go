@@ -391,10 +391,18 @@ func (l *LinkedInPlatform) FetchAnalytics(ctx context.Context, platformID string
 	}, nil
 }
 
-// Delete is not implemented for LinkedIn yet. Returning an honest error
-// instead of nil matters: callers use this result to decide whether the
-// local post record is safe to remove, and a lying nil made postctl believe
-// a still-live LinkedIn post had been deleted.
+// Delete removes the post via the platform API.
 func (l *LinkedInPlatform) Delete(ctx context.Context, platformID string) error {
-	return fmt.Errorf("linkedin: delete not implemented — post %s was not removed from LinkedIn", platformID)
+	token, _, _, err := l.store.GetToken(ctx, models.PlatformLinkedIn)
+	if err != nil {
+		return err
+	}
+	// ugcPosts ids are URNs (urn:li:share:123) and must be URL-encoded in the path.
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, l.apiURL+"/v2/ugcPosts/"+url.PathEscape(platformID), nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("X-Restli-Protocol-Version", "2.0.0")
+	return doDelete(l.client, req, "linkedin")
 }

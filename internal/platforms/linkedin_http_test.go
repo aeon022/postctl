@@ -161,7 +161,4 @@ func TestLinkedInAnalyticsAndDelete(t *testing.T) {
 	if a, err := l.FetchAnalytics(context.Background(), "u"); err != nil || a.PlatformID != "u" {
 		t.Errorf("analytics = %+v err=%v", a, err)
 	}
-	if err := l.Delete(context.Background(), "urn:x"); err == nil || !strings.Contains(err.Error(), "urn:x") {
-		t.Errorf("Delete must be an honest error, got %v", err)
-	}
 }

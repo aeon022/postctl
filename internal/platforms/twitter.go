@@ -941,10 +941,19 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 	}
 }
 
-// Delete is not implemented for Twitter yet. Returning an honest error
-// instead of nil matters: callers use this result to decide whether the
-// local post record is safe to remove, and a lying nil made postctl believe
-// a still-live tweet had been deleted (same fix as the other platforms).
+// Delete removes the post via the platform API.
 func (t *TwitterPlatform) Delete(ctx context.Context, platformID string) error {
-	return fmt.Errorf("twitter: delete not implemented — post %s was not removed from Twitter", platformID)
+	if config.ActiveConfig.Twitter.AuthMode == "cookie" {
+		return fmt.Errorf("twitter: delete is not supported in cookie auth mode — post %s was not removed from Twitter", platformID)
+	}
+	token, err := t.getValidToken(ctx)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, t.apiURL+"/2/tweets/"+url.PathEscape(platformID), nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	return doDelete(t.client, req, "twitter")
 }

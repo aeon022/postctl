@@ -453,10 +453,15 @@ func (f *FacebookPlatform) FetchAnalytics(ctx context.Context, platformID string
 	}, nil
 }
 
-// Delete is not implemented for Facebook yet. Returning an honest error
-// instead of nil matters: callers use this result to decide whether the
-// local post record is safe to remove, and a lying nil made postctl believe
-// a still-live Facebook post had been deleted.
+// Delete removes a Page post via the Graph API (DELETE /{post-id}).
 func (f *FacebookPlatform) Delete(ctx context.Context, platformID string) error {
-	return fmt.Errorf("facebook: delete not implemented — post %s was not removed from Facebook", platformID)
+	token, err := f.getPageToken(ctx)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, f.baseURL+"/"+url.PathEscape(platformID)+"?access_token="+url.QueryEscape(token), nil)
+	if err != nil {
+		return err
+	}
+	return doDelete(f.client, req, "facebook")
 }

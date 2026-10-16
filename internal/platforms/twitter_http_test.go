@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/aeon022/postctl/internal/config"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -170,9 +171,11 @@ func TestTwitterPostErrors(t *testing.T) {
 	}
 }
 
-// Regression: Delete used to return nil without doing anything, so
-// `postctl delete` removed the local record of a tweet that was still live.
-func TestTwitterDeleteIsHonest(t *testing.T) {
+// Cookie mode has no delete endpoint: it must say so instead of returning nil,
+// or `postctl delete` would drop the local record of a tweet that is still live.
+func TestTwitterDeleteCookieModeIsHonest(t *testing.T) {
+	config.ActiveConfig.Twitter.AuthMode = "cookie"
+	defer func() { config.ActiveConfig.Twitter.AuthMode = "" }()
 	err := NewTwitterPlatform(nil, "", "").Delete(context.Background(), "12345")
 	if err == nil || !strings.Contains(err.Error(), "12345") {
 		t.Errorf("Delete must not pretend to succeed, got %v", err)

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/aeon022/postctl/internal/models"
 )
@@ -144,10 +145,38 @@ func TestFacebookPostErrorsAndAnalytics(t *testing.T) {
 
 func TestFacebookDeleteAndUploadAreHonest(t *testing.T) {
 	f := NewFacebookPlatform(nil, "", "", "")
-	if err := f.Delete(context.Background(), "p1"); err == nil || !strings.Contains(err.Error(), "p1") {
-		t.Errorf("Delete must report not-implemented instead of lying nil, got %v", err)
-	}
 	if id, err := f.UploadImage(context.Background(), "x"); id != "" || err != nil {
 		t.Errorf("UploadImage = %q, %v", id, err)
+	}
+}
+
+func TestDeleteSendsDELETEOnThreePlatforms(t *testing.T) {
+	var got []mReq
+	srv, reqs := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) { w.WriteHeader(200) })
+	_ = got
+	fb := newFB(t, srv.URL, true)
+	if err := fb.Delete(context.Background(), "123_456"); err != nil {
+		t.Fatal(err)
+	}
+	li := newLI(t, srv.URL, true)
+	if err := li.Delete(context.Background(), "urn:li:share:9"); err != nil {
+		t.Fatal(err)
+	}
+	tw := newTW(t, srv.URL)
+	saveTWToken(t, tw, "AT", "RT", time.Hour)
+	if err := tw.Delete(context.Background(), "777"); err != nil {
+		t.Fatal(err)
+	}
+	for i, wantPath := range []string{"/123_456", "/v2/ugcPosts/urn:li:share:9", "/2/tweets/777"} {
+		if (*reqs)[i].Method != "DELETE" || (*reqs)[i].Path != wantPath {
+			t.Errorf("req %d = %s %s, want DELETE %s", i, (*reqs)[i].Method, (*reqs)[i].Path, wantPath)
+		}
+	}
+}
+
+func TestDeleteSurfacesServerError(t *testing.T) {
+	srv, _ := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) { w.WriteHeader(403) })
+	if newFB(t, srv.URL, true).Delete(context.Background(), "1") == nil {
+		t.Error("403 must be an error")
 	}
 }
