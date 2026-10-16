@@ -89,7 +89,7 @@ func (t *ThreadsPlatform) Auth(ctx context.Context) error {
 	redirectURI := "https://localhost:8753/callback"
 
 	// Scopes für Threads
-	scopes := "threads_basic,threads_content_publish"
+	scopes := "threads_basic,threads_content_publish,threads_delete"
 
 	authURL := fmt.Sprintf(
 		"https://www.threads.net/oauth/authorize?client_id=%s&redirect_uri=%s&scope=%s&response_type=code&state=%s",
