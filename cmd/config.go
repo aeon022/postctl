@@ -453,12 +453,12 @@ var configSetupCmd = &cobra.Command{
 
 		if platform == "twitter" && setupCookie != "" && setupCt0 != "" {
 			config.ActiveConfig.Twitter.AuthMode = "cookie"
-			dbPath := config.ActiveConfig.DBPath
-			s, err := store.NewSQLiteStore(dbPath, config.Shared())
+			s, err := store.NewSQLiteStore(config.GetDBPath(), config.Shared())
 			if err != nil {
 				fmt.Printf("Fehler beim Öffnen der Datenbank: %v\n", err)
 				return
 			}
+			defer s.Close()
 			err = s.SaveToken(context.Background(), models.PlatformTwitter, setupCookie, setupCt0, nil)
 			if err != nil {
 				fmt.Printf("Fehler beim Speichern der Cookies: %v\n", err)
@@ -527,12 +527,12 @@ var configSetupCmd = &cobra.Command{
 				}
 
 				// DB initialisieren und Cookies speichern
-				dbPath := config.ActiveConfig.DBPath
-				s, err := store.NewSQLiteStore(dbPath, config.Shared())
+				s, err := store.NewSQLiteStore(config.GetDBPath(), config.Shared())
 				if err != nil {
 					fmt.Printf("Fehler beim Öffnen der Datenbank: %v\n", err)
 					return
 				}
+				defer s.Close()
 
 				// auth_token im token-Feld, ct0 im refresh-Feld speichern
 				err = s.SaveToken(context.Background(), models.PlatformTwitter, authCookie, csrfCookie, nil)
@@ -573,10 +573,9 @@ var configSetupCmd = &cobra.Command{
 				}
 
 				// Wenn API gewählt, Token löschen falls Cookie-basierte Reste vorhanden waren
-				dbPath := config.ActiveConfig.DBPath
-				s, err := store.NewSQLiteStore(dbPath, config.Shared())
-				if err == nil {
+				if s, err := store.NewSQLiteStore(config.GetDBPath(), config.Shared()); err == nil {
 					_ = s.DeleteToken(context.Background(), models.PlatformTwitter)
+					s.Close()
 				}
 
 				fmt.Println("\n✔ Client ID und Secret wurden konfiguriert. Du kannst dich jetzt im Hauptmenü verbinden!")

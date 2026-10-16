@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -204,5 +205,35 @@ func TestImagesEncodingKeepsLegacyFormatAndRoundTripsAlts(t *testing.T) {
 	imgs, alts, err = decodeImages(enc)
 	if err != nil || len(imgs) != 2 || alts[0] != "A" {
 		t.Fatalf("round trip: %v %v %v", imgs, alts, err)
+	}
+}
+
+func TestSuspendLetsAnotherOpenerWriteAndResumeSeesIt(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "p.db")
+	a, err := NewSQLiteStore(path, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	ctx := context.Background()
+
+	if err := a.Suspend(); err != nil {
+		t.Fatal(err)
+	}
+	b, err := NewSQLiteStore(path, false) // what a child process does while the TUI is suspended
+	if err != nil {
+		t.Fatalf("the lock must be free while suspended: %v", err)
+	}
+	if err := b.SaveToken(ctx, "twitter", "AUTH", "CT0", nil); err != nil {
+		t.Fatal(err)
+	}
+	b.Close()
+
+	if err := a.Resume(); err != nil {
+		t.Fatal(err)
+	}
+	tok, ref, _, err := a.GetToken(ctx, "twitter")
+	if err != nil || tok != "AUTH" || ref != "CT0" {
+		t.Errorf("after Resume the original handle sees the child's write: %q %q %v", tok, ref, err)
 	}
 }

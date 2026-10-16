@@ -8,6 +8,7 @@ import (
 	"github.com/aeon022/missionctl-core/theme"
 	"github.com/aeon022/missionctl-core/ui"
 	"github.com/aeon022/postctl/internal/service"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -587,7 +588,7 @@ func platformNeedsSetup(platformName string) bool {
 // runSetupWizardCmd startet das interaktive CLI Setup für eine Plattform
 func (m Model) runSetupWizardCmd(platformName string) tea.Cmd {
 	c := selfCmd("config", "setup", platformName)
-	return tea.ExecProcess(c, func(err error) tea.Msg {
+	return m.execWithStoreReleased(c, func(err error) tea.Msg {
 		return setupWizardFinishedMsg{platform: platformName, err: err}
 	})
 }
@@ -656,7 +657,7 @@ func (m Model) clearPlatformCmd(platformName string) tea.Cmd {
 // runBackupExportCmd pausiert die TUI und startet interaktiv den CLI-Export
 func (m Model) runBackupExportCmd() tea.Cmd {
 	c := selfCmd("config", "export")
-	return tea.ExecProcess(c, func(err error) tea.Msg {
+	return m.execWithStoreReleased(c, func(err error) tea.Msg {
 		return backupFinishedMsg{isExport: true, err: err}
 	})
 }
@@ -664,7 +665,7 @@ func (m Model) runBackupExportCmd() tea.Cmd {
 // runBackupImportCmd pausiert die TUI und startet interaktiv den CLI-Import
 func (m Model) runBackupImportCmd() tea.Cmd {
 	c := selfCmd("config", "import")
-	return tea.ExecProcess(c, func(err error) tea.Msg {
+	return m.execWithStoreReleased(c, func(err error) tea.Msg {
 		return backupFinishedMsg{isExport: false, err: err}
 	})
 }
@@ -672,7 +673,7 @@ func (m Model) runBackupImportCmd() tea.Cmd {
 // runImportPostsCmd pausiert die TUI und startet interaktiv den CLI-Post-Import
 func (m Model) runImportPostsCmd() tea.Cmd {
 	c := selfCmd("import")
-	return tea.ExecProcess(c, func(err error) tea.Msg {
+	return m.execWithStoreReleased(c, func(err error) tea.Msg {
 		return importFinishedMsg{err: err}
 	})
 }
@@ -2095,4 +2096,29 @@ func (m Model) exportHistoryEntryCmd(entry *models.HistoryEntry) tea.Cmd {
 
 		return exportFinishedMsg{filename: filename}
 	}
+}
+
+// storeReleasingCmd runs a child process while this TUI's database lock is released: postctl's
+// store is exclusive, so a wizard or import started from the TUI could not open the database
+// at all (it failed, or — for the X cookie wizard — saved nothing). The lock is taken back when
+// the child exits.
+type storeReleasingCmd struct {
+	cmd   *exec.Cmd
+	store *store.SQLiteStore
+}
+
+func (c *storeReleasingCmd) SetStdin(r io.Reader)  { c.cmd.Stdin = r }
+func (c *storeReleasingCmd) SetStdout(w io.Writer) { c.cmd.Stdout = w }
+func (c *storeReleasingCmd) SetStderr(w io.Writer) { c.cmd.Stderr = w }
+
+func (c *storeReleasingCmd) Run() error {
+	if c.store != nil {
+		_ = c.store.Suspend()
+		defer func() { _ = c.store.Resume() }()
+	}
+	return c.cmd.Run()
+}
+
+func (m Model) execWithStoreReleased(c *exec.Cmd, cb tea.ExecCallback) tea.Cmd {
+	return tea.Exec(&storeReleasingCmd{cmd: c, store: m.store}, cb)
 }

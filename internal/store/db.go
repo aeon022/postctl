@@ -17,8 +17,9 @@ import (
 
 // SQLiteStore ist die konkrete Implementierung des Store-Interfaces mit SQLite
 type SQLiteStore struct {
-	db   *sql.DB
-	path string
+	db     *sql.DB
+	path   string
+	shared bool
 }
 
 // postctl opens a fresh *SQLiteStore per operation rather than holding one
@@ -136,7 +137,7 @@ func NewSQLiteStore(dbPath string, shared bool) (*SQLiteStore, error) {
 		return nil, fmt.Errorf("ping db: %w", err)
 	}
 
-	store := &SQLiteStore{db: db, path: expandedPath}
+	store := &SQLiteStore{db: db, path: expandedPath, shared: shared}
 
 	// Migrationen ausführen
 	if err := store.migrate(); err != nil {
@@ -146,6 +147,43 @@ func NewSQLiteStore(dbPath string, shared bool) (*SQLiteStore, error) {
 	}
 
 	return store, nil
+}
+
+// Suspend closes the connection and releases the lock so another process (for example a CLI
+// wizard started from the TUI) can use the database; Resume takes it back. Both are no-ops
+// for in-memory stores.
+func (s *SQLiteStore) Suspend() error {
+	if s.path == "" {
+		return nil
+	}
+	err := s.db.Close()
+	releaseLock(s.path)
+	return err
+}
+
+// Resume re-acquires the lock and reopens the connection after Suspend.
+func (s *SQLiteStore) Resume() error {
+	if s.path == "" {
+		return nil
+	}
+	err := acquireLock(s.path)
+	for i := 0; i < 20 && errors.Is(err, syncdir.ErrLocked); i++ { // the child may still be flushing
+		time.Sleep(250 * time.Millisecond)
+		err = acquireLock(s.path)
+	}
+	if err != nil {
+		return fmt.Errorf("re-acquire database lock: %w", err)
+	}
+	db, err := sql.Open("sqlite", s.path+"?_journal="+syncdir.JournalMode(s.shared)+"&_timeout=5000")
+	if err == nil {
+		err = db.Ping()
+	}
+	if err != nil {
+		releaseLock(s.path)
+		return fmt.Errorf("reopen database: %w", err)
+	}
+	s.db = db
+	return nil
 }
 
 // Close schließt die Datenbankverbindung
