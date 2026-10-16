@@ -40,7 +40,9 @@ func (m Model) WantsProfileSwitch() bool { return m.switchProfile }
 // Model repräsentiert den Zustand der Bubbletea-Anwendung
 type Model struct {
 	store     *store.SQLiteStore
-	activeTab int // 0: Dashboard, 1: Posts, 2: Schedule, 3: History
+	activeTab int       // one of the tab* constants (tabs.go)
+	calDay    time.Time // selected day of the calendar tab (zero = today)
+	calCursor int       // selected post within that day
 	cursor    int
 
 	// Geladene Daten
@@ -1336,7 +1338,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		// Filter zurücksetzen oder Auswahl aufheben bei Esc im Posts-Tab, wenn keine Detailansicht offen ist
-		if m.activeTab == 1 && m.selectedPost == nil && !m.showReadme && key.Matches(msg, Keys.Esc) {
+		if m.activeTab == tabPosts && m.selectedPost == nil && !m.showReadme && key.Matches(msg, Keys.Esc) {
 			hasSelected := false
 			for _, sel := range m.selectedPosts {
 				if sel {
@@ -1354,7 +1356,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		// Leertaste wählt Post aus / wählt Post ab im Posts-Tab (Massenaktionen)
-		if m.activeTab == 1 && m.selectedPost == nil && !m.showReadme && msg.String() == "space" {
+		if m.activeTab == tabPosts && m.selectedPost == nil && !m.showReadme && msg.String() == "space" {
 			filtered := m.getFilteredPosts()
 			if len(filtered) > 0 && m.cursor < len(filtered) {
 				p := filtered[m.cursor]
@@ -1443,6 +1445,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 
+		if m.activeTab == tabCalendar && m.selectedPost == nil && !m.showReadme && !m.showHelp {
+			if nm, cmd, ok := m.calendarKey(msg); ok {
+				return nm, cmd
+			}
+		}
+
 		// Hauptmenü-Steuerung
 		switch {
 		case key.Matches(msg, Keys.Quit):
@@ -1461,7 +1469,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, Keys.Up):
 			if m.cursor > 0 {
 				m.cursor--
-				if m.activeTab == 5 && m.settingsOptions()[m.cursor].kind == settingDisplay {
+				if m.activeTab == tabSettings && m.settingsOptions()[m.cursor].kind == settingDisplay {
 					m.cursor--
 				}
 			}
@@ -1471,21 +1479,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			maxItems := m.maxCursorItems()
 			if m.cursor < maxItems-1 {
 				m.cursor++
-				if m.activeTab == 5 && m.settingsOptions()[m.cursor].kind == settingDisplay {
+				if m.activeTab == tabSettings && m.settingsOptions()[m.cursor].kind == settingDisplay {
 					m.cursor++
 				}
 			}
 			return m, nil
 
 		case key.Matches(msg, Keys.Left), key.Matches(msg, Keys.Right):
-			if m.activeTab == 5 && m.settingsOptions()[m.cursor].kind == settingCyclable {
+			if m.activeTab == tabSettings && m.settingsOptions()[m.cursor].kind == settingCyclable {
 				m.cycleSetting()
 				return m, nil
 			}
 			return m, nil
 
 		case key.Matches(msg, Keys.Enter):
-			if m.activeTab == 5 {
+			if m.activeTab == tabSettings {
 				opt := m.settingsOptions()[m.cursor]
 				switch opt.kind {
 				case settingPlatformAuth:
@@ -1523,24 +1531,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cycleSetting()
 				return m, nil
 			}
-			if m.activeTab == 0 && len(m.campaigns) > 0 {
+			if m.activeTab == tabDashboard && len(m.campaigns) > 0 {
 				m.filterCampaign = m.campaigns[m.cursor].Slug
-				m.activeTab = 1
+				m.activeTab = tabPosts
 				m.cursor = 0
 				return m, nil
 			}
-			if m.activeTab == 1 {
+			if m.activeTab == tabPosts {
 				filtered := m.getFilteredPosts()
 				if len(filtered) > 0 {
 					m.selectedPost = &filtered[m.cursor]
 				}
 			}
-			if m.activeTab == 2 {
+			if m.activeTab == tabSchedule {
 				if len(m.nextUp) > 0 && m.cursor < len(m.nextUp) {
 					m.selectedPost = &m.nextUp[m.cursor]
 				}
 			}
-			if m.activeTab == 3 {
+			if m.activeTab == tabHistory {
 				if len(m.history) > 0 && m.cursor < len(m.history) {
 					m.selectedHistory = &m.history[m.cursor]
 				}
@@ -1548,7 +1556,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 
 		case key.Matches(msg, Keys.Delete):
-			if m.activeTab == 1 {
+			if m.activeTab == tabPosts {
 				var ids []string
 				for id, selected := range m.selectedPosts {
 					if selected {
@@ -1565,7 +1573,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					idToDelete := filtered[m.cursor].ID
 					return m, m.deletePostCmd(idToDelete)
 				}
-			} else if m.activeTab == 5 { // Settings
+			} else if m.activeTab == tabSettings { // Settings
 				opt := m.settingsOptions()[m.cursor]
 				if opt.kind == settingPlatformAuth {
 					m.loading = true
@@ -1577,14 +1585,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, Keys.Export):
 			if m.selectedPost == nil && !m.showReadme {
-				if m.activeTab == 3 {
+				if m.activeTab == tabHistory {
 					return m, m.exportHistoryCmd(m.history)
 				}
 			}
 			return m, nil
 
 		case key.Matches(msg, Keys.Filter):
-			if m.selectedPost == nil && !m.showReadme && m.activeTab == 1 {
+			if m.selectedPost == nil && !m.showReadme && m.activeTab == tabPosts {
 				if len(m.campaigns) > 0 {
 					nextCampaign := ""
 					if m.filterCampaign == "" {
@@ -1622,14 +1630,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, Keys.Edit):
 			if m.selectedPost == nil && !m.showReadme {
-				if m.activeTab == 1 { // Posts
+				if m.activeTab == tabPosts { // Posts
 					filtered := m.getFilteredPosts()
 					if len(filtered) > 0 && m.cursor < len(filtered) {
 						postToEdit := filtered[m.cursor]
 						m.initEditor(&postToEdit)
 						return m, nil
 					}
-				} else if m.activeTab == 2 { // Schedule
+				} else if m.activeTab == tabSchedule { // Schedule
 					if len(m.nextUp) > 0 && m.cursor < len(m.nextUp) {
 						postToEdit := m.nextUp[m.cursor]
 						m.initEditor(&postToEdit)
@@ -1641,7 +1649,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, Keys.Schedule):
 			if m.selectedPost == nil && !m.showReadme {
-				if m.activeTab == 1 { // Posts
+				if m.activeTab == tabPosts { // Posts
 					var ids []string
 					for id, selected := range m.selectedPosts {
 						if selected {
@@ -1664,7 +1672,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, Keys.Post):
 			if m.selectedPost == nil && !m.showReadme {
-				if m.activeTab == 1 { // Posts
+				if m.activeTab == tabPosts { // Posts
 					var ids []string
 					for id, selected := range m.selectedPosts {
 						if selected {
@@ -1685,7 +1693,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						m.statusMessage = Tr("st_publishing")
 						return m, m.bulkPublishPostsCmd([]string{idToPost})
 					}
-				} else if m.activeTab == 2 { // Schedule
+				} else if m.activeTab == tabSchedule { // Schedule
 					if len(m.nextUp) > 0 && m.cursor < len(m.nextUp) {
 						idToPost := m.nextUp[m.cursor].ID
 						m.loading = true
@@ -1720,15 +1728,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // maxCursorItems gibt die Anzahl der selektierbaren Elemente im aktuellen Tab zurück
 func (m Model) maxCursorItems() int {
 	switch m.activeTab {
-	case 0: // Dashboard
+	case tabDashboard:
 		return len(m.campaigns)
-	case 1: // Posts
+	case tabPosts:
 		return len(m.getFilteredPosts())
-	case 2: // Schedule
+	case tabSchedule:
 		return len(m.nextUp)
-	case 3: // History
+	case tabHistory:
 		return len(m.history)
-	case 5: // Settings
+	case tabSettings:
 		return len(m.settingsOptions())
 	default:
 		return 0

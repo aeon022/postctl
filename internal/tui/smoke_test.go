@@ -91,13 +91,13 @@ func TestSmokeFlowsReachTheirViews(t *testing.T) {
 		keys []string
 		ok   func(Model) bool
 	}{
-		{"posts tab", []string{"tab"}, func(m Model) bool { return m.activeTab == 1 }},
+		{"posts tab", []string{"tab"}, func(m Model) bool { return m.activeTab == tabPosts }},
 		{"detail", []string{"tab", "enter"}, func(m Model) bool { return m.selectedPost != nil }},
 		{"editor", []string{"tab", "n"}, func(m Model) bool { return m.isEditing }},
 		{"help", []string{"?"}, func(m Model) bool { return m.showHelp }},
 		{"readme", []string{"f1"}, func(m Model) bool { return m.showReadme }},
 		{"bulk select", []string{"tab", "space"}, func(m Model) bool { return len(m.selectedPosts) == 1 }},
-		{"settings tab", []string{"tab", "tab", "tab", "tab", "tab"}, func(m Model) bool { return m.activeTab == 5 }},
+		{"settings tab", []string{"tab", "tab", "tab", "tab", "tab", "tab"}, func(m Model) bool { return m.activeTab == tabSettings }},
 	} {
 		mm, _ := tuitest.Keys(smokeModel(t, true), c.keys...)
 		if !c.ok(mm.(Model)) {

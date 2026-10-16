@@ -40,11 +40,12 @@ func chromeViews(t *testing.T, w, h int) map[string]Model {
 	}
 	views := map[string]Model{
 		"detail":         keys("tab", "enter"),
-		"history":        keys("tab", "tab", "tab"),
-		"history detail": keys("tab", "tab", "tab", "j", "enter"),
-		"analytics":      keys("tab", "tab", "tab", "tab"),
-		"settings":       keys("tab", "tab", "tab", "tab", "tab"),
-		"logs":           keys("tab", "tab", "tab", "tab", "tab", "tab"),
+		"history":        keys("tab", "tab", "tab", "tab"),
+		"history detail": keys("tab", "tab", "tab", "tab", "j", "enter"),
+		"analytics":      keys("tab", "tab", "tab", "tab", "tab"),
+		"settings":       keys("tab", "tab", "tab", "tab", "tab", "tab"),
+		"logs":           keys("tab", "tab", "tab", "tab", "tab", "tab", "tab"),
+		"calendar tab":   keys("tab", "tab", "tab"),
 		"help":           keys("?"),
 		"help posts":     keys("tab", "?"),
 		"readme toc":     keys("f1"),
@@ -62,7 +63,7 @@ func chromeViews(t *testing.T, w, h int) map[string]Model {
 	p.Tweets = []models.Tweet{{Index: 1, Content: strings.Repeat("first tweet ", 30)}, {Index: 2, Content: "second", IsReply: true, Image: "a.png"}}
 	th.selectedPost = &p
 	views["thread detail"] = th
-	slots := keys("tab", "tab", "tab", "tab", "tab")
+	slots := keys("tab", "tab", "tab", "tab", "tab", "tab")
 	slots.editingQueueSlots = true
 	views["queue slots"] = slots
 	return views
@@ -135,6 +136,7 @@ func TestViewContentShowsTheRealThing(t *testing.T) {
 		"readme content": {"Manual", "back to contents"},
 		"editor new":     {"Platform", "SAVE", "[TWITTER]"},
 		"calendar":       {"Calendar", "Mo Tu We Th Fr Sa Su"},
+		"calendar tab":   {"CALENDAR", "Mon", "Fri"},
 		"help":           {"KEYBOARD HELP"},
 	} {
 		text := tuitest.Text(v[name])

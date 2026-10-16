@@ -51,7 +51,7 @@ func (m Model) scopeText() string {
 }
 
 func (m Model) tabLabels() []string {
-	return []string{Tr("tab_dashboard"), Tr("tab_posts"), Tr("tab_schedule"), Tr("tab_history"),
+	return []string{Tr("tab_dashboard"), Tr("tab_posts"), Tr("tab_schedule"), Tr("tab_calendar"), Tr("tab_history"),
 		Tr("tab_analytics"), Tr("tab_settings"), Tr("tab_logs")}
 }
 
@@ -98,9 +98,9 @@ func (m Model) tabAt(x int) int {
 
 // switchTab is the shared tab change used by keys and clicks.
 func (m Model) switchTab(i int) (Model, tea.Cmd) {
-	m.activeTab = ((i % 7) + 7) % 7
+	m.activeTab = ((i % tabCount) + tabCount) % tabCount
 	m.cursor = 0
-	if m.activeTab == 4 {
+	if m.activeTab == tabStats {
 		m.analyticsLoading = true
 		return m, m.loadAnalyticsCmd
 	}
@@ -141,7 +141,7 @@ func (m Model) hintsFor() [][2]string {
 		return [][2]string{hint("esc", "hint_back"), hint("x", "hint_export"), hint("j/k", "hint_scroll")}
 	}
 	switch m.activeTab {
-	case 1: // posts
+	case tabPosts:
 		h := [][2]string{hint("enter", "hint_open"), hint("n", "hint_new"), hint("?", "hint_help"), hint("q", "hint_quit"),
 			hint("e", "hint_edit"), hint("d", "hint_delete"), hint("s", "hint_schedule"), hint("p", "hint_post"),
 			hint("space", "hint_select"), hint("f", "hint_filter"), hint("r", "hint_repurpose"), hint("i", "hint_import"),
@@ -150,16 +150,19 @@ func (m Model) hintsFor() [][2]string {
 			h = append([][2]string{hint("esc", "hint_clear")}, h...)
 		}
 		return h
-	case 2: // queue
+	case tabSchedule:
 		return [][2]string{hint("enter", "hint_open"), hint("?", "hint_help"), hint("q", "hint_quit"), hint("e", "hint_edit"),
 			hint("d", "hint_delete"), hint("tab", "hint_tab"), hint("f1", "hint_manual")}
-	case 3: // history
+	case tabHistory:
 		return [][2]string{hint("enter", "hint_open"), hint("?", "hint_help"), hint("q", "hint_quit"),
 			hint("x", "hint_export"), hint("tab", "hint_tab"), hint("f1", "hint_manual")}
-	case 0: // dashboard
+	case tabDashboard:
 		return [][2]string{hint("enter", "hint_open"), hint("?", "hint_help"), hint("q", "hint_quit"), hint("n", "hint_new"),
 			hint("tab", "hint_tab"), hint("i", "hint_import"), hint("f1", "hint_manual")}
-	case 5: // settings
+	case tabCalendar:
+		return [][2]string{hint("?", "hint_help"), hint("q", "hint_quit"), hint("←↑↓→", "hint_day"), hint("[ ]", "hint_month"),
+			hint("t", "hint_today"), hint("enter", "hint_open"), hint("tab", "hint_tab"), hint("f1", "hint_manual")}
+	case tabSettings:
 		return [][2]string{hint("←/→", "hint_change"), hint("?", "hint_help"), hint("q", "hint_quit"), hint("enter", "hint_open"),
 			hint("d", "hint_reset"), hint("tab", "hint_tab"), hint("f1", "hint_manual")}
 	}
@@ -174,7 +177,7 @@ func (m Model) footerLine() string {
 	case m.statusMessage != "":
 		right = ui.Toast(ui.Info, m.statusMessage)
 	case m.maxCursorItems() > 0 && m.selectedPost == nil && m.selectedHistory == nil && !m.showReadme && !m.isEditing && !m.editingQueueSlots &&
-		(m.activeTab == 1 || m.activeTab == 2 || m.activeTab == 3 || m.activeTab == 5):
+		(m.activeTab == tabPosts || m.activeTab == tabSchedule || m.activeTab == tabHistory || m.activeTab == tabSettings):
 		right = dimStyle.Render(fmt.Sprintf("%d/%d", m.cursor+1, m.maxCursorItems()))
 	}
 	left := statusbar.Hints(max(w-lipgloss.Width(right)-2, 10), m.hintsFor()...)
@@ -251,19 +254,21 @@ func (m Model) pageBody(w, h int) string {
 		return m.renderHistoryDetailView(w, h)
 	}
 	switch m.activeTab {
-	case 0:
+	case tabDashboard:
 		return m.renderDashboard(w, h)
-	case 1:
+	case tabPosts:
 		return m.renderPostList(w, h)
-	case 2:
+	case tabSchedule:
 		return m.renderSchedule(w, h)
-	case 3:
+	case tabCalendar:
+		return m.renderCalendarTab(w, h)
+	case tabHistory:
 		return m.renderHistory(w, h)
-	case 4:
+	case tabStats:
 		return m.renderAnalytics(w, h)
-	case 5:
+	case tabSettings:
 		return m.renderSettings(w, h)
-	case 6:
+	case tabLogs:
 		return m.renderLogs(w, h)
 	}
 	return ""

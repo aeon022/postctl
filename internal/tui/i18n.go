@@ -26,6 +26,9 @@ func Tr(key string) string {
 }
 
 var translationsMap = map[string]map[string]string{
+	"tab_calendar":      {"de": "▦ KALENDER", "en": "▦ CALENDAR"},
+	"hint_today":        {"de": "heute", "en": "today"},
+	"cal_empty_day":     {"de": "Keine Posts an diesem Tag.", "en": "No posts on this day."},
 	"st_converted":      {"de": "Erfolgreich konvertiert: %s", "en": "Converted: %s"},
 	"st_open_browser":   {"de": "Verbinde mit %s (ggf. öffnet sich der Browser)...", "en": "Connecting to %s (your browser may open)..."},
 	"st_reset_done":     {"de": "Verbindung und Einstellungen für %s wurden zurückgesetzt.", "en": "Connection and settings for %s were reset."},

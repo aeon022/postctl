@@ -71,7 +71,7 @@ func (m Model) renderSchedule(w, h int) string {
 			rows = append(rows, it.text)
 			continue
 		}
-		rows = append(rows, m.queueRow(m.nextUp[it.postIndex], rowW, m.activeTab == 2 && it.postIndex == m.cursor, now))
+		rows = append(rows, m.queueRow(m.nextUp[it.postIndex], rowW, m.activeTab == tabSchedule && it.postIndex == m.cursor, now))
 	}
 
 	if w >= wideBreak {

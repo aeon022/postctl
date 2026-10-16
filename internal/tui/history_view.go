@@ -44,7 +44,7 @@ func (m Model) renderHistory(w, h int) string {
 	var rows []string
 	for i := start; i < end; i++ {
 		e := m.history[i]
-		sel := m.activeTab == 3 && i == m.cursor
+		sel := m.activeTab == tabHistory && i == m.cursor
 		pre := dimStyle.Render(e.CreatedAt.Format("02.01.2006 15:04")) + " " + actionPill(e.Action) + " "
 		info := ansi.Truncate(historyInfo(e), max(rw-lipgloss.Width(pre)-2, 4), "…")
 		rows = append(rows, ui.Row(rw, sel, pre+info))

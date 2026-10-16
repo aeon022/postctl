@@ -24,7 +24,7 @@ func TestSettingsEnterKeyWithConfig(t *testing.T) {
 	config.ActiveConfig.Bluesky.AppPassword = "test-password"
 
 	m := NewModel(s)
-	m.activeTab = 5 // Settings
+	m.activeTab = tabSettings
 	m.loading = false
 
 	// Test case for Bluesky (cursor 10)
@@ -73,7 +73,7 @@ func TestSettingsEnterKeyNeedsSetup(t *testing.T) {
 	config.ActiveConfig.Bluesky.AppPassword = ""
 
 	m := NewModel(s)
-	m.activeTab = 5 // Settings
+	m.activeTab = tabSettings
 	m.loading = false
 
 	// Test case for Bluesky (cursor 10)
@@ -129,7 +129,7 @@ func TestSettingsAutoPublishToggle(t *testing.T) {
 	config.ActiveConfig.Scheduler.AutoPublish = false
 
 	m := NewModel(s)
-	m.activeTab = 5 // Settings
+	m.activeTab = tabSettings
 	m.loading = false
 	m.cursor = 3 // Auto-Publish
 

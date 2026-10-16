@@ -49,7 +49,7 @@ func TestTUIBulkActions(t *testing.T) {
 
 	// 2. Initialize Model
 	m := NewModel(s)
-	m.activeTab = 1 // Posts tab
+	m.activeTab = tabPosts
 	m.loading = false
 
 	// Load data manually for the test

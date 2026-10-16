@@ -40,7 +40,7 @@ func (m Model) campaignLines(w, capacity int) []string {
 	for i := start; i < end; i++ {
 		c := m.campaigns[i]
 		counts := fmt.Sprintf(Tr("dash_campaign_counts"), len(c.Posts), c.Posted, c.Scheduled)
-		out = append(out, ui.Row(w, m.activeTab == 0 && i == m.cursor, "● "+c.Slug+"  "+dimStyle.Render(counts)))
+		out = append(out, ui.Row(w, m.activeTab == tabDashboard && i == m.cursor, "● "+c.Slug+"  "+dimStyle.Render(counts)))
 	}
 	return out
 }
@@ -93,7 +93,7 @@ func (m Model) platformLines() []string {
 // dashTwoCol, one below; sizes follow the terminal instead of fixed boxes.
 func (m Model) renderDashboard(w, h int) string {
 	now := time.Now()
-	focus := m.activeTab == 0
+	focus := m.activeTab == tabDashboard
 	statsH := 4
 
 	if w >= dashTwoCol {
@@ -242,7 +242,7 @@ func (m Model) renderPostList(w, h int) string {
 		start, end := window(len(filtered), m.cursor, h-2)
 		var rows []string
 		for i := start; i < end; i++ {
-			rows = append(rows, m.postRow(filtered[i], panelRowW(lw), m.activeTab == 1 && i == m.cursor, now))
+			rows = append(rows, m.postRow(filtered[i], panelRowW(lw), m.activeTab == tabPosts && i == m.cursor, now))
 		}
 		left := ui.Panel(lw, h, m.postsTitle(), strings.Join(rows, "\n"), true)
 		return joinColumns(left, m.previewPanel(sel, rw, h), lw, 1)
@@ -251,7 +251,7 @@ func (m Model) renderPostList(w, h int) string {
 	start, end := window(len(filtered), m.cursor, h-1)
 	rows := []string{ui.Divider(w, m.postsTitle())}
 	for i := start; i < end; i++ {
-		rows = append(rows, m.postRow(filtered[i], w, m.activeTab == 1 && i == m.cursor, now))
+		rows = append(rows, m.postRow(filtered[i], w, m.activeTab == tabPosts && i == m.cursor, now))
 	}
 	return strings.Join(rows, "\n")
 }
