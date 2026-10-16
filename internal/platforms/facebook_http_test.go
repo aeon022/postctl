@@ -213,24 +213,46 @@ func TestFacebookLoginAcceptsVanityNameAndStoresNumericID(t *testing.T) {
 	}
 }
 
-func TestFacebookAuthWithStaticPageTokenNeedsNoOAuth(t *testing.T) {
+func TestFacebookAuthWithStaticTokens(t *testing.T) {
 	t.Setenv("HOME", t.TempDir())
 	prev := config.ActiveConfig
 	t.Cleanup(func() { config.ActiveConfig = prev })
-	config.ActiveConfig.Facebook.PageToken = "PTOK"
 
-	srv, reqs := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) {
-		_, _ = w.Write([]byte(`{"id":"222","name":"Die Brücke | Graz"}`))
-	})
-	f := newFB(t, srv.URL, false)
-	f.appID, f.appSecret, f.pageID = "", "", "brueckegraz"
-	if err := f.Auth(context.Background()); err != nil {
+	run := func(token string, userToken bool) (*FacebookPlatform, error) {
+		config.ActiveConfig.Facebook.PageToken = token
+		srv, _ := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) {})
+		srv.Config.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			tok := r.URL.Query().Get("access_token")
+			switch {
+			case r.URL.Path == "/me/accounts" && userToken:
+				_, _ = w.Write([]byte(`{"data":[{"id":"222","name":"Die Brücke","username":"brueckegraz","access_token":"PAGETOK"}]}`))
+			case r.URL.Path == "/me/accounts":
+				w.WriteHeader(400) // a page token cannot list accounts
+			case r.URL.Path == "/me" && tok == "PAGETOK":
+				_, _ = w.Write([]byte(`{"id":"222","name":"Die Brücke","username":"brueckegraz"}`))
+			case r.URL.Path == "/me":
+				_, _ = w.Write([]byte(`{"id":"999","name":"Gerwin"}`)) // user token: /me is the person
+			}
+		})
+		f := newFB(t, srv.URL, false)
+		f.appID, f.appSecret, f.pageID = "", "", "brueckegraz"
+		return f, f.Auth(context.Background())
+	}
+
+	// a user token is swapped for the page's own token
+	f, err := run("USERTOK", true)
+	if err != nil {
 		t.Fatal(err)
 	}
-	if r := (*reqs)[0]; r.Path != "/brueckegraz" {
-		t.Errorf("lookup path = %s", r.Path)
-	}
-	if tok, _, _, _ := f.store.GetToken(context.Background(), models.PlatformFacebook); tok != "PTOK" || f.pageID != "222" || config.ActiveConfig.Facebook.PageID != "222" {
+	if tok, _, _, _ := f.store.GetToken(context.Background(), models.PlatformFacebook); tok != "PAGETOK" || f.pageID != "222" || config.ActiveConfig.Facebook.PageID != "222" {
 		t.Errorf("token=%q pageID=%q cfg=%q", tok, f.pageID, config.ActiveConfig.Facebook.PageID)
+	}
+	// a real page token is taken as is
+	if f, err = run("PAGETOK", false); err != nil {
+		t.Fatal(err)
+	}
+	// a user token that does not manage the page is rejected with a clear message
+	if _, err = run("USERTOK", false); err == nil || !strings.Contains(err.Error(), "user token") {
+		t.Errorf("want user-token error, got %v", err)
 	}
 }
