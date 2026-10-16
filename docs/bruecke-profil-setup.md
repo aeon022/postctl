@@ -140,6 +140,13 @@ X: Löschen funktioniert nur im OAuth-Modus, nicht im Cookie-Modus.
 
 ---
 
+### Wichtig: Meta-App auf „Live" stellen (sonst sieht nur das Team die Posts)
+Eine Meta-App im **Entwicklungsmodus** darf zwar posten, die Beiträge sind aber nur für Personen mit Rolle in der App sichtbar (Admin,
+Entwickler, Tester) — für alle anderen wirken sie, als gäbe es sie nicht, obwohl die API „öffentlich" meldet. Deshalb vor dem ersten
+echten Post: im Dashboard oben den **App-Modus auf „Live"** schalten. Meta verlangt dafür u. a. Datenschutzerklärungs-URL, App-Symbol,
+Kategorie (und je nach App eine Kontakt-E-Mail). Eine App-Prüfung ist für die eigene Seite nicht nötig. Danach den Post in einem
+privaten Browserfenster (ausgeloggt) prüfen. Gilt für Facebook; bei Instagram und Threads ebenfalls prüfen.
+
 ### Facebook ohne Weiterleitungs-URL (Seiten-Token)
 Findest du bei Meta kein Feld für `https://localhost:8753/callback`, geht es auch mit einem fertigen **Seiten-Token**:
 1. developers.facebook.com/tools/explorer → deine App wählen, *User Token*, Berechtigungen `pages_show_list`,
