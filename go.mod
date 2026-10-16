@@ -2,14 +2,11 @@ module github.com/aeon022/postctl
 
 go 1.26.5
 
-// TEMP (local dev, not pushed): the live-theme API is not in the published core yet
-replace github.com/aeon022/missionctl-core => ../missionctl-core
-
 require (
 	charm.land/bubbles/v2 v2.2.1
 	charm.land/bubbletea/v2 v2.1.0
 	charm.land/lipgloss/v2 v2.0.6
-	github.com/aeon022/missionctl-core v0.0.0-20261007192658-82edca71269a
+	github.com/aeon022/missionctl-core v0.0.0-20261016184730-f71f85da70ba
 	github.com/charmbracelet/x/ansi v0.11.9
 	github.com/chromedp/cdproto v0.0.0-20260321001828-e3e3800016bc
 	github.com/chromedp/chromedp v0.15.1
