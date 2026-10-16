@@ -26,6 +26,14 @@ func Tr(key string) string {
 }
 
 var translationsMap = map[string]map[string]string{
+	"panel_logs_status":   {"de": "Status", "en": "Status"},
+	"logs_src_tui":        {"de": "TUI", "en": "TUI"},
+	"logs_src_daemon":     {"de": "Scheduler-Dienst", "en": "Scheduler service"},
+	"logs_errors":         {"de": "Fehler", "en": "errors"},
+	"logs_warnings":       {"de": "Hinweise", "en": "notices"},
+	"logs_lines":          {"de": "Zeilen", "en": "lines"},
+	"logs_daemon_empty":   {"de": "Noch kein Dienst-Log. Der Scheduler schreibt hierhin, sobald er läuft (Settings → Scheduler).", "en": "No service log yet. The scheduler writes here once it runs (Settings → Scheduler)."},
+	"hint_source":         {"de": "Quelle", "en": "source"},
 	"panel_notes":         {"de": "Hinweise", "en": "Notes"},
 	"help_search":         {"de": "Posts durchsuchen (Posts-Tab)", "en": "search posts (Posts tab)"},
 	"help_palette":        {"de": "Befehlspalette", "en": "command palette"},

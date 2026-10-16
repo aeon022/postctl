@@ -84,6 +84,7 @@ type Model struct {
 	inPalette         bool            // ":" command palette open
 	spin              int             // spinner frame
 	searching         bool            // "/" search input open (Posts tab)
+	logSource         int             // logSourceTUI or logSourceDaemon
 	searchInput       textinput.Model
 	searchQuery       string
 	spinning          bool // a spinner tick is in flight
@@ -1541,6 +1542,10 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 
+		if m.activeTab == tabLogs && msg.String() == "s" && !m.showReadme && !m.showHelp {
+			m.logSource = (m.logSource + 1) % 2
+			return m, nil
+		}
 		if m.activeTab == tabCalendar && m.selectedPost == nil && !m.showReadme && !m.showHelp {
 			if nm, cmd, ok := m.calendarKey(msg); ok {
 				return nm, cmd

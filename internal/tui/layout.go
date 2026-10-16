@@ -168,6 +168,8 @@ func (m Model) hintsFor() [][2]string {
 	case tabDashboard:
 		return [][2]string{hint("enter", "hint_open"), hint("?", "hint_help"), hint("q", "hint_quit"), hint("n", "hint_new"),
 			hint("tab", "hint_tab"), hint("i", "hint_import"), hint("f1", "hint_manual")}
+	case tabLogs:
+		return [][2]string{hint("?", "hint_help"), hint("q", "hint_quit"), hint("s", "hint_source"), hint("tab", "hint_tab"), hint("f1", "hint_manual")}
 	case tabCalendar:
 		return [][2]string{hint("?", "hint_help"), hint("q", "hint_quit"), hint("←↑↓→", "hint_day"), hint("[ ]", "hint_month"),
 			hint("t", "hint_today"), hint("enter", "hint_open"), hint("tab", "hint_tab"), hint("f1", "hint_manual")}
