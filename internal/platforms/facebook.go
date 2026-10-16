@@ -302,74 +302,38 @@ func (f *FacebookPlatform) Post(ctx context.Context, post *models.Post) (string,
 		postBody = strings.Join(contents, "\n\n")
 	}
 
-	// Erstes verfügbares Bild ermitteln
-	var imgPath string
-	if len(post.Images) > 0 {
-		imgPath = post.Images[0]
-	} else {
+	// Bilder: Post.Images (lokale Dateien oder https-URLs); bei Threads-artigen Posts das erste Tweet-Bild
+	images := post.Images
+	if len(images) == 0 {
 		for _, tw := range post.Tweets {
 			if tw.Image != "" {
-				imgPath = tw.Image
+				images = []string{tw.Image}
 				break
 			}
 		}
 	}
 
-	// Falls Bilder vorhanden sind, laden wir das erste Bild als Foto mit Bildunterschrift hoch
-	if imgPath != "" {
-		file, err := os.Open(imgPath)
-		if err != nil {
-			return "", fmt.Errorf("open image file: %w", err)
-		}
-		defer file.Close()
-
-		photoURL := fmt.Sprintf(f.baseURL+"/%s/photos", f.pageID)
-
-		body := &bytes.Buffer{}
-		writer := multipart.NewWriter(body)
-
-		part, err := writer.CreateFormFile("source", filepath.Base(imgPath))
+	// Ein Bild: Foto-Post mit Bildunterschrift.
+	if len(images) == 1 {
+		id, postID, err := f.uploadPhoto(ctx, token, images[0], postBody, post.AltAt(0), true)
 		if err != nil {
 			return "", err
 		}
-		if _, err := io.Copy(part, file); err != nil {
-			return "", err
+		if postID != "" {
+			return postID, nil
 		}
+		return id, nil
+	}
 
-		_ = writer.WriteField("caption", postBody)
-		_ = writer.WriteField("access_token", token)
-		writer.Close()
-
-		req, err := http.NewRequestWithContext(ctx, "POST", photoURL, body)
+	// Mehrere Bilder: unveröffentlichte Fotos hochladen und an einen Feed-Post hängen.
+	var attached []string
+	for n, img := range images {
+		id, _, err := f.uploadPhoto(ctx, token, img, "", post.AltAt(n), false)
 		if err != nil {
 			return "", err
 		}
-		req.Header.Set("Content-Type", writer.FormDataContentType())
-
-		resp, err := f.client.Do(req)
-		if err != nil {
-			return "", err
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-			respBody, _ := io.ReadAll(resp.Body)
-			return "", fmt.Errorf("facebook photo post failed (status %d): %s", resp.StatusCode, string(respBody))
-		}
-
-		var photoResp struct {
-			PostID string `json:"post_id"`
-			ID     string `json:"id"`
-		}
-
-		if err := json.NewDecoder(resp.Body).Decode(&photoResp); err != nil {
-			return "", err
-		}
-
-		if photoResp.PostID != "" {
-			return photoResp.PostID, nil
-		}
-		return photoResp.ID, nil
+		b, _ := json.Marshal(map[string]string{"media_fbid": id})
+		attached = append(attached, string(b))
 	}
 
 	// Standard-Textpost
@@ -377,6 +341,9 @@ func (f *FacebookPlatform) Post(ctx context.Context, post *models.Post) (string,
 	data := url.Values{}
 	data.Set("message", postBody)
 	data.Set("access_token", token)
+	for n, a := range attached {
+		data.Set(fmt.Sprintf("attached_media[%d]", n), a)
+	}
 
 	req, err := http.NewRequestWithContext(ctx, "POST", feedURL, strings.NewReader(data.Encode()))
 	if err != nil {
@@ -577,4 +544,79 @@ func (f *FacebookPlatform) useStaticPageToken(ctx context.Context, token string)
 	_ = config.SaveConfig()
 	fmt.Printf("✓ Facebook-Seite %q (ID %s) verbunden.\n", me.Name, me.ID)
 	return nil
+}
+
+// uploadPhoto puts one photo on the page: a local file is sent as multipart, an https:// URL is
+// handed to Facebook to fetch. published=false creates an unpublished photo to attach to a post.
+// alt is optional; if Facebook rejects the request with it, it is retried without.
+func (f *FacebookPlatform) uploadPhoto(ctx context.Context, token, src, caption, alt string, published bool) (id, postID string, err error) {
+	send := func(alt string) (int, []byte, error) {
+		var body io.Reader
+		var ctype string
+		fields := map[string]string{"access_token": token, "published": fmt.Sprintf("%t", published)}
+		if caption != "" {
+			fields["caption"] = caption
+		}
+		if alt != "" {
+			fields["alt_text_custom"] = alt
+		}
+		if strings.HasPrefix(src, "https://") {
+			form := url.Values{"url": {src}}
+			for k, v := range fields {
+				form.Set(k, v)
+			}
+			body, ctype = strings.NewReader(form.Encode()), "application/x-www-form-urlencoded"
+		} else {
+			file, err := os.Open(src)
+			if err != nil {
+				return 0, nil, fmt.Errorf("open image file: %w", err)
+			}
+			defer file.Close()
+			buf := &bytes.Buffer{}
+			w := multipart.NewWriter(buf)
+			part, err := w.CreateFormFile("source", filepath.Base(src))
+			if err != nil {
+				return 0, nil, err
+			}
+			if _, err := io.Copy(part, file); err != nil {
+				return 0, nil, err
+			}
+			for k, v := range fields {
+				_ = w.WriteField(k, v)
+			}
+			w.Close()
+			body, ctype = buf, w.FormDataContentType()
+		}
+		req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf(f.baseURL+"/%s/photos", f.pageID), body)
+		if err != nil {
+			return 0, nil, err
+		}
+		req.Header.Set("Content-Type", ctype)
+		resp, err := f.client.Do(req)
+		if err != nil {
+			return 0, nil, err
+		}
+		defer resp.Body.Close()
+		b, _ := io.ReadAll(resp.Body)
+		return resp.StatusCode, b, nil
+	}
+
+	code, b, err := send(alt)
+	if err == nil && code != http.StatusOK && code != http.StatusCreated && alt != "" {
+		code, b, err = send("") // alt text is nice-to-have: never let it block a post
+	}
+	if err != nil {
+		return "", "", err
+	}
+	if code != http.StatusOK && code != http.StatusCreated {
+		return "", "", fmt.Errorf("facebook photo post failed (status %d): %s", code, b)
+	}
+	var r struct {
+		PostID string `json:"post_id"`
+		ID     string `json:"id"`
+	}
+	if err := json.Unmarshal(b, &r); err != nil {
+		return "", "", err
+	}
+	return r.ID, r.PostID, nil
 }

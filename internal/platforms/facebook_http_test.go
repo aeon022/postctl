@@ -2,6 +2,7 @@ package platforms
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -287,5 +288,52 @@ func TestFacebookAuthWithStaticTokens(t *testing.T) {
 	// a user token without a role on the page is rejected with a clear message
 	if _, err = run("USERTOK", false, false); err == nil || !strings.Contains(err.Error(), "user token") {
 		t.Errorf("want user-token error, got %v", err)
+	}
+}
+
+func TestFacebookPhotoPostsFromURLsSingleAndMulti(t *testing.T) {
+	rejectAlt := false
+	srv, reqs := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) {
+		switch {
+		case strings.HasSuffix(r.Path, "/photos"):
+			if rejectAlt && r.Form.Get("alt_text_custom") != "" {
+				w.WriteHeader(400)
+				_, _ = w.Write([]byte(`{"error":{"message":"bad alt"}}`))
+				return
+			}
+			_, _ = w.Write([]byte(fmt.Sprintf(`{"id":"ph%d","post_id":"page_post%d"}`, n, n)))
+		case strings.HasSuffix(r.Path, "/feed"):
+			_, _ = w.Write([]byte(`{"id":"feedpost"}`))
+		}
+	})
+	f := newFB(t, srv.URL, true)
+	ctx := context.Background()
+
+	id, err := f.Post(ctx, &models.Post{Body: "cap", Images: []string{"https://x/a.png"}, Alts: []string{"Alt A"}})
+	if err != nil || id != "page_post1" {
+		t.Fatalf("single: id=%q err=%v", id, err)
+	}
+	if c := (*reqs)[0]; c.Form.Get("url") != "https://x/a.png" || c.Form.Get("caption") != "cap" || c.Form.Get("alt_text_custom") != "Alt A" || c.Form.Get("published") != "true" {
+		t.Errorf("single photo form = %v", c.Form)
+	}
+
+	*reqs = nil
+	id, err = f.Post(ctx, &models.Post{Body: "week", Images: []string{"https://x/1.png", "https://x/2.png"}})
+	if err != nil || id != "feedpost" {
+		t.Fatalf("multi: id=%q err=%v", id, err)
+	}
+	r := *reqs
+	if len(r) != 3 || r[0].Form.Get("published") != "false" || !strings.HasSuffix(r[2].Path, "/feed") ||
+		!strings.Contains(r[2].Form.Get("attached_media[0]"), "ph1") || !strings.Contains(r[2].Form.Get("attached_media[1]"), "ph2") || r[2].Form.Get("message") != "week" {
+		t.Errorf("multi requests: %+v", r)
+	}
+
+	*reqs = nil
+	rejectAlt = true
+	if _, err = f.Post(ctx, &models.Post{Body: "c", Images: []string{"https://x/a.png"}, Alts: []string{"bad"}}); err != nil {
+		t.Fatalf("alt rejected must fall back: %v", err)
+	}
+	if len(*reqs) != 2 || (*reqs)[1].Form.Get("alt_text_custom") != "" {
+		t.Errorf("expected a plain retry: %+v", *reqs)
 	}
 }
