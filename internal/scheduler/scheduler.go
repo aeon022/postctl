@@ -95,15 +95,30 @@ func PublishPost(ctx context.Context, s *store.SQLiteStore, post *models.Post, d
 }
 
 // RunDaemon startet den Scheduler-Daemon im Headless-Modus (Endlosschleife)
-func RunDaemon(ctx context.Context, s *store.SQLiteStore, checkInterval time.Duration, dryRun bool) error {
+//
+// The store is opened per check and closed again: the store holds an exclusive
+// lock, and a daemon that kept it for its whole lifetime would lock the TUI and
+// every CLI command out. If something else holds the lock (e.g. the TUI is
+// open), the check is skipped and retried on the next tick.
+func RunDaemon(ctx context.Context, open func() (*store.SQLiteStore, error), checkInterval time.Duration, dryRun bool) error {
 	fmt.Fprintf(os.Stderr, "Starte postctl Scheduler-Daemon (Intervall: %v, Dry-Run: %v)...\n", checkInterval, dryRun)
 	fmt.Fprintln(os.Stderr, "Drücke Ctrl+C zum Beenden.")
 
 	ticker := time.NewTicker(checkInterval)
 	defer ticker.Stop()
 
+	check := func() {
+		s, err := open()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%s Check übersprungen: %v\n", time.Now().Format("15:04:05"), err)
+			return
+		}
+		defer s.Close()
+		runIfDesignated(ctx, s, dryRun)
+	}
+
 	// Initialer Check beim Start
-	runIfDesignated(ctx, s, dryRun)
+	check()
 
 	for {
 		select {
@@ -111,7 +126,7 @@ func RunDaemon(ctx context.Context, s *store.SQLiteStore, checkInterval time.Dur
 			fmt.Fprintln(os.Stderr, "Scheduler-Daemon wird heruntergefahren...")
 			return nil
 		case <-ticker.C:
-			runIfDesignated(ctx, s, dryRun)
+			check()
 		}
 	}
 }

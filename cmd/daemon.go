@@ -35,17 +35,13 @@ var daemonCmd = &cobra.Command{
 			cancel()
 		}()
 
-		dbPath := config.GetDBPath()
-		s, err := store.NewSQLiteStore(dbPath, config.Shared())
-		if err != nil {
-			return fmt.Errorf("open sqlite store for daemon: %w", err)
+		open := func() (*store.SQLiteStore, error) {
+			return store.NewSQLiteStore(config.GetDBPath(), config.Shared())
 		}
-		defer s.Close()
-
 		interval := time.Duration(checkIntervalSec) * time.Second
 
 		// Daemon starten
-		return scheduler.RunDaemon(ctx, s, interval, DryRunFlag)
+		return scheduler.RunDaemon(ctx, open, interval, DryRunFlag)
 	},
 }
 

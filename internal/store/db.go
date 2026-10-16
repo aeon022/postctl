@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/aeon022/missionctl-core/syncdir"
 	_ "modernc.org/sqlite"
@@ -102,7 +103,12 @@ func NewSQLiteStore(dbPath string, shared bool) (*SQLiteStore, error) {
 		return nil, fmt.Errorf("%s hasn't finished downloading from iCloud yet (found %s) — open Finder and download it, or disable \"Optimize Mac Storage\" for this folder", expandedPath, placeholder)
 	}
 
-	if err := acquireLock(expandedPath); err != nil {
+	err = acquireLock(expandedPath)
+	for i := 0; i < 8 && errors.Is(err, syncdir.ErrLocked); i++ { // ride out a short-lived holder (daemon check)
+		time.Sleep(250 * time.Millisecond)
+		err = acquireLock(expandedPath)
+	}
+	if err != nil {
 		if errors.Is(err, syncdir.ErrLocked) {
 			return nil, fmt.Errorf("postctl is already running elsewhere, or a previous session crashed — remove %s.lock if you're sure nothing else is using it", expandedPath)
 		}
