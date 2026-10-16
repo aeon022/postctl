@@ -218,8 +218,21 @@ func TestThreadsContainerErrorAndDelete(t *testing.T) {
 	if err := p.Delete(context.Background(), "pid1"); err == nil {
 		t.Error("failed delete must error")
 	}
-	if a, err := p.FetchAnalytics(context.Background(), "z"); err != nil || a.PlatformID != "z" {
-		t.Errorf("analytics = %+v %v", a, err)
+	if _, err := p.FetchAnalytics(context.Background(), "z"); err == nil {
+		t.Error("insights without the permission must be an error, not invented zeros")
+	}
+}
+
+func TestThreadsInsightsAreMappedToMetrics(t *testing.T) {
+	srv, reqs := qServer(t, func(r qReq, n int, w http.ResponseWriter) {
+		_, _ = w.Write([]byte(`{"data":[{"name":"views","values":[{"value":120}]},{"name":"likes","values":[{"value":7}]},{"name":"replies","values":[{"value":2}]},{"name":"reposts","values":[{"value":1}]},{"name":"quotes","values":[{"value":3}]}]}`))
+	})
+	a, err := newThreads(t, srv.URL, "77:TOK").FetchAnalytics(context.Background(), "post9")
+	if err != nil || a.Impressions != 120 || a.Likes != 7 || a.Comments != 2 || a.Shares != 4 {
+		t.Fatalf("metrics = %+v err=%v", a, err)
+	}
+	if r := (*reqs)[0]; r.Path != "/v1.0/post9/insights" || r.Q.Get("metric") == "" || r.Q.Get("access_token") != "TOK" {
+		t.Errorf("insights request = %s %v", r.Path, r.Q)
 	}
 }
 

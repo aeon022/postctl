@@ -142,6 +142,7 @@ type analyticsLoadedMsg struct {
 	totalImpressions int
 	platStats        map[string]*platMetricSummary
 	analyzedPosts    []postMetric
+	noData           int // posts the platform returned no metrics for
 	dailyEngagement  []int
 	err              error
 }
@@ -156,14 +157,15 @@ type platMetricSummary struct {
 }
 
 type postMetric struct {
-	ID          string `json:"id"`
-	Title       string `json:"title"`
-	Platform    string `json:"platform"`
-	PostedAt    string `json:"posted_at"`
-	Likes       int    `json:"likes"`
-	Shares      int    `json:"shares"`
-	Comments    int    `json:"comments"`
-	Impressions int    `json:"impressions"`
+	ID          string    `json:"id"`
+	Title       string    `json:"title"`
+	Platform    string    `json:"platform"`
+	PostedAt    string    `json:"posted_at"`
+	Likes       int       `json:"likes"`
+	Shares      int       `json:"shares"`
+	Comments    int       `json:"comments"`
+	Impressions int       `json:"impressions"`
+	At          time.Time `json:"-"`
 }
 
 type authResultMsg struct {
@@ -835,14 +837,16 @@ func (m Model) loadAnalyticsCmd() tea.Msg {
 	totalImpressions := 0
 
 	platStats := map[string]*platMetricSummary{
-		"twitter":  {Name: "Twitter/X"},
-		"linkedin": {Name: "LinkedIn"},
-		"threads":  {Name: "Threads"},
-		"mastodon": {Name: "Mastodon"},
-		"bluesky":  {Name: "Bluesky"},
-		"facebook": {Name: "Facebook"},
+		"twitter":   {Name: "Twitter/X"},
+		"linkedin":  {Name: "LinkedIn"},
+		"threads":   {Name: "Threads"},
+		"mastodon":  {Name: "Mastodon"},
+		"bluesky":   {Name: "Bluesky"},
+		"facebook":  {Name: "Facebook"},
+		"instagram": {Name: "Instagram"},
 	}
 
+	noData := 0
 	dailyEngagement := make([]int, days)
 
 	for _, p := range posts {
@@ -857,9 +861,8 @@ func (m Model) loadAnalyticsCmd() tea.Msg {
 
 		metrics, err := plat.FetchAnalytics(ctx, p.PlatformID)
 		if err != nil {
-			// fallback/mock
-			metrics.Likes = 10
-			metrics.Impressions = 150
+			noData++ // never invent numbers: a post without data counts as a post, with zeros
+			metrics = models.AnalyticsData{}
 		}
 
 		postedAtStr := ""
@@ -885,6 +888,9 @@ func (m Model) loadAnalyticsCmd() tea.Msg {
 			Comments:    metrics.Comments,
 			Impressions: metrics.Impressions,
 		}
+		if p.PostedAt != nil {
+			metricItem.At = *p.PostedAt
+		}
 		analyzedPosts = append(analyzedPosts, metricItem)
 
 		totalPosts++
@@ -908,6 +914,7 @@ func (m Model) loadAnalyticsCmd() tea.Msg {
 		totalShares:      totalShares,
 		totalComments:    totalComments,
 		totalImpressions: totalImpressions,
+		noData:           noData,
 		platStats:        platStats,
 		analyzedPosts:    analyzedPosts,
 		dailyEngagement:  dailyEngagement,

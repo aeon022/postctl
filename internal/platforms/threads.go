@@ -89,7 +89,7 @@ func (t *ThreadsPlatform) Auth(ctx context.Context) error {
 	redirectURI := "https://localhost:8753/callback"
 
 	// Scopes für Threads
-	scopes := "threads_basic,threads_content_publish,threads_delete"
+	scopes := "threads_basic,threads_content_publish,threads_delete,threads_manage_insights"
 
 	authURL := fmt.Sprintf(
 		"https://www.threads.net/oauth/authorize?client_id=%s&redirect_uri=%s&scope=%s&response_type=code&state=%s",
@@ -563,14 +563,56 @@ func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, 
 
 // FetchAnalytics retrieves public metrics from Threads API
 func (t *ThreadsPlatform) FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error) {
-	return models.AnalyticsData{
-		PlatformID:  platformID,
-		Likes:       0,
-		Shares:      0,
-		Comments:    0,
-		Impressions: 0,
-		FetchedAt:   time.Now(),
-	}, nil
+	_, token, err := t.getUserIDAndToken(ctx)
+	if err != nil {
+		return models.AnalyticsData{}, err
+	}
+	q := url.Values{"metric": {"views,likes,replies,reposts,quotes"}, "access_token": {token}}
+	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf(t.baseURL+"/v1.0/%s/insights?", url.PathEscape(platformID))+q.Encode(), nil)
+	if err != nil {
+		return models.AnalyticsData{}, err
+	}
+	resp, err := t.client.Do(req)
+	if err != nil {
+		return models.AnalyticsData{}, err
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return models.AnalyticsData{}, fmt.Errorf("threads insights failed (status %d): %s", resp.StatusCode, body)
+	}
+	var r struct {
+		Data []struct {
+			Name   string `json:"name"`
+			Values []struct {
+				Value int `json:"value"`
+			} `json:"values"`
+			TotalValue struct {
+				Value int `json:"value"`
+			} `json:"total_value"`
+		} `json:"data"`
+	}
+	if err := json.Unmarshal(body, &r); err != nil {
+		return models.AnalyticsData{}, err
+	}
+	out := models.AnalyticsData{PlatformID: platformID, FetchedAt: time.Now()}
+	for _, m := range r.Data {
+		v := m.TotalValue.Value
+		if len(m.Values) > 0 {
+			v = m.Values[0].Value
+		}
+		switch m.Name {
+		case "views":
+			out.Impressions = v
+		case "likes":
+			out.Likes = v
+		case "replies":
+			out.Comments = v
+		case "reposts", "quotes":
+			out.Shares += v
+		}
+	}
+	return out, nil
 }
 
 // Delete entfernt einen Beitrag von Threads über die API
