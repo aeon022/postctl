@@ -23,6 +23,9 @@ type Config struct {
 	LinkedIn struct {
 		ClientID     string `mapstructure:"client_id" yaml:"client_id"`
 		ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
+		// OrganizationID (numeric) makes postctl publish as that company page
+		// instead of the logged-in person.
+		OrganizationID string `mapstructure:"organization_id" yaml:"organization_id"`
 	} `mapstructure:"linkedin" yaml:"linkedin"`
 	Threads struct {
 		AppID     string `mapstructure:"app_id" yaml:"app_id"`

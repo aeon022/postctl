@@ -74,6 +74,9 @@ func (l *LinkedInPlatform) Auth(ctx context.Context) error {
 
 	// Scopes für LinkedIn Posting und OIDC Profil
 	scopes := "w_member_social openid profile"
+	if config.ActiveConfig.LinkedIn.OrganizationID != "" {
+		scopes += " w_organization_social" // needs the "Community Management API" product on the LinkedIn app
+	}
 
 	authURL := fmt.Sprintf(
 		"https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=%s&redirect_uri=%s&state=%s&scope=%s",
@@ -143,6 +146,14 @@ func (l *LinkedInPlatform) exchangeCodeForToken(ctx context.Context, code, redir
 	}
 
 	return nil
+}
+
+// authorURN is the company page when linkedin.organization_id is set, else the logged-in person.
+func (l *LinkedInPlatform) authorURN(ctx context.Context, token string) (string, error) {
+	if org := config.ActiveConfig.LinkedIn.OrganizationID; org != "" {
+		return "urn:li:organization:" + org, nil
+	}
+	return l.getMeURN(ctx, token)
 }
 
 // getMe urn liest den URN des angemeldeten Benutzers aus (z. B. urn:li:person:12345)
@@ -232,7 +243,7 @@ func (l *LinkedInPlatform) UploadImage(ctx context.Context, path string) (string
 		return "", fmt.Errorf("token not found: %w", err)
 	}
 
-	authorURN, err := l.getMeURN(ctx, token)
+	authorURN, err := l.authorURN(ctx, token)
 	if err != nil {
 		return "", fmt.Errorf("get author URN: %w", err)
 	}
@@ -277,7 +288,7 @@ func (l *LinkedInPlatform) Post(ctx context.Context, post *models.Post) (string,
 		return "", fmt.Errorf("token not found: %w", err)
 	}
 
-	authorURN, err := l.getMeURN(ctx, token)
+	authorURN, err := l.authorURN(ctx, token)
 	if err != nil {
 		return "", fmt.Errorf("get author URN: %w", err)
 	}

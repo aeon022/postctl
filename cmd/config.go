@@ -100,6 +100,8 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.LinkedIn.ClientID = value
 	case "linkedin.client_secret":
 		config.ActiveConfig.LinkedIn.ClientSecret = value
+	case "linkedin.organization_id":
+		config.ActiveConfig.LinkedIn.OrganizationID = value
 	case "threads.app_id":
 		config.ActiveConfig.Threads.AppID = value
 	case "threads.app_secret":

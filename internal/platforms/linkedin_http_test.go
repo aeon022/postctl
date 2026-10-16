@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 )
 
@@ -160,5 +161,14 @@ func TestLinkedInAnalyticsAndDelete(t *testing.T) {
 	l := NewLinkedInPlatform(nil, "", "")
 	if a, err := l.FetchAnalytics(context.Background(), "u"); err != nil || a.PlatformID != "u" {
 		t.Errorf("analytics = %+v err=%v", a, err)
+	}
+}
+
+func TestLinkedInAuthorIsOrganizationWhenConfigured(t *testing.T) {
+	config.ActiveConfig.LinkedIn.OrganizationID = "424242"
+	defer func() { config.ActiveConfig.LinkedIn.OrganizationID = "" }()
+	got, err := NewLinkedInPlatform(nil, "", "").authorURN(context.Background(), "tok")
+	if err != nil || got != "urn:li:organization:424242" {
+		t.Errorf("author = %q, %v", got, err)
 	}
 }
