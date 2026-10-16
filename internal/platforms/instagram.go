@@ -20,11 +20,13 @@ import (
 type InstagramPlatform struct {
 	token, accountID string
 	client           *http.Client
-	baseURL          string // Graph API root; tests point it at httptest
+	baseURL          string        // Graph API root; tests point it at httptest
+	pollEvery        time.Duration // how often to ask whether a container is processed
+	pollFor          time.Duration // give up waiting after this long
 }
 
 func NewInstagramPlatform(token, accountID string) *InstagramPlatform {
-	return &InstagramPlatform{token: token, accountID: accountID, client: &http.Client{Timeout: 30 * time.Second}, baseURL: "https://graph.facebook.com/v19.0"}
+	return &InstagramPlatform{token: token, accountID: accountID, client: &http.Client{Timeout: 30 * time.Second}, baseURL: "https://graph.facebook.com/v19.0", pollEvery: 2 * time.Second, pollFor: 90 * time.Second}
 }
 
 func (i *InstagramPlatform) Name() string { return models.PlatformInstagram }
@@ -90,7 +92,38 @@ func (i *InstagramPlatform) container(ctx context.Context, form url.Values) (str
 	if json.Unmarshal(b, &c) != nil || c.ID == "" {
 		return "", fmt.Errorf("instagram: no container id in response: %s", b)
 	}
-	return c.ID, nil
+	return c.ID, i.waitReady(ctx, c.ID)
+}
+
+// waitReady polls the container until Instagram has finished processing it;
+// publishing earlier fails with "Media ID is not available" (code 9007).
+func (i *InstagramPlatform) waitReady(ctx context.Context, id string) error {
+	deadline := time.Now().Add(i.pollFor)
+	for {
+		b, err := i.graph(ctx, http.MethodGet, "/"+url.PathEscape(id), url.Values{"fields": {"status_code,status"}})
+		if err != nil {
+			return err
+		}
+		var st struct {
+			Code   string `json:"status_code"`
+			Detail string `json:"status"`
+		}
+		_ = json.Unmarshal(b, &st)
+		switch st.Code {
+		case "FINISHED":
+			return nil
+		case "ERROR", "EXPIRED":
+			return fmt.Errorf("instagram: container %s failed processing (%s): %s", id, st.Code, st.Detail)
+		}
+		if time.Now().After(deadline) {
+			return fmt.Errorf("instagram: container %s still %q after %v", id, st.Code, i.pollFor)
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(i.pollEvery):
+		}
+	}
 }
 
 // Post publishes post.Images as a feed post: one image, a carousel (2-10 images),
