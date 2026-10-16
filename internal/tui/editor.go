@@ -21,6 +21,22 @@ import (
 )
 
 // initEditor initialisiert die Eingabefelder des Editors mit Werten eines bestehenden Beitrags oder leer
+// editorPlatforms is the platform selector's order.
+var editorPlatforms = []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "instagram", "telegram", "discord", "devto", "reddit", "hashnode", "medium"}
+
+// editor focus targets, in tab order
+const (
+	focusPlatform = iota
+	focusCampaign
+	focusSchedule
+	focusImages
+	focusAlts
+	focusBody
+	focusSave
+	focusCancel
+	focusCount
+)
+
 func (m *Model) initEditor(p *models.Post) {
 	campaignInput := textinput.New()
 	campaignInput.Placeholder = "z.B. launch-2026"
@@ -30,6 +46,9 @@ func (m *Model) initEditor(p *models.Post) {
 
 	imagesInput := textinput.New()
 	imagesInput.Placeholder = "z.B. bild1.png, bild2.png (Komma-separiert)"
+
+	altsInput := textinput.New()
+	altsInput.Placeholder = "Alt-Text je Bild, getrennt mit  |  (Barrierefreiheit, max. ~100 Zeichen)"
 
 	bodyArea := textarea.New()
 	bodyArea.Placeholder = "Schreibe deinen Beitrag hier..."
@@ -42,6 +61,8 @@ func (m *Model) initEditor(p *models.Post) {
 		campaignInput.SetValue("")
 		schedInput.SetValue("")
 		imagesInput.SetValue("")
+		altsInput.SetValue("")
+		m.editorType = ""
 		bodyArea.SetValue("")
 	} else {
 		m.editorPostID = p.ID
@@ -55,6 +76,8 @@ func (m *Model) initEditor(p *models.Post) {
 		}
 
 		imagesInput.SetValue(strings.Join(p.Images, ", "))
+		altsInput.SetValue(strings.Join(p.Alts, " | "))
+		m.editorType = p.Type
 
 		if p.Type == "thread" && len(p.Tweets) > 0 {
 			var sb strings.Builder
@@ -73,6 +96,7 @@ func (m *Model) initEditor(p *models.Post) {
 	m.editorCampaign = campaignInput
 	m.editorScheduledAt = schedInput
 	m.editorImages = imagesInput
+	m.editorAlts = altsInput
 	m.editorBody = bodyArea
 	m.editorFocus = 0
 	m.isEditing = true
@@ -85,16 +109,19 @@ func (m *Model) updateEditorFocus() {
 	m.editorCampaign.Blur()
 	m.editorScheduledAt.Blur()
 	m.editorImages.Blur()
+	m.editorAlts.Blur()
 	m.editorBody.Blur()
 
 	switch m.editorFocus {
-	case 1:
+	case focusCampaign:
 		m.editorCampaign.Focus()
-	case 2:
+	case focusSchedule:
 		m.editorScheduledAt.Focus()
-	case 3:
+	case focusImages:
 		m.editorImages.Focus()
-	case 4:
+	case focusAlts:
+		m.editorAlts.Focus()
+	case focusBody:
 		m.editorBody.Focus()
 	}
 }
@@ -139,6 +166,14 @@ func (m *Model) saveEditedPost() error {
 		}
 	}
 
+	var alts []string
+	for _, a := range strings.Split(m.editorAlts.Value(), "|") {
+		alts = append(alts, strings.TrimSpace(a))
+	}
+	if strings.TrimSpace(strings.Join(alts, "")) == "" {
+		alts = nil
+	}
+
 	body := m.editorBody.Value()
 
 	// ID beibehalten oder neu generieren
@@ -166,6 +201,7 @@ func (m *Model) saveEditedPost() error {
 		Status:      status,
 		ScheduledAt: scheduledAt,
 		Images:      images,
+		Alts:        alts,
 		Language:    "de",
 		SourceFile:  "TUI Editor",
 		CreatedAt:   time.Now(),
@@ -184,6 +220,9 @@ func (m *Model) saveEditedPost() error {
 		}
 	} else {
 		post.Type = "single"
+		if m.editorType == "story" { // editing must not turn a story into a feed post
+			post.Type = "story"
+		}
 		post.Body = body
 	}
 
@@ -197,10 +236,10 @@ func (m *Model) saveEditedPost() error {
 	return nil
 }
 
-// renderEditor zeichnet die Editor-Maske im Terminal
-func (m Model) renderEditor(w, h int) string {
+// renderEditorForm zeichnet die Editor-Maske im Terminal
+func (m Model) renderEditorForm(w, h int) string {
 	var builder strings.Builder
-	var fieldAt [7]int // line where each focus target starts, to keep the focused one in view
+	var fieldAt [focusCount]int // line where each focus target starts, to keep the focused one in view
 	mark := func(i int) { fieldAt[i] = strings.Count(builder.String(), "\n") }
 	label := func(focus int, text string) string {
 		if m.editorFocus == focus {
@@ -216,37 +255,37 @@ func (m Model) renderEditor(w, h int) string {
 	}
 
 	// 1. Plattform (wrapped so the selected one never falls off a narrow terminal)
-	mark(0)
+	mark(focusPlatform)
 	var platSelect []string
-	for _, p := range []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord", "devto", "reddit", "hashnode", "medium"} {
+	for _, p := range editorPlatforms {
 		if p == m.editorPlatform {
 			platSelect = append(platSelect, lipgloss.NewStyle().Bold(true).Foreground(ColorSecondary).Render("["+strings.ToUpper(p)+"]"))
 		} else {
 			platSelect = append(platSelect, strings.ToUpper(p))
 		}
 	}
-	builder.WriteString(label(0, Tr("editor_label_platform")) + "\n")
+	builder.WriteString(label(focusPlatform, Tr("editor_label_platform")) + "\n")
 	for _, l := range wrapLines(strings.Join(platSelect, "  "), iw-4) {
 		builder.WriteString("    " + l + "\n")
 	}
 	builder.WriteString("\n")
 
 	// 2. Kampagne
-	mark(1)
-	builder.WriteString(label(1, Tr("editor_label_campaign")) + m.editorCampaign.View() + "\n\n")
+	mark(focusCampaign)
+	builder.WriteString(label(focusCampaign, Tr("editor_label_campaign")) + m.editorCampaign.View() + "\n\n")
 
 	// 3. Geplantes Datum
-	mark(2)
-	builder.WriteString(label(2, Tr("editor_label_schedule")) + m.editorScheduledAt.View() + "\n")
-	if m.editorFocus == 2 && !m.showDatePicker {
+	mark(focusSchedule)
+	builder.WriteString(label(focusSchedule, Tr("editor_label_schedule")) + m.editorScheduledAt.View() + "\n")
+	if m.editorFocus == focusSchedule && !m.showDatePicker {
 		builder.WriteString(dimStyle.Render("     "+Tr("editor_tip_now")) + "\n\n")
 	} else {
 		builder.WriteString("\n")
 	}
 
 	// 4. Bilder
-	mark(3)
-	builder.WriteString(label(3, Tr("editor_label_images")) + m.editorImages.View() + "\n")
+	mark(focusImages)
+	builder.WriteString(label(focusImages, Tr("editor_label_images")) + m.editorImages.View() + "\n")
 	for _, part := range strings.Split(m.editorImages.Value(), ",") {
 		trimmed := strings.TrimSpace(part)
 		if trimmed == "" {
@@ -264,21 +303,28 @@ func (m Model) renderEditor(w, h int) string {
 			break
 		}
 	}
-	if m.editorFocus == 3 {
-		builder.WriteString(dimStyle.Render(Tr("editor_images_help")) + "\n\n")
-	} else {
-		builder.WriteString("\n")
+	if m.editorFocus == focusImages {
+		builder.WriteString(dimStyle.Render(Tr("editor_images_help")) + "\n")
 	}
+	builder.WriteString("\n")
+
+	// 4b. Alt-Texte
+	mark(focusAlts)
+	builder.WriteString(label(focusAlts, Tr("editor_label_alts")) + m.editorAlts.View() + "\n")
+	if n := missingAlts(m.editorImages.Value(), m.editorAlts.Value()); n > 0 {
+		builder.WriteString("     " + amberStyle().Render(fmt.Sprintf(Tr("editor_alt_missing"), n)) + "\n")
+	}
+	builder.WriteString("\n")
 
 	// 5. Text-Inhalt (width follows the terminal; local copy, the model keeps its own)
-	mark(4)
+	mark(focusBody)
 	bodyLabel := Tr("editor_label_body")
 	if m.editorPlatform == "twitter" || m.editorPlatform == "mastodon" || m.editorPlatform == "bluesky" {
 		bodyLabel += Tr("editor_twitter_thread_note")
 	}
 	body := m.editorBody
 	body.SetWidth(min(max(iw-4, 20), 100))
-	builder.WriteString(label(4, bodyLabel) + "\n" + body.View() + "\n")
+	builder.WriteString(label(focusBody, bodyLabel) + "\n" + body.View() + "\n")
 	if charLimitMsg, _ := m.checkCharacterLimits(); charLimitMsg != "" {
 		builder.WriteString("     " + charLimitMsg + "\n\n")
 	} else {
@@ -286,15 +332,15 @@ func (m Model) renderEditor(w, h int) string {
 	}
 
 	// 6. Action-Buttons
-	mark(5)
-	fieldAt[6] = fieldAt[5]
+	mark(focusSave)
+	fieldAt[focusCancel] = fieldAt[focusSave]
 	saveLabel, cancelLabel := Tr("editor_save"), Tr("editor_cancel")
-	if m.editorFocus == 5 {
+	if m.editorFocus == focusSave {
 		saveLabel = lipgloss.NewStyle().Bold(true).Foreground(ColorBgFg).Background(ColorPosted).Render(saveLabel)
 	} else {
 		saveLabel = lipgloss.NewStyle().Foreground(ColorPosted).Render(saveLabel)
 	}
-	if m.editorFocus == 6 {
+	if m.editorFocus == focusCancel {
 		cancelLabel = lipgloss.NewStyle().Bold(true).Foreground(ColorBgFg).Background(ColorFailed).Render(cancelLabel)
 	} else {
 		cancelLabel = lipgloss.NewStyle().Foreground(ColorFailed).Render(cancelLabel)
@@ -304,9 +350,9 @@ func (m Model) renderEditor(w, h int) string {
 	// scroll so the focused field (and, for the body, its text area) is visible
 	room, span := max(h-2, 1), 3
 	switch {
-	case m.editorFocus == 4:
+	case m.editorFocus == focusBody:
 		span = body.Height() + 2
-	case m.editorFocus >= 5:
+	case m.editorFocus >= focusSave:
 		span = 1
 	}
 	off := max(fieldAt[m.editorFocus]+span-room, 0)
@@ -526,4 +572,21 @@ func renderImageANSI(path string, maxW, maxH int) string {
 	}
 
 	return sb.String()
+}
+
+// missingAlts counts images without an alt text.
+func missingAlts(images, alts string) int {
+	n := 0
+	for _, i := range strings.Split(images, ",") {
+		if strings.TrimSpace(i) != "" {
+			n++
+		}
+	}
+	have := 0
+	for _, a := range strings.Split(alts, "|") {
+		if strings.TrimSpace(a) != "" {
+			have++
+		}
+	}
+	return max(n-have, 0)
 }

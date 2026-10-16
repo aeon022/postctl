@@ -54,7 +54,7 @@ func chromeViews(t *testing.T, w, h int) map[string]Model {
 		"edit":           keys("tab", "e"),
 		"calendar":       keys("tab", "n", "tab", "tab", "ctrl+d"),
 	}
-	for f := 1; f <= 6; f++ {
+	for f := 1; f < focusCount; f++ {
 		views[fmt.Sprintf("editor focus %d", f)] = keys(append([]string{"tab", "n"}, strings.Split(strings.Repeat("tab,", f), ",")[:f]...)...)
 	}
 	th := keys("tab", "enter")
@@ -150,7 +150,7 @@ func TestViewContentShowsTheRealThing(t *testing.T) {
 
 func TestEditorKeepsTheFocusedFieldVisibleOnASmallTerminal(t *testing.T) {
 	v := chromeViews(t, 80, 24)
-	if text := tuitest.Text(v["editor focus 5"]); !strings.Contains(text, "[ SAVE ]") {
+	if text := tuitest.Text(v["editor focus 6"]); !strings.Contains(text, "[ SAVE ]") {
 		t.Errorf("save button must be visible when focused:\n%s", text)
 	}
 	if text := tuitest.Text(v["editor focus 1"]); !strings.Contains(text, "➔") {

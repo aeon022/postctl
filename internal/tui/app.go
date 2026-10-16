@@ -76,6 +76,8 @@ type Model struct {
 	editorImages      textinput.Model
 	editorBody        textarea.Model
 	editorFocus       int
+	editorAlts        textinput.Model // alt text per image, separated by " | "
+	editorType        string          // kept when editing (e.g. "story")
 	showDatePicker    bool
 	datePickerDate    time.Time
 
@@ -994,37 +996,37 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.isEditing = false
 				return m, nil
 			case "tab":
-				m.editorFocus = (m.editorFocus + 1) % 7
+				m.editorFocus = (m.editorFocus + 1) % focusCount
 				m.updateEditorFocus()
 				return m, nil
 			case "shift+tab":
-				m.editorFocus = (m.editorFocus - 1 + 7) % 7
+				m.editorFocus = (m.editorFocus - 1 + focusCount) % focusCount
 				m.updateEditorFocus()
 				return m, nil
 			case "enter":
-				if m.editorFocus == 5 { // Save
+				if m.editorFocus == focusSave {
 					if err := m.saveEditedPost(); err != nil {
 						m.err = err
 						return m, nil
 					}
 					m.isEditing = false
 					return m, m.loadDataCmd
-				} else if m.editorFocus == 6 { // Cancel
+				} else if m.editorFocus == focusCancel {
 					m.isEditing = false
 					return m, nil
 				}
 			case "ctrl+v":
 				return m, m.runExternalEditorCmd()
 			case "ctrl+d":
-				if m.editorFocus == 2 {
+				if m.editorFocus == focusSchedule {
 					m.showDatePicker = true
 					m.datePickerDate = time.Now()
 					return m, nil
 				}
 			}
 
-			if m.editorFocus == 0 {
-				platformsList := []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "telegram", "discord", "devto", "reddit", "hashnode", "medium"}
+			if m.editorFocus == focusPlatform {
+				platformsList := editorPlatforms
 				currIdx := -1
 				for idx, p := range platformsList {
 					if p == m.editorPlatform {
@@ -1047,13 +1049,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			var cmd tea.Cmd
 			switch m.editorFocus {
-			case 1:
+			case focusCampaign:
 				m.editorCampaign, cmd = m.editorCampaign.Update(msg)
-			case 2:
+			case focusSchedule:
 				m.editorScheduledAt, cmd = m.editorScheduledAt.Update(msg)
-			case 3:
+			case focusImages:
 				m.editorImages, cmd = m.editorImages.Update(msg)
-			case 4:
+			case focusAlts:
+				m.editorAlts, cmd = m.editorAlts.Update(msg)
+			case focusBody:
 				m.editorBody, cmd = m.editorBody.Update(msg)
 			}
 			return m, cmd

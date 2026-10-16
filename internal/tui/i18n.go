@@ -26,6 +26,22 @@ func Tr(key string) string {
 }
 
 var translationsMap = map[string]map[string]string{
+	"preview_title":       {"de": "Vorschau", "en": "Preview"},
+	"prev_images":         {"de": "Bilder", "en": "images"},
+	"prev_need_image":     {"de": "Instagram braucht ein Bild", "en": "Instagram needs an image"},
+	"prev_more":           {"de": "… mehr", "en": "… more"},
+	"prev_empty":          {"de": "(noch kein Text)", "en": "(no text yet)"},
+	"prev_chars":          {"de": "Zeichen", "en": "characters"},
+	"prev_hashtags":       {"de": "Hashtags", "en": "hashtags"},
+	"prev_too_many":       {"de": "mehr als ~10 bringen kaum etwas", "en": "more than ~10 rarely help"},
+	"prev_alt_ok":         {"de": "Alt-Text vorhanden", "en": "alt text present"},
+	"prev_place_on":       {"de": "Ort-Tag aktiv", "en": "place tag on"},
+	"prev_place_off":      {"de": "kein Ort-Tag (instagram.location_id)", "en": "no place tag (instagram.location_id)"},
+	"prev_draft":          {"de": "Entwurf (kein Termin)", "en": "draft (no time set)"},
+	"prev_now":            {"de": "sofort", "en": "immediately"},
+	"prev_bad_date":       {"de": "Datum nicht lesbar", "en": "date not readable"},
+	"editor_label_alts":   {"de": "Alt-Texte:  ", "en": "Alt texts:  "},
+	"editor_alt_missing":  {"de": "⚠ Alt-Text fehlt bei %d Bild(ern)", "en": "⚠ alt text missing for %d image(s)"},
 	"tab_calendar":        {"de": "▦ KALENDER", "en": "▦ CALENDAR"},
 	"ask_title":           {"de": "Jetzt veröffentlichen?", "en": "Publish now?"},
 	"health_expired":      {"de": "abgelaufen", "en": "expired"},

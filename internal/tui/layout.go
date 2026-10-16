@@ -123,10 +123,10 @@ func (m Model) hintsFor() [][2]string {
 		return [][2]string{hint("esc", "hint_close"), hint("enter", "hint_pick"), hint("←↑↓→", "hint_day"), hint("p/n", "hint_month")}
 	case m.isEditing:
 		h := [][2]string{hint("esc", "hint_cancel"), hint("tab", "hint_next"), hint("shift+tab", "hint_prev"), hint("ctrl+v", "hint_nvim")}
-		if m.editorFocus == 2 {
+		if m.editorFocus == focusSchedule {
 			h = append(h, hint("ctrl+d", "hint_calendar"))
 		}
-		if m.editorFocus >= 5 {
+		if m.editorFocus >= focusSave {
 			h = append(h[:1], append([][2]string{hint("enter", "hint_pick")}, h[1:]...)...)
 		}
 		return h
