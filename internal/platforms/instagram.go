@@ -21,6 +21,7 @@ type InstagramPlatform struct {
 	token, accountID string
 	client           *http.Client
 	baseURL          string        // Graph API root; tests point it at httptest
+	locationID       string        // optional place tag for feed posts
 	pollEvery        time.Duration // how often to ask whether a container is processed
 	pollFor          time.Duration // give up waiting after this long
 }
@@ -80,9 +81,21 @@ func (i *InstagramPlatform) graph(ctx context.Context, method, path string, form
 	return b, nil
 }
 
-// container creates a media container and returns its id.
-func (i *InstagramPlatform) container(ctx context.Context, form url.Values) (string, error) {
-	b, err := i.graph(ctx, http.MethodPost, "/"+i.accountID+"/media", form)
+// container creates a media container and returns its id. optional holds
+// nice-to-have fields (alt text, place tag): if Instagram rejects the request with
+// them, it is retried without, so a bad optional field never blocks a scheduled post.
+func (i *InstagramPlatform) container(ctx context.Context, form, optional url.Values) (string, error) {
+	full := url.Values{}
+	for k, v := range form {
+		full[k] = v
+	}
+	for k, v := range optional {
+		full[k] = v
+	}
+	b, err := i.graph(ctx, http.MethodPost, "/"+i.accountID+"/media", full)
+	if err != nil && len(optional) > 0 {
+		b, err = i.graph(ctx, http.MethodPost, "/"+i.accountID+"/media", form)
+	}
 	if err != nil {
 		return "", err
 	}
@@ -126,6 +139,19 @@ func (i *InstagramPlatform) waitReady(ctx context.Context, id string) error {
 	}
 }
 
+// optionalFor builds the optional container fields: alt text for image n (n >= 0)
+// and the place tag for the post-level container (withLocation).
+func (i *InstagramPlatform) optionalFor(post *models.Post, n int, withLocation bool) url.Values {
+	o := url.Values{}
+	if a := post.AltAt(n); a != "" {
+		o.Set("alt_text", a)
+	}
+	if withLocation && i.locationID != "" {
+		o.Set("location_id", i.locationID)
+	}
+	return o
+}
+
 // Post publishes post.Images as a feed post: one image, a carousel (2-10 images),
 // or a Story when post.Type is "story" (one image, no caption). All image URLs
 // must be public https:// URLs.
@@ -157,19 +183,19 @@ func (i *InstagramPlatform) Post(ctx context.Context, post *models.Post) (string
 	var err error
 	switch {
 	case story:
-		creation, err = i.container(ctx, url.Values{"image_url": {post.Images[0]}, "media_type": {"STORIES"}})
+		creation, err = i.container(ctx, url.Values{"image_url": {post.Images[0]}, "media_type": {"STORIES"}}, nil)
 	case len(post.Images) == 1:
-		creation, err = i.container(ctx, url.Values{"image_url": {post.Images[0]}, "caption": {caption}})
+		creation, err = i.container(ctx, url.Values{"image_url": {post.Images[0]}, "caption": {caption}}, i.optionalFor(post, 0, true))
 	default:
 		var kids []string
-		for _, img := range post.Images {
-			id, cerr := i.container(ctx, url.Values{"image_url": {img}, "is_carousel_item": {"true"}})
+		for n, img := range post.Images {
+			id, cerr := i.container(ctx, url.Values{"image_url": {img}, "is_carousel_item": {"true"}}, i.optionalFor(post, n, false))
 			if cerr != nil {
 				return "", cerr
 			}
 			kids = append(kids, id)
 		}
-		creation, err = i.container(ctx, url.Values{"media_type": {"CAROUSEL"}, "children": {strings.Join(kids, ",")}, "caption": {caption}})
+		creation, err = i.container(ctx, url.Values{"media_type": {"CAROUSEL"}, "children": {strings.Join(kids, ",")}, "caption": {caption}}, i.optionalFor(post, -1, true))
 	}
 	if err != nil {
 		return "", err

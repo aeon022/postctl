@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/aeon022/postctl/internal/models"
@@ -23,13 +24,9 @@ func (s *SQLiteStore) SavePost(ctx context.Context, post *models.Post) error {
 		content = post.Body
 	}
 
-	var imagesStr string
-	if len(post.Images) > 0 {
-		b, err := json.Marshal(post.Images)
-		if err != nil {
-			return fmt.Errorf("marshal images: %w", err)
-		}
-		imagesStr = string(b)
+	imagesStr, err := encodeImages(post.Images, post.Alts)
+	if err != nil {
+		return fmt.Errorf("marshal images: %w", err)
 	}
 
 	scheduledStr := timeToNullString(post.ScheduledAt)
@@ -64,7 +61,7 @@ func (s *SQLiteStore) SavePost(ctx context.Context, post *models.Post) error {
 			updated_at = excluded.updated_at
 	`
 
-	_, err := s.db.ExecContext(ctx, query,
+	_, err = s.db.ExecContext(ctx, query,
 		post.ID,
 		post.Platform,
 		post.Type,
@@ -145,7 +142,7 @@ func (s *SQLiteStore) GetPost(ctx context.Context, id string) (*models.Post, err
 
 	// Bilder unmarshaln
 	if imagesStr.Valid && imagesStr.String != "" {
-		if err := json.Unmarshal([]byte(imagesStr.String), &post.Images); err != nil {
+		if post.Images, post.Alts, err = decodeImages(imagesStr.String); err != nil {
 			return nil, fmt.Errorf("unmarshal images: %w", err)
 		}
 	}
@@ -237,7 +234,7 @@ func (s *SQLiteStore) ListPosts(ctx context.Context, platform, status, campaign 
 		}
 
 		if imagesStr.Valid && imagesStr.String != "" {
-			if err := json.Unmarshal([]byte(imagesStr.String), &post.Images); err != nil {
+			if post.Images, post.Alts, err = decodeImages(imagesStr.String); err != nil {
 				return nil, fmt.Errorf("unmarshal images on list: %w", err)
 			}
 		}
@@ -312,4 +309,33 @@ func (s *SQLiteStore) TryLockPost(ctx context.Context, id string) (bool, error) 
 		return false, fmt.Errorf("get lock post rows affected: %w", err)
 	}
 	return rows == 1, nil
+}
+
+// encodeImages keeps the legacy format (a plain JSON array) when there is no alt text,
+// so databases stay readable by older binaries; with alt text it stores {"images","alts"}.
+func encodeImages(images, alts []string) (string, error) {
+	if len(images) == 0 {
+		return "", nil
+	}
+	var v any = images
+	if len(alts) > 0 {
+		v = struct {
+			Images []string `json:"images"`
+			Alts   []string `json:"alts"`
+		}{images, alts}
+	}
+	b, err := json.Marshal(v)
+	return string(b), err
+}
+
+func decodeImages(s string) (images, alts []string, err error) {
+	if strings.HasPrefix(strings.TrimSpace(s), "[") {
+		return images, nil, json.Unmarshal([]byte(s), &images)
+	}
+	var o struct {
+		Images []string `json:"images"`
+		Alts   []string `json:"alts"`
+	}
+	err = json.Unmarshal([]byte(s), &o)
+	return o.Images, o.Alts, err
 }

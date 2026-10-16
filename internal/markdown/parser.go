@@ -39,6 +39,7 @@ type Frontmatter struct {
 	Campaign string        `yaml:"campaign"`
 	Schedule string        `yaml:"schedule"` // ISO 8601 oder YYYY-MM-DD HH:MM
 	Images   StringOrSlice `yaml:"images"`
+	Alt      StringOrSlice `yaml:"alt"` // alt text per image, same order as images
 	Tags     []string      `yaml:"tags"`
 	Title    string        `yaml:"title"`
 }
@@ -142,6 +143,7 @@ func ParseContent(content, sourcePath string) ([]models.Post, error) {
 			Campaign:    fm.Campaign,
 			Title:       title,
 			Images:      []string(fm.Images),
+			Alts:        []string(fm.Alt),
 			Tags:        fm.Tags,
 			ScheduledAt: scheduledAt,
 			SourceFile:  sourcePath,

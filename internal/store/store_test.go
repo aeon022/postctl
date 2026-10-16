@@ -190,3 +190,19 @@ func TestStoreWorkflow(t *testing.T) {
 		t.Errorf("expected history to be empty after cascading delete, got %d", len(historyAfterDelete))
 	}
 }
+
+func TestImagesEncodingKeepsLegacyFormatAndRoundTripsAlts(t *testing.T) {
+	legacy, _ := encodeImages([]string{"a.png"}, nil)
+	if legacy != `["a.png"]` {
+		t.Errorf("without alt text the legacy array format must be kept, got %s", legacy)
+	}
+	imgs, alts, err := decodeImages(legacy)
+	if err != nil || len(imgs) != 1 || len(alts) != 0 {
+		t.Fatalf("legacy decode: %v %v %v", imgs, alts, err)
+	}
+	enc, _ := encodeImages([]string{"a.png", "b.png"}, []string{"A", ""})
+	imgs, alts, err = decodeImages(enc)
+	if err != nil || len(imgs) != 2 || alts[0] != "A" {
+		t.Fatalf("round trip: %v %v %v", imgs, alts, err)
+	}
+}

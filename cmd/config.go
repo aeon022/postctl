@@ -146,6 +146,8 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Medium.IntegrationToken = value
 	case "instagram.access_token":
 		config.ActiveConfig.Instagram.AccessToken = value
+	case "instagram.location_id":
+		config.ActiveConfig.Instagram.LocationID = value
 	case "instagram.api":
 		config.ActiveConfig.Instagram.API = value
 	case "instagram.account_id":

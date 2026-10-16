@@ -43,6 +43,7 @@ func GetPlatform(name string, s *store.SQLiteStore, dryRun bool) (Platform, erro
 		return NewFacebookPlatform(s, config.ActiveConfig.Facebook.AppID, config.ActiveConfig.Facebook.AppSecret, config.ActiveConfig.Facebook.PageID), nil
 	case models.PlatformInstagram:
 		ig := NewInstagramPlatform(config.ActiveConfig.Instagram.AccessToken, config.ActiveConfig.Instagram.AccountID)
+		ig.locationID = config.ActiveConfig.Instagram.LocationID
 		if config.ActiveConfig.Instagram.API == "instagram" {
 			ig.baseURL = "https://graph.instagram.com/v21.0"
 		}

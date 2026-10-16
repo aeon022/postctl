@@ -329,7 +329,7 @@ func (t *ThreadsPlatform) UploadImage(ctx context.Context, path string) (string,
 
 // createAndPublishContainer erstellt einen Container für Threads und veröffentlicht ihn.
 // Falls replyToID angegeben ist, wird der Beitrag als Antwort auf diesen deklariert.
-func (t *ThreadsPlatform) createAndPublishContainer(ctx context.Context, userID, token, text, imgPath, replyToID string) (string, error) {
+func (t *ThreadsPlatform) createAndPublishContainer(ctx context.Context, userID, token, text, imgPath, alt, replyToID string) (string, error) {
 	// 1. Container erstellen
 	createURL := fmt.Sprintf(t.baseURL+"/v1.0/%s/threads", userID)
 
@@ -347,6 +347,9 @@ func (t *ThreadsPlatform) createAndPublishContainer(ctx context.Context, userID,
 		}
 		params.Set("media_type", "IMAGE")
 		params.Set("image_url", imageUrl)
+		if alt != "" {
+			params.Set("alt_text", alt)
+		}
 	} else {
 		params.Set("media_type", "TEXT")
 	}
@@ -361,6 +364,19 @@ func (t *ThreadsPlatform) createAndPublishContainer(ctx context.Context, userID,
 		return "", fmt.Errorf("create threads container request failed: %w", err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK && params.Has("alt_text") {
+		// alt text is nice-to-have: never let it block a scheduled post
+		resp.Body.Close()
+		params.Del("alt_text")
+		if req, err = http.NewRequestWithContext(ctx, "POST", createURL+"?"+params.Encode(), nil); err != nil {
+			return "", err
+		}
+		if resp, err = t.client.Do(req); err != nil {
+			return "", fmt.Errorf("create threads container request failed: %w", err)
+		}
+		defer resp.Body.Close()
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -435,7 +451,7 @@ func (t *ThreadsPlatform) publishContainer(ctx context.Context, userID, token, c
 }
 
 // postCarousel publishes 2-20 images as one carousel post.
-func (t *ThreadsPlatform) postCarousel(ctx context.Context, userID, token, text string, images []string) (string, error) {
+func (t *ThreadsPlatform) postCarousel(ctx context.Context, userID, token, text string, images, alts []string) (string, error) {
 	create := func(params url.Values) (string, error) {
 		params.Set("access_token", token)
 		req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf(t.baseURL+"/v1.0/%s/threads?", userID)+params.Encode(), nil)
@@ -458,12 +474,20 @@ func (t *ThreadsPlatform) postCarousel(ctx context.Context, userID, token, text 
 	}
 
 	var kids []string
-	for _, img := range images {
+	for n, img := range images {
 		u, err := t.UploadImage(ctx, img)
 		if err != nil {
 			return "", err
 		}
-		id, err := create(url.Values{"media_type": {"IMAGE"}, "image_url": {u}, "is_carousel_item": {"true"}})
+		form := url.Values{"media_type": {"IMAGE"}, "image_url": {u}, "is_carousel_item": {"true"}}
+		if n < len(alts) && alts[n] != "" {
+			form.Set("alt_text", alts[n])
+		}
+		id, err := create(form)
+		if err != nil && form.Has("alt_text") {
+			form.Del("alt_text")
+			id, err = create(form)
+		}
 		if err != nil {
 			return "", err
 		}
@@ -485,18 +509,20 @@ func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, 
 
 	var contents []string
 	var images []string
+	var alts []string
 
 	if post.Type == "thread" {
 		for _, tw := range post.Tweets {
 			contents = append(contents, tw.Content)
 			images = append(images, tw.Image)
+			alts = append(alts, "")
 		}
 	} else {
 		if len(post.Images) > 1 {
 			if len(post.Images) > 20 {
 				return "", fmt.Errorf("threads: a carousel holds at most 20 images, got %d", len(post.Images))
 			}
-			return t.postCarousel(ctx, userID, token, post.Body, post.Images)
+			return t.postCarousel(ctx, userID, token, post.Body, post.Images, post.Alts)
 		}
 		contents = []string{post.Body}
 		var img string
@@ -504,6 +530,7 @@ func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, 
 			img = post.Images[0]
 		}
 		images = []string{img}
+		alts = []string{post.AltAt(0)}
 	}
 
 	var lastPostID string
@@ -520,7 +547,7 @@ func (t *ThreadsPlatform) Post(ctx context.Context, post *models.Post) (string, 
 			time.Sleep(threadsPostGap)
 		}
 
-		postID, err := t.createAndPublishContainer(ctx, userID, token, content, imgPath, lastPostID)
+		postID, err := t.createAndPublishContainer(ctx, userID, token, content, imgPath, alts[i], lastPostID)
 		if err != nil {
 			return "", fmt.Errorf("failed to post thread item %d: %w", i+1, err)
 		}

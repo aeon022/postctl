@@ -43,6 +43,7 @@ type Post struct {
 	Tweets      []Tweet    `json:"tweets" yaml:"tweets"` // Für Threads
 	Body        string     `json:"body" yaml:"body"`     // Für Singles
 	Images      []string   `json:"images" yaml:"images"`
+	Alts        []string   `json:"alts,omitempty" yaml:"alt"` // alt text per image, same order as Images
 	Tags        []string   `json:"tags" yaml:"tags"`
 	Status      string     `json:"status" yaml:"status"`
 	ScheduledAt *time.Time `json:"scheduled_at" yaml:"schedule"`
@@ -140,4 +141,12 @@ func (p *Post) PrepareTweets() {
 			}
 		}
 	}
+}
+
+// AltAt returns the alt text of image i ("" if none was given).
+func (p *Post) AltAt(i int) string {
+	if i < 0 || i >= len(p.Alts) {
+		return ""
+	}
+	return p.Alts[i]
 }

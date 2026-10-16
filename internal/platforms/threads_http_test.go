@@ -244,3 +244,35 @@ func TestThreadsPostCarousel(t *testing.T) {
 		t.Errorf("unexpected requests: %+v", r)
 	}
 }
+
+func TestThreadsSendsAltTextAndFallsBack(t *testing.T) {
+	reject := false
+	srv, reqs := qServer(t, func(r qReq, n int, w http.ResponseWriter) {
+		if strings.HasSuffix(r.Path, "/threads") {
+			if reject && r.Q.Has("alt_text") {
+				w.WriteHeader(400)
+				_, _ = w.Write([]byte(`{"error":{"message":"nope"}}`))
+				return
+			}
+			_, _ = w.Write([]byte(fmt.Sprintf(`{"id":"c%d"}`, n)))
+			return
+		}
+		_, _ = w.Write([]byte(fmt.Sprintf(`{"id":"post-of-%s"}`, r.Q.Get("creation_id"))))
+	})
+	p := newThreads(t, srv.URL, "77:TOK")
+	post := &models.Post{Type: "single", Body: "hi", Images: []string{"https://x/a.png"}, Alts: []string{"Plakat"}}
+	if _, err := p.Post(context.Background(), post); err != nil {
+		t.Fatal(err)
+	}
+	if got := (*reqs)[0].Q.Get("alt_text"); got != "Plakat" {
+		t.Errorf("alt_text = %q", got)
+	}
+	*reqs = nil
+	reject = true
+	if _, err := p.Post(context.Background(), post); err != nil {
+		t.Fatalf("fallback must succeed: %v", err)
+	}
+	if (*reqs)[1].Q.Has("alt_text") || (*reqs)[1].Q.Get("image_url") == "" {
+		t.Errorf("retry must drop alt_text and keep the image: %v", (*reqs)[1].Q)
+	}
+}

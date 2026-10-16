@@ -130,7 +130,9 @@ func (l *LinkedInPlatform) postOrg(ctx context.Context, token string, post *mode
 			return "", err
 		}
 		media := map[string]string{"id": img}
-		if post.Title != "" {
+		if a := post.AltAt(0); a != "" {
+			media["altText"] = a
+		} else if post.Title != "" {
 			media["altText"] = post.Title
 		}
 		body["content"] = map[string]any{"media": media}

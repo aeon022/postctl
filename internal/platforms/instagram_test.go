@@ -140,3 +140,41 @@ func TestInstagramWaitsUntilContainerIsFinished(t *testing.T) {
 		t.Errorf("ERROR status must surface, got %v", err)
 	}
 }
+
+func TestInstagramSendsAltTextAndLocationAndFallsBack(t *testing.T) {
+	reject := false
+	srv, reqs := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) {
+		if r.Method == "GET" {
+			_, _ = w.Write([]byte(`{"status_code":"FINISHED"}`))
+			return
+		}
+		if reject && strings.HasSuffix(r.Path, "/media") && (r.Form.Get("alt_text") != "" || r.Form.Get("location_id") != "") {
+			w.WriteHeader(400)
+			_, _ = w.Write([]byte(`{"error":{"message":"bad optional field"}}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{"id":"C1"}`))
+	})
+	p := newIG(srv.URL)
+	p.locationID = "555"
+	post := &models.Post{Body: "x", Images: []string{"https://x/a.png"}, Alts: []string{"Plakat"}}
+
+	if _, err := p.Post(context.Background(), post); err != nil {
+		t.Fatal(err)
+	}
+	c := igPosts(*reqs)[0]
+	if c.Form.Get("alt_text") != "Plakat" || c.Form.Get("location_id") != "555" {
+		t.Errorf("container form = %v", c.Form)
+	}
+
+	// Instagram rejects the optional fields: the post must still go out, without them
+	*reqs = nil
+	reject = true
+	if _, err := p.Post(context.Background(), post); err != nil {
+		t.Fatalf("fallback must succeed: %v", err)
+	}
+	r := igPosts(*reqs)
+	if len(r) != 3 || r[1].Form.Get("alt_text") != "" || r[1].Form.Get("location_id") != "" || r[1].Form.Get("image_url") == "" {
+		t.Errorf("expected rejected attempt, plain retry, publish; got %+v", r)
+	}
+}
