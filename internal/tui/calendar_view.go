@@ -175,27 +175,92 @@ func (m Model) calendarKey(msg tea.KeyPressMsg) (Model, tea.Cmd, bool) {
 	return m, nil, false
 }
 
+// calGeom is the calendar tab's layout, shared by drawing and mouse hit-testing.
+type calGeom struct {
+	first, last, start time.Time // month bounds and the Monday the shown grid starts on
+	weeks, showWeeks   int
+	rowH, gridH, cellW int
+}
+
+func calLayout(w, h int, sel time.Time) calGeom {
+	g := calGeom{}
+	g.first = time.Date(sel.Year(), sel.Month(), 1, 0, 0, 0, 0, time.Local)
+	g.last = g.first.AddDate(0, 1, -1)
+	gridStart := mondayOnOrBefore(g.first)
+	g.weeks = int(mondayOnOrBefore(g.last).Sub(gridStart).Hours()/24/7) + 1
+
+	// Month grid needs 2 border rows, 1 weekday row and rowH rows per week; the day list gets the rest.
+	// When that leaves too little, show only the selected week.
+	g.showWeeks, g.start, g.rowH = g.weeks, gridStart, 2
+	if h-(3+3*g.weeks) >= 9 { // roomy: a third line per week shows the first post of the day
+		g.rowH = 3
+	}
+	if h-(3+g.rowH*g.weeks) < 6 {
+		g.showWeeks, g.start, g.rowH = 1, mondayOnOrBefore(sel), 2
+	}
+	g.gridH = 3 + g.rowH*g.showWeeks
+	g.cellW = max((w-4-6)/7, 5)
+	return g
+}
+
+// calHit maps a click inside the body (x, y relative to the body's top-left) to a grid day or a
+// post row of the selected day's list. day is zero when the click is not on a day cell.
+func calHit(g calGeom, x, y int) (day time.Time, postRow int) {
+	postRow = -1
+	cx := x - 4 // 2 indent + border + space
+	if y >= 2 && y < g.gridH-1 {
+		wk := (y - 2) / g.rowH
+		c := cx / (g.cellW + 1)
+		if cx >= 0 && c < 7 && wk < g.showWeeks && cx%(g.cellW+1) < g.cellW {
+			return g.start.AddDate(0, 0, wk*7+c), -1
+		}
+		return time.Time{}, -1
+	}
+	if y >= g.gridH+1 {
+		return time.Time{}, y - (g.gridH + 1)
+	}
+	return time.Time{}, -1
+}
+
+// calendarClick selects the clicked day; a click on the already selected day or post opens it.
+func (m Model) calendarClick(x, y int) (Model, bool) {
+	w, h := m.bodyDims()
+	g := calLayout(w, h, m.calSel())
+	day, row := calHit(g, x, y-len(m.headerLines()))
+	sel := m.calSel()
+	switch {
+	case !day.IsZero():
+		d := dayStart(day)
+		if d.Equal(sel) {
+			if ps := m.postsByDay()[dayKey(sel)]; len(ps) > 0 {
+				p := ps[min(m.calCursor, len(ps)-1)]
+				m.selectedPost = &p
+			}
+		} else {
+			m.calDay, m.calCursor = d, 0
+		}
+		return m, true
+	case row >= 0:
+		ps := m.postsByDay()[dayKey(sel)]
+		if row < len(ps) {
+			if row == m.calCursor {
+				p := ps[row]
+				m.selectedPost = &p
+			}
+			m.calCursor = row
+			return m, true
+		}
+	}
+	return m, false
+}
+
 func (m Model) renderCalendarTab(w, h int) string {
 	sel := m.calSel()
 	byDay := m.postsByDay()
 	today := dayStart(time.Now())
-	first := time.Date(sel.Year(), sel.Month(), 1, 0, 0, 0, 0, time.Local)
-	last := first.AddDate(0, 1, -1)
-	gridStart := mondayOnOrBefore(first)
-	weeks := int(mondayOnOrBefore(last).Sub(gridStart).Hours()/24/7) + 1
-
-	// Month grid needs 2 border rows, 1 weekday row and 2 rows per week; the day list gets the rest.
-	// When that leaves too little, show only the selected week.
-	showWeeks, start, rowH := weeks, gridStart, 2
-	if h-(3+3*weeks) >= 9 { // roomy: a third line per week shows the first post of the day
-		rowH = 3
-	}
-	if h-(3+rowH*weeks) < 6 {
-		showWeeks, start, rowH = 1, mondayOnOrBefore(sel), 2
-	}
-	gridH := 3 + rowH*showWeeks
-	inner := w - 4
-	cellW := max((inner-6)/7, 5)
+	g := calLayout(w, h, sel)
+	first, last, start := g.first, g.last, g.start
+	showWeeks, rowH, gridH, cellW := g.showWeeks, g.rowH, g.gridH, g.cellW
 
 	posts := 0
 	for d := first; !d.After(last); d = d.AddDate(0, 0, 1) {

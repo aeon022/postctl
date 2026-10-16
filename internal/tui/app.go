@@ -1277,6 +1277,12 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.loadDataCmd
 
 	case tea.MouseClickMsg:
+		if msg.Button == tea.MouseLeft && m.activeTab == tabCalendar && msg.Y > tabsRow && !m.loading && m.err == nil && !m.isEditing &&
+			m.selectedPost == nil && m.selectedHistory == nil && !m.showReadme && !m.showHelp && !m.inPalette && m.ask == nil {
+			if nm, ok := m.calendarClick(msg.X, msg.Y); ok {
+				return nm, nil
+			}
+		}
 		if msg.Button == tea.MouseLeft && msg.Y == tabsRow && !m.loading && m.err == nil && !m.isEditing &&
 			m.selectedPost == nil && m.selectedHistory == nil && !m.showReadme && !m.showHelp {
 			if i := m.tabAt(msg.X); i >= 0 && i != m.activeTab {
@@ -1286,6 +1292,15 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.MouseWheelMsg:
+		if m.activeTab == tabCalendar && m.selectedPost == nil && !m.showReadme && !m.showHelp && !m.inPalette && m.ask == nil {
+			switch msg.Button {
+			case tea.MouseWheelUp:
+				m.calDay, m.calCursor = dayStart(m.calSel().AddDate(0, 0, -7)), 0
+			case tea.MouseWheelDown:
+				m.calDay, m.calCursor = dayStart(m.calSel().AddDate(0, 0, 7)), 0
+			}
+			return m, nil
+		}
 		if m.showReadme {
 			if m.readmeFocus == 0 {
 				switch msg.Button {
