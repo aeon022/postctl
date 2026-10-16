@@ -27,6 +27,11 @@ func Tr(key string) string {
 
 var translationsMap = map[string]map[string]string{
 	"tab_calendar":      {"de": "▦ KALENDER", "en": "▦ CALENDAR"},
+	"ask_title":         {"de": "Jetzt veröffentlichen?", "en": "Publish now?"},
+	"ask_profile":       {"de": "Profil:", "en": "Profile:"},
+	"ask_n_posts":       {"de": "%d Post(s)", "en": "%d post(s)"},
+	"ask_yes":           {"de": "ja, veröffentlichen", "en": "yes, publish"},
+	"ask_no":            {"de": "abbrechen", "en": "cancel"},
 	"hint_today":        {"de": "heute", "en": "today"},
 	"cal_empty_day":     {"de": "Keine Posts an diesem Tag.", "en": "No posts on this day."},
 	"st_converted":      {"de": "Erfolgreich konvertiert: %s", "en": "Converted: %s"},

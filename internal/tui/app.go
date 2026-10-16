@@ -40,9 +40,10 @@ func (m Model) WantsProfileSwitch() bool { return m.switchProfile }
 // Model repräsentiert den Zustand der Bubbletea-Anwendung
 type Model struct {
 	store     *store.SQLiteStore
-	activeTab int       // one of the tab* constants (tabs.go)
-	calDay    time.Time // selected day of the calendar tab (zero = today)
-	calCursor int       // selected post within that day
+	activeTab int         // one of the tab* constants (tabs.go)
+	calDay    time.Time   // selected day of the calendar tab (zero = today)
+	calCursor int         // selected post within that day
+	ask       *publishAsk // pending "publish now?" confirmation
 	cursor    int
 
 	// Geladene Daten
@@ -1252,6 +1253,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.KeyPressMsg:
+		if m.ask != nil {
+			nm, cmd := m.askKey(msg)
+			return nm, cmd
+		}
 		// Wenn wir die Queue Slots bearbeiten, verarbeite nur diese Tasten
 		if m.editingQueueSlots {
 			var cmd tea.Cmd
@@ -1415,10 +1420,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.detailScrollOffset++
 				return m, nil
 			case key.Matches(msg, Keys.Post):
-				m.loading = true
-				m.statusMessage = Tr("st_publishing")
-				postID := m.selectedPost.ID
-				return m, m.bulkPublishPostsCmd([]string{postID})
+				return m.askPublish([]string{m.selectedPost.ID})
 			case key.Matches(msg, Keys.Repurpose):
 				if m.repurposing {
 					return m, nil
@@ -1681,24 +1683,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 					if len(ids) > 0 {
 						m.selectedPosts = make(map[string]bool)
-						m.loading = true
-						m.statusMessage = Tr("st_publishing_n")
-						return m, m.bulkPublishPostsCmd(ids)
+						return m.askPublish(ids)
 					}
 
 					filtered := m.getFilteredPosts()
 					if len(filtered) > 0 && m.cursor < len(filtered) {
-						idToPost := filtered[m.cursor].ID
-						m.loading = true
-						m.statusMessage = Tr("st_publishing")
-						return m, m.bulkPublishPostsCmd([]string{idToPost})
+						return m.askPublish([]string{filtered[m.cursor].ID})
 					}
 				} else if m.activeTab == tabSchedule { // Schedule
 					if len(m.nextUp) > 0 && m.cursor < len(m.nextUp) {
-						idToPost := m.nextUp[m.cursor].ID
-						m.loading = true
-						m.statusMessage = Tr("st_publishing")
-						return m, m.bulkPublishPostsCmd([]string{idToPost})
+						return m.askPublish([]string{m.nextUp[m.cursor].ID})
 					}
 				}
 			}

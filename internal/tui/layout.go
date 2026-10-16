@@ -42,7 +42,7 @@ func (m Model) innerW() int { return max(m.termW()-2*indent, 20) }
 func (m Model) scopeText() string {
 	parts := []string{}
 	if p := config.ActiveProfile; p != "" && p != "default" {
-		parts = append(parts, "profile: "+p)
+		parts = append(parts, profileChip(p))
 	}
 	if m.filterCampaign != "" {
 		parts = append(parts, "campaign: "+m.filterCampaign)
@@ -62,7 +62,7 @@ func (m Model) headerLines() []string {
 	w := m.innerW()
 	lines := []string{
 		ui.Header(w, "postctl · Social Media", m.scopeText(), time.Now().Format("Mon 02 Jan")),
-		ui.Divider(w, ""),
+		profileDivider(w),
 		ui.Tabs(w, m.tabLabels(), m.activeTab, m.tabCounts()),
 	}
 	if m.height <= 0 || m.height >= 22 {
@@ -115,6 +115,8 @@ func hint(key, trKey string) [2]string { return [2]string{key, Tr(trKey)} }
 // `q` come early so they are the last to be dropped on a narrow terminal.
 func (m Model) hintsFor() [][2]string {
 	switch {
+	case m.ask != nil:
+		return [][2]string{hint("y", "ask_yes"), hint("n", "ask_no")}
 	case m.showHelp:
 		return [][2]string{hint("?", "hint_close"), hint("q", "hint_quit")}
 	case m.isEditing && m.showDatePicker:
@@ -233,6 +235,8 @@ func (m Model) tabBody(w, h int) string {
 		return m.renderEditor(w, h)
 	case m.showReadme:
 		return m.renderReadme(w, h)
+	case m.ask != nil:
+		return popup(m.pageBody(w, h), m.askBody(w, h), w, h)
 	case m.showHelp:
 		return popup(m.pageBody(w, h), m.helpBody(min(w, 64), h), w, h)
 	}
