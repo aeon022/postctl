@@ -13,7 +13,7 @@ import (
 	"github.com/aeon022/postctl/internal/models"
 )
 
-// InstagramPlatform publishes single-image posts through the Instagram Graph
+// InstagramPlatform publishes image posts, carousels and stories through the Instagram Graph
 // API. It needs an Instagram Business/Creator account linked to a Facebook Page
 // and a long-lived token (postctl config set instagram.access_token / .account_id).
 // The API only accepts publicly reachable image URLs, so post.Images[0] must be https://.
@@ -78,19 +78,9 @@ func (i *InstagramPlatform) graph(ctx context.Context, method, path string, form
 	return b, nil
 }
 
-func (i *InstagramPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
-	if !i.IsAuthenticated(ctx) {
-		return "", i.Auth(ctx)
-	}
-	if len(post.Images) == 0 || !strings.HasPrefix(post.Images[0], "https://") {
-		return "", fmt.Errorf("instagram: needs a public https:// image URL as the first entry of images (text-only posts are not possible)")
-	}
-	caption := post.Body
-	if len([]rune(caption)) > 2200 {
-		return "", fmt.Errorf("instagram: caption has %d characters, limit is 2200", len([]rune(caption)))
-	}
-
-	b, err := i.graph(ctx, http.MethodPost, "/"+i.accountID+"/media", url.Values{"image_url": {post.Images[0]}, "caption": {caption}})
+// container creates a media container and returns its id.
+func (i *InstagramPlatform) container(ctx context.Context, form url.Values) (string, error) {
+	b, err := i.graph(ctx, http.MethodPost, "/"+i.accountID+"/media", form)
 	if err != nil {
 		return "", err
 	}
@@ -100,8 +90,59 @@ func (i *InstagramPlatform) Post(ctx context.Context, post *models.Post) (string
 	if json.Unmarshal(b, &c) != nil || c.ID == "" {
 		return "", fmt.Errorf("instagram: no container id in response: %s", b)
 	}
+	return c.ID, nil
+}
 
-	b, err = i.graph(ctx, http.MethodPost, "/"+i.accountID+"/media_publish", url.Values{"creation_id": {c.ID}})
+// Post publishes post.Images as a feed post: one image, a carousel (2-10 images),
+// or a Story when post.Type is "story" (one image, no caption). All image URLs
+// must be public https:// URLs.
+func (i *InstagramPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
+	if !i.IsAuthenticated(ctx) {
+		return "", i.Auth(ctx)
+	}
+	if len(post.Images) == 0 {
+		return "", fmt.Errorf("instagram: needs public https:// image URLs in images (text-only posts are not possible)")
+	}
+	for _, img := range post.Images {
+		if !strings.HasPrefix(img, "https://") {
+			return "", fmt.Errorf("instagram: image %q is not a public https:// URL", img)
+		}
+	}
+	story := post.Type == "story"
+	caption := post.Body
+	if !story && len([]rune(caption)) > 2200 {
+		return "", fmt.Errorf("instagram: caption has %d characters, limit is 2200", len([]rune(caption)))
+	}
+	if story && len(post.Images) != 1 {
+		return "", fmt.Errorf("instagram: a story takes exactly one image, got %d", len(post.Images))
+	}
+	if len(post.Images) > 10 {
+		return "", fmt.Errorf("instagram: a carousel holds at most 10 images, got %d", len(post.Images))
+	}
+
+	var creation string
+	var err error
+	switch {
+	case story:
+		creation, err = i.container(ctx, url.Values{"image_url": {post.Images[0]}, "media_type": {"STORIES"}})
+	case len(post.Images) == 1:
+		creation, err = i.container(ctx, url.Values{"image_url": {post.Images[0]}, "caption": {caption}})
+	default:
+		var kids []string
+		for _, img := range post.Images {
+			id, cerr := i.container(ctx, url.Values{"image_url": {img}, "is_carousel_item": {"true"}})
+			if cerr != nil {
+				return "", cerr
+			}
+			kids = append(kids, id)
+		}
+		creation, err = i.container(ctx, url.Values{"media_type": {"CAROUSEL"}, "children": {strings.Join(kids, ",")}, "caption": {caption}})
+	}
+	if err != nil {
+		return "", err
+	}
+
+	b, err := i.graph(ctx, http.MethodPost, "/"+i.accountID+"/media_publish", url.Values{"creation_id": {creation}})
 	if err != nil {
 		return "", err
 	}

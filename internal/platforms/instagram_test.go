@@ -56,3 +56,33 @@ func TestGetPlatformInstagramHostFollowsAPISetting(t *testing.T) {
 		t.Error("default must stay on graph.facebook.com")
 	}
 }
+
+func TestInstagramCarouselAndStory(t *testing.T) {
+	srv, reqs := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) {
+		_, _ = w.Write([]byte(`{"id":"X` + string(rune('0'+n)) + `"}`))
+	})
+	p := NewInstagramPlatform("TOK", "IG1")
+	p.baseURL = srv.URL
+	ctx := context.Background()
+
+	if _, err := p.Post(ctx, &models.Post{Body: "c", Images: []string{"https://x/1.png", "https://x/2.png"}}); err != nil {
+		t.Fatal(err)
+	}
+	r := *reqs
+	if len(r) != 4 || r[0].Form.Get("is_carousel_item") != "true" || r[2].Form.Get("media_type") != "CAROUSEL" ||
+		r[2].Form.Get("children") == "" || r[3].Path != "/IG1/media_publish" {
+		t.Errorf("carousel requests: %+v", r)
+	}
+
+	*reqs = nil
+	if _, err := p.Post(ctx, &models.Post{Type: "story", Body: "ignored", Images: []string{"https://x/s.png"}}); err != nil {
+		t.Fatal(err)
+	}
+	r = *reqs
+	if r[0].Form.Get("media_type") != "STORIES" || r[0].Form.Get("caption") != "" {
+		t.Errorf("story container: %+v", r[0])
+	}
+	if _, err := p.Post(ctx, &models.Post{Type: "story", Images: []string{"https://x/1.png", "https://x/2.png"}}); err == nil {
+		t.Error("a story with two images must be rejected")
+	}
+}
