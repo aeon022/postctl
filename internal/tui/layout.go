@@ -163,7 +163,7 @@ func (m Model) hintsFor() [][2]string {
 		return [][2]string{hint("←/→", "hint_change"), hint("?", "hint_help"), hint("q", "hint_quit"), hint("enter", "hint_open"),
 			hint("d", "hint_reset"), hint("tab", "hint_tab"), hint("f1", "hint_manual")}
 	}
-	return [][2]string{hint("?", "hint_help"), hint("q", "hint_quit"), hint("enter", "hint_open"),
+	return [][2]string{hint("?", "hint_help"), hint("q", "hint_quit"), hint("P", "hint_profile"), hint("enter", "hint_open"),
 		hint("tab", "hint_tab"), hint("f1", "hint_manual")}
 }
 

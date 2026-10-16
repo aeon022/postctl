@@ -134,6 +134,7 @@ var translationsMap = map[string]map[string]string{
 		"de": "schließen",
 		"en": "close",
 	},
+	"hint_profile": {"de": "Profil", "en": "profile"},
 	"hint_quit": {
 		"de": "beenden",
 		"en": "quit",

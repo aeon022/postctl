@@ -24,6 +24,7 @@ type KeyMap struct {
 	Quit      key.Binding
 	Help      key.Binding
 	Filter    key.Binding
+	Profile   key.Binding
 }
 
 // Keys ist die globale KeyMap Instanz
@@ -107,5 +108,9 @@ var Keys = KeyMap{
 	Filter: key.NewBinding(
 		key.WithKeys("f"),
 		key.WithHelp("f", "filter campaign"),
+	),
+	Profile: key.NewBinding(
+		key.WithKeys("P"),
+		key.WithHelp("P", "switch profile"),
 	),
 }

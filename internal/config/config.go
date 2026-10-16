@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -187,6 +188,23 @@ func ListProfiles() ([]string, error) {
 	}
 	sort.Strings(names)
 	return names, nil
+}
+
+var profileNameRe = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]{0,31}$`)
+
+// CreateProfile creates an empty named profile (config dir + default config.yaml).
+// It leaves the active profile untouched.
+func CreateProfile(name string) error {
+	name = strings.TrimSpace(name)
+	if name == "default" || !profileNameRe.MatchString(name) {
+		return fmt.Errorf("invalid profile name %q: use lowercase letters, digits, - or _ (max 32), not \"default\"", name)
+	}
+	if _, err := os.Stat(filepath.Join(configDir(name), "config.yaml")); err == nil {
+		return fmt.Errorf("profile %q already exists", name)
+	}
+	prev := ActiveProfile
+	defer func() { _ = loadConfig(prev) }()
+	return loadConfig(name)
 }
 
 // LoadConfig (re)loads the config for the currently active profile — use

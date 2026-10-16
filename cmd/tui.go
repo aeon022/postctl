@@ -29,38 +29,47 @@ func runTUI() error {
 	// default profile from the interactive TUI would require remembering
 	// --profile every time. Non-interactive commands (list, post, ...)
 	// deliberately skip this: it would break scripting.
-	if ProfileFlag == "" && os.Getenv("POSTCTL_PROFILE") == "" {
-		named, err := config.ListProfiles()
-		if err == nil && len(named) > 0 {
-			profiles := append([]string{""}, named...)
-			chosen, ok, err := tui.RunProfilePicker(profiles)
-			if err != nil {
-				return fmt.Errorf("profile picker: %w", err)
-			}
-			if !ok {
-				return nil
-			}
-			if err := config.LoadConfigProfile(chosen); err != nil {
-				return fmt.Errorf("load profile %q: %w", chosen, err)
+	pick := ProfileFlag == "" && os.Getenv("POSTCTL_PROFILE") == ""
+	for {
+		if pick {
+			named, err := config.ListProfiles()
+			if err == nil && len(named) > 0 {
+				chosen, ok, err := tui.RunProfilePicker(append([]string{""}, named...))
+				if err != nil {
+					return fmt.Errorf("profile picker: %w", err)
+				}
+				if !ok {
+					return nil
+				}
+				if err := config.LoadConfigProfile(chosen); err != nil {
+					return fmt.Errorf("load profile %q: %w", chosen, err)
+				}
 			}
 		}
+		again, err := runTUIOnce()
+		if err != nil || !again {
+			return err
+		}
+		// P pressed: show the picker again, even if --profile was given.
+		pick = true
 	}
+}
 
-	dbPath := config.GetDBPath()
-	s, err := store.NewSQLiteStore(dbPath, config.Shared())
+// runTUIOnce runs one TUI session on the active profile's store and reports
+// whether the user asked to switch profile.
+func runTUIOnce() (switchProfile bool, err error) {
+	s, err := store.NewSQLiteStore(config.GetDBPath(), config.Shared())
 	if err != nil {
-		return fmt.Errorf("open sqlite store for TUI: %w", err)
+		return false, fmt.Errorf("open sqlite store for TUI: %w", err)
 	}
 	defer s.Close()
 
-	model := tui.NewModel(s)
-	p := tea.NewProgram(model)
-
-	if _, err := p.Run(); err != nil {
-		return fmt.Errorf("run bubbletea program: %w", err)
+	final, err := tea.NewProgram(tui.NewModel(s)).Run()
+	if err != nil {
+		return false, fmt.Errorf("run bubbletea program: %w", err)
 	}
-
-	return nil
+	m, ok := final.(tui.Model)
+	return ok && m.WantsProfileSwitch(), nil
 }
 
 func init() {

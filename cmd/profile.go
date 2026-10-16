@@ -65,7 +65,20 @@ var profileListCmd = &cobra.Command{
 	},
 }
 
+var profileCreateCmd = &cobra.Command{
+	Use:   "create <name>",
+	Short: "Create a new profile with its own config, credentials and database",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := config.CreateProfile(args[0]); err != nil {
+			return err
+		}
+		fmt.Printf("Profile %q created. Log in with: postctl --profile %s auth <platform>\n", args[0], args[0])
+		return nil
+	},
+}
+
 func init() {
-	profileCmd.AddCommand(profileListCmd)
+	profileCmd.AddCommand(profileListCmd, profileCreateCmd)
 	rootCmd.AddCommand(profileCmd)
 }

@@ -33,6 +33,9 @@ type PostStats struct {
 	failed    int
 }
 
+// WantsProfileSwitch reports whether the program ended because the user asked to change profile.
+func (m Model) WantsProfileSwitch() bool { return m.switchProfile }
+
 // Model repräsentiert den Zustand der Bubbletea-Anwendung
 type Model struct {
 	store     *store.SQLiteStore
@@ -53,6 +56,7 @@ type Model struct {
 	filterCampaign     string
 	isEditing          bool
 	showHelp           bool
+	switchProfile      bool // set by Keys.Profile; cmd/tui.go re-runs with another profile
 	err                error
 	loading            bool
 	repurposing        bool
@@ -1419,6 +1423,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Hauptmenü-Steuerung
 		switch {
 		case key.Matches(msg, Keys.Quit):
+			return m, tea.Quit
+
+		case key.Matches(msg, Keys.Profile):
+			m.switchProfile = true
 			return m, tea.Quit
 
 		case key.Matches(msg, Keys.Tab):
