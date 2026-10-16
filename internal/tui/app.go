@@ -1069,7 +1069,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.err = msg.err
 			return m, nil
 		}
-		m.statusMessage = fmt.Sprintf("Erfolgreich konvertiert: %s", strings.Join(msg.files, ", "))
+		m.statusMessage = fmt.Sprintf(Tr("st_converted"), strings.Join(msg.files, ", "))
 		return m, m.loadDataCmd
 
 	case setupWizardFinishedMsg:
@@ -1084,7 +1084,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		// Jetzt direkt OAuth-Flow starten
 		m.loading = true
-		m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", msg.platform)
+		m.statusMessage = fmt.Sprintf(Tr("st_open_browser"), msg.platform)
 		return m, m.runAuthCmd(msg.platform)
 
 	case platformClearedMsg:
@@ -1094,7 +1094,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.statusMessage = ""
 			return m, nil
 		} else {
-			m.statusMessage = fmt.Sprintf("Verbindung und Einstellungen für %s wurden zurückgesetzt.", strings.ToUpper(msg.platform))
+			m.statusMessage = fmt.Sprintf(Tr("st_reset_done"), strings.ToUpper(msg.platform))
 			return m, m.loadDataCmd
 		}
 
@@ -1105,7 +1105,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.statusMessage = ""
 			return m, nil
 		} else {
-			m.statusMessage = fmt.Sprintf("Erfolgreich mit %s verbunden!", msg.platform)
+			m.statusMessage = fmt.Sprintf(Tr("st_connected"), msg.platform)
 			return m, m.loadDataCmd
 		}
 
@@ -1119,15 +1119,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if msg.isExport {
 				action = "exportiert (postctl_backup.bin)"
 			}
-			m.statusMessage = fmt.Sprintf("Konfiguration erfolgreich %s!", action)
+			m.statusMessage = fmt.Sprintf(Tr("st_config_done"), action)
 			return m, m.loadDataCmd
 		}
 
 	case importFinishedMsg:
 		if msg.err != nil {
-			m.statusMessage = fmt.Sprintf("Import fehlgeschlagen: %v", msg.err)
+			m.statusMessage = fmt.Sprintf(Tr("st_import_failed"), msg.err)
 		} else {
-			m.statusMessage = "Beiträge erfolgreich importiert!"
+			m.statusMessage = Tr("st_imported")
 		}
 		return m, m.loadDataCmd
 
@@ -1135,19 +1135,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.err != nil {
 			m.err = fmt.Errorf("Fehler beim Exportieren: %w", msg.err)
 		} else {
-			m.statusMessage = fmt.Sprintf("Erfolgreich exportiert nach %s!", msg.filename)
+			m.statusMessage = fmt.Sprintf(Tr("st_exported"), msg.filename)
 		}
 		return m, nil
 
 	case publishFinishedMsg:
 		m.loading = false
 		if msg.err != nil {
-			m.statusMessage = fmt.Sprintf("Veröffentlichung fehlgeschlagen: %v", msg.err)
+			m.statusMessage = fmt.Sprintf(Tr("st_publish_failed"), msg.err)
 		} else {
 			if msg.count == 1 {
-				m.statusMessage = "Beitrag erfolgreich veröffentlicht!"
+				m.statusMessage = Tr("st_published")
 			} else {
-				m.statusMessage = fmt.Sprintf("%d Beiträge erfolgreich veröffentlicht!", msg.count)
+				m.statusMessage = fmt.Sprintf(Tr("st_published_n"), msg.count)
 			}
 		}
 		m.selectedPost = nil
@@ -1391,7 +1391,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			case key.Matches(msg, Keys.Post):
 				m.loading = true
-				m.statusMessage = "Veröffentliche Beitrag..."
+				m.statusMessage = Tr("st_publishing")
 				postID := m.selectedPost.ID
 				return m, m.bulkPublishPostsCmd([]string{postID})
 			case key.Matches(msg, Keys.Repurpose):
@@ -1414,7 +1414,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 				}
 				m.repurposing = true
-				m.statusMessage = "KI generiert Konvertierungen..."
+				m.statusMessage = Tr("st_ai_converting")
 				return m, m.repurposePostCmd(p, targets)
 			}
 			return m, nil
@@ -1471,7 +1471,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						return m, m.runSetupWizardCmd(platName)
 					}
 					m.loading = true
-					m.statusMessage = fmt.Sprintf("Öffne Browser für %s...", platName)
+					m.statusMessage = fmt.Sprintf(Tr("st_open_browser"), platName)
 					return m, m.runAuthCmd(platName)
 				case settingAction:
 					switch opt.action {
@@ -1535,7 +1535,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				opt := m.settingsOptions()[m.cursor]
 				if opt.kind == settingPlatformAuth {
 					m.loading = true
-					m.statusMessage = fmt.Sprintf("Setze %s zurück...", opt.platform)
+					m.statusMessage = fmt.Sprintf(Tr("st_resetting"), opt.platform)
 					return m, m.clearPlatformCmd(opt.platform)
 				}
 			}
@@ -1640,7 +1640,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					if len(ids) > 0 {
 						m.selectedPosts = make(map[string]bool)
 						m.loading = true
-						m.statusMessage = "Veröffentliche Beiträge..."
+						m.statusMessage = Tr("st_publishing_n")
 						return m, m.bulkPublishPostsCmd(ids)
 					}
 
@@ -1648,14 +1648,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					if len(filtered) > 0 && m.cursor < len(filtered) {
 						idToPost := filtered[m.cursor].ID
 						m.loading = true
-						m.statusMessage = "Veröffentliche Beitrag..."
+						m.statusMessage = Tr("st_publishing")
 						return m, m.bulkPublishPostsCmd([]string{idToPost})
 					}
 				} else if m.activeTab == 2 { // Schedule
 					if len(m.nextUp) > 0 && m.cursor < len(m.nextUp) {
 						idToPost := m.nextUp[m.cursor].ID
 						m.loading = true
-						m.statusMessage = "Veröffentliche Beitrag..."
+						m.statusMessage = Tr("st_publishing")
 						return m, m.bulkPublishPostsCmd([]string{idToPost})
 					}
 				}
@@ -1726,19 +1726,20 @@ func (m Model) View() tea.View {
 }
 
 func (m Model) viewContent() string {
-	if m.loading {
-		if m.statusMessage != "" {
-			return fmt.Sprintf("\n  ⏳ %s\n", m.statusMessage)
-		}
-		return "\n  Lade Daten aus SQLite Store...\n"
-	}
-
-	if m.err != nil {
-		return fmt.Sprintf("\n  [FEHLER]: %v\n\n  Drücke ESC zum Schließen.\n", m.err)
-	}
-
 	w, h := m.bodyDims()
-	body := m.indentLines(m.tabBody(w, h))
+	var body string
+	switch {
+	case m.loading:
+		msg := m.statusMessage
+		if msg == "" {
+			msg = Tr("loading_data")
+		}
+		body = m.indentLines("⏳ " + msg)
+	case m.err != nil:
+		body = m.indentLines(ui.Pill(Tr("error_title"), ui.Err) + " " + fmt.Sprint(m.err) + "\n\n" + Tr("error_close"))
+	default:
+		body = m.indentLines(m.tabBody(w, h))
+	}
 	header := m.indentLines(strings.Join(m.headerLines(), "\n"))
 	footer := m.indentLines(m.footerLine())
 	return ui.Frame(m.frameHeight(), header, body, footer)

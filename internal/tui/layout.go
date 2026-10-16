@@ -316,7 +316,21 @@ func platformName(p string) string {
 	return strings.ToUpper(p[:1]) + p[1:]
 }
 
-func platformPill(p string) string { return ui.Pill(platformName(p), ui.Info) }
+// platformBrand are the platforms' brand colors; black logos (X, Threads) use a
+// mid grey so the pill stays readable on dark terminals.
+var platformBrand = map[string]string{
+	models.PlatformTwitter: "#71767B", models.PlatformLinkedIn: "#0A66C2", models.PlatformThreads: "#8A8A8A",
+	models.PlatformMastodon: "#6364FF", models.PlatformBluesky: "#0085FF", models.PlatformFacebook: "#1877F2",
+	"instagram": "#E4405F",
+}
+
+func platformPill(p string) string {
+	c, ok := platformBrand[p]
+	if !ok {
+		return ui.Pill(platformName(p), ui.Info)
+	}
+	return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFFFFF")).Background(lipgloss.Color(c)).Padding(0, 1).Render(platformName(p))
+}
 
 // statusPill is the post status as a fixed-width pill: draft muted, scheduled
 // info, posted ok, failed err.

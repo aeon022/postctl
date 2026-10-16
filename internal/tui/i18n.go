@@ -26,6 +26,24 @@ func Tr(key string) string {
 }
 
 var translationsMap = map[string]map[string]string{
+	"st_converted":      {"de": "Erfolgreich konvertiert: %s", "en": "Converted: %s"},
+	"st_open_browser":   {"de": "Öffne Browser für %s...", "en": "Opening browser for %s..."},
+	"st_reset_done":     {"de": "Verbindung und Einstellungen für %s wurden zurückgesetzt.", "en": "Connection and settings for %s were reset."},
+	"st_connected":      {"de": "Erfolgreich mit %s verbunden!", "en": "Connected to %s!"},
+	"st_config_done":    {"de": "Konfiguration erfolgreich %s!", "en": "Configuration %s successfully!"},
+	"st_import_failed":  {"de": "Import fehlgeschlagen: %v", "en": "Import failed: %v"},
+	"st_imported":       {"de": "Beiträge erfolgreich importiert!", "en": "Posts imported!"},
+	"st_exported":       {"de": "Erfolgreich exportiert nach %s!", "en": "Exported to %s!"},
+	"st_publish_failed": {"de": "Veröffentlichung fehlgeschlagen: %v", "en": "Publishing failed: %v"},
+	"st_published":      {"de": "Beitrag erfolgreich veröffentlicht!", "en": "Post published!"},
+	"st_published_n":    {"de": "%d Beiträge erfolgreich veröffentlicht!", "en": "%d posts published!"},
+	"st_publishing":     {"de": "Veröffentliche Beitrag...", "en": "Publishing post..."},
+	"st_ai_converting":  {"de": "KI generiert Konvertierungen...", "en": "AI is generating conversions..."},
+	"st_resetting":      {"de": "Setze %s zurück...", "en": "Resetting %s..."},
+	"st_publishing_n":   {"de": "Veröffentliche Beiträge...", "en": "Publishing posts..."},
+	"loading_data":      {"de": "Lade Daten aus SQLite Store...", "en": "Loading data from the SQLite store..."},
+	"error_title":       {"de": "FEHLER", "en": "ERROR"},
+	"error_close":       {"de": "Drücke ESC zum Schließen.", "en": "Press ESC to close."},
 	// Tab headers
 	"tab_dashboard": {
 		"de": "● DASHBOARD",
