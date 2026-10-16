@@ -47,6 +47,9 @@ func (m Model) scopeText() string {
 	if m.filterCampaign != "" {
 		parts = append(parts, "campaign: "+m.filterCampaign)
 	}
+	if m.searchQuery != "" {
+		parts = append(parts, "search: "+m.searchQuery)
+	}
 	return strings.Join(parts, " · ")
 }
 
@@ -117,6 +120,8 @@ func (m Model) hintsFor() [][2]string {
 	switch {
 	case m.inPalette:
 		return [][2]string{hint("enter", "hint_pick"), hint("esc", "hint_close"), hint("↑↓", "hint_move")}
+	case m.searching:
+		return [][2]string{hint("enter", "hint_pick"), hint("esc", "hint_clear")}
 	case m.ask != nil:
 		return [][2]string{hint("y", "ask_yes"), hint("n", "ask_no")}
 	case m.showHelp:
@@ -148,7 +153,7 @@ func (m Model) hintsFor() [][2]string {
 	case tabPosts:
 		h := [][2]string{hint("enter", "hint_open"), hint("n", "hint_new"), hint("?", "hint_help"), hint("q", "hint_quit"),
 			hint("e", "hint_edit"), hint("d", "hint_delete"), hint("s", "hint_schedule"), hint("p", "hint_post"),
-			hint("space", "hint_select"), hint("f", "hint_filter"), hint("r", "hint_repurpose"), hint("i", "hint_import"),
+			hint("space", "hint_select"), hint("/", "hint_search"), hint("f", "hint_filter"), hint("r", "hint_repurpose"), hint("i", "hint_import"),
 			hint("tab", "hint_tab"), hint("f1", "hint_manual")}
 		if m.filterCampaign != "" {
 			h = append([][2]string{hint("esc", "hint_clear")}, h...)
@@ -222,6 +227,7 @@ func (m Model) helpBody(w, h int) string {
 		{"tab / shift+tab", "help_tab"}, {"↑/k  ↓/j", "help_up"}, {"enter", "help_enter"}, {"n", "help_new_post"},
 		{"e", "help_edit_post"}, {"s", "help_schedule"}, {"p", "help_post"}, {"i", "help_import"}, {"d", "help_delete"},
 		{"r", "help_repurpose"}, {"f", "help_filter"}, {"esc", "help_esc"}, {"f1 / R", "help_readme"},
+		{"/", "help_search"}, {":", "help_palette"}, {"P", "help_profile"}, {"space", "help_multi"},
 		{"?", "help_toggle"}, {"q / ctrl+c", "help_quit"},
 	}
 	var b strings.Builder
@@ -239,6 +245,8 @@ func (m Model) tabBody(w, h int) string {
 		return m.renderReadme(w, h)
 	case m.inPalette:
 		return popup(m.pageBody(w, h), m.paletteBody(w, h), w, h)
+	case m.searching:
+		return popup(m.pageBody(w, h), m.searchBody(w), w, h)
 	case m.ask != nil:
 		return popup(m.pageBody(w, h), m.askBody(w, h), w, h)
 	case m.showHelp:

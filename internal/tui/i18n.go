@@ -26,6 +26,14 @@ func Tr(key string) string {
 }
 
 var translationsMap = map[string]map[string]string{
+	"help_search":         {"de": "Posts durchsuchen (Posts-Tab)", "en": "search posts (Posts tab)"},
+	"help_palette":        {"de": "Befehlspalette", "en": "command palette"},
+	"help_profile":        {"de": "Profil wechseln", "en": "switch profile"},
+	"help_multi":          {"de": "Editor: mehrere Plattformen wählen", "en": "editor: select several platforms"},
+	"search_title":        {"de": "Suche", "en": "Search"},
+	"search_placeholder":  {"de": "Titel, Text, Plattform, Kampagne…", "en": "title, text, platform, campaign…"},
+	"search_hits":         {"de": "Treffer", "en": "hits"},
+	"hint_search":         {"de": "suchen", "en": "search"},
 	"palette_title":       {"de": "Befehle", "en": "Commands"},
 	"palette_placeholder": {"de": "Befehl tippen…", "en": "type a command…"},
 	"palette_none":        {"de": "Kein Befehl gefunden.", "en": "No matching command."},

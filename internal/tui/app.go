@@ -83,7 +83,10 @@ type Model struct {
 	editorTargets     map[string]bool // platforms selected for a new post (space toggles)
 	inPalette         bool            // ":" command palette open
 	spin              int             // spinner frame
-	spinning          bool            // a spinner tick is in flight
+	searching         bool            // "/" search input open (Posts tab)
+	searchInput       textinput.Model
+	searchQuery       string
+	spinning          bool // a spinner tick is in flight
 	paletteInput      textinput.Model
 	paletteCursor     int
 	showDatePicker    bool
@@ -1319,6 +1322,17 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			nm, cmd := m.paletteKey(msg)
 			return nm, cmd
 		}
+		if m.searching {
+			nm, cmd := m.searchKey(msg)
+			return nm, cmd
+		}
+		if msg.String() == "/" && m.activeTab == tabPosts && m.selectedPost == nil && !m.isEditing && !m.editingQueueSlots && !m.showReadme && m.err == nil && !m.loading {
+			return m.openSearch(), nil
+		}
+		if msg.String() == "esc" && m.searchQuery != "" && m.activeTab == tabPosts && m.selectedPost == nil && !m.isEditing {
+			m.searchQuery, m.cursor = "", 0
+			return m, nil
+		}
 		if msg.String() == ":" && !m.isEditing && !m.editingQueueSlots && !m.showReadme && m.err == nil && !m.loading {
 			return m.openPalette(), nil
 		}
@@ -1804,12 +1818,12 @@ func (m Model) maxCursorItems() int {
 
 // getFilteredPosts gibt die Liste der Posts unter Berücksichtigung des Kampagnen-Filters zurück
 func (m Model) getFilteredPosts() []models.Post {
-	if m.filterCampaign == "" {
+	if m.filterCampaign == "" && strings.TrimSpace(m.searchQuery) == "" {
 		return m.posts
 	}
 	var filtered []models.Post
 	for _, p := range m.posts {
-		if p.Campaign == m.filterCampaign {
+		if (m.filterCampaign == "" || p.Campaign == m.filterCampaign) && m.matchesSearch(p) {
 			filtered = append(filtered, p)
 		}
 	}
