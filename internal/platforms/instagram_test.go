@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 )
 
@@ -39,5 +40,19 @@ func TestInstagramRejectsTextOnlyAndLocalImages(t *testing.T) {
 	}
 	if p.Delete(context.Background(), "M1") == nil {
 		t.Error("Delete must be an honest error")
+	}
+}
+
+func TestGetPlatformInstagramHostFollowsAPISetting(t *testing.T) {
+	config.ActiveConfig.Instagram.API = "instagram"
+	defer func() { config.ActiveConfig.Instagram.API = "" }()
+	p, err := GetPlatform(models.PlatformInstagram, nil, false)
+	if err != nil || !strings.HasPrefix(p.(*InstagramPlatform).baseURL, "https://graph.instagram.com/") {
+		t.Fatalf("got %v %v", p, err)
+	}
+	config.ActiveConfig.Instagram.API = ""
+	p, _ = GetPlatform(models.PlatformInstagram, nil, false)
+	if !strings.HasPrefix(p.(*InstagramPlatform).baseURL, "https://graph.facebook.com/") {
+		t.Error("default must stay on graph.facebook.com")
 	}
 }

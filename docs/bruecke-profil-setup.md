@@ -17,30 +17,43 @@ der **Facebook-Seite der Brücke verknüpft** sein.
 - Verknüpfen: Instagram *Konto → Verknüpfte Konten / Seite verbinden* oder in der
   Facebook-Seite *Einstellungen → Verknüpfte Konten → Instagram*
 
-### Token und ID besorgen
+### App anlegen (developers.facebook.com → App erstellen → Anwendungsfälle)
 
-1. **App:** developers.facebook.com → *Meine Apps*. Die Facebook-App des Brücke-Profils
-   kann weiterverwendet werden. Anwendungsfall für Instagram hinzufügen
-   (Instagram API mit Facebook-Login). Solange du Admin der App bist, ist kein
-   App-Review nötig (Entwicklungsmodus).
-2. **Kurzzeit-Token:** developers.facebook.com/tools/explorer → App wählen,
-   Token-Typ *User Token*. Berechtigungen: `instagram_basic`,
-   `instagram_content_publish`, `pages_show_list`, `pages_read_engagement`.
-   *Generate Access Token* → im Dialog die Brücke-Seite und das Instagram-Konto wählen.
-   (Gilt ca. 1 Stunde.)
-3. **Langzeit-Token (60 Tage)** im Browser aufrufen:
+Anwendungsfall **„Messaging und Content auf Instagram verwalten"** wählen — den braucht
+postctl. **„Facebook-, Instagram- und Threads-Content auf anderen Websites einbetten"
+(oEmbed) abwählen**: wird nicht gebraucht.
+Für die Facebook-Seite der Brücke zusätzlich **„Alles auf deiner Seite verwalten"**.
+Meta weist darauf hin, dass sich manche Anwendungsfälle nicht kombinieren lassen — wenn
+das hier zutrifft, für Facebook eine zweite App verwenden.
+Solange du Admin der App bist, ist kein App-Review nötig (Entwicklungsmodus).
+
+### Variante A (empfohlen): Instagram-Login — keine Facebook-Seite, kein Graph Explorer
+
+1. App-Dashboard → *Anwendungsfälle → Messaging und Content auf Instagram verwalten →
+   Anpassen → API-Einrichtung mit Instagram-Login*.
+2. Das Instagram-Konto der Brücke als **Instagram-Tester** zur App hinzufügen
+   (*App-Rollen → Rollen*) und die Einladung in Instagram annehmen
+   (*Einstellungen → Apps und Websites → Tester-Einladungen*).
+3. Im Schritt *Zugriffstoken generieren* das Konto hinzufügen, bei Instagram einloggen
+   und freigeben. Scopes: `instagram_business_basic`, `instagram_business_content_publish`.
+   Das Dashboard zeigt den **Token (60 Tage gültig)** und die **Konto-ID**.
+4. Token verlängern (frühestens 24 h nach Ausstellung, vor Ablauf):
+   `https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=TOKEN`
+5. Konto-ID alternativ: `https://graph.instagram.com/me?fields=user_id,username&access_token=TOKEN`
+
+Die Menünamen bei Meta ändern sich häufig — die Reihenfolge stimmt, die Beschriftung kann abweichen.
+
+### Variante B: Facebook-Login (Konto muss mit einer Facebook-Seite verknüpft sein)
+
+1. developers.facebook.com/tools/explorer → App wählen, *User Token*. Berechtigungen:
+   `instagram_basic`, `instagram_content_publish`, `pages_show_list`, `pages_read_engagement`.
+   *Generate Access Token* → Brücke-Seite und Instagram-Konto wählen (gilt ca. 1 Stunde).
+2. Langzeit-Token (60 Tage):
    `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=APP_ID&client_secret=APP_SECRET&fb_exchange_token=KURZZEIT_TOKEN`
-4. **Besser — Seiten-Token ohne Ablauf:** im Explorer mit dem Langzeit-Token
-   `me/accounts` abfragen und das `access_token` der Brücke-Seite nehmen.
-5. **Instagram-Account-ID:** im Explorer `me/accounts?fields=name,instagram_business_account`
-   → `id` unter `instagram_business_account`.
-
-### Eintragen und testen
-
-```sh
-postctl --profile bruecke config setup instagram   # fragt Token + Account-ID ab
-postctl --profile bruecke config test              # Verbindungstest
-```
+3. Besser: mit dem Langzeit-Token `me/accounts` abfragen und das `access_token` der
+   Seite nehmen (läuft nicht ab).
+4. Account-ID: `me/accounts?fields=name,instagram_business_account` → `id` unter
+   `instagram_business_account`.
 
 ### Wichtig beim Posten
 
@@ -49,7 +62,8 @@ postctl --profile bruecke config test              # Verbindungstest
   eigenen Webseite ablegen (`~/Sites`).
 - Reine Textposts gehen nicht. Caption max. 2200 Zeichen.
 - Löschen per API ist bei Instagram nicht möglich — Posts in der App löschen.
-- Ein Token läuft ab (Langzeit-Token nach 60 Tagen) → dann `config setup instagram` erneut.
+- Ein Token läuft nach 60 Tagen ab (Variante A: vorher verlängern, siehe oben) → sonst `config setup instagram` erneut.
+- Die Einstellung steht in `instagram.api` (`instagram` = Variante A, sonst Variante B). Beide Varianten sind gegen Mocks getestet, nicht gegen die echte API.
 
 ---
 

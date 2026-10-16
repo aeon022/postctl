@@ -71,6 +71,10 @@ type Config struct {
 	Instagram struct {
 		AccessToken string `mapstructure:"access_token" yaml:"access_token"`
 		AccountID   string `mapstructure:"account_id" yaml:"account_id"`
+		// API selects the token type: "instagram" = Instagram API with Instagram
+		// Login (graph.instagram.com, no Facebook Page needed); anything else =
+		// Facebook Login tokens against graph.facebook.com.
+		API string `mapstructure:"api" yaml:"api"`
 	} `mapstructure:"instagram" yaml:"instagram"`
 	Pinterest struct {
 		AccessToken string `mapstructure:"access_token" yaml:"access_token"`

@@ -146,6 +146,8 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Medium.IntegrationToken = value
 	case "instagram.access_token":
 		config.ActiveConfig.Instagram.AccessToken = value
+	case "instagram.api":
+		config.ActiveConfig.Instagram.API = value
 	case "instagram.account_id":
 		config.ActiveConfig.Instagram.AccountID = value
 	case "pinterest.access_token":
@@ -704,12 +706,19 @@ var configSetupCmd = &cobra.Command{
 			}
 
 		case "instagram":
-			fmt.Println("Voraussetzung: Instagram Business/Creator-Konto, verknüpft mit einer Facebook-Seite.")
-			fmt.Println("Schritt 1: Im Meta Developer Portal einen langlebigen Token erzeugen")
-			fmt.Println("           (Scopes: instagram_basic, instagram_content_publish, pages_show_list).")
-			fmt.Println("Schritt 2: Die Instagram-Business-Account-ID ermitteln (Graph API Explorer: /me/accounts → instagram_business_account).")
+			fmt.Println("Voraussetzung: Instagram Professional-Konto (Business/Creator). Ausführlich: docs/bruecke-profil-setup.md")
 			fmt.Println("Hinweis:   Posts brauchen ein Bild als öffentliche https://-URL (images: im Frontmatter).")
 			fmt.Println()
+			fmt.Println("Token-Art:")
+			fmt.Println("  1) Instagram-Login (empfohlen) — Token aus dem App-Dashboard, keine Facebook-Seite nötig")
+			fmt.Println("  2) Facebook-Login — Token aus dem Graph API Explorer, Konto an Facebook-Seite gekoppelt")
+			fmt.Print("➔ Auswahl [1]: ")
+			igMode, _ := reader.ReadString('\n')
+			if strings.TrimSpace(igMode) == "2" {
+				config.ActiveConfig.Instagram.API = "facebook"
+			} else {
+				config.ActiveConfig.Instagram.API = "instagram"
+			}
 
 			fmt.Print("➔ Access Token: ")
 			igToken, _ := reader.ReadString('\n')

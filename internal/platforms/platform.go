@@ -42,7 +42,11 @@ func GetPlatform(name string, s *store.SQLiteStore, dryRun bool) (Platform, erro
 	case models.PlatformFacebook:
 		return NewFacebookPlatform(s, config.ActiveConfig.Facebook.AppID, config.ActiveConfig.Facebook.AppSecret, config.ActiveConfig.Facebook.PageID), nil
 	case models.PlatformInstagram:
-		return NewInstagramPlatform(config.ActiveConfig.Instagram.AccessToken, config.ActiveConfig.Instagram.AccountID), nil
+		ig := NewInstagramPlatform(config.ActiveConfig.Instagram.AccessToken, config.ActiveConfig.Instagram.AccountID)
+		if config.ActiveConfig.Instagram.API == "instagram" {
+			ig.baseURL = "https://graph.instagram.com/v21.0"
+		}
+		return ig, nil
 	case models.PlatformTelegram:
 		return NewTelegramPlatform(s, config.ActiveConfig.Telegram.BotToken, config.ActiveConfig.Telegram.ChatID), nil
 	case models.PlatformDiscord:
