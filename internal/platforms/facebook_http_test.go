@@ -220,6 +220,8 @@ func TestFacebookAuthWithStaticTokens(t *testing.T) {
 
 	// accounts: does /me/accounts list the page (a business-owned page is missing from it)?
 	// manages: does the user token have a role on the page (page node returns access_token)?
+	var f_appID string
+	exchanged := false
 	run := func(token string, accounts, manages bool) (*FacebookPlatform, error) {
 		config.ActiveConfig.Facebook.PageToken = token
 		srv, _ := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) {})
@@ -231,6 +233,13 @@ func TestFacebookAuthWithStaticTokens(t *testing.T) {
 					_, _ = w.Write([]byte(`{"id":"222","name":"Die Brücke","access_token":"PAGETOK"}`))
 				} else {
 					_, _ = w.Write([]byte(`{"id":"222","name":"Die Brücke"}`))
+				}
+			case r.URL.Path == "/oauth/access_token":
+				if r.URL.Query().Get("fb_exchange_token") == "USERTOK" && f_appID != "" {
+					_, _ = w.Write([]byte(`{"access_token":"USERTOK"}`)) // long-lived token (same value here)
+					exchanged = true
+				} else {
+					w.WriteHeader(400)
 				}
 			case r.URL.Path == "/me/accounts":
 				if accounts && tok == "USERTOK" {
@@ -245,7 +254,7 @@ func TestFacebookAuthWithStaticTokens(t *testing.T) {
 			}
 		})
 		f := newFB(t, srv.URL, false)
-		f.appID, f.appSecret, f.pageID = "", "", "brueckegraz"
+		f.appID, f.appSecret, f.pageID = f_appID, f_appID, "brueckegraz"
 		return f, f.Auth(context.Background())
 	}
 	stored := func(f *FacebookPlatform) string {
@@ -258,6 +267,12 @@ func TestFacebookAuthWithStaticTokens(t *testing.T) {
 	if err != nil || stored(f) != "PAGETOK" || f.pageID != "222" || config.ActiveConfig.Facebook.PageID != "222" {
 		t.Fatalf("page node: err=%v token=%q id=%q", err, stored(f), f.pageID)
 	}
+	// with app credentials a user token is exchanged for a long-lived one first
+	f_appID = "app"
+	if f, err = run("USERTOK", false, true); err != nil || !exchanged || stored(f) != "PAGETOK" {
+		t.Fatalf("exchange: err=%v exchanged=%v token=%q", err, exchanged, stored(f))
+	}
+	f_appID = ""
 	// user token, page found via /me/accounts only
 	if f, err = run("USERTOK", true, false); err != nil || stored(f) != "PAGETOK" {
 		t.Fatalf("me/accounts: err=%v token=%q", err, stored(f))

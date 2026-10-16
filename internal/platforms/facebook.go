@@ -495,9 +495,27 @@ func (f *FacebookPlatform) useStaticPageToken(ctx context.Context, token string)
 		return resp.StatusCode, b, nil
 	}
 
+	// 0. A short-lived user token (about an hour) is exchanged for a long-lived one first: page
+	//    tokens derived from a long-lived user token do not expire. Page tokens simply fail here.
+	if f.appID != "" && f.appSecret != "" {
+		q := "/oauth/access_token?grant_type=fb_exchange_token&client_id=" + url.QueryEscape(f.appID) + "&client_secret=" + url.QueryEscape(f.appSecret) + "&fb_exchange_token=" + url.QueryEscape(token)
+		if req, err := http.NewRequestWithContext(ctx, http.MethodGet, f.baseURL+q, nil); err == nil {
+			if resp, err := f.client.Do(req); err == nil {
+				var ll struct {
+					AccessToken string `json:"access_token"`
+				}
+				if resp.StatusCode == http.StatusOK && json.NewDecoder(resp.Body).Decode(&ll) == nil && ll.AccessToken != "" {
+					token = ll.AccessToken
+				}
+				resp.Body.Close()
+			}
+		}
+	}
+
 	// 1. The page node: a user token with a role on the page gets the page token in access_token;
 	//    a page token gets no such field. Works also when /me/accounts is empty (business-owned pages).
 	pageID := f.pageID
+	derived := false
 	if code, b, err := get("/"+url.PathEscape(f.pageID)+"?fields=id,name,access_token", token); err == nil && code == http.StatusOK {
 		var n struct {
 			ID          string `json:"id"`
@@ -506,12 +524,12 @@ func (f *FacebookPlatform) useStaticPageToken(ctx context.Context, token string)
 		if json.Unmarshal(b, &n) == nil && n.ID != "" {
 			pageID = n.ID
 			if n.AccessToken != "" {
-				token = n.AccessToken
+				token, derived = n.AccessToken, true
 			}
 		}
 	}
 	// 2. Fallback: pages listed by /me/accounts.
-	if token == config.ActiveConfig.Facebook.PageToken {
+	if !derived {
 		if code, b, err := get("/me/accounts?fields=id,name,access_token", token); err == nil && code == http.StatusOK {
 			var accs struct {
 				Data []struct {
