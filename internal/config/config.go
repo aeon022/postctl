@@ -80,6 +80,8 @@ type Config struct {
 		API string `mapstructure:"api" yaml:"api"`
 		// LocationID tags feed posts with an Instagram place (from instagram.com/explore/locations/<ID>/…).
 		LocationID string `mapstructure:"location_id" yaml:"location_id"`
+		// TokenIssued (YYYY-MM-DD) is when AccessToken was created or last refreshed; tokens last 60 days.
+		TokenIssued string `mapstructure:"token_issued" yaml:"token_issued"`
 	} `mapstructure:"instagram" yaml:"instagram"`
 	Pinterest struct {
 		AccessToken string `mapstructure:"access_token" yaml:"access_token"`

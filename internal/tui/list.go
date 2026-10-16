@@ -83,7 +83,17 @@ func (m Model) platformLines() []string {
 		if m.platforms[p] {
 			kind, status = ui.OK, Tr("dash_connected")
 		}
-		out = append(out, ui.Dot(kind)+" "+padRight(platformName(p), 12)+dimStyle.Render(status))
+		line := ui.Dot(kind) + " " + padRight(platformName(p), 12) + dimStyle.Render(status)
+		if m.platforms[p] {
+			if e := m.health.expiryText(p, time.Now()); e != "" {
+				line += " " + e
+			}
+		}
+		out = append(out, line)
+	}
+	if hl := m.healthLines(); len(hl) > 0 {
+		out = append(out, "")
+		out = append(out, hl...)
 	}
 	out = append(out, "", dimStyle.Render(Tr("dash_connect_hint")))
 	return out

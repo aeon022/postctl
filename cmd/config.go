@@ -148,6 +148,9 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Medium.IntegrationToken = value
 	case "instagram.access_token":
 		config.ActiveConfig.Instagram.AccessToken = value
+		config.ActiveConfig.Instagram.TokenIssued = time.Now().Format("2006-01-02")
+	case "instagram.token_issued":
+		config.ActiveConfig.Instagram.TokenIssued = value
 	case "instagram.location_id":
 		config.ActiveConfig.Instagram.LocationID = value
 	case "instagram.api":
@@ -708,6 +711,7 @@ var configSetupCmd = &cobra.Command{
 
 			if igToken != "" {
 				config.ActiveConfig.Instagram.AccessToken = igToken
+				config.ActiveConfig.Instagram.TokenIssued = time.Now().Format("2006-01-02")
 			}
 			if igID != "" {
 				config.ActiveConfig.Instagram.AccountID = igID

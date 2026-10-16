@@ -44,6 +44,7 @@ type Model struct {
 	calDay    time.Time   // selected day of the calendar tab (zero = today)
 	calCursor int         // selected post within that day
 	ask       *publishAsk // pending "publish now?" confirmation
+	health    healthInfo  // token expiry, scheduler state (dashboard)
 	cursor    int
 
 	// Geladene Daten
@@ -110,6 +111,7 @@ type dataLoadedMsg struct {
 	campaigns []models.Campaign
 	platforms map[string]bool
 	nextUp    []models.Post
+	health    healthInfo
 }
 
 type errorMsg struct {
@@ -363,6 +365,7 @@ func (m Model) loadDataCmd() tea.Msg {
 		campaigns: campaigns,
 		platforms: platforms,
 		nextUp:    nextUp,
+		health:    collectHealth(ctx, m.store, posts),
 	}
 }
 
@@ -1201,6 +1204,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.campaigns = msg.campaigns
 		m.platforms = msg.platforms
 		m.nextUp = msg.nextUp
+		m.health = msg.health
 		m.loading = false
 		m.err = nil
 		return m, nil

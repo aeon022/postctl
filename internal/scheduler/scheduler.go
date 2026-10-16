@@ -107,14 +107,24 @@ func RunDaemon(ctx context.Context, open func() (*store.SQLiteStore, error), che
 	ticker := time.NewTicker(checkInterval)
 	defer ticker.Stop()
 
+	var lastRefresh time.Time
 	check := func() {
+		// Keep the Instagram token alive (refreshed when 30+ days old); looked at twice a day.
+		if !dryRun && time.Since(lastRefresh) > 12*time.Hour {
+			lastRefresh = time.Now()
+			if ok, err := platforms.RefreshInstagramIfDue(ctx); err != nil {
+				platforms.Log("[SCHEDULER] Instagram-Token-Erneuerung fehlgeschlagen: %v", err)
+			} else if ok {
+				platforms.Log("[SCHEDULER] Instagram-Token erneuert (60 Tage ab heute).")
+			}
+		}
 		s, err := open()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%s Check übersprungen: %v\n", time.Now().Format("15:04:05"), err)
 			return
 		}
 		defer s.Close()
-		runIfDesignated(ctx, s, dryRun)
+		runDaemonCheck(ctx, s, dryRun)
 	}
 
 	// Initialer Check beim Start
@@ -198,6 +208,17 @@ func RescheduleOverdue(ctx context.Context, s *store.SQLiteStore) error {
 func runIfDesignated(ctx context.Context, s *store.SQLiteStore, dryRun bool) {
 	if !dryRun && !(config.AutoPublishEnabled() && config.DBSettled(dbSettleQuiet)) {
 		platforms.Log("[SCHEDULER] Diese Maschine ist nicht der designierte Publisher (auto_publish aus) oder die lokale DB-Kopie ist noch nicht \"settled\" — überspringe diesen Check.")
+		return
+	}
+	checkAndPublishDue(ctx, s, dryRun)
+}
+
+// runDaemonCheck is the check of an explicitly started daemon: running (or installing) it on a
+// machine is the designation, so auto_publish — which only gates the TUI's background tick — is
+// not required. The Dropbox "settled" guard still applies.
+func runDaemonCheck(ctx context.Context, s *store.SQLiteStore, dryRun bool) {
+	if !dryRun && !config.DBSettled(dbSettleQuiet) {
+		platforms.Log("[SCHEDULER] Die lokale DB-Kopie ist noch nicht \"settled\" (Sync läuft?) — überspringe diesen Check.")
 		return
 	}
 	checkAndPublishDue(ctx, s, dryRun)
