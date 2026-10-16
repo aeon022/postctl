@@ -12,6 +12,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Label is the launchd label for a profile ("" = default profile).
@@ -105,6 +106,9 @@ func Install(profile string) error {
 		return err
 	}
 	_ = launchctl("bootout", domain()+"/"+Label(profile)) // reload with the new plist; ok if not loaded
+	for i := 0; i < 50 && Running(profile); i++ {         // bootout is asynchronous; bootstrapping too early fails with EIO
+		time.Sleep(100 * time.Millisecond)
+	}
 	return launchctl("bootstrap", domain(), p)
 }
 
