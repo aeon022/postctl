@@ -662,7 +662,27 @@
 <blockquote>
 <p>[!WARNING]
 <strong>API Rate Limits &amp; Bulk Publishing:</strong> Publishing multiple posts simultaneously or in quick succession can lead to API rate limits or permanent account bans (especially on federated networks like Mastodon). Always space out posts over time (e.g., at least 15-30 minutes delay between consecutive publishing events).</p>
+<p><strong>Built-in safeguards in the scheduler/daemon:</strong> several overdue posts on one platform are rescheduled in 20-minute steps (log tag <code>[SAFETY]</code>), and on <strong>Twitter/X</strong> at least <strong>60 minutes</strong> must pass between two published posts — a post that comes due earlier simply waits and goes out on a later check.</p>
 </blockquote>
+<hr>
+<h2 id="recent-changes-october-2026">Recent changes (October 2026)</h2>
+<ul>
+<li>
+<p><strong>Scheduled posts.</strong> On Dev.to and Medium a post whose scheduled time has arrived is now published; a draft is only created when the scheduled time is still in the future (before, due posts were saved as drafts while postctl showed them as posted).</p>
+</li>
+<li>
+<p><strong>Discord.</strong> Posts now return the real message ID (the webhook is called with <code>?wait=true</code>), so they can be deleted later.</p>
+</li>
+<li>
+<p><strong><code>postctl delete</code>.</strong> It removes the post on the platform first and only then the local record. Twitter deletion is not implemented, and old Discord posts stored with the placeholder ID <code>webhook-posted</code> cannot be deleted remotely — in both cases it now stops with an error and keeps the local record instead of pretending success.</p>
+</li>
+<li>
+<p><strong>OAuth callback.</strong> The local callback page HTML-escapes the <code>error</code> text it shows.</p>
+</li>
+<li>
+<p><strong>Tests.</strong> The platform clients are covered by tests against mock HTTP servers (no network, no tokens needed).</p>
+</li>
+</ul>
 <hr>
 <h2 id="architecture">Architecture</h2>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Markdown files</span></span>
@@ -1486,6 +1506,8 @@ Die Cookie-basierte Authentifizierung simuliert eine Web-Sitzung. Diese Methode 
 <p>Wir empfehlen die Schnelleinrichtung per Einzeiler im Terminal. Ersetze die Platzhalter durch deine kopierten Werte:</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">./postctl</span><span style="color:#9ECBFF"> config</span><span style="color:#9ECBFF"> setup</span><span style="color:#9ECBFF"> twitter</span><span style="color:#79B8FF"> --cookie</span><span style="color:#9ECBFF"> "HIER_DER_GESAMTE_KOPIERTE_COOKIE_STRING"</span><span style="color:#79B8FF"> --ct0</span><span style="color:#9ECBFF"> "HIER_NUR_DER_CT0_WERT"</span></span></code></pre>
 <p><em>(Hinweis: Falls du das interaktive Setup über <code>./postctl config setup twitter</code> startest und Option <code>2</code> wählst, kannst du bei der Abfrage nach dem <code>auth_token</code> ebenfalls den gesamten langen Cookie-String einfügen).</em></p>
+<h3 id="️-schutz-vor-kontosperrung">🛡️ Schutz vor Kontosperrung</h3>
+<p>Besonders im Cookie-Modus gilt X als sensibel gegenüber automatisiertem Verhalten. Der Scheduler/Daemon erzwingt deshalb einen <strong>Mindestabstand von 60 Minuten</strong> zwischen zwei veröffentlichten X-Posts (ein früher fälliger Post wartet automatisch). Mehrere überfällige Posts werden zusätzlich in 20-Minuten-Schritten verteilt, Tweets innerhalb eines Threads mit 3 Sekunden Pause gepostet. Log-Hinweise tragen das Kürzel <code>[SAFETY]</code>. Plane trotzdem nicht mehr als wenige Posts pro Tag.</p>
 <h3 id="️-fehlerbehebung-bei-cookie-fehlern--automatisierungswarnungen">🛠️ Fehlerbehebung bei Cookie-Fehlern / Automatisierungswarnungen</h3>
 <p>Sollte beim Veröffentlichen eines Tweets ein GraphQL-Fehler wie <code>empty tweet ID returned...</code> oder der Fehler <strong>226</strong> (<code>This request looks like it might be automated...</code>) auftreten, greift <code>postctl</code> automatisch auf einen <strong>Headless-Browser-Fallback</strong> zurück:</p>
 <ol>
@@ -2348,64 +2370,64 @@ Twitter/X no longer offers free write access (Free Tier) for newly created devel
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Repository: ~/Developing/Projects/postctl</span></span>
 <span class="line"><span>Module:     github.com/aeon022/postctl</span></span>
 <span class="line"><span>License:    MIT</span></span></code></pre>
-</div><div class="lang-de"><h1 id="postctl--spezifikation">postctl — Spezifikation</h1>
-<h2 id="überblick">Überblick</h2>
-<p><strong>postctl</strong> ist ein in Go geschriebenes TUI-CLI-Tool, das Social-Media-Beiträge und Blogartikel über Twitter/X, LinkedIn, Threads, Mastodon, Bluesky, Facebook, Telegram, Discord, Reddit, Dev.to, Hashnode und Medium hinweg verwaltet. Beiträge werden als Markdown-Dateien verfasst, in eine lokale SQLite-Datenbank importiert, in einer Terminal-UI vorgeschaut und über Plattform-APIs veröffentlicht — sofort oder nach Zeitplan.</p>
+</div><div class="lang-de"><h1 id="postctl--specification">postctl — Specification</h1>
+<h2 id="overview">Overview</h2>
+<p><strong>postctl</strong> is a TUI CLI tool written in Go that manages social media postings and blogs across Twitter/X, LinkedIn, Threads, Mastodon, Bluesky, Facebook, Telegram, Discord, Reddit, Dev.to, Hashnode, and Medium. Posts are authored as Markdown files, imported into a local SQLite database, previewed in a terminal UI, and published via platform APIs — immediately or on a schedule.</p>
 <h2 id="user-stories">User Stories</h2>
-<h3 id="als-solo-entwickler--indie-hacker">Als Solo-Entwickler / Indie Hacker:</h3>
+<h3 id="as-a-solo-developer--indie-hacker">As a solo developer / indie hacker:</h3>
 <ul>
-<li>Ich will Beiträge als Markdown-Dateien in meinem Repo schreiben</li>
-<li>Ich will vorschauen, wie ein Twitter-Thread aussehen wird, bevor ich poste</li>
-<li>Ich will Beiträge für optimales Timing über Zeitzonen hinweg einplanen</li>
-<li>Ich will denselben Inhalt mit einem Befehl auf mehreren Plattformen posten</li>
-<li>Ich will sehen, was ich wann gepostet habe</li>
-<li>Ich will eine Zeichenzahl-Prüfung vor dem Posten (280 Zeichen pro Tweet)</li>
+<li>I want to write posts as Markdown files in my repo</li>
+<li>I want to preview how a Twitter thread will look before posting</li>
+<li>I want to schedule posts for optimal timing across time zones</li>
+<li>I want to post the same content to multiple platforms with one command</li>
+<li>I want to see what I’ve posted and when</li>
+<li>I want character count validation before posting (280 chars per tweet)</li>
 </ul>
-<h3 id="als-ki-assistent-claude-gpt-antigravity">Als KI-Assistent (Claude, GPT, Antigravity):</h3>
+<h3 id="as-an-ai-assistant-claude-gpt-antigravity">As an AI assistant (Claude, GPT, Antigravity):</h3>
 <ul>
-<li>Ich will korrekt formatierte Markdown-Beiträge erstellen</li>
-<li>Ich will das Posten über CLI-Befehle auslösen</li>
-<li>Ich will Beitragsstatus und -verlauf prüfen können</li>
-<li>Ich will den kompletten Workflow durchgängig ohne menschliches Eingreifen ausführen (außer Freigabe)</li>
-<li>Ich will strukturierte JSON-Ausgabe für alle Befehle, um Ergebnisse zu parsen</li>
-<li>Ich will einen Dry-Run-Modus, um alles zu prüfen, bevor es verbindlich wird</li>
+<li>I want to create properly formatted Markdown posts</li>
+<li>I want to trigger posting via CLI commands</li>
+<li>I want to check post status and history</li>
+<li>I want to run the full workflow end-to-end without human intervention (except approval)</li>
+<li>I want structured JSON output for all commands so I can parse results</li>
+<li>I want dry-run mode to preview everything before committing</li>
 </ul>
-<h2 id="prinzip-ki-als-operator">Prinzip: KI als Operator</h2>
-<p><strong>postctl ist darauf ausgelegt, dass KI es bedient — nicht nur Text generiert.</strong></p>
-<p>Die meisten Social-Media-Tools behandeln KI als Copywriting-Feature — “KI schreibt deine Bildunterschrift”. postctl behandelt KI als Operator des gesamten Tools. Der Mensch legt die Strategie fest und gibt frei; die KI führt aus.</p>
-<h3 id="workflow-ki-bedient-mensch-gibt-frei">Workflow: KI bedient, Mensch gibt frei</h3>
-<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Mensch: "Poste den neuen Orbiter-v0.3.66-Release"</span></span>
+<h2 id="ai-as-operator-principle">AI-as-Operator Principle</h2>
+<p><strong>postctl is designed for AI to operate, not just to generate text.</strong></p>
+<p>Most social media tools treat AI as a copywriting feature — “AI writes your caption.” postctl treats AI as the operator of the entire tool. The human sets the strategy and approves; the AI executes.</p>
+<h3 id="workflow-ai-operates-human-approves">Workflow: AI operates, human approves</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Human: "Post the new Orbiter v0.3.66 release"</span></span>
 <span class="line"><span>   ↓</span></span>
-<span class="line"><span>KI (Claude/GPT):</span></span>
-<span class="line"><span>   1. Schreibt Beiträge als Markdown-Dateien (alle Plattformen, DE+EN)</span></span>
+<span class="line"><span>AI (Claude/GPT):</span></span>
+<span class="line"><span>   1. Writes posts as Markdown files (all platforms, EN+DE)</span></span>
 <span class="line"><span>   2. postctl import ./posts/</span></span>
-<span class="line"><span>   3. postctl list --format json          → zeigt Entwürfe</span></span>
-<span class="line"><span>   4. "Hier sind 8 fertige Beiträge. Prüfen?"</span></span>
+<span class="line"><span>   3. postctl list --format json          → shows draft posts</span></span>
+<span class="line"><span>   4. "Here are 8 posts ready. Review?"</span></span>
 <span class="line"><span>   ↓</span></span>
-<span class="line"><span>Mensch: "LinkedIn DE ändern, sonst passt es"</span></span>
+<span class="line"><span>Human: "LinkedIn DE ändern, sonst passt"</span></span>
 <span class="line"><span>   ↓</span></span>
-<span class="line"><span>KI:</span></span>
-<span class="line"><span>   5. Bearbeitet die Datei, importiert neu</span></span>
+<span class="line"><span>AI:</span></span>
+<span class="line"><span>   5. Edits the file, re-imports</span></span>
 <span class="line"><span>   6. postctl campaign post orbiter-v0366 --dry-run</span></span>
-<span class="line"><span>   7. "Dry Run erfolgreich. Posten?"</span></span>
+<span class="line"><span>   7. "Dry run passed. Post?"</span></span>
 <span class="line"><span>   ↓</span></span>
-<span class="line"><span>Mensch: "go"</span></span>
+<span class="line"><span>Human: "go"</span></span>
 <span class="line"><span>   ↓</span></span>
-<span class="line"><span>KI:</span></span>
+<span class="line"><span>AI:</span></span>
 <span class="line"><span>   8. postctl campaign post orbiter-v0366</span></span>
-<span class="line"><span>   9. "Gepostet. 4/4 Twitter, 2/2 LinkedIn, 2/2 Threads. IDs: ..."</span></span></code></pre>
-<h3 id="designanforderungen-für-den-ki-betrieb">Designanforderungen für den KI-Betrieb</h3>
+<span class="line"><span>   9. "Posted. 4/4 Twitter, 2/2 LinkedIn, 2/2 Threads. IDs: ..."</span></span></code></pre>
+<h3 id="design-requirements-for-ai-operation">Design requirements for AI operation</h3>
 <ol>
-<li><strong>Alle Befehle müssen nicht-interaktiv funktionieren</strong> — keine Prompts, kein “bist du sicher?”, keine interaktiven Menüs. Flags steuern alles.</li>
-<li><strong><code>--format json</code></strong> bei allen Befehlen — strukturierte Ausgabe, die KI parsen kann. Standard ist menschenlesbar, <code>--format json</code> liefert maschinenlesbar.</li>
-<li><strong><code>--dry-run</code></strong> bei allen verändernden Befehlen — KI kann ohne Nebenwirkungen vorschauen. Mensch gibt frei, dann führt KI ohne <code>--dry-run</code> aus.</li>
-<li><strong>Exit-Codes</strong> — 0 = Erfolg, 1 = Validierungsfehler, 2 = API-Fehler, 3 = Auth-Fehler. KI liest Exit-Codes, nicht nur die Ausgabe.</li>
-<li><strong>Idempotente Importe</strong> — <code>postctl import</code> zweimal auszuführen dupliziert keine Beiträge. KI kann nach Bearbeitungen ohne Aufräumen neu importieren.</li>
-<li><strong>Wiederherstellung nach Teilfehlern</strong> — schlägt Tweet 3/5 fehl, setzt <code>postctl post &lt;id&gt; --resume</code> dort fort, wo es aufgehört hat. KI muss den Zustand nicht manuell verfolgen.</li>
-<li><strong>Kein Browser nötig</strong> — der OAuth-Flow nutzt einen Localhost-Callback, aber nach der Authentifizierung läuft alles rein über die CLI. KI muss nie einen Browser öffnen.</li>
-<li><strong>Batch-Operationen</strong> — <code>postctl campaign post &lt;name&gt;</code> postet alle Beiträge einer Kampagne. KI muss nicht über einzelne Beiträge loopen.</li>
+<li><strong>All commands must work non-interactively</strong> — no prompts, no “are you sure?”, no interactive menus. Flags control everything.</li>
+<li><strong><code>--format json</code></strong> on all commands — structured output that AI can parse. Default is human-readable, <code>--format json</code> returns machine-readable.</li>
+<li><strong><code>--dry-run</code></strong> on all mutation commands — AI can preview without side effects. Human approves, then AI runs without <code>--dry-run</code>.</li>
+<li><strong>Exit codes</strong> — 0 = success, 1 = validation error, 2 = API error, 3 = auth error. AI reads exit codes, not just output.</li>
+<li><strong>Idempotent imports</strong> — running <code>postctl import</code> twice doesn’t duplicate posts. AI can re-import after edits without cleanup.</li>
+<li><strong>Partial failure recovery</strong> — if tweet 3/5 fails, <code>postctl post &lt;id&gt; --resume</code> continues from where it stopped. AI doesn’t need to track state manually.</li>
+<li><strong>No browser required</strong> — OAuth flow uses localhost callback, but once authenticated, everything is CLI-only. AI never needs to open a browser.</li>
+<li><strong>Batch operations</strong> — <code>postctl campaign post &lt;name&gt;</code> posts all posts in a campaign. AI doesn’t need to loop over individual posts.</li>
 </ol>
-<h3 id="beispiel-für-json-ausgabe">Beispiel für JSON-Ausgabe</h3>
+<h3 id="json-output-example">JSON output example</h3>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> postctl</span><span style="color:#9ECBFF"> list</span><span style="color:#79B8FF"> --format</span><span style="color:#9ECBFF"> json</span></span>
 <span class="line"><span style="color:#E1E4E8">{</span></span>
 <span class="line"><span style="color:#B392F0">  "posts"</span><span style="color:#79B8FF">:</span><span style="color:#E1E4E8"> [</span></span>
@@ -2431,149 +2453,149 @@ Twitter/X no longer offers free write access (Free Tier) for newly created devel
 <span class="line"><span style="color:#B392F0">  "thread_id"</span><span style="color:#79B8FF">:</span><span style="color:#9ECBFF"> "1234567890",</span></span>
 <span class="line"><span style="color:#B392F0">  "urls"</span><span style="color:#79B8FF">:</span><span style="color:#E1E4E8"> [</span><span style="color:#9ECBFF">"https://x.com/gerwinweiher/status/1234567890"</span><span style="color:#E1E4E8">]</span></span>
 <span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
-<h2 id="kern-workflows">Kern-Workflows</h2>
-<h3 id="1-import-workflow">1. Import-Workflow</h3>
-<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Markdown-Dateien → postctl import → SQLite-DB</span></span>
+<h2 id="core-workflows">Core Workflows</h2>
+<h3 id="1-import-workflow">1. Import Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Markdown files → postctl import → SQLite DB</span></span>
 <span class="line"><span>                                    ↓</span></span>
-<span class="line"><span>                              Beiträge mit Status "draft"</span></span></code></pre>
-<p><strong>Eingabe</strong>: Verzeichnis mit <code>.md</code>-Dateien mit YAML-Frontmatter
-<strong>Verarbeitung</strong>:</p>
+<span class="line"><span>                              Posts with status "draft"</span></span></code></pre>
+<p><strong>Input</strong>: Directory of <code>.md</code> files with YAML frontmatter
+<strong>Processing</strong>:</p>
 <ul>
-<li>Frontmatter parsen (platform, type, language, campaign, schedule, images)</li>
-<li>Body in Tweets zerlegen (Trennung bei <code>## Tweet N</code>-Überschriften)</li>
-<li>Reply-Abschnitt erkennen (<code>## Reply</code>)</li>
-<li>Validieren: Zeichenzahl pro Tweet (≤280), Bildpfade existieren</li>
-<li>Deterministische ID aus Dateiname + Plattform erzeugen</li>
-<li>In SQLite einfügen/aktualisieren (Upsert auf ID)</li>
+<li>Parse frontmatter (platform, type, language, campaign, schedule, images)</li>
+<li>Parse body into tweets (split on <code>## Tweet N</code> headers)</li>
+<li>Detect reply section (<code>## Reply</code>)</li>
+<li>Validate: character count per tweet (≤280), image paths exist</li>
+<li>Generate deterministic ID from filename + platform</li>
+<li>Insert/update in SQLite (upsert on ID)</li>
 </ul>
-<p><strong>Ausgabe</strong>: Beiträge in der DB mit Status <code>draft</code> oder <code>scheduled</code> (falls <code>schedule:</code>-Frontmatter vorhanden)</p>
-<h3 id="2-vorschau-workflow">2. Vorschau-Workflow</h3>
-<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl (ohne Argumente) → TUI</span></span>
+<p><strong>Output</strong>: Posts in DB with status <code>draft</code> or <code>scheduled</code> (if <code>schedule:</code> frontmatter present)</p>
+<h3 id="2-preview-workflow">2. Preview Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl (no args) → TUI</span></span>
 <span class="line"><span>                      ↓</span></span>
-<span class="line"><span>              Dashboard → Beitragsliste → Detailansicht</span></span>
+<span class="line"><span>              Dashboard → Post list → Detail view</span></span>
 <span class="line"><span>                                        ↓</span></span>
-<span class="line"><span>                                   Tweet-für-Tweet-Vorschau</span></span>
-<span class="line"><span>                                   mit Zeichenzahl + Bildindikatoren</span></span></code></pre>
-<h3 id="3-post-workflow">3. Post-Workflow</h3>
-<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl post &#x3C;id> → Aus DB laden → Validieren → API-Aufruf → Status aktualisieren</span></span>
+<span class="line"><span>                                   Tweet-by-tweet preview</span></span>
+<span class="line"><span>                                   with char count + image indicators</span></span></code></pre>
+<h3 id="3-post-workflow">3. Post Workflow</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl post &#x3C;id> → Load from DB → Validate → API Call → Update status</span></span>
 <span class="line"><span>                                                ↓</span></span>
-<span class="line"><span>                                          Zuerst Bilder hochladen</span></span>
-<span class="line"><span>                                          Dann Text mit Media-IDs posten</span></span>
-<span class="line"><span>                                          Bei Threads: sequenziell posten,</span></span>
-<span class="line"><span>                                          als Antwort auf vorherige Tweet-ID</span></span></code></pre>
-<p><strong>Ablauf beim Thread-Posten</strong>:</p>
+<span class="line"><span>                                          Upload images first</span></span>
+<span class="line"><span>                                          Then post text with media IDs</span></span>
+<span class="line"><span>                                          For threads: post sequentially,</span></span>
+<span class="line"><span>                                          reply to previous tweet ID</span></span></code></pre>
+<p><strong>Thread posting sequence</strong>:</p>
 <ol>
-<li>Alle Bilder hochladen → Media-IDs erhalten</li>
-<li>Tweet 1 posten → Tweet-ID erhalten</li>
-<li>Tweet 2 als Antwort auf Tweet 1 posten → Tweet-ID erhalten</li>
-<li>Tweet 3 als Antwort auf Tweet 2 posten → …</li>
-<li>Reply-Tweet als Antwort auf den letzten Tweet posten</li>
-<li>DB aktualisieren: status = “posted”, platform_id = erste Tweet-ID</li>
+<li>Upload all images → get media IDs</li>
+<li>Post Tweet 1 → get tweet ID</li>
+<li>Post Tweet 2 as reply to Tweet 1 → get tweet ID</li>
+<li>Post Tweet 3 as reply to Tweet 2 → …</li>
+<li>Post Reply tweet as reply to last tweet</li>
+<li>Update DB: status = “posted”, platform_id = first tweet ID</li>
 </ol>
-<p><strong>Fehlerbehandlung</strong>:</p>
+<p><strong>Error handling</strong>:</p>
 <ul>
-<li>Schlägt Tweet N fehl: Beitrag als “partial” markieren, letzte erfolgreiche Tweet-ID speichern</li>
-<li>Wiederholung: ab dem fehlgeschlagenen Tweet fortsetzen (erfolgreiche nicht erneut posten)</li>
-<li>Bei Rate-Limit: warten und mit exponentiellem Backoff wiederholen</li>
+<li>If tweet N fails: mark post as “partial”, store last successful tweet ID</li>
+<li>Retry: resume from the failed tweet (don’t re-post successful ones)</li>
+<li>Rate limit hit: wait and retry with exponential backoff</li>
 </ul>
-<h3 id="4-zeitplan-workflow">4. Zeitplan-Workflow</h3>
+<h3 id="4-schedule-workflow">4. Schedule Workflow</h3>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl schedule &#x3C;id> "2026-06-23 09:00"</span></span>
 <span class="line"><span>       ↓</span></span>
-<span class="line"><span>  DB aktualisieren: status = "scheduled", scheduled_at = Zeitstempel</span></span>
+<span class="line"><span>  Update DB: status = "scheduled", scheduled_at = datetime</span></span>
 <span class="line"><span>       ↓</span></span>
-<span class="line"><span>  Scheduler-Daemon greift zur richtigen Zeit</span></span>
+<span class="line"><span>  Scheduler daemon picks it up at the right time</span></span>
 <span class="line"><span>       ↓</span></span>
-<span class="line"><span>  Wie der Post-Workflow</span></span></code></pre>
+<span class="line"><span>  Same as Post Workflow</span></span></code></pre>
 <p><strong>Scheduler</strong>:</p>
 <ul>
-<li>Läuft als Hintergrund-Goroutine, während die TUI offen ist</li>
-<li>Läuft auch als <code>postctl daemon</code> im Headless-Modus</li>
-<li>Prüft alle 30 Sekunden auf fällige Beiträge</li>
-<li>Postet in Reihenfolge von scheduled_at</li>
+<li>Runs as background goroutine when TUI is open</li>
+<li>Also runs as <code>postctl daemon</code> for headless mode</li>
+<li>Checks every 30 seconds for due posts</li>
+<li>Posts in order of scheduled_at</li>
 </ul>
-<h3 id="5-auth-workflow">5. Auth-Workflow</h3>
+<h3 id="5-auth-workflow">5. Auth Workflow</h3>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>postctl auth twitter</span></span>
 <span class="line"><span>       ↓</span></span>
-<span class="line"><span>  Browser öffnen → Twitter-OAuth-Zustimmungsseite</span></span>
+<span class="line"><span>  Open browser → Twitter OAuth consent page</span></span>
 <span class="line"><span>       ↓</span></span>
-<span class="line"><span>  Lokaler HTTP-Server auf :8753 fängt den Callback ab</span></span>
+<span class="line"><span>  Local HTTP server on :8753 catches callback</span></span>
 <span class="line"><span>       ↓</span></span>
-<span class="line"><span>  Code gegen Token tauschen</span></span>
+<span class="line"><span>  Exchange code for token</span></span>
 <span class="line"><span>       ↓</span></span>
-<span class="line"><span>  Verschlüsseltes Token in SQLite speichern</span></span></code></pre>
-<h2 id="markdown-formatspezifikation">Markdown-Formatspezifikation</h2>
-<h3 id="frontmatter-felder">Frontmatter-Felder</h3>
+<span class="line"><span>  Store encrypted token in SQLite</span></span></code></pre>
+<h2 id="markdown-format-spec">Markdown Format Spec</h2>
+<h3 id="frontmatter-fields">Frontmatter Fields</h3>
 <table>
 <thead>
 <tr>
-<th>Feld</th>
-<th>Pflicht</th>
-<th>Typ</th>
-<th>Werte</th>
-<th>Standard</th>
+<th>Field</th>
+<th>Required</th>
+<th>Type</th>
+<th>Values</th>
+<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>platform</code></td>
-<td>ja</td>
-<td>String</td>
+<td>yes</td>
+<td>string</td>
 <td><code>twitter</code>, <code>linkedin</code>, <code>threads</code>, <code>all</code></td>
 <td>—</td>
 </tr>
 <tr>
 <td><code>type</code></td>
-<td>ja</td>
-<td>String</td>
+<td>yes</td>
+<td>string</td>
 <td><code>thread</code>, <code>single</code>, <code>article</code></td>
 <td>—</td>
 </tr>
 <tr>
 <td><code>language</code></td>
-<td>nein</td>
-<td>String</td>
+<td>no</td>
+<td>string</td>
 <td>ISO 639-1 (<code>en</code>, <code>de</code>)</td>
 <td><code>en</code></td>
 </tr>
 <tr>
 <td><code>campaign</code></td>
-<td>nein</td>
-<td>String</td>
-<td>freier Slug</td>
+<td>no</td>
+<td>string</td>
+<td>freeform slug</td>
 <td>—</td>
 </tr>
 <tr>
 <td><code>schedule</code></td>
-<td>nein</td>
-<td>Datum/Zeit</td>
-<td>ISO 8601 lokal</td>
+<td>no</td>
+<td>datetime</td>
+<td>ISO 8601 local</td>
 <td>—</td>
 </tr>
 <tr>
 <td><code>images</code></td>
-<td>nein</td>
-<td>Liste</td>
-<td>relative Dateipfade</td>
+<td>no</td>
+<td>list</td>
+<td>relative file paths</td>
 <td>—</td>
 </tr>
 <tr>
 <td><code>tags</code></td>
-<td>nein</td>
-<td>Liste</td>
-<td>Hashtags ohne #</td>
+<td>no</td>
+<td>list</td>
+<td>hashtags without #</td>
 <td>—</td>
 </tr>
 </tbody>
 </table>
-<h3 id="body-format">Body-Format</h3>
-<p><strong>Einzelbeitrag</strong> (LinkedIn, Threads):</p>
+<h3 id="body-format">Body Format</h3>
+<p><strong>Single post</strong> (LinkedIn, Threads):</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="color:#E1E4E8">---</span></span>
 <span class="line"><span style="color:#85E89D">platform</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">linkedin</span></span>
 <span class="line"><span style="color:#85E89D">type</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">single</span></span>
 <span class="line"><span style="color:#E1E4E8">---</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#E1E4E8">Der gesamte Beitragstext kommt hierher.</span></span>
-<span class="line"><span style="color:#E1E4E8">Mehrere Absätze werden unterstützt.</span></span></code></pre>
+<span class="line"><span style="color:#E1E4E8">The entire post body goes here.</span></span>
+<span class="line"><span style="color:#E1E4E8">Multiple paragraphs supported.</span></span></code></pre>
 <p><strong>Thread</strong> (Twitter):</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="markdown"><code><span class="line"><span style="color:#E1E4E8">---</span></span>
 <span class="line"><span style="color:#85E89D">platform</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">twitter</span></span>
@@ -2584,33 +2606,33 @@ Twitter/X no longer offers free write access (Free Tier) for newly created devel
 <span class="line"></span>
 <span class="line"><span style="color:#79B8FF;font-weight:bold">## Tweet 1</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#E1E4E8">Inhalt des ersten Tweets. Keine Links hier, wegen algorithmischer Reichweite.</span></span>
+<span class="line"><span style="color:#E1E4E8">First tweet content. No links here for algorithmic reach.</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#79B8FF;font-weight:bold">## Tweet 2</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#E1E4E8">Zweiter Tweet. Bild anhängen: screenshots/01-dashboard.png</span></span>
+<span class="line"><span style="color:#E1E4E8">Second tweet. Attach image: screenshots/01-dashboard.png</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#79B8FF;font-weight:bold">## Tweet 3</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#E1E4E8">Inhalt des dritten Tweets.</span></span>
+<span class="line"><span style="color:#E1E4E8">Third tweet content.</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#79B8FF;font-weight:bold">## Reply</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#E1E4E8">Links und Hashtags kommen in den Selbst-Reply.</span></span>
+<span class="line"><span style="color:#E1E4E8">Links and hashtags go in the self-reply.</span></span>
 <span class="line"><span style="color:#E1E4E8">github.com/aeon022/orbiter</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#E1E4E8">#opensource #webdev</span></span></code></pre>
-<p><strong>Regeln</strong>:</p>
+<p><strong>Rules</strong>:</p>
 <ul>
-<li><code>## Tweet N</code> trennt in einzelne Tweets</li>
-<li><code>## Reply</code> wird als Antwort auf den letzten Tweet gepostet</li>
-<li>Bildzuordnung: erstes Bild in der <code>images:</code>-Liste geht an Tweet 2, zweites an Tweet 3, usw. Alternativ inline mit <code>&lt;!-- image: filename.png --&gt;</code></li>
-<li>Zeichenzahl: ≤280 pro Tweet (URLs zählen als 23 Zeichen, nach Twitters t.co)</li>
-<li>Leere Tweets werden übersprungen</li>
+<li><code>## Tweet N</code> splits into individual tweets</li>
+<li><code>## Reply</code> is posted as a reply to the last tweet</li>
+<li>Image assignment: first image in <code>images:</code> list goes to Tweet 2, second to Tweet 3, etc. Or use <code>&lt;!-- image: filename.png --&gt;</code> inline</li>
+<li>Character count: ≤280 per tweet (URLs count as 23 chars per Twitter’s t.co)</li>
+<li>Empty tweets are skipped</li>
 </ul>
-<h2 id="plattform-api-details">Plattform-API-Details</h2>
+<h2 id="platform-api-details">Platform API Details</h2>
 <h3 id="twitterx-v2">Twitter/X v2</h3>
-<p><strong>Auth</strong>: OAuth 2.0 mit PKCE</p>
+<p><strong>Auth</strong>: OAuth 2.0 with PKCE</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>GET https://twitter.com/i/oauth2/authorize</span></span>
 <span class="line"><span>  ?client_id=...</span></span>
 <span class="line"><span>  &#x26;redirect_uri=http://localhost:8753/callback</span></span>
@@ -2619,19 +2641,19 @@ Twitter/X no longer offers free write access (Free Tier) for newly created devel
 <span class="line"><span>  &#x26;code_challenge=...</span></span>
 <span class="line"><span>  &#x26;code_challenge_method=S256</span></span>
 <span class="line"><span>  &#x26;state=...</span></span></code></pre>
-<p><strong>Tweet posten</strong>:</p>
+<p><strong>Post tweet</strong>:</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://api.twitter.com/2/tweets</span></span>
 <span class="line"><span>Authorization: Bearer &#x3C;token></span></span>
 <span class="line"><span>Content-Type: application/json</span></span>
 <span class="line"><span></span></span>
 <span class="line"><span>{"text": "...", "media": {"media_ids": ["..."]}, "reply": {"in_reply_to_tweet_id": "..."}}</span></span></code></pre>
-<p><strong>Medien hochladen</strong> (v1.1 — weiterhin erforderlich):</p>
+<p><strong>Upload media</strong> (v1.1 — still required):</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://upload.twitter.com/1.1/media/upload.json</span></span>
 <span class="line"><span>Content-Type: multipart/form-data</span></span>
 <span class="line"><span></span></span>
 <span class="line"><span>media_data=&#x3C;base64></span></span></code></pre>
 <h3 id="linkedin-v2">LinkedIn v2</h3>
-<p><strong>Beitrag</strong>:</p>
+<p><strong>Post</strong>:</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://api.linkedin.com/v2/ugcPosts</span></span>
 <span class="line"><span>Authorization: Bearer &#x3C;token></span></span>
 <span class="line"><span></span></span>
@@ -2647,117 +2669,142 @@ Twitter/X no longer offers free write access (Free Tier) for newly created devel
 <span class="line"><span>  },</span></span>
 <span class="line"><span>  "visibility": {"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"}</span></span>
 <span class="line"><span>}</span></span></code></pre>
-<p><strong>Bild-Upload</strong> (2 Schritte):</p>
+<p><strong>Image upload</strong> (2-step):</p>
 <ol>
-<li>Registrieren: <code>POST /v2/assets?action=registerUpload</code> → liefert Upload-URL + Asset-URN</li>
-<li>Hochladen: <code>PUT &lt;upload-url&gt;</code> mit binären Bilddaten</li>
+<li>Register: <code>POST /v2/assets?action=registerUpload</code> → get upload URL + asset URN</li>
+<li>Upload: <code>PUT &lt;upload-url&gt;</code> with binary image data</li>
 </ol>
 <h3 id="threads-meta-graph-api">Threads (Meta Graph API)</h3>
-<p><strong>Container erstellen</strong>:</p>
+<p><strong>Create container</strong>:</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://graph.threads.net/v1.0/&#x3C;user_id>/threads</span></span>
 <span class="line"><span>  ?media_type=TEXT</span></span>
 <span class="line"><span>  &#x26;text=...</span></span>
 <span class="line"><span>  &#x26;access_token=...</span></span></code></pre>
-<p><strong>Veröffentlichen</strong>:</p>
+<p><strong>Publish</strong>:</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>POST https://graph.threads.net/v1.0/&#x3C;user_id>/threads_publish</span></span>
 <span class="line"><span>  ?creation_id=&#x3C;container_id></span></span>
 <span class="line"><span>  &#x26;access_token=...</span></span></code></pre>
-<h2 id="fehlerbehandlungs-strategie">Fehlerbehandlungs-Strategie</h2>
+<h2 id="error-handling-strategy">Error Handling Strategy</h2>
 <table>
 <thead>
 <tr>
-<th>Fehler</th>
-<th>Aktion</th>
+<th>Error</th>
+<th>Action</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Rate-Limit (429)</td>
-<td><code>retry-after</code>-Header abwarten, dann wiederholen</td>
+<td>Rate limit (429)</td>
+<td>Wait <code>retry-after</code> header, then retry</td>
 </tr>
 <tr>
-<td>Auth abgelaufen (401)</td>
-<td>Token-Refresh versuchen, bei Fehlschlag erneute Anmeldung anfordern</td>
+<td>Auth expired (401)</td>
+<td>Attempt token refresh, if fails prompt re-auth</td>
 </tr>
 <tr>
-<td>Netzwerkfehler</td>
-<td>3x wiederholen mit exponentiellem Backoff (1s, 4s, 16s)</td>
+<td>Network error</td>
+<td>Retry 3x with exponential backoff (1s, 4s, 16s)</td>
 </tr>
 <tr>
-<td>Teilweiser Thread</td>
-<td>Als “partial” markieren, Fortschritt speichern, Fortsetzung erlauben</td>
+<td>Partial thread</td>
+<td>Mark as “partial”, store progress, allow resume</td>
 </tr>
 <tr>
-<td>Ungültiger Inhalt</td>
-<td>Validierungsfehler vor dem API-Aufruf, Anzeige in der TUI</td>
+<td>Invalid content</td>
+<td>Validation error before API call, show in TUI</td>
 </tr>
 <tr>
-<td>Bild zu groß</td>
-<td>Mit Go-Bildbibliothek vor dem Upload verkleinern</td>
+<td>Image too large</td>
+<td>Resize with Go image library before upload</td>
 </tr>
 </tbody>
 </table>
-<h2 id="nicht-ziele-v1">Nicht-Ziele (v1)</h2>
+<h2 id="non-goals-v1">Non-Goals (v1)</h2>
 <ul>
-<li>Kein Web-Dashboard</li>
-<li>Keine Mehrbenutzer-/Team-Funktionen</li>
-<li>Keine eingebaute Bildgenerierung</li>
-<li>Kein automatisches Cross-Posting (explizit pro Plattform)</li>
+<li>No web dashboard</li>
+<li>No multi-user / team features</li>
+<li>No built-in image generation</li>
+<li>No automatic cross-posting (explicit per platform)</li>
 </ul>
-<h2 id="erfolgsmetriken">Erfolgsmetriken</h2>
+<h2 id="success-metrics">Success Metrics</h2>
 <ul>
-<li>20 Markdown-Beiträge in &lt;1 Sekunde importieren</li>
-<li>Einen 6-Tweet-Thread mit 2 Bildern in &lt;10 Sekunden posten</li>
-<li>TUI rendert mit 60fps im Standard-Terminal</li>
-<li>Einzelnes Binary, &lt;20MB, keine Laufzeit-Abhängigkeiten</li>
-<li>Läuft unter macOS, Linux, Windows</li>
+<li>Import 20 Markdown posts in &lt;1 second</li>
+<li>Post a 6-tweet thread with 2 images in &lt;10 seconds</li>
+<li>TUI renders at 60fps on standard terminal</li>
+<li>Single binary, &lt;20MB, no runtime dependencies</li>
+<li>Works on macOS, Linux, Windows</li>
 </ul>
 <hr>
-<h2 id="zukünftige-features-v2">Zukünftige Features (v2+)</h2>
-<blockquote>
-<p><strong>Hinweis:</strong> Alles in diesem Abschnitt ist eine zukunftsgerichtete Idee, keine Zusage und kein aktuell verkauftes Produkt. postctls tatsächliches Preismodell ist heute die einmalige missionctl-Bundle-Lizenz (Polar.sh), beschrieben auf der <a href="/#pricing">Preise-Seite</a> — nicht die Abo-Stufen, die unten skizziert sind.</p>
-</blockquote>
+<h2 id="future-features-v2">Future Features (v2+)</h2>
 <h3 id="postctl-generate"><code>postctl generate</code></h3>
-<p>KI generiert Beiträge aus einer URL oder einem Markdown-Artikel.</p>
+<p>AI generiert Posts aus einer URL oder einem Markdown-Artikel.</p>
 <ul>
-<li>Eingabe: URL, Markdown-Datei oder freier Text</li>
-<li>Ausgabe: Thread-Entwurf + LinkedIn-Beitrag + Threads-Beitrag als Markdown</li>
-<li>Nutzt die Claude-API, OpenAI-API oder Ollama (lokal)</li>
-<li>Nutzer prüft und bearbeitet vor dem Posten</li>
+<li>Input: URL, Markdown-Datei, oder freier Text</li>
+<li>Output: Thread-Draft + LinkedIn-Post + Threads-Post als Markdown</li>
+<li>Nutzt Claude API, OpenAI API, oder Ollama (lokal)</li>
+<li>User reviewt und editiert vor dem Posten</li>
 </ul>
 <h3 id="postctl-repurpose"><code>postctl repurpose</code></h3>
-<p>Nimmt einen bestehenden Beitrag und konvertiert ihn für andere Plattformen.</p>
+<p>Nimmt einen bestehenden Post und konvertiert ihn für andere Plattformen.</p>
 <ul>
-<li>Dev.to-Artikel → Twitter-Thread + LinkedIn + Threads</li>
-<li>Twitter-Thread → LinkedIn-Langbeitrag</li>
-<li>Passt Länge, Ton und Hashtags automatisch an</li>
+<li>Dev.to Artikel → Twitter Thread + LinkedIn + Threads</li>
+<li>Twitter Thread → LinkedIn Langpost</li>
+<li>Passt Länge, Ton, Hashtags automatisch an</li>
 </ul>
 <h3 id="postctl-analytics"><code>postctl analytics</code></h3>
-<p>Holt Engagement-Daten von den APIs nach dem Posten.</p>
+<p>Engagement-Daten von den APIs nach dem Posten holen.</p>
 <ul>
 <li>Likes, Retweets, Impressions (Twitter)</li>
-<li>Reaktionen, Kommentare (LinkedIn)</li>
-<li>Ermittelt beste Posting-Zeiten</li>
+<li>Reactions, Comments (LinkedIn)</li>
+<li>Beste Posting-Zeiten ermitteln</li>
 <li>Terminal-Dashboard mit Sparklines</li>
 </ul>
 <h3 id="postctl-template"><code>postctl template</code></h3>
-<p>Vorgefertigte Beitragsstrukturen.</p>
+<p>Vorgefertigte Post-Strukturen.</p>
 <ul>
-<li><code>postctl template launch</code> — Produkt-Launch-Ankündigung</li>
-<li><code>postctl template feature</code> — Feature-Update-Thread</li>
-<li><code>postctl template thought</code> — Thought-Leadership-Beitrag</li>
-<li>Erzeugt eine Markdown-Datei mit Platzhaltern</li>
+<li><code>postctl template launch</code> — Product Launch Announcement</li>
+<li><code>postctl template feature</code> — Feature Update Thread</li>
+<li><code>postctl template thought</code> — Thought Leadership Post</li>
+<li>Generiert Markdown-Datei mit Platzhaltern</li>
+</ul>
+<hr>
+<h2 id="monetarisierung">Monetarisierung</h2>
+<h3 id="postctl-open-source-gratis">postctl (Open Source, gratis)</h3>
+<p>Das CLI-Tool ist MIT-lizenziert. Baut Reputation und Community.</p>
+<h3 id="postctl-pro-9monat-oder-79jahr">postctl pro ($9/Monat oder $79/Jahr)</h3>
+<p>Premium-Features als bezahlte Erweiterung:</p>
+<ul>
+<li><strong>Analytics-Dashboard</strong> — Engagement pro Post, beste Posting-Zeiten, Wachstum über Zeit</li>
+<li><strong>AI-Optimierung</strong> — Claude/GPT rewritet Posts für maximale Reichweite (A/B-Vorschläge)</li>
+<li><strong>Team-Mode</strong> — mehrere Leute posten unter einem Account, Approval-Workflow</li>
+<li><strong>Priority Support</strong> — GitHub Issues mit SLA</li>
+<li>Implementierung: License Key in <code>~/.config/postctl/config.yaml</code>, Feature-Gates im Code</li>
+</ul>
+<h3 id="postctl-cloud-future--19monat">postctl cloud (Future — $19/Monat)</h3>
+<p>Gehostete Version für Nicht-Entwickler.</p>
+<ul>
+<li>Web-UI statt Terminal</li>
+<li>Managed Scheduling (kein eigener Rechner muss laufen)</li>
+<li>Status: niedrige Priorität, nur wenn Nachfrage da ist</li>
+</ul>
+<h3 id="go-tutorial-als-kurs-49-79-einmalig">Go Tutorial als Kurs ($49-79 einmalig)</h3>
+<p>Das Tutorial das wir parallel schreiben wird zum bezahlten Produkt:</p>
+<ul>
+<li>“Build a real CLI tool in Go” — Video-Serie</li>
+<li>postctl als Projekt-Basis, 7 Phasen</li>
+<li>Plattform: eigene Seite, Udemy, oder Lemon Squeezy</li>
+<li>Gratis-Teaser: erste 2 Phasen als Blog-Posts auf Dev.to</li>
 </ul>
 <hr>
 <h2 id="ökosystem-vision">Ökosystem-Vision</h2>
 <p>postctl ist Teil eines Content-Loops:</p>
-<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Orbiter (Erstellen) → postctl (Verteilen) → Analytics (Lernen) → Orbiter (Verbessern)</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>Orbiter (Create) → postctl (Distribute) → Analytics (Learn) → Orbiter (Improve)</span></span></code></pre>
 <ol>
-<li>Content in Orbiter schreiben (Blogbeiträge, Seiten)</li>
-<li>Beiträge als Markdown exportieren/generieren</li>
+<li>Content in Orbiter schreiben (Blog Posts, Pages)</li>
+<li>Posts als Markdown exportieren / generieren</li>
 <li>postctl verteilt auf Twitter, LinkedIn, Threads</li>
-<li>Analytics zeigt, was funktioniert</li>
-<li>Erkenntnisse fließen in den nächsten Content-Zyklus</li>
+<li>Analytics zeigt was funktioniert</li>
+<li>Insights fließen in nächsten Content-Zyklus</li>
 </ol>
 <p>Langfristig: <code>orbiter export --to-postctl</code> als Integration.</p>
 <hr>
