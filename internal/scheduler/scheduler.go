@@ -224,6 +224,10 @@ func runDaemonCheck(ctx context.Context, s *store.SQLiteStore, dryRun bool) {
 	checkAndPublishDue(ctx, s, dryRun)
 }
 
+// minGap: Mindestabstand zwischen zwei Posts je Plattform; ein zu früher Post bleibt fällig
+// und geht im nächsten Tick raus.
+var minGap = map[string]time.Duration{"twitter": 60 * time.Minute}
+
 // checkAndPublishDue prüft die DB auf fällige geplante Posts und veröffentlicht sie
 func checkAndPublishDue(ctx context.Context, s *store.SQLiteStore, dryRun bool) {
 	// Sicherheits-Rescheduling für überfällige Beiträge durchführen
@@ -255,8 +259,24 @@ func checkAndPublishDue(ctx context.Context, s *store.SQLiteStore, dryRun bool) 
 		return
 	}
 
+	// Mindestabstand zwischen zwei Posts derselben Plattform (X: Sperrschutz).
+	lastPosted := map[string]time.Time{}
+	for plat := range minGap {
+		if done, err := s.ListPosts(ctx, plat, models.StatusPosted, ""); err == nil {
+			for _, d := range done {
+				if d.PostedAt != nil && d.PostedAt.After(lastPosted[plat]) {
+					lastPosted[plat] = *d.PostedAt
+				}
+			}
+		}
+	}
+
 	for _, p := range posts {
 		if p.ScheduledAt != nil && p.ScheduledAt.Before(now) {
+			if gap, ok := minGap[p.Platform]; ok && !dryRun && time.Since(lastPosted[p.Platform]) < gap {
+				platforms.Log("[SAFETY] Post %s (%s) zurückgestellt: Mindestabstand %s seit letztem Post noch nicht erreicht.", p.ID, p.Platform, gap)
+				continue
+			}
 			if !dryRun {
 				// Versuche den Post atomar zu sperren, um doppeltes Posten zu verhindern
 				locked, err := s.TryLockPost(ctx, p.ID)
@@ -277,6 +297,7 @@ func checkAndPublishDue(ctx context.Context, s *store.SQLiteStore, dryRun bool) 
 				fmt.Fprintf(os.Stderr, "[SCHEDULER FEHLER] Posten von %s fehlgeschlagen: %v\n", p.ID, err)
 			} else {
 				fmt.Fprintf(os.Stderr, "[SCHEDULER] Post %s erfolgreich veröffentlicht.\n", p.ID)
+				lastPosted[p.Platform] = time.Now()
 			}
 		}
 	}

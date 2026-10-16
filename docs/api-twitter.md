@@ -42,6 +42,10 @@ Wir empfehlen die Schnelleinrichtung per Einzeiler im Terminal. Ersetze die Plat
 
 *(Hinweis: Falls du das interaktive Setup über `./postctl config setup twitter` startest und Option `2` wählst, kannst du bei der Abfrage nach dem `auth_token` ebenfalls den gesamten langen Cookie-String einfügen).*
 
+### 🛡️ Schutz vor Kontosperrung
+
+Besonders im Cookie-Modus gilt X als sensibel gegenüber automatisiertem Verhalten. Der Scheduler/Daemon erzwingt deshalb einen **Mindestabstand von 60 Minuten** zwischen zwei veröffentlichten X-Posts (ein früher fälliger Post wartet automatisch). Mehrere überfällige Posts werden zusätzlich in 20-Minuten-Schritten verteilt, Tweets innerhalb eines Threads mit 3 Sekunden Pause gepostet. Log-Hinweise tragen das Kürzel `[SAFETY]`. Plane trotzdem nicht mehr als wenige Posts pro Tag.
+
 ### 🛠️ Fehlerbehebung bei Cookie-Fehlern / Automatisierungswarnungen
 
 Sollte beim Veröffentlichen eines Tweets ein GraphQL-Fehler wie `empty tweet ID returned...` oder der Fehler **226** (`This request looks like it might be automated...`) auftreten, greift `postctl` automatisch auf einen **Headless-Browser-Fallback** zurück:
