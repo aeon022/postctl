@@ -172,3 +172,67 @@ func TestLinkedInAuthorIsOrganizationWhenConfigured(t *testing.T) {
 		t.Errorf("author = %q, %v", got, err)
 	}
 }
+
+func TestLinkedInCompanyPagePostsViaPostsAPI(t *testing.T) {
+	config.ActiveConfig.LinkedIn.OrganizationID = "424242"
+	defer func() { config.ActiveConfig.LinkedIn.OrganizationID = "" }()
+
+	var srvURL string
+	srv, reqs := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) {
+		switch {
+		case strings.HasPrefix(r.Path, "/rest/images"):
+			_, _ = w.Write([]byte(`{"value":{"uploadUrl":"` + srvURL + `/upload","image":"urn:li:image:IMG1"}}`))
+		case r.Path == "/rest/posts" && r.Method == "POST":
+			w.Header().Set("x-restli-id", "urn:li:share:99")
+			w.WriteHeader(201)
+		}
+	})
+	srvURL = srv.URL
+	l := newLI(t, srv.URL, true)
+	ctx := context.Background()
+
+	// text only
+	id, err := l.Post(ctx, &models.Post{Body: "hello page"})
+	if err != nil || id != "urn:li:share:99" {
+		t.Fatalf("id=%q err=%v", id, err)
+	}
+	var sent map[string]any
+	r := (*reqs)[0]
+	_ = json.Unmarshal(r.Raw, &sent)
+	if r.Method != "POST" || r.Path != "/rest/posts" || sent["author"] != "urn:li:organization:424242" || sent["commentary"] != "hello page" {
+		t.Errorf("request: %s %s %v", r.Method, r.Path, sent)
+	}
+
+	// one image: initializeUpload -> PUT bytes -> post with content.media.id
+	*reqs = nil
+	img := filepath.Join(t.TempDir(), "a.png")
+	if err := os.WriteFile(img, []byte("PNGDATA"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := l.Post(ctx, &models.Post{Body: "pic", Images: []string{img}}); err != nil {
+		t.Fatal(err)
+	}
+	got := *reqs
+	if len(got) != 3 || got[1].Method != "PUT" || string(got[1].Raw) != "PNGDATA" {
+		t.Fatalf("expected init, PUT, post; got %+v", got)
+	}
+	_ = json.Unmarshal(got[2].Raw, &sent)
+	media := sent["content"].(map[string]any)["media"].(map[string]any)
+	if media["id"] != "urn:li:image:IMG1" {
+		t.Errorf("media = %v", media)
+	}
+
+	// several images are rejected, not silently dropped
+	if _, err := l.Post(ctx, &models.Post{Body: "x", Images: []string{"a.png", "b.png"}}); err == nil {
+		t.Error("multiple images must be rejected")
+	}
+
+	// delete goes through /rest/posts
+	*reqs = nil
+	if err := l.Delete(ctx, "urn:li:share:99"); err != nil {
+		t.Fatal(err)
+	}
+	if (*reqs)[0].Method != "DELETE" || (*reqs)[0].Path != "/rest/posts/urn:li:share:99" {
+		t.Errorf("delete: %+v", (*reqs)[0])
+	}
+}

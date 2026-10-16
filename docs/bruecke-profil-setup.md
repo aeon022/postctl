@@ -98,8 +98,8 @@ Voraussetzungen laut Microsoft/LinkedIn-Doku
 - Die App darf **kein anderes API-Produkt** haben — das Produkt wird auf einer
   **neuen, leeren App** beantragt (*Products → Community Management API → Request Access*).
   Für das Brücke-Profil also eine eigene LinkedIn-App mit eigener Client-ID/-Secret.
-- Das eigene LinkedIn-Konto braucht auf der Seite die Rolle **Administrator**
-  (bzw. Content-Admin laut Drittquellen — maßgeblich ist die aktuelle Rollenliste der Doku).
+- Das eigene LinkedIn-Konto braucht auf der Seite die Rolle **Administrator**, **Content-Admin** oder
+  **Direct Sponsored Content Poster** (laut Posts-API-Doku).
 - Stufen: **Development** (Standard nach Freigabe): 500 Aufrufe/App und 100 Aufrufe/Mitglied
   pro 24 h, in 12 Monaten fertig integrieren. **Standard**: keine Limits, braucht
   zweites Formular + Screencast (< 5 min). Für wenige Posts pro Woche reicht Development.
@@ -112,11 +112,14 @@ postctl --profile bruecke config set linkedin.organization_id 123456   # Zahl au
 postctl --profile bruecke auth linkedin                                  # neu einloggen (neuer Scope)
 ```
 
-**Offenes Risiko:** postctl schreibt über den älteren Endpunkt `/v2/ugcPosts`. Die
-Community-Management-Doku beschreibt die Posts API (`/rest/posts`, Header
-`Linkedin-Version`). Ob `/v2/ugcPosts` für Seiten weiter akzeptiert wird, konnte ich nicht
-verifizieren, und der Seiten-Pfad ist nur gegen Mocks getestet. Sobald der Zugang
-da ist: ersten Post testweise absetzen; wenn LinkedIn ablehnt, auf `/rest/posts` umstellen.
+**Technik (seit Commit "company page via Posts API"):** Mit gesetzter `linkedin.organization_id` postet
+postctl über die **Posts API** (`POST /rest/posts`, Header `Linkedin-Version: 202606`), nicht mehr über das
+abgelöste `/v2/ugcPosts` (laut LinkedIn-Doku „The Posts API replaces the ugcPosts API"). Bilder laufen über die
+Images API (`/rest/images?action=initializeUpload` → Upload → `urn:li:image`). Unterstützt: **Text oder ein Bild**;
+mehrere Bilder werden mit klarer Fehlermeldung abgelehnt (MultiImage-Format noch nicht umgesetzt). Bild-URLs
+(`https://…`) werden heruntergeladen und hochgeladen. Löschen: `DELETE /rest/posts/{urn}`.
+Erforderliche Seitenrolle laut Doku: **ADMINISTRATOR, DIRECT_SPONSORED_CONTENT_POSTER oder CONTENT_ADMIN**.
+Gegen die echte API ist das **noch nicht getestet** (nur Mocks) — erster Testpost nach der Freigabe.
 
 ### Alternativen, falls der Antrag nicht durchgeht
 - Auf der Seite von Hand posten (oder LinkedIns eigene Planung nutzen).

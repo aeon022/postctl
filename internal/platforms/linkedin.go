@@ -288,6 +288,10 @@ func (l *LinkedInPlatform) Post(ctx context.Context, post *models.Post) (string,
 		return "", fmt.Errorf("token not found: %w", err)
 	}
 
+	if orgMode() {
+		return l.postOrg(ctx, token, post)
+	}
+
 	authorURN, err := l.authorURN(ctx, token)
 	if err != nil {
 		return "", fmt.Errorf("get author URN: %w", err)
@@ -407,6 +411,9 @@ func (l *LinkedInPlatform) Delete(ctx context.Context, platformID string) error 
 	token, _, _, err := l.store.GetToken(ctx, models.PlatformLinkedIn)
 	if err != nil {
 		return err
+	}
+	if orgMode() {
+		return l.deleteOrg(ctx, token, platformID)
 	}
 	// ugcPosts ids are URNs (urn:li:share:123) and must be URL-encoded in the path.
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, l.apiURL+"/v2/ugcPosts/"+url.PathEscape(platformID), nil)
