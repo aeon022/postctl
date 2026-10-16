@@ -17,18 +17,19 @@ const (
 
 // Platform-Konstanten
 const (
-	PlatformTwitter  = "twitter"
-	PlatformLinkedIn = "linkedin"
-	PlatformThreads  = "threads"
-	PlatformMastodon = "mastodon"
-	PlatformBluesky  = "bluesky"
-	PlatformFacebook = "facebook"
-	PlatformTelegram = "telegram"
-	PlatformDiscord  = "discord"
-	PlatformDevTo    = "devto"
-	PlatformReddit   = "reddit"
-	PlatformHashnode = "hashnode"
-	PlatformMedium   = "medium"
+	PlatformTwitter   = "twitter"
+	PlatformLinkedIn  = "linkedin"
+	PlatformThreads   = "threads"
+	PlatformMastodon  = "mastodon"
+	PlatformBluesky   = "bluesky"
+	PlatformFacebook  = "facebook"
+	PlatformInstagram = "instagram"
+	PlatformTelegram  = "telegram"
+	PlatformDiscord   = "discord"
+	PlatformDevTo     = "devto"
+	PlatformReddit    = "reddit"
+	PlatformHashnode  = "hashnode"
+	PlatformMedium    = "medium"
 )
 
 // Post repräsentiert einen Social-Media-Post

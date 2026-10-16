@@ -331,18 +331,19 @@ func (m Model) loadDataCmd() tea.Msg {
 	}
 
 	platforms := map[string]bool{
-		models.PlatformTwitter:  false,
-		models.PlatformLinkedIn: false,
-		models.PlatformThreads:  false,
-		models.PlatformMastodon: false,
-		models.PlatformBluesky:  false,
-		models.PlatformFacebook: false,
-		models.PlatformTelegram: config.ActiveConfig.Telegram.BotToken != "" && config.ActiveConfig.Telegram.ChatID != "",
-		models.PlatformDiscord:  config.ActiveConfig.Discord.WebhookURL != "",
-		models.PlatformDevTo:    config.ActiveConfig.DevTo.APIToken != "",
-		models.PlatformReddit:   config.ActiveConfig.Reddit.ClientID != "" && config.ActiveConfig.Reddit.ClientSecret != "" && config.ActiveConfig.Reddit.Username != "" && config.ActiveConfig.Reddit.Password != "",
-		models.PlatformHashnode: config.ActiveConfig.Hashnode.APIToken != "" && config.ActiveConfig.Hashnode.PublicationID != "",
-		models.PlatformMedium:   config.ActiveConfig.Medium.IntegrationToken != "",
+		models.PlatformTwitter:   false,
+		models.PlatformLinkedIn:  false,
+		models.PlatformThreads:   false,
+		models.PlatformMastodon:  false,
+		models.PlatformBluesky:   false,
+		models.PlatformFacebook:  false,
+		models.PlatformInstagram: config.ActiveConfig.Instagram.AccessToken != "" && config.ActiveConfig.Instagram.AccountID != "",
+		models.PlatformTelegram:  config.ActiveConfig.Telegram.BotToken != "" && config.ActiveConfig.Telegram.ChatID != "",
+		models.PlatformDiscord:   config.ActiveConfig.Discord.WebhookURL != "",
+		models.PlatformDevTo:     config.ActiveConfig.DevTo.APIToken != "",
+		models.PlatformReddit:    config.ActiveConfig.Reddit.ClientID != "" && config.ActiveConfig.Reddit.ClientSecret != "" && config.ActiveConfig.Reddit.Username != "" && config.ActiveConfig.Reddit.Password != "",
+		models.PlatformHashnode:  config.ActiveConfig.Hashnode.APIToken != "" && config.ActiveConfig.Hashnode.PublicationID != "",
+		models.PlatformMedium:    config.ActiveConfig.Medium.IntegrationToken != "",
 	}
 	for p := range platforms {
 		_, _, _, err := m.store.GetToken(ctx, p)
@@ -515,6 +516,8 @@ func platformNeedsSetup(platformName string) bool {
 		return config.ActiveConfig.Bluesky.Handle == "" || config.ActiveConfig.Bluesky.AppPassword == ""
 	case models.PlatformFacebook:
 		return config.ActiveConfig.Facebook.AppID == "" || config.ActiveConfig.Facebook.AppSecret == ""
+	case models.PlatformInstagram:
+		return config.ActiveConfig.Instagram.AccessToken == "" || config.ActiveConfig.Instagram.AccountID == ""
 	case models.PlatformTelegram:
 		return config.ActiveConfig.Telegram.BotToken == "" || config.ActiveConfig.Telegram.ChatID == ""
 	case models.PlatformDiscord:

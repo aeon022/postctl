@@ -15,7 +15,7 @@ import (
 // ── dashboard (tab 0) ─────────────────────────────────────────────────────────
 
 var dashPlatforms = []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads,
-	models.PlatformMastodon, models.PlatformBluesky, models.PlatformFacebook}
+	models.PlatformMastodon, models.PlatformBluesky, models.PlatformFacebook, models.PlatformInstagram}
 
 // window returns the [start,end) slice of n items that fits cap rows and keeps
 // cursor roughly centered.

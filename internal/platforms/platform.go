@@ -41,6 +41,8 @@ func GetPlatform(name string, s *store.SQLiteStore, dryRun bool) (Platform, erro
 		return NewBlueskyPlatform(s, config.ActiveConfig.Bluesky.Handle, config.ActiveConfig.Bluesky.AppPassword), nil
 	case models.PlatformFacebook:
 		return NewFacebookPlatform(s, config.ActiveConfig.Facebook.AppID, config.ActiveConfig.Facebook.AppSecret, config.ActiveConfig.Facebook.PageID), nil
+	case models.PlatformInstagram:
+		return NewInstagramPlatform(config.ActiveConfig.Instagram.AccessToken, config.ActiveConfig.Instagram.AccountID), nil
 	case models.PlatformTelegram:
 		return NewTelegramPlatform(s, config.ActiveConfig.Telegram.BotToken, config.ActiveConfig.Telegram.ChatID), nil
 	case models.PlatformDiscord:

@@ -78,7 +78,7 @@ type authErrorJSON struct {
 }
 
 func reportAuthStatus(ctx context.Context, s *store.SQLiteStore) {
-	plats := []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon, models.PlatformBluesky, models.PlatformFacebook}
+	plats := []string{models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon, models.PlatformBluesky, models.PlatformFacebook, models.PlatformInstagram}
 	statusMap := make(map[string]bool)
 
 	for _, p := range plats {
@@ -117,6 +117,8 @@ func reportAuthStatus(ctx context.Context, s *store.SQLiteStore) {
 				name = "Bluesky"
 			} else if p == models.PlatformFacebook {
 				name = "Facebook"
+			} else if p == models.PlatformInstagram {
+				name = "Instagram"
 			}
 			fmt.Printf(" - %-12s %s\n", name+":", statusText)
 		}

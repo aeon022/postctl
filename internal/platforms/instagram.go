@@ -1,0 +1,137 @@
+package platforms
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"strings"
+	"time"
+
+	"github.com/aeon022/postctl/internal/models"
+)
+
+// InstagramPlatform publishes single-image posts through the Instagram Graph
+// API. It needs an Instagram Business/Creator account linked to a Facebook Page
+// and a long-lived token (postctl config set instagram.access_token / .account_id).
+// The API only accepts publicly reachable image URLs, so post.Images[0] must be https://.
+type InstagramPlatform struct {
+	token, accountID string
+	client           *http.Client
+	baseURL          string // Graph API root; tests point it at httptest
+}
+
+func NewInstagramPlatform(token, accountID string) *InstagramPlatform {
+	return &InstagramPlatform{token: token, accountID: accountID, client: &http.Client{Timeout: 30 * time.Second}, baseURL: "https://graph.facebook.com/v19.0"}
+}
+
+func (i *InstagramPlatform) Name() string { return models.PlatformInstagram }
+
+func (i *InstagramPlatform) IsAuthenticated(ctx context.Context) bool {
+	return i.token != "" && i.accountID != ""
+}
+
+func (i *InstagramPlatform) Auth(ctx context.Context) error {
+	if i.IsAuthenticated(ctx) {
+		return nil
+	}
+	return fmt.Errorf("Instagram uses a token instead of a login. Needs a Business/Creator account linked to a Facebook Page:\n" +
+		"  postctl config set instagram.access_token \"LONG_LIVED_TOKEN\"\n" +
+		"  postctl config set instagram.account_id \"INSTAGRAM_BUSINESS_ACCOUNT_ID\"\n" +
+		"Token scopes: instagram_basic, instagram_content_publish, pages_show_list.")
+}
+
+func (i *InstagramPlatform) UploadImage(ctx context.Context, path string) (string, error) {
+	return "", nil // the Graph API fetches the image itself from a public URL
+}
+
+func (i *InstagramPlatform) graph(ctx context.Context, method, path string, form url.Values) ([]byte, error) {
+	if form == nil {
+		form = url.Values{}
+	}
+	form.Set("access_token", i.token)
+	var body io.Reader
+	u := i.baseURL + path
+	if method == http.MethodGet || method == http.MethodDelete {
+		u += "?" + form.Encode()
+	} else {
+		body = strings.NewReader(form.Encode())
+	}
+	req, err := http.NewRequestWithContext(ctx, method, u, body)
+	if err != nil {
+		return nil, err
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
+	resp, err := i.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("instagram request failed: %w", err)
+	}
+	defer resp.Body.Close()
+	b, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode/100 != 2 {
+		return nil, fmt.Errorf("instagram %s %s failed (status %d): %s", method, path, resp.StatusCode, b)
+	}
+	return b, nil
+}
+
+func (i *InstagramPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
+	if !i.IsAuthenticated(ctx) {
+		return "", i.Auth(ctx)
+	}
+	if len(post.Images) == 0 || !strings.HasPrefix(post.Images[0], "https://") {
+		return "", fmt.Errorf("instagram: needs a public https:// image URL as the first entry of images (text-only posts are not possible)")
+	}
+	caption := post.Body
+	if len([]rune(caption)) > 2200 {
+		return "", fmt.Errorf("instagram: caption has %d characters, limit is 2200", len([]rune(caption)))
+	}
+
+	b, err := i.graph(ctx, http.MethodPost, "/"+i.accountID+"/media", url.Values{"image_url": {post.Images[0]}, "caption": {caption}})
+	if err != nil {
+		return "", err
+	}
+	var c struct {
+		ID string `json:"id"`
+	}
+	if json.Unmarshal(b, &c) != nil || c.ID == "" {
+		return "", fmt.Errorf("instagram: no container id in response: %s", b)
+	}
+
+	b, err = i.graph(ctx, http.MethodPost, "/"+i.accountID+"/media_publish", url.Values{"creation_id": {c.ID}})
+	if err != nil {
+		return "", err
+	}
+	var p struct {
+		ID string `json:"id"`
+	}
+	if json.Unmarshal(b, &p) != nil || p.ID == "" {
+		return "", fmt.Errorf("instagram: no media id in response: %s", b)
+	}
+	return p.ID, nil
+}
+
+func (i *InstagramPlatform) FetchAnalytics(ctx context.Context, platformID string) (models.AnalyticsData, error) {
+	b, err := i.graph(ctx, http.MethodGet, "/"+url.PathEscape(platformID), url.Values{"fields": {"like_count,comments_count"}})
+	if err != nil {
+		return models.AnalyticsData{}, err
+	}
+	var r struct {
+		Likes    int `json:"like_count"`
+		Comments int `json:"comments_count"`
+	}
+	if err := json.Unmarshal(b, &r); err != nil {
+		return models.AnalyticsData{}, err
+	}
+	return models.AnalyticsData{PlatformID: platformID, Likes: r.Likes, Comments: r.Comments, FetchedAt: time.Now()}, nil
+}
+
+// Delete: the Instagram Graph API has no endpoint to remove media. Say so
+// instead of returning nil, otherwise the local record would be dropped while
+// the post stays live.
+func (i *InstagramPlatform) Delete(ctx context.Context, platformID string) error {
+	return fmt.Errorf("instagram: the API cannot delete posts — post %s was not removed (delete it in the app)", platformID)
+}

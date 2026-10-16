@@ -151,8 +151,8 @@ func TestDashboardPlatformDotsAndStats(t *testing.T) {
 	m := layoutModel(t, 110, 30)
 	m.platforms = map[string]bool{"bluesky": true}
 	text := tuitest.Text(m)
-	if strings.Count(text, "Connected ✓") != 1 || strings.Count(text, "Not connected") != 5 {
-		t.Errorf("one connected, five not:\n%s", text)
+	if strings.Count(text, "Connected ✓") != 1 || strings.Count(text, "Not connected") != len(dashPlatforms)-1 {
+		t.Errorf("one connected, rest not:\n%s", text)
 	}
 	if strings.Contains(text, "Press Enter") {
 		t.Error("the per-platform '(Press Enter)' hint is gone")
