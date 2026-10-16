@@ -1,0 +1,139 @@
+# Brücke-Profil einrichten (Instagram, LinkedIn-Seite, X, Facebook)
+
+Stand: 2026-10-16. Profil `bruecke` existiert (`postctl profile create bruecke`).
+Alle Befehle mit `--profile bruecke`, sonst landen Zugangsdaten im Default-Profil.
+**Token nie in den Chat oder in Repos einfügen** — nur über `config setup` ins Terminal.
+
+Die Lizenz muss nicht neu eingerichtet werden: ein benanntes Profil ohne eigenen
+`license_key` erbt den des Default-Profils.
+
+---
+
+## 1. Instagram
+
+Vorher: Das Konto muss ein **Professional-Konto** sein (Business oder Creator) und mit
+der **Facebook-Seite der Brücke verknüpft** sein.
+- Instagram-App: *Einstellungen → Kontotyp und Tools → Zu Professional-Konto wechseln*
+- Verknüpfen: Instagram *Konto → Verknüpfte Konten / Seite verbinden* oder in der
+  Facebook-Seite *Einstellungen → Verknüpfte Konten → Instagram*
+
+### Token und ID besorgen
+
+1. **App:** developers.facebook.com → *Meine Apps*. Die Facebook-App des Brücke-Profils
+   kann weiterverwendet werden. Anwendungsfall für Instagram hinzufügen
+   (Instagram API mit Facebook-Login). Solange du Admin der App bist, ist kein
+   App-Review nötig (Entwicklungsmodus).
+2. **Kurzzeit-Token:** developers.facebook.com/tools/explorer → App wählen,
+   Token-Typ *User Token*. Berechtigungen: `instagram_basic`,
+   `instagram_content_publish`, `pages_show_list`, `pages_read_engagement`.
+   *Generate Access Token* → im Dialog die Brücke-Seite und das Instagram-Konto wählen.
+   (Gilt ca. 1 Stunde.)
+3. **Langzeit-Token (60 Tage)** im Browser aufrufen:
+   `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=APP_ID&client_secret=APP_SECRET&fb_exchange_token=KURZZEIT_TOKEN`
+4. **Besser — Seiten-Token ohne Ablauf:** im Explorer mit dem Langzeit-Token
+   `me/accounts` abfragen und das `access_token` der Brücke-Seite nehmen.
+5. **Instagram-Account-ID:** im Explorer `me/accounts?fields=name,instagram_business_account`
+   → `id` unter `instagram_business_account`.
+
+### Eintragen und testen
+
+```sh
+postctl --profile bruecke config setup instagram   # fragt Token + Account-ID ab
+postctl --profile bruecke config test              # Verbindungstest
+```
+
+### Wichtig beim Posten
+
+- Jeder Instagram-Post braucht **ein Bild als öffentliche `https://`-URL**
+  (`images:` im Frontmatter). Lokale Dateien nimmt die API nicht. Bilder z. B. auf der
+  eigenen Webseite ablegen (`~/Sites`).
+- Reine Textposts gehen nicht. Caption max. 2200 Zeichen.
+- Löschen per API ist bei Instagram nicht möglich — Posts in der App löschen.
+- Ein Token läuft ab (Langzeit-Token nach 60 Tagen) → dann `config setup instagram` erneut.
+
+---
+
+## 2. LinkedIn
+
+### Als Person posten
+Funktioniert mit der normalen LinkedIn-App (Produkt *Share on LinkedIn*, Scope
+`w_member_social`):
+
+```sh
+postctl --profile bruecke config setup linkedin    # Client-ID/-Secret der App
+postctl --profile bruecke auth linkedin            # Browser-Login
+```
+
+### Als Unternehmensseite posten — Ergebnis der Recherche
+
+postctl kann es (`linkedin.organization_id`, Commit `0d945f7`), **aber LinkedIn gibt
+die API dafür nur eingeschränkt frei**. Seiten-Posts brauchen den Scope
+`w_organization_social`, und der gehört zum Produkt **Community Management API**.
+
+Voraussetzungen laut Microsoft/LinkedIn-Doku
+([Increasing Access](https://learn.microsoft.com/en-us/linkedin/marketing/increasing-access?view=li-lms-2025-11),
+[Migration Guide](https://learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-api-migration-guide?view=li-lms-2026-06)):
+
+- **„At this time, our Community Management APIs are only available to registered legal
+  organizations for commercial use cases only."** Private Projekte/Einzelpersonen ohne
+  Firma werden voraussichtlich abgelehnt.
+- Für den Antrag nötig: **verifizierte Geschäfts-E-Mail** (keine private Adresse),
+  Firmenname, Firmenadresse, Website, Datenschutzerklärung.
+- Ein **Super-Admin der LinkedIn-Seite** muss die App mit der Seite verknüpfen
+  (*App → Settings → Verify*).
+- Die App darf **kein anderes API-Produkt** haben — das Produkt wird auf einer
+  **neuen, leeren App** beantragt (*Products → Community Management API → Request Access*).
+  Für das Brücke-Profil also eine eigene LinkedIn-App mit eigener Client-ID/-Secret.
+- Das eigene LinkedIn-Konto braucht auf der Seite die Rolle **Administrator**
+  (bzw. Content-Admin laut Drittquellen — maßgeblich ist die aktuelle Rollenliste der Doku).
+- Stufen: **Development** (Standard nach Freigabe): 500 Aufrufe/App und 100 Aufrufe/Mitglied
+  pro 24 h, in 12 Monaten fertig integrieren. **Standard**: keine Limits, braucht
+  zweites Formular + Screencast (< 5 min). Für wenige Posts pro Woche reicht Development.
+- Ablehnung: kein erneuter Antrag mit derselben App — neue App + neuer Antrag.
+
+### Falls die Freigabe kommt
+
+```sh
+postctl --profile bruecke config set linkedin.organization_id 123456   # Zahl aus linkedin.com/company/<ID>/admin
+postctl --profile bruecke auth linkedin                                  # neu einloggen (neuer Scope)
+```
+
+**Offenes Risiko:** postctl schreibt über den älteren Endpunkt `/v2/ugcPosts`. Die
+Community-Management-Doku beschreibt die Posts API (`/rest/posts`, Header
+`Linkedin-Version`). Ob `/v2/ugcPosts` für Seiten weiter akzeptiert wird, konnte ich nicht
+verifizieren, und der Seiten-Pfad ist nur gegen Mocks getestet. Sobald der Zugang
+da ist: ersten Post testweise absetzen; wenn LinkedIn ablehnt, auf `/rest/posts` umstellen.
+
+### Alternativen, falls der Antrag nicht durchgeht
+- Auf der Seite von Hand posten (oder LinkedIns eigene Planung nutzen).
+- Als Person posten und die Seite teilen lassen.
+
+---
+
+## 3. X und Facebook
+
+```sh
+postctl --profile bruecke config setup twitter
+postctl --profile bruecke auth twitter
+postctl --profile bruecke config setup facebook   # App-ID, App-Secret, Page-ID der Brücke-Seite
+postctl --profile bruecke auth facebook
+```
+
+X: Löschen funktioniert nur im OAuth-Modus, nicht im Cookie-Modus.
+
+---
+
+## 4. Scheduler
+
+```sh
+postctl --profile bruecke daemon install    # eigener Dienst für dieses Profil
+postctl --profile bruecke daemon status
+```
+
+Log: `~/Library/Logs/postctl-bruecke.log`. Im TUI: Settings → *Scheduler (Hintergrund)*.
+Solange das TUI offen ist, hält es die DB-Sperre — dann pausiert der Dienst; mit
+`scheduler.auto_publish: true` veröffentlicht stattdessen das TUI.
+
+## 5. Im TUI zwischen Profilen wechseln
+
+Taste `P` → Profilauswahl.
