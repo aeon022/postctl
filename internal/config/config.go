@@ -44,6 +44,9 @@ type Config struct {
 		AppID     string `mapstructure:"app_id" yaml:"app_id"`
 		AppSecret string `mapstructure:"app_secret" yaml:"app_secret"`
 		PageID    string `mapstructure:"page_id" yaml:"page_id"`
+		// PageToken is a ready-made Page access token (Graph API Explorer). With it no
+		// OAuth redirect URL is needed: Auth just verifies and stores it.
+		PageToken string `mapstructure:"page_token" yaml:"page_token"`
 	} `mapstructure:"facebook" yaml:"facebook"`
 	Telegram struct {
 		BotToken string `mapstructure:"bot_token" yaml:"bot_token"`

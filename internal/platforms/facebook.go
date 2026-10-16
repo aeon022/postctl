@@ -50,6 +50,9 @@ func (f *FacebookPlatform) IsAuthenticated(ctx context.Context) bool {
 
 // Auth startet den OAuth Flow für Facebook via StartCallbackServerTLS (HTTPS)
 func (f *FacebookPlatform) Auth(ctx context.Context) error {
+	if tok := config.ActiveConfig.Facebook.PageToken; tok != "" && f.pageID != "" {
+		return f.useStaticPageToken(ctx, tok)
+	}
 	if f.appID == "" || f.appSecret == "" || f.pageID == "" {
 		if config.ActiveConfig.Defaults.Language == "de" {
 			return fmt.Errorf("Facebook-Konfiguration fehlt! Bitte folge diesen Schritten:\n" +
@@ -471,4 +474,36 @@ func (f *FacebookPlatform) Delete(ctx context.Context, platformID string) error 
 		return err
 	}
 	return doDelete(f.client, req, "facebook")
+}
+
+// useStaticPageToken verifies a ready-made Page access token, resolves the numeric page id
+// (page_id may be the vanity name) and stores the token — no OAuth redirect URL needed.
+func (f *FacebookPlatform) useStaticPageToken(ctx context.Context, token string) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, f.baseURL+"/"+url.PathEscape(f.pageID)+"?fields=id,name&access_token="+url.QueryEscape(token), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := f.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	b, _ := io.ReadAll(resp.Body)
+	var page struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	if resp.StatusCode != http.StatusOK || json.Unmarshal(b, &page) != nil || page.ID == "" {
+		return fmt.Errorf("page token rejected for %q (status %d): %s", f.pageID, resp.StatusCode, b)
+	}
+	if page.ID != f.pageID {
+		f.pageID = page.ID
+		config.ActiveConfig.Facebook.PageID = page.ID
+		_ = config.SaveConfig()
+	}
+	if err := f.store.SaveToken(ctx, models.PlatformFacebook, token, "", nil); err != nil {
+		return fmt.Errorf("save page token: %w", err)
+	}
+	fmt.Printf("✓ Facebook-Seite %q (ID %s) verbunden.\n", page.Name, page.ID)
+	return nil
 }

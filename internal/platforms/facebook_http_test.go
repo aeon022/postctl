@@ -212,3 +212,25 @@ func TestFacebookLoginAcceptsVanityNameAndStoresNumericID(t *testing.T) {
 		t.Errorf("numeric id not remembered: %q / %q", f.pageID, config.ActiveConfig.Facebook.PageID)
 	}
 }
+
+func TestFacebookAuthWithStaticPageTokenNeedsNoOAuth(t *testing.T) {
+	t.Setenv("HOME", t.TempDir())
+	prev := config.ActiveConfig
+	t.Cleanup(func() { config.ActiveConfig = prev })
+	config.ActiveConfig.Facebook.PageToken = "PTOK"
+
+	srv, reqs := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) {
+		_, _ = w.Write([]byte(`{"id":"222","name":"Die Brücke | Graz"}`))
+	})
+	f := newFB(t, srv.URL, false)
+	f.appID, f.appSecret, f.pageID = "", "", "brueckegraz"
+	if err := f.Auth(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if r := (*reqs)[0]; r.Path != "/brueckegraz" {
+		t.Errorf("lookup path = %s", r.Path)
+	}
+	if tok, _, _, _ := f.store.GetToken(context.Background(), models.PlatformFacebook); tok != "PTOK" || f.pageID != "222" || config.ActiveConfig.Facebook.PageID != "222" {
+		t.Errorf("token=%q pageID=%q cfg=%q", tok, f.pageID, config.ActiveConfig.Facebook.PageID)
+	}
+}

@@ -532,7 +532,7 @@ func platformNeedsSetup(platformName string) bool {
 	case models.PlatformBluesky:
 		return config.ActiveConfig.Bluesky.Handle == "" || config.ActiveConfig.Bluesky.AppPassword == ""
 	case models.PlatformFacebook:
-		return config.ActiveConfig.Facebook.AppID == "" || config.ActiveConfig.Facebook.AppSecret == ""
+		return (config.ActiveConfig.Facebook.AppID == "" || config.ActiveConfig.Facebook.AppSecret == "") && config.ActiveConfig.Facebook.PageToken == ""
 	case models.PlatformInstagram:
 		return config.ActiveConfig.Instagram.AccessToken == "" || config.ActiveConfig.Instagram.AccountID == ""
 	case models.PlatformTelegram:

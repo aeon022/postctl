@@ -140,6 +140,17 @@ X: Löschen funktioniert nur im OAuth-Modus, nicht im Cookie-Modus.
 
 ---
 
+### Facebook ohne Weiterleitungs-URL (Seiten-Token)
+Findest du bei Meta kein Feld für `https://localhost:8753/callback`, geht es auch mit einem fertigen **Seiten-Token**:
+1. developers.facebook.com/tools/explorer → deine App wählen, *User Token*, Berechtigungen `pages_show_list`,
+   `pages_manage_posts`, `pages_read_engagement` → *Generate Access Token* (Seite im Dialog auswählen).
+2. Optional (für einen Token ohne Ablauf): den Token im Browser gegen einen langlebigen tauschen:
+   `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=APP_ID&client_secret=APP_SECRET&fb_exchange_token=TOKEN`
+3. Im Explorer `me/accounts` abfragen → das `access_token` **der Brücke-Seite** kopieren (das ist der Seiten-Token).
+4. `postctl --profile bruecke config setup facebook`: App-ID/Secret leer lassen oder eintragen, als Seite `brueckegraz`, beim
+   Seiten-Access-Token den Token einfügen. Dann `postctl --profile bruecke auth facebook` — prüft den Token, löst die Seiten-ID auf, speichert.
+Token nie in den Chat.
+
 ## 4. Scheduler
 
 ```sh

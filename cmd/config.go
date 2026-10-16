@@ -120,6 +120,8 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Facebook.AppID = value
 	case "facebook.app_secret":
 		config.ActiveConfig.Facebook.AppSecret = value
+	case "facebook.page_token":
+		config.ActiveConfig.Facebook.PageToken = value
 	case "facebook.page_id":
 		config.ActiveConfig.Facebook.PageID = value
 	case "telegram.bot_token":
@@ -201,6 +203,7 @@ func reportConfigShow(cmd *cobra.Command) {
 	masked.Mastodon.ClientSecret = maskSecret(masked.Mastodon.ClientSecret)
 	masked.Bluesky.AppPassword = maskSecret(masked.Bluesky.AppPassword)
 	masked.Facebook.AppSecret = maskSecret(masked.Facebook.AppSecret)
+	masked.Facebook.PageToken = maskSecret(masked.Facebook.PageToken)
 	masked.Telegram.BotToken = maskSecret(masked.Telegram.BotToken)
 	masked.Discord.WebhookURL = maskSecret(masked.Discord.WebhookURL)
 	masked.Reddit.ClientSecret = maskSecret(masked.Reddit.ClientSecret)
@@ -697,6 +700,16 @@ var configSetupCmd = &cobra.Command{
 			pageID, _ := reader.ReadString('\n')
 			pageID = strings.TrimSpace(pageID)
 
+			fmt.Println()
+			fmt.Println("Optional: Seiten-Access-Token (aus dem Graph API Explorer: me/accounts → access_token der Seite).")
+			fmt.Println("Damit entfällt die Weiterleitungs-URL und der Browser-Login. Leer lassen für den normalen Login.")
+			fmt.Print("➔ Seiten-Access-Token: ")
+			pageToken, _ := reader.ReadString('\n')
+			pageToken = strings.TrimSpace(pageToken)
+
+			if pageToken != "" {
+				config.ActiveConfig.Facebook.PageToken = pageToken
+			}
 			if appID != "" {
 				config.ActiveConfig.Facebook.AppID = appID
 			}
@@ -928,7 +941,7 @@ var configTestCmd = &cobra.Command{
 			case models.PlatformBluesky:
 				isConfigured = config.ActiveConfig.Bluesky.Handle != ""
 			case models.PlatformFacebook:
-				isConfigured = config.ActiveConfig.Facebook.AppID != ""
+				isConfigured = config.ActiveConfig.Facebook.AppID != "" || config.ActiveConfig.Facebook.PageToken != ""
 			case models.PlatformInstagram:
 				isConfigured = config.ActiveConfig.Instagram.AccessToken != "" && config.ActiveConfig.Instagram.AccountID != ""
 			case models.PlatformTelegram:
