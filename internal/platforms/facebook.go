@@ -193,7 +193,7 @@ func (f *FacebookPlatform) exchangeCodeForPageToken(ctx context.Context, code, r
 
 	// 3. Page Access Token für pageID holen
 	accountsURL := fmt.Sprintf(
-		f.baseURL+"/me/accounts?access_token=%s",
+		f.baseURL+"/me/accounts?fields=id,name,username,access_token&access_token=%s",
 		url.QueryEscape(llUserTokenResp.AccessToken),
 	)
 
@@ -213,6 +213,7 @@ func (f *FacebookPlatform) exchangeCodeForPageToken(ctx context.Context, code, r
 			ID          string   `json:"id"`
 			AccessToken string   `json:"access_token"`
 			Name        string   `json:"name"`
+			Username    string   `json:"username"`
 			Tasks       []string `json:"tasks"`
 		} `json:"data"`
 	}
@@ -225,8 +226,14 @@ func (f *FacebookPlatform) exchangeCodeForPageToken(ctx context.Context, code, r
 	var availablePages []string
 	for _, acc := range accountsResp.Data {
 		availablePages = append(availablePages, fmt.Sprintf("  - %s (ID: %s)", acc.Name, acc.ID))
-		if acc.ID == f.pageID {
+		// page_id may be the numeric id, the vanity name (facebook.com/<name>) or the page name
+		if acc.ID == f.pageID || strings.EqualFold(acc.Username, f.pageID) || strings.EqualFold(acc.Name, f.pageID) {
 			pageToken = acc.AccessToken
+			if acc.ID != f.pageID { // remember the numeric id: the feed endpoints need it
+				f.pageID = acc.ID
+				config.ActiveConfig.Facebook.PageID = acc.ID
+				_ = config.SaveConfig()
+			}
 		}
 	}
 

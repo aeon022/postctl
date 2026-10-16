@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/models"
 )
 
@@ -178,5 +179,36 @@ func TestDeleteSurfacesServerError(t *testing.T) {
 	srv, _ := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) { w.WriteHeader(403) })
 	if newFB(t, srv.URL, true).Delete(context.Background(), "1") == nil {
 		t.Error("403 must be an error")
+	}
+}
+
+func TestFacebookLoginAcceptsVanityNameAndStoresNumericID(t *testing.T) {
+	t.Setenv("HOME", t.TempDir()) // SaveConfig must not touch the real config
+	prev := config.ActiveConfig
+	t.Cleanup(func() { config.ActiveConfig = prev })
+
+	srv, _ := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) {})
+	srv.Config.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/oauth/access_token":
+			if r.URL.Query().Get("code") != "" {
+				_, _ = w.Write([]byte(`{"access_token":"USERTOK"}`))
+			} else {
+				_, _ = w.Write([]byte(`{"access_token":"LLTOK"}`))
+			}
+		case "/me/accounts":
+			_, _ = w.Write([]byte(`{"data":[{"id":"111","access_token":"NO","name":"Other","username":"other"},{"id":"222","access_token":"PAGETOK","name":"Die Brücke | Graz","username":"brueckegraz"}]}`))
+		}
+	})
+	f := newFB(t, srv.URL, false)
+	f.pageID = "BrueckeGraz" // as typed from facebook.com/brueckegraz
+	if err := f.exchangeCodeForPageToken(context.Background(), "C", "r"); err != nil {
+		t.Fatal(err)
+	}
+	if tok, _, _, _ := f.store.GetToken(context.Background(), models.PlatformFacebook); tok != "PAGETOK" {
+		t.Errorf("token = %q", tok)
+	}
+	if f.pageID != "222" || config.ActiveConfig.Facebook.PageID != "222" {
+		t.Errorf("numeric id not remembered: %q / %q", f.pageID, config.ActiveConfig.Facebook.PageID)
 	}
 }
