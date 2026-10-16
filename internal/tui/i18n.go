@@ -26,6 +26,9 @@ func Tr(key string) string {
 }
 
 var translationsMap = map[string]map[string]string{
+	"palette_title":       {"de": "Befehle", "en": "Commands"},
+	"palette_placeholder": {"de": "Befehl tippen…", "en": "type a command…"},
+	"palette_none":        {"de": "Kein Befehl gefunden.", "en": "No matching command."},
 	"editor_multi_hint":   {"de": "space: Plattform zusätzlich wählen (✓) – ein Text, mehrere Plattformen", "en": "space: also select this platform (✓) – one text, several platforms"},
 	"prev_multi":          {"de": "%d Plattformen, je %d Min. versetzt:", "en": "%d platforms, %d min apart:"},
 	"panel_top":           {"de": "Top-Posts", "en": "Top posts"},

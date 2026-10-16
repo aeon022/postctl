@@ -44,10 +44,9 @@ func TestSettingsEnterKeyWithConfig(t *testing.T) {
 
 	// Trigger the command to see if it executes without crashing
 	// (it should run in background and return authResultMsg)
-	resMsg := cmd()
-	authRes, ok := resMsg.(authResultMsg)
+	authRes, ok := firstMsg[authResultMsg](cmd)
 	if !ok {
-		t.Fatalf("expected command result to be authResultMsg, got %T", resMsg)
+		t.Fatalf("expected the command (or a batched one) to produce an authResultMsg")
 	}
 
 	if authRes.platform != models.PlatformBluesky {
@@ -218,4 +217,26 @@ func TestSettingsOptions_Shape(t *testing.T) {
 	if opts[19].separatorBefore == "" {
 		t.Error(`opts[19] (Export) missing separatorBefore ("BACKUP & SYNC")`)
 	}
+}
+
+// firstMsg runs cmd (unpacking a batch, skipping the spinner tick) and returns the first message of type T.
+func firstMsg[T any](cmd tea.Cmd) (T, bool) {
+	var zero T
+	if cmd == nil {
+		return zero, false
+	}
+	switch msg := cmd().(type) {
+	case tea.BatchMsg:
+		for _, c := range msg {
+			if c == nil {
+				continue
+			}
+			if v, ok := firstMsg[T](c); ok {
+				return v, true
+			}
+		}
+	case T:
+		return msg, true
+	}
+	return zero, false
 }

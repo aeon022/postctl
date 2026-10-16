@@ -115,6 +115,8 @@ func hint(key, trKey string) [2]string { return [2]string{key, Tr(trKey)} }
 // `q` come early so they are the last to be dropped on a narrow terminal.
 func (m Model) hintsFor() [][2]string {
 	switch {
+	case m.inPalette:
+		return [][2]string{hint("enter", "hint_pick"), hint("esc", "hint_close"), hint("↑↓", "hint_move")}
 	case m.ask != nil:
 		return [][2]string{hint("y", "ask_yes"), hint("n", "ask_no")}
 	case m.showHelp:
@@ -235,6 +237,8 @@ func (m Model) tabBody(w, h int) string {
 		return m.renderEditor(w, h)
 	case m.showReadme:
 		return m.renderReadme(w, h)
+	case m.inPalette:
+		return popup(m.pageBody(w, h), m.paletteBody(w, h), w, h)
 	case m.ask != nil:
 		return popup(m.pageBody(w, h), m.askBody(w, h), w, h)
 	case m.showHelp:

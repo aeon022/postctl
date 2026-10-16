@@ -1,9 +1,11 @@
 package tui
 
 import (
+	"charm.land/lipgloss/v2"
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/aeon022/missionctl-core/theme"
 	"github.com/aeon022/missionctl-core/ui"
 	"github.com/aeon022/postctl/internal/service"
 	"os"
@@ -79,6 +81,11 @@ type Model struct {
 	editorAlts        textinput.Model // alt text per image, separated by " | "
 	editorType        string          // kept when editing (e.g. "story")
 	editorTargets     map[string]bool // platforms selected for a new post (space toggles)
+	inPalette         bool            // ":" command palette open
+	spin              int             // spinner frame
+	spinning          bool            // a spinner tick is in flight
+	paletteInput      textinput.Model
+	paletteCursor     int
 	showDatePicker    bool
 	datePickerDate    time.Time
 
@@ -208,6 +215,17 @@ type publishFinishedMsg struct {
 }
 
 type tickMsg struct{}
+
+// spinMsg advances the loading spinner.
+type spinMsg struct{}
+
+func spinTick() tea.Cmd {
+	return tea.Tick(90*time.Millisecond, func(time.Time) tea.Msg { return spinMsg{} })
+}
+
+var spinFrames = []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+
+func (m Model) spinner() string { return spinFrames[m.spin%len(spinFrames)] }
 
 // NewModel initialisiert ein TUI-Model
 func NewModel(s *store.SQLiteStore) Model {
@@ -958,6 +976,23 @@ func (m Model) publishDuePostsCmd() tea.Msg {
 
 // Update reagiert auf Events und aktualisiert den Zustand
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if _, ok := msg.(spinMsg); ok {
+		m.spin++
+		if !m.loading {
+			m.spinning = false
+			return m, nil
+		}
+		return m, spinTick()
+	}
+	nm, cmd := m.update(msg)
+	if mm, ok := nm.(Model); ok && mm.loading && !mm.spinning {
+		mm.spinning = true // the spinner only ticks while something loads
+		return mm, tea.Batch(cmd, spinTick())
+	}
+	return nm, cmd
+}
+
+func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.isEditing {
 		if keyMsg, ok := msg.(tea.KeyPressMsg); ok {
 			if m.showDatePicker {
@@ -1279,6 +1314,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.ask != nil {
 			nm, cmd := m.askKey(msg)
 			return nm, cmd
+		}
+		if m.inPalette {
+			nm, cmd := m.paletteKey(msg)
+			return nm, cmd
+		}
+		if msg.String() == ":" && !m.isEditing && !m.editingQueueSlots && !m.showReadme && m.err == nil && !m.loading {
+			return m.openPalette(), nil
 		}
 		// Wenn wir die Queue Slots bearbeiten, verarbeite nur diese Tasten
 		if m.editingQueueSlots {
@@ -1793,7 +1835,7 @@ func (m Model) viewContent() string {
 		if msg == "" {
 			msg = Tr("loading_data")
 		}
-		body = m.indentLines("⏳ " + msg)
+		body = m.indentLines(lipgloss.NewStyle().Foreground(theme.BlueV2).Render(m.spinner()) + " " + msg)
 	case m.err != nil:
 		body = m.indentLines(ui.Pill(Tr("error_title"), ui.Err) + " " + fmt.Sprint(m.err) + "\n\n" + Tr("error_close"))
 	default:
