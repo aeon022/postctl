@@ -572,6 +572,9 @@ func (f *FacebookPlatform) useStaticPageToken(ctx context.Context, token string)
 	if err := f.store.SaveToken(ctx, models.PlatformFacebook, token, "", nil); err != nil {
 		return fmt.Errorf("save page token: %w", err)
 	}
+	// the pasted token was only the input: do not keep a user token in the plaintext config
+	config.ActiveConfig.Facebook.PageToken = ""
+	_ = config.SaveConfig()
 	fmt.Printf("✓ Facebook-Seite %q (ID %s) verbunden.\n", me.Name, me.ID)
 	return nil
 }

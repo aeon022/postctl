@@ -267,6 +267,9 @@ func TestFacebookAuthWithStaticTokens(t *testing.T) {
 	if err != nil || stored(f) != "PAGETOK" || f.pageID != "222" || config.ActiveConfig.Facebook.PageID != "222" {
 		t.Fatalf("page node: err=%v token=%q id=%q", err, stored(f), f.pageID)
 	}
+	if config.ActiveConfig.Facebook.PageToken != "" {
+		t.Error("the pasted input token must be cleared from the config after a successful login")
+	}
 	// with app credentials a user token is exchanged for a long-lived one first
 	f_appID = "app"
 	if f, err = run("USERTOK", false, true); err != nil || !exchanged || stored(f) != "PAGETOK" {
