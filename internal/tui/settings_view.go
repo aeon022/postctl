@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"github.com/aeon022/postctl/internal/service"
 	"strings"
 
 	"github.com/aeon022/missionctl-core/ui"
@@ -31,6 +32,7 @@ const (
 	actionExport
 	actionImport
 	actionEditSlots
+	actionScheduler
 )
 
 // settingOption is one row of the Settings tab (row 5). settingKey
@@ -80,6 +82,7 @@ func (m Model) settingsOptions() []settingOption {
 		{label: Tr("settings_auth_mastodon"), value: platformStatus(models.PlatformMastodon), kind: settingPlatformAuth, platform: models.PlatformMastodon},
 		{label: Tr("settings_auth_bluesky"), value: platformStatus(models.PlatformBluesky), kind: settingPlatformAuth, platform: models.PlatformBluesky},
 		{label: Tr("settings_auth_facebook"), value: platformStatus(models.PlatformFacebook), kind: settingPlatformAuth, platform: models.PlatformFacebook},
+		{label: Tr("settings_auth_instagram"), value: platformStatus(models.PlatformInstagram), kind: settingPlatformAuth, platform: models.PlatformInstagram},
 		{label: Tr("settings_auth_telegram"), value: platformStatus(models.PlatformTelegram), kind: settingPlatformAuth, platform: models.PlatformTelegram},
 		{label: Tr("settings_auth_discord"), value: platformStatus(models.PlatformDiscord), kind: settingPlatformAuth, platform: models.PlatformDiscord},
 		{label: Tr("settings_auth_devto"), value: platformStatus(models.PlatformDevTo), kind: settingPlatformAuth, platform: models.PlatformDevTo},
@@ -89,6 +92,7 @@ func (m Model) settingsOptions() []settingOption {
 		{label: Tr("settings_config_export"), value: Tr("settings_run_action"), kind: settingAction, action: actionExport, separatorBefore: Tr("settings_sec_backup")},
 		{label: Tr("settings_config_import"), value: Tr("settings_run_action"), kind: settingAction, action: actionImport},
 		{label: Tr("settings_edit_slots"), value: Tr("settings_run_action"), kind: settingAction, action: actionEditSlots},
+		{label: Tr("settings_scheduler"), value: schedulerValue(), kind: settingAction, action: actionScheduler},
 	}
 }
 
@@ -149,4 +153,12 @@ func (m Model) settingValue(opt settingOption) string {
 		return ui.Dot(ui.Err) + " " + opt.value
 	}
 	return opt.value
+}
+
+// schedulerValue is the launchd scheduler state shown on its settings row.
+func schedulerValue() string {
+	if service.Running(config.ActiveProfile) {
+		return Tr("settings_scheduler_on")
+	}
+	return Tr("settings_scheduler_off")
 }

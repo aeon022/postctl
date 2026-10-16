@@ -406,6 +406,16 @@ var translationsMap = map[string]map[string]string{
 		"de": "Facebook     ",
 		"en": "Facebook     ",
 	},
+	"settings_scheduler": {
+		"de": "Scheduler (Hintergrund) ",
+		"en": "Scheduler (background)  ",
+	},
+	"settings_scheduler_on":  {"de": "● läuft — Enter zum Stoppen", "en": "● running — enter to stop"},
+	"settings_scheduler_off": {"de": "aus — Enter zum Starten", "en": "off — enter to start"},
+	"settings_auth_instagram": {
+		"de": "Instagram    ",
+		"en": "Instagram    ",
+	},
 	"settings_auth_telegram": {
 		"de": "Telegram     ",
 		"en": "Telegram     ",

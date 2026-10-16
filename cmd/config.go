@@ -701,6 +701,29 @@ var configSetupCmd = &cobra.Command{
 				config.ActiveConfig.Facebook.PageID = pageID
 			}
 
+		case "instagram":
+			fmt.Println("Voraussetzung: Instagram Business/Creator-Konto, verknüpft mit einer Facebook-Seite.")
+			fmt.Println("Schritt 1: Im Meta Developer Portal einen langlebigen Token erzeugen")
+			fmt.Println("           (Scopes: instagram_basic, instagram_content_publish, pages_show_list).")
+			fmt.Println("Schritt 2: Die Instagram-Business-Account-ID ermitteln (Graph API Explorer: /me/accounts → instagram_business_account).")
+			fmt.Println("Hinweis:   Posts brauchen ein Bild als öffentliche https://-URL (images: im Frontmatter).")
+			fmt.Println()
+
+			fmt.Print("➔ Access Token: ")
+			igToken, _ := reader.ReadString('\n')
+			igToken = strings.TrimSpace(igToken)
+
+			fmt.Print("➔ Instagram Account ID: ")
+			igID, _ := reader.ReadString('\n')
+			igID = strings.TrimSpace(igID)
+
+			if igToken != "" {
+				config.ActiveConfig.Instagram.AccessToken = igToken
+			}
+			if igID != "" {
+				config.ActiveConfig.Instagram.AccountID = igID
+			}
+
 		case "telegram":
 			fmt.Println("Schritt 1: Erstelle einen Telegram Bot via @BotFather in Telegram.")
 			fmt.Println("Schritt 2: Kopiere das erhaltene HTTP API Token.")
@@ -864,6 +887,7 @@ var configTestCmd = &cobra.Command{
 			models.PlatformMastodon,
 			models.PlatformBluesky,
 			models.PlatformFacebook,
+			models.PlatformInstagram,
 			models.PlatformTelegram,
 			models.PlatformDiscord,
 			models.PlatformDevTo,
@@ -892,6 +916,8 @@ var configTestCmd = &cobra.Command{
 				isConfigured = config.ActiveConfig.Bluesky.Handle != ""
 			case models.PlatformFacebook:
 				isConfigured = config.ActiveConfig.Facebook.AppID != ""
+			case models.PlatformInstagram:
+				isConfigured = config.ActiveConfig.Instagram.AccessToken != "" && config.ActiveConfig.Instagram.AccountID != ""
 			case models.PlatformTelegram:
 				isConfigured = config.ActiveConfig.Telegram.BotToken != ""
 			case models.PlatformDiscord:

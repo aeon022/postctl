@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/aeon022/missionctl-core/ui"
+	"github.com/aeon022/postctl/internal/service"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -491,6 +492,14 @@ func (m Model) runAuthCmd(platformName string) tea.Cmd {
 	}
 }
 
+// selfCmd runs postctl itself as a subprocess on the active profile; without
+// POSTCTL_PROFILE the child would silently fall back to the default profile.
+func selfCmd(args ...string) *exec.Cmd {
+	c := exec.Command(getExecutablePath(), args...)
+	c.Env = append(os.Environ(), "POSTCTL_PROFILE="+config.ActiveProfile)
+	return c
+}
+
 func getExecutablePath() string {
 	exe, err := os.Executable()
 	if err != nil {
@@ -536,7 +545,7 @@ func platformNeedsSetup(platformName string) bool {
 
 // runSetupWizardCmd startet das interaktive CLI Setup für eine Plattform
 func (m Model) runSetupWizardCmd(platformName string) tea.Cmd {
-	c := exec.Command(getExecutablePath(), "config", "setup", platformName)
+	c := selfCmd("config", "setup", platformName)
 	return tea.ExecProcess(c, func(err error) tea.Msg {
 		return setupWizardFinishedMsg{platform: platformName, err: err}
 	})
@@ -572,6 +581,9 @@ func (m Model) clearPlatformCmd(platformName string) tea.Cmd {
 			config.ActiveConfig.Facebook.AppID = ""
 			config.ActiveConfig.Facebook.AppSecret = ""
 			config.ActiveConfig.Facebook.PageID = ""
+		case models.PlatformInstagram:
+			config.ActiveConfig.Instagram.AccessToken = ""
+			config.ActiveConfig.Instagram.AccountID = ""
 		case models.PlatformTelegram:
 			config.ActiveConfig.Telegram.BotToken = ""
 			config.ActiveConfig.Telegram.ChatID = ""
@@ -602,7 +614,7 @@ func (m Model) clearPlatformCmd(platformName string) tea.Cmd {
 
 // runBackupExportCmd pausiert die TUI und startet interaktiv den CLI-Export
 func (m Model) runBackupExportCmd() tea.Cmd {
-	c := exec.Command(getExecutablePath(), "config", "export")
+	c := selfCmd("config", "export")
 	return tea.ExecProcess(c, func(err error) tea.Msg {
 		return backupFinishedMsg{isExport: true, err: err}
 	})
@@ -610,7 +622,7 @@ func (m Model) runBackupExportCmd() tea.Cmd {
 
 // runBackupImportCmd pausiert die TUI und startet interaktiv den CLI-Import
 func (m Model) runBackupImportCmd() tea.Cmd {
-	c := exec.Command(getExecutablePath(), "config", "import")
+	c := selfCmd("config", "import")
 	return tea.ExecProcess(c, func(err error) tea.Msg {
 		return backupFinishedMsg{isExport: false, err: err}
 	})
@@ -618,7 +630,7 @@ func (m Model) runBackupImportCmd() tea.Cmd {
 
 // runImportPostsCmd pausiert die TUI und startet interaktiv den CLI-Post-Import
 func (m Model) runImportPostsCmd() tea.Cmd {
-	c := exec.Command(getExecutablePath(), "import")
+	c := selfCmd("import")
 	return tea.ExecProcess(c, func(err error) tea.Msg {
 		return importFinishedMsg{err: err}
 	})
@@ -1482,6 +1494,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						return m, m.runBackupExportCmd()
 					case actionImport:
 						return m, m.runBackupImportCmd()
+					case actionScheduler:
+						var err error
+						if service.Running(config.ActiveProfile) {
+							err = service.Uninstall(config.ActiveProfile)
+						} else {
+							err = service.Install(config.ActiveProfile)
+						}
+						if err != nil {
+							m.err = err
+						}
+						return m, nil
 					case actionEditSlots:
 						m.editingQueueSlots = true
 						m.queueSlotsInput.SetValue(strings.Join(config.ActiveConfig.Scheduler.Slots, ", "))

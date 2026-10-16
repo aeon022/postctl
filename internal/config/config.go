@@ -267,6 +267,18 @@ func loadConfig(profile string) error {
 		return fmt.Errorf("unmarshal config: %w", err)
 	}
 
+	// One license covers every profile: a named profile without its own key
+	// inherits the default profile's.
+	if profile != "" && ActiveConfig.LicenseKey == "" {
+		var def struct {
+			LicenseKey    string `yaml:"license_key"`
+			LicenseStatus string `yaml:"license_status"`
+		}
+		if b, err := os.ReadFile(filepath.Join(configDir(""), "config.yaml")); err == nil && yaml.Unmarshal(b, &def) == nil {
+			ActiveConfig.LicenseKey, ActiveConfig.LicenseStatus = def.LicenseKey, def.LicenseStatus
+		}
+	}
+
 	return nil
 }
 

@@ -10,6 +10,7 @@ import (
 
 	"github.com/aeon022/postctl/internal/config"
 	"github.com/aeon022/postctl/internal/scheduler"
+	"github.com/aeon022/postctl/internal/service"
 	"github.com/aeon022/postctl/internal/store"
 	"github.com/spf13/cobra"
 )
@@ -51,4 +52,44 @@ var daemonCmd = &cobra.Command{
 func init() {
 	daemonCmd.Flags().IntVar(&checkIntervalSec, "interval", 30, "Database check interval in seconds")
 	rootCmd.AddCommand(daemonCmd)
+}
+
+var daemonInstallCmd = &cobra.Command{
+	Use:   "install",
+	Short: "Run the scheduler at login for the active profile (macOS launchd)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := service.Install(config.ActiveProfile); err != nil {
+			return err
+		}
+		fmt.Printf("✓ Scheduler installed (%s). Log: %s\n", service.Label(config.ActiveProfile), service.LogPath(config.ActiveProfile))
+		return nil
+	},
+}
+
+var daemonUninstallCmd = &cobra.Command{
+	Use:   "uninstall",
+	Short: "Stop and remove the scheduler launch agent for the active profile",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := service.Uninstall(config.ActiveProfile); err != nil {
+			return err
+		}
+		fmt.Println("✓ Scheduler removed.")
+		return nil
+	},
+}
+
+var daemonStatusCmd = &cobra.Command{
+	Use:   "status",
+	Short: "Show whether the scheduler launch agent runs for the active profile",
+	Run: func(cmd *cobra.Command, args []string) {
+		if service.Running(config.ActiveProfile) {
+			fmt.Printf("● running (%s)\n", service.Label(config.ActiveProfile))
+		} else {
+			fmt.Println("○ not running")
+		}
+	},
+}
+
+func init() {
+	daemonCmd.AddCommand(daemonInstallCmd, daemonUninstallCmd, daemonStatusCmd)
 }
