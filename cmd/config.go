@@ -850,7 +850,7 @@ var configSetupCmd = &cobra.Command{
 
 		fmt.Println()
 		fmt.Println(wl("✅ Konfiguration erfolgreich in config.yaml gespeichert!", "✅ Configuration saved to config.yaml!"))
-		fmt.Println("\nDrücke Enter, um fortzufahren...")
+		fmt.Println(wl("\nDrücke Enter, um fortzufahren...", "\nPress Enter to continue..."))
 		_, _ = reader.ReadString('\n')
 	},
 }
