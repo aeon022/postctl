@@ -2,6 +2,7 @@ package tui
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -102,5 +103,13 @@ func TestSmokeFlowsReachTheirViews(t *testing.T) {
 		if !c.ok(mm.(Model)) {
 			t.Errorf("%s: keys %v did not reach the view", c.name, c.keys)
 		}
+	}
+}
+
+func TestRunAuthCmdRestoresStdout(t *testing.T) {
+	out, errw := os.Stdout, os.Stderr
+	_ = (Model{}).runAuthCmd("no-such-platform")()
+	if os.Stdout != out || os.Stderr != errw {
+		t.Fatal("os.Stdout/os.Stderr must be restored after an auth run")
 	}
 }

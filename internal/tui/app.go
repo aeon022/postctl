@@ -481,6 +481,14 @@ func (m Model) bulkPublishPostsCmd(ids []string) tea.Cmd {
 // runAuthCmd startet den Authentifizierungs-Flow für eine Plattform asynchron im Hintergrund
 func (m Model) runAuthCmd(platformName string) tea.Cmd {
 	return func() tea.Msg {
+		// Auth flows print instructions with fmt.Println; on the TUI's alt screen that
+		// scrolls the terminal and desyncs the renderer. The TUI writes through its own
+		// file handle, so pointing the globals at /dev/null only mutes the platform code.
+		if null, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0); err == nil {
+			out, errw := os.Stdout, os.Stderr
+			os.Stdout, os.Stderr = null, null
+			defer func() { os.Stdout, os.Stderr = out, errw; null.Close() }()
+		}
 		ctx := context.Background()
 		plat, err := platforms.GetPlatform(platformName, m.store, false)
 		if err != nil {

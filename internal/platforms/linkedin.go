@@ -47,6 +47,17 @@ func (l *LinkedInPlatform) IsAuthenticated(ctx context.Context) bool {
 }
 
 // Auth startet den OAuth 2.0 Flow für LinkedIn
+// linkedinScopes: as a person we need posting rights plus OIDC for the member URN.
+// As a company page only w_organization_social (Community Management API product) —
+// that app often has neither OpenID Connect nor Share on LinkedIn, and asking for
+// a scope the app lacks makes LinkedIn reject the whole login.
+func linkedinScopes() string {
+	if orgMode() {
+		return "w_organization_social"
+	}
+	return "w_member_social openid profile"
+}
+
 func (l *LinkedInPlatform) Auth(ctx context.Context) error {
 	if l.clientID == "" || l.clientSecret == "" {
 		if config.ActiveConfig.Defaults.Language == "de" {
@@ -72,11 +83,7 @@ func (l *LinkedInPlatform) Auth(ctx context.Context) error {
 	state := fmt.Sprintf("state-%d", time.Now().UnixNano())
 	redirectURI := "http://localhost:8753/callback"
 
-	// Scopes für LinkedIn Posting und OIDC Profil
-	scopes := "w_member_social openid profile"
-	if config.ActiveConfig.LinkedIn.OrganizationID != "" {
-		scopes += " w_organization_social" // needs the "Community Management API" product on the LinkedIn app
-	}
+	scopes := linkedinScopes()
 
 	authURL := fmt.Sprintf(
 		"https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=%s&redirect_uri=%s&state=%s&scope=%s",

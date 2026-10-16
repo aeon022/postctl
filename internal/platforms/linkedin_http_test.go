@@ -236,3 +236,14 @@ func TestLinkedInCompanyPagePostsViaPostsAPI(t *testing.T) {
 		t.Errorf("delete: %+v", (*reqs)[0])
 	}
 }
+
+func TestLinkedInScopes(t *testing.T) {
+	if got := linkedinScopes(); got != "w_member_social openid profile" {
+		t.Errorf("person scopes = %q", got)
+	}
+	config.ActiveConfig.LinkedIn.OrganizationID = "1"
+	defer func() { config.ActiveConfig.LinkedIn.OrganizationID = "" }()
+	if got := linkedinScopes(); got != "w_organization_social" {
+		t.Errorf("org scopes = %q", got)
+	}
+}
