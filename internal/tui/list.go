@@ -31,18 +31,63 @@ func window(n, cursor, capacity int) (int, int) {
 // panelRowW is the usable text width inside a ui.Panel of the given width.
 func panelRowW(w int) int { return max(w-3, 4) }
 
+func (m Model) campaignsTitle() string {
+	if len(m.campaigns) == 0 && m.needsOnboarding() {
+		return Tr("onb_title")
+	}
+	return Tr("dash_campaigns")
+}
+
+func (m Model) campaignsOrOnboarding(w, capacity int) []string {
+	if len(m.campaigns) == 0 && m.needsOnboarding() {
+		return m.onboardingLines()
+	}
+	return m.campaignLines(w, capacity)
+}
+
 func (m Model) campaignLines(w, capacity int) []string {
 	if len(m.campaigns) == 0 {
 		return []string{dimStyle.Render(Tr("dash_no_campaigns"))}
 	}
 	start, end := window(len(m.campaigns), m.cursor, capacity)
+	now := time.Now()
 	var out []string
 	for i := start; i < end; i++ {
 		c := m.campaigns[i]
-		counts := fmt.Sprintf(Tr("dash_campaign_counts"), len(c.Posts), c.Posted, c.Scheduled)
-		out = append(out, ui.Row(w, m.activeTab == tabDashboard && i == m.cursor, "● "+c.Slug+"  "+dimStyle.Render(counts)))
+		out = append(out, ui.Row(w, m.activeTab == tabDashboard && i == m.cursor, campaignRow(c, w-2, now)))
 	}
 	return out
+}
+
+// campaignRow is "● slug  ████░░░░ 7/20 ✗1 · in 2d": progress bar, counts, failures, next post.
+func campaignRow(c models.Campaign, w int, now time.Time) string {
+	total := len(c.Posts)
+	ratio := 0.0
+	if total > 0 {
+		ratio = float64(c.Posted) / float64(total)
+	}
+	failed := 0
+	var next *time.Time
+	for _, p := range c.Posts {
+		switch p.Status {
+		case models.StatusFailed:
+			failed++
+		case models.StatusScheduled:
+			if p.ScheduledAt != nil && p.ScheduledAt.After(now) && (next == nil || p.ScheduledAt.Before(*next)) {
+				next = p.ScheduledAt
+			}
+		}
+	}
+	right := ui.Bar(8, ratio, false) + dimStyle.Render(fmt.Sprintf(" %d/%d", c.Posted, total))
+	if failed > 0 {
+		right += " " + lipgloss.NewStyle().Foreground(theme.RedV2).Render(fmt.Sprintf("✗%d", failed))
+	}
+	if next != nil && w >= 60 {
+		right += dimStyle.Render(" · " + ui.RelTime(*next, now))
+	}
+	slug := ansi.Truncate(c.Slug, max(w-lipgloss.Width(right)-4, 6), "…")
+	gap := strings.Repeat(" ", max(w-lipgloss.Width(slug)-lipgloss.Width(right)-3, 1))
+	return "● " + slug + gap + right
 }
 
 func (m Model) nextUpLines(w, capacity int, now time.Time) []string {
@@ -111,7 +156,7 @@ func (m Model) renderDashboard(w, h int) string {
 		rw := w - 1 - lw
 		hc := max(h/2, 5)
 		hn := max(h-hc, 5)
-		left := ui.Panel(lw, hc, Tr("dash_campaigns"), strings.Join(m.campaignLines(panelRowW(lw), hc-2), "\n"), focus) + "\n" +
+		left := ui.Panel(lw, hc, m.campaignsTitle(), strings.Join(m.campaignsOrOnboarding(panelRowW(lw), hc-2), "\n"), focus) + "\n" +
 			ui.Panel(lw, hn, Tr("dash_next_up"), strings.Join(m.nextUpLines(panelRowW(lw), hn-2, now), "\n"), false)
 		right := ui.Panel(rw, statsH, Tr("dash_stats"), strings.Join(m.statsLines(), "\n"), false) + "\n" +
 			ui.Panel(rw, max(h-statsH, 6), Tr("dash_platforms"), strings.Join(m.platformLines(), "\n"), false)
@@ -123,7 +168,7 @@ func (m Model) renderDashboard(w, h int) string {
 	hp := max(rest-hc-hn, 4)
 	return strings.Join([]string{
 		ui.Panel(w, statsH, Tr("dash_stats"), strings.Join(m.statsLines(), "\n"), false),
-		ui.Panel(w, hc, Tr("dash_campaigns"), strings.Join(m.campaignLines(panelRowW(w), hc-2), "\n"), focus),
+		ui.Panel(w, hc, m.campaignsTitle(), strings.Join(m.campaignsOrOnboarding(panelRowW(w), hc-2), "\n"), focus),
 		ui.Panel(w, hn, Tr("dash_next_up"), strings.Join(m.nextUpLines(panelRowW(w), hn-2, now), "\n"), false),
 		ui.Panel(w, hp, Tr("dash_platforms"), strings.Join(m.platformLines(), "\n"), false),
 	}, "\n")

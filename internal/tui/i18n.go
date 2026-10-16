@@ -26,6 +26,16 @@ func Tr(key string) string {
 }
 
 var translationsMap = map[string]map[string]string{
+	"onb_title":           {"de": "Einrichtung", "en": "Getting started"},
+	"onb_intro":           {"de": "Vier Schritte bis zum ersten geplanten Post:", "en": "Four steps to your first scheduled post:"},
+	"onb_connect":         {"de": "Plattform verbinden", "en": "Connect a platform"},
+	"onb_connect_hint":    {"de": "Tab → Settings, Enter auf der Plattform", "en": "tab to Settings, Enter on the platform"},
+	"onb_create":          {"de": "Ersten Post anlegen", "en": "Create your first post"},
+	"onb_create_hint":     {"de": "n", "en": "n"},
+	"onb_schedule":        {"de": "Termin setzen", "en": "Set a time"},
+	"onb_schedule_hint":   {"de": "im Editor „Scheduled“ ausfüllen (ctrl+d = Kalender)", "en": "fill \"Scheduled\" in the editor (ctrl+d = calendar)"},
+	"onb_scheduler":       {"de": "Scheduler starten", "en": "Start the scheduler"},
+	"onb_scheduler_hint":  {"de": "Settings → Scheduler (Hintergrund)", "en": "Settings → Scheduler (background)"},
 	"preview_title":       {"de": "Vorschau", "en": "Preview"},
 	"prev_images":         {"de": "Bilder", "en": "images"},
 	"prev_need_image":     {"de": "Instagram braucht ein Bild", "en": "Instagram needs an image"},
