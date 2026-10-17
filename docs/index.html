@@ -495,6 +495,10 @@
 <hr>
 <h2 id="mcp--ai-integration">MCP — AI Integration</h2>
 <p>postctl ships a built-in MCP server that exposes all core operations to AI agents. This lets tools like Claude Desktop create, schedule, and publish posts on your behalf.</p>
+<blockquote>
+<p>[!IMPORTANT]
+<strong>Publishing and scheduling through MCP are off by default</strong> — an AI agent that reads untrusted text (mail, web pages) could be tricked into posting. Without opt-in, <code>create_post</code> saves drafts and <code>publish_post</code> / <code>schedule_post</code> refuse. To allow them, start the MCP server with <code>POSTCTL_MCP_ALLOW_PUBLISH=1</code> in its environment (<code>dry_run</code> always works).</p>
+</blockquote>
 <h3 id="claude-desktop-configuration">Claude Desktop Configuration</h3>
 <p>Add the following to <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>:</p>
 <pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="json"><code><span class="line"><span style="color:#E1E4E8">{</span></span>
@@ -572,6 +576,17 @@
 </blockquote>
 <p>Claude calls <code>get_post</code> to retrieve the original, then calls <code>create_post</code> twice — once for <code>linkedin</code> and once for <code>threads</code> — adapting tone and length for each platform automatically.</p>
 <hr>
+<h2 id="security">Security</h2>
+<ul>
+<li><strong>Local files are owner-only:</strong> <code>config.yaml</code> (API secrets), the database and the scheduler log are written with <code>0600</code> permissions; older, world-readable files are tightened automatically on the next start.</li>
+<li><strong>Token encryption:</strong> stored tokens use AES-256-GCM with a random per-installation key in <code>~/.config/postctl/encryption.key</code> (<code>0600</code>, never inside a synced data directory). Installations that predate the key file switch with <code>postctl security migrate</code>; <code>postctl security status</code> shows what you use. Copy the key file to your other devices — a synced database is unreadable without it.</li>
+<li><strong>Backups</strong> (<code>postctl config export</code> / <code>config import</code>) are encrypted with AES-256-GCM, key derived with PBKDF2-HMAC-SHA256 (600k iterations, random salt). Older backups still restore.</li>
+<li><strong>Uploads are checked:</strong> only real PNG/JPEG/GIF/WebP files (any extension, symlinks resolved, ≤ 25 MB) are uploaded from local paths — a post can never publish e.g. an SSH key.</li>
+<li><strong>No secrets in logs:</strong> token-like values are stripped from logs, history and error messages. <code>postctl config set KEY -</code> reads a secret from stdin instead of the command line.</li>
+<li><strong>OAuth:</strong> random <code>state</code>, PKCE, callback only on <code>127.0.0.1</code>; forged callbacks cannot abort a login.</li>
+<li><strong>X cookie mode</strong> is unofficial, off by default and needs <code>twitter.unofficial_cookie_mode: true</code>.</li>
+</ul>
+<p>Report vulnerabilities privately: see <a href="SECURITY.md">SECURITY.md</a>.</p>
 <h2 id="platform-notes">Platform Notes</h2>
 <table>
 <thead>
