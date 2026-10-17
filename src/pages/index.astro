@@ -18,7 +18,13 @@ import {
   Heart,
   Cloud
 } from '@lucide/astro';
-import ScreenshotCarousel from '../components/ScreenshotCarousel.astro';
+import mockDashboard from '../mockups/dashboard.html?raw';
+import mockPosts from '../mockups/posts.html?raw';
+import mockEditor from '../mockups/editor.html?raw';
+import mockCalendar from '../mockups/calendar.html?raw';
+import mockSchedule from '../mockups/schedule.html?raw';
+import mockHistory from '../mockups/history.html?raw';
+import mockSettings from '../mockups/settings.html?raw';
 import FooterSignature from '../components/FooterSignature.astro';
 import LangToggle from '../components/LangToggle.astro';
 ---
@@ -41,10 +47,11 @@ import LangToggle from '../components/LangToggle.astro';
 				<span class="system-status"><span class="status-dot"></span>SYS_OK</span>
 			</div>
 			<nav class="nav" id="main-nav">
+				<a href="#channels" class="nav-link"><span class="lang-en">Channels</span><span class="lang-de">Kanäle</span></a>
+				<a href="#tour" class="nav-link"><span class="lang-en">Tour</span><span class="lang-de">Tour</span></a>
 				<a href="#features" class="nav-link"><span class="lang-en">Features</span><span class="lang-de">Funktionen</span></a>
-				<a href="#how-it-works" class="nav-link"><span class="lang-en">Workflow</span><span class="lang-de">Ablauf</span></a>
-				<a href="#screenshots" class="nav-link"><span class="lang-en">Preview</span><span class="lang-de">Vorschau</span></a>
-				<a href="/tui" class="nav-link"><span class="lang-en">TUI Demo</span><span class="lang-de">TUI-Demo</span></a>
+				<a href="#profiles" class="nav-link"><span class="lang-en">Profiles</span><span class="lang-de">Profile</span></a>
+				<a href="#safety" class="nav-link"><span class="lang-en">Safety</span><span class="lang-de">Sicherheit</span></a>
 				<a href="/docs" class="nav-link"><span class="lang-en">Docs</span><span class="lang-de">Doku</span></a>
 				<a href="#pricing" class="nav-link"><span class="lang-en">Pricing</span><span class="lang-de">Preise</span></a>
 				<a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="nav-link"><span class="lang-en">Donate</span><span class="lang-de">Spenden</span></a>
@@ -81,13 +88,13 @@ import LangToggle from '../components/LangToggle.astro';
 						<span class="lang-de">Ein Markdown-first, Terminal-nativer Post-Scheduler. 100% kostenlos und Open-Source für bis zu 2 soziale Netzwerke. Verwalte Instagram, Facebook, Threads, X, LinkedIn, Bluesky, Mastodon, Telegram und Discord direkt über die CLI oder TUI.</span>
 					</p>
 					<div class="hero-ctas">
-						<a href="#features" class="btn btn-primary">
-							<span class="lang-en">See Features</span>
-							<span class="lang-de">Funktionen ansehen</span>
+						<a href="#channels" class="btn btn-primary">
+							<span class="lang-en">See Channels</span>
+							<span class="lang-de">Kanäle ansehen</span>
 						</a>
-						<a href="/tui" class="btn btn-secondary">
-							<span class="lang-en">Try Interactive TUI</span>
-							<span class="lang-de">Interaktive TUI testen</span>
+						<a href="#tour" class="btn btn-secondary">
+							<span class="lang-en">Take the Tour</span>
+							<span class="lang-de">Zur Tour</span>
 						</a>
 						<a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="btn btn-tertiary">
 							<Heart class="heart-icon" size={14} /> 
@@ -97,319 +104,70 @@ import LangToggle from '../components/LangToggle.astro';
 					</div>
 				</div>
 				
-				<!-- Interactive Terminal Emulator -->
-				<div class="hero-terminal">
-					<div class="terminal-header">
-						<div class="terminal-dots">
-							<span class="dot dot-red"></span>
-							<span class="dot dot-yellow"></span>
-							<span class="dot dot-green"></span>
-						</div>
-						<div class="terminal-title">bash - postctl --help</div>
-					</div>
-					<div class="terminal-body" id="typing-terminal">
-						<span class="terminal-prompt">$</span> <span class="typed-text"></span><span class="cursor-blink">|</span>
-						<pre class="terminal-output hide"></pre>
-					</div>
+				<!-- Real TUI screenshot (generated from the app, fictional demo data) -->
+				<div class="hero-terminal mock-window">
+					<div class="mock-chrome"><span class="tui-dot tui-dot-red"></span><span class="tui-dot tui-dot-yellow"></span><span class="tui-dot tui-dot-green"></span><span class="mock-title">postctl</span></div>
+					<pre class="mock-pre mock-pre-hero" set:html={mockDashboard}></pre>
 				</div>
 			</div>
 		</section>
 
-
-
-		<!-- Interactive TUI Demo Section -->
-		<section id="tui-demo" class="tui-demo-section">
+		<!-- Channels -->
+		<section id="channels" class="channels-section">
 			<div class="container">
 				<div class="section-header">
-					<div class="section-tag"><span class="lang-en">Live Demo</span><span class="lang-de">Live-Demo</span></div>
-					<h2 class="section-title"><span class="lang-en">Try the TUI</span><span class="lang-de">TUI ausprobieren</span></h2>
-					<p class="section-subtitle"><span class="lang-en">A faithful replica of the postctl terminal UI. Click the window to focus, then use <kbd class="kbd">Tab</kbd> to switch tabs and <kbd class="kbd">↑↓</kbd> to navigate.</span><span class="lang-de">Eine originalgetreue Nachbildung der postctl-Terminal-UI. Klicke in das Fenster und nutze dann <kbd class="kbd">Tab</kbd> zum Wechseln der Tabs und <kbd class="kbd">↑↓</kbd> zur Navigation.</span></p>
+					<div class="section-tag"><span class="lang-en">One tool, every channel</span><span class="lang-de">Ein Tool, alle Kanäle</span></div>
+					<h2 class="section-title"><span class="lang-en">Write once, publish everywhere</span><span class="lang-de">Einmal schreiben, überall veröffentlichen</span></h2>
+					<p class="section-subtitle"><span class="lang-en">Feed posts, carousels and stories on Instagram, photo posts on Facebook pages, carousels on Threads — plus X, LinkedIn, Bluesky, Mastodon, Telegram and Discord. What each network can do, postctl does.</span><span class="lang-de">Feed-Posts, Carousels und Stories auf Instagram, Foto-Posts auf Facebook-Seiten, Carousels auf Threads — dazu X, LinkedIn, Bluesky, Mastodon, Telegram und Discord. Was ein Netzwerk kann, kann auch postctl.</span></p>
 				</div>
-
-				<div class="tui-window" id="tui-window" tabindex="0" aria-label="Interactive TUI demo">
-					<!-- Window title bar (Mac dots style) -->
-					<div class="tui-chrome">
-						<div class="tui-dots"><span class="tui-dot tui-dot-red"></span><span class="tui-dot tui-dot-yellow"></span><span class="tui-dot tui-dot-green"></span></div>
-						<div class="tui-chrome-title">gweiher@mac: ~ (postctl)</div>
-						<div></div>
-					</div>
-					
-					<!-- Terminal Inner Content -->
-					<div class="tui-window-content">
-						<!-- Title Block (mimics style.go StyleTitle) -->
-						<div class="tui-title-block">&nbsp;postctl — Social Media CLI&nbsp;</div>
-						
-						<!-- Tabs (mimics tabs.go horizontal layout) -->
-						<div class="tui-tabbar">
-							<button class="tui-tab-btn active" data-tab="dashboard">● DASHBOARD</button>
-							<button class="tui-tab-btn" data-tab="posts">◷ POSTS</button>
-							<button class="tui-tab-btn" data-tab="schedule">↺ SCHEDULE</button>
-							<button class="tui-tab-btn" data-tab="history">📊 HISTORY</button>
-							<button class="tui-tab-btn" data-tab="settings">⚙ SETTINGS</button>
-						</div>
-						
-						<!-- Panels / Tabs Body -->
-						<div class="tui-body">
-							
-							<!-- DASHBOARD -->
-							<div class="tui-panel active" id="panel-dashboard">
-								<div class="tui-dashboard-layout">
-									<!-- Box 1: Campaigns & Next Up -->
-									<div class="tui-box">
-										<div class="tui-label">CAMPAIGNS</div>
-										<div class="tui-campaign-item tui-row-sel">
-											<span class="tui-arr">&gt;</span>●&nbsp;<span class="tui-rtitle">orbiter-0.3.65</span>
-										</div>
-										<div class="tui-meta">   1 posts (1 posted, 0 scheduled)</div>
-										
-										<div class="tui-campaign-item">
-											<span class="tui-arr tui-arr-h">&gt;</span>●&nbsp;<span class="tui-rtitle">postctl-launch</span>
-										</div>
-										<div class="tui-meta">   1 posts (1 posted, 0 scheduled)</div>
-										
-										<div class="tui-campaign-item">
-											<span class="tui-arr tui-arr-h">&gt;</span>●&nbsp;<span class="tui-rtitle">q2-newsletter</span>
-										</div>
-										<div class="tui-meta">   3 posts (0 posted, 3 scheduled)</div>
-										
-										<div class="tui-gap"></div>
-										<div class="tui-label">NEXT UP</div>
-										<div class="tui-muted">No scheduled posts.</div>
-									</div>
-									
-									<!-- Box 2: Stats & Platforms -->
-									<div class="tui-box">
-										<div class="tui-label">STATS</div>
-										<div class="tui-stat-r">stats_posted<span class="tui-val">2</span></div>
-										<div class="tui-stat-r">stats_scheduled<span class="tui-val">0</span></div>
-										<div class="tui-stat-r">stats_drafts<span class="tui-val">0</span></div>
-										<div class="tui-stat-r">stats_failed<span class="tui-val">0</span></div>
-										
-										<div class="tui-gap"></div>
-										<div class="tui-label">PLATFORMS</div>
-										<div class="tui-plat-r">Twitter/X: <span class="tui-connected">Connected ✓</span></div>
-										<div class="tui-plat-r">LinkedIn:  <span class="tui-connected">Connected ✓</span></div>
-										<div class="tui-plat-r">Threads:   <span class="tui-connected">Connected ✓</span></div>
-										<div class="tui-plat-r">Mastodon:  <span class="tui-connected">Connected ✓</span></div>
-										<div class="tui-plat-r">Bluesky:   <span class="tui-connected">Connected ✓</span></div>
-										<div class="tui-plat-r">Facebook:  <span class="tui-connected">Connected ✓</span></div>
-									</div>
-								</div>
-							</div>
-							
-							<!-- POSTS -->
-							<div class="tui-panel" id="panel-posts">
-								<div class="tui-box">
-									<div class="tui-label">POSTS</div>
-									
-									<div class="tui-post-item tui-row-sel">
-										<div class="tui-post-header-line">
-											<span class="tui-arr">&gt;</span>
-											<span class="tui-post-meta-plat">THREADS / DE</span>
-											<span class="tui-post-badge badge-posted">POSTED 25.06. 14:15</span>
-										</div>
-										<div class="tui-post-body">"Your CMS is a single file."</div>
-										<div class="tui-post-meta-line">single · 📎 1 images · 📁 orbiter-0.3.65</div>
-									</div>
-									
-									<div class="tui-post-item">
-										<div class="tui-post-header-line">
-											<span class="tui-arr tui-arr-h">&gt;</span>
-											<span class="tui-post-meta-plat">MASTODON / DE</span>
-											<span class="tui-post-badge badge-posted">POSTED 25.06. 16:11</span>
-										</div>
-										<div class="tui-post-body">"🚀 I just built a terminal-native s..."</div>
-										<div class="tui-post-meta-line">thread · 3 tweets · 📎 1 · 📁 postctl-launch</div>
-									</div>
-									
-									<div class="tui-post-item">
-										<div class="tui-post-header-line">
-											<span class="tui-arr tui-arr-h">&gt;</span>
-											<span class="tui-post-meta-plat">TWITTER / EN</span>
-											<span class="tui-post-badge badge-scheduled">SCHED 27.06. 09:00</span>
-										</div>
-										<div class="tui-post-body">"Announcing postctl v0.4 — now with..."</div>
-										<div class="tui-post-meta-line">thread · 5 tweets · 📁 q2-newsletter</div>
-									</div>
-									
-									<div class="tui-post-item">
-										<div class="tui-post-header-line">
-											<span class="tui-arr tui-arr-h">&gt;</span>
-											<span class="tui-post-meta-plat">LINKEDIN / EN</span>
-											<span class="tui-post-badge badge-draft">DRAFT</span>
-										</div>
-										<div class="tui-post-body">"Why I manage my entire social prese..."</div>
-										<div class="tui-post-meta-line">single · 📁 q2-newsletter</div>
-									</div>
-								</div>
-							</div>
-							
-							<!-- SCHEDULE -->
-							<div class="tui-panel" id="panel-schedule">
-								<div class="tui-box">
-									<div class="tui-label">SCHEDULED POSTS</div>
-									<div class="tui-sch-item tui-row-sel">
-										<span class="tui-arr">&gt;</span>
-										<span class="tui-sch-icon">◷</span>
-										<span class="tui-sch-time">27.06.2026 09:00</span>
-										<span class="tui-sch-plat">TWITTER</span>
-										<span class="tui-sch-lang">EN</span>
-										<span class="tui-sch-title">Announcing postctl v0.4 — now with daemon mode and history...</span>
-									</div>
-									<div class="tui-sch-item">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-sch-icon">◷</span>
-										<span class="tui-sch-time">27.06.2026 09:05</span>
-										<span class="tui-sch-plat">LINKEDIN</span>
-										<span class="tui-sch-lang">EN</span>
-										<span class="tui-sch-title">Announcing postctl v0.4 — now with daemon mode and history...</span>
-									</div>
-									<div class="tui-sch-item">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-sch-icon">◷</span>
-										<span class="tui-sch-time">28.06.2026 14:00</span>
-										<span class="tui-sch-plat">THREADS</span>
-										<span class="tui-sch-lang">DE</span>
-										<span class="tui-sch-title">Why I manage my entire social presence from a terminal.</span>
-									</div>
-									
-									<div class="tui-gap"></div>
-									<div class="tui-muted" style="font-size:0.72rem"><span class="dot-active tui-sdot" style="font-size:0.55rem">●</span> Daemon running · next check in <span id="daemon-counter">28</span>s · postctl daemon --interval 30 --background</div>
-								</div>
-							</div>
-							
-							<!-- HISTORY -->
-							<div class="tui-panel" id="panel-history">
-								<div class="tui-box">
-									<div class="tui-label">POSTING HISTORY</div>
-									<div class="tui-hist-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-hist-time">25.06.2026 14:15:00</span>
-										<span class="tui-hist-action tui-ok">posted</span>
-										<span class="tui-hist-info">Post: threads-102 (ID: threads/928374)</span>
-									</div>
-									<div class="tui-hist-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-hist-time">25.06.2026 16:11:00</span>
-										<span class="tui-hist-action tui-ok">posted</span>
-										<span class="tui-hist-info">Post: mastodon-33 (ID: mastodon/7183)</span>
-									</div>
-									<div class="tui-hist-row tui-row-sel">
-										<span class="tui-arr">&gt;</span>
-										<span class="tui-hist-time">24.06.2026 10:00:00</span>
-										<span class="tui-hist-action tui-ok">posted</span>
-										<span class="tui-hist-info">Post: twitter-42 (ID: twitter/812739)</span>
-									</div>
-									<div class="tui-hist-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-hist-time">23.06.2026 09:30:00</span>
-										<span class="tui-hist-action tui-ok">posted</span>
-										<span class="tui-hist-info">Post: linkedin-12 (ID: linkedin/3847)</span>
-									</div>
-									<div class="tui-hist-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-hist-time">20.06.2026 17:00:00</span>
-										<span class="tui-hist-action tui-ok">posted</span>
-										<span class="tui-hist-info">Post: bluesky-9 (ID: bluesky/812)</span>
-									</div>
-								</div>
-							</div>
-							
-							<!-- SETTINGS -->
-							<div class="tui-panel" id="panel-settings">
-								<div class="tui-box">
-									<div class="tui-label">SETTINGS &amp; CONNECTIONS</div>
-									
-									<div class="tui-set-row tui-row-sel" id="set-ai-provider">
-										<span class="tui-arr">&gt;</span>
-										<span class="tui-skey">AI Provider  </span>: <span class="tui-sval val-cyan">claude</span>
-									</div>
-									<div class="tui-set-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">AI Model     </span>: <span class="tui-sval val-cyan">claude-3-5-sonnet-latest</span>
-									</div>
-									<div class="tui-set-row" id="dryrun-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">Dry Run      </span>: <span class="tui-sval val-red" id="dryrun-val">false</span>
-									</div>
-									<div class="tui-set-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">Language     </span>: <span class="tui-sval val-cyan">en</span>
-									</div>
-									<div class="tui-set-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">License Type </span>: <span class="tui-sval val-gray">Core (Free)</span>
-									</div>
-									
-									<div class="tui-gap"></div>
-									<div class="tui-label">PLATFORM ACCOUNTS</div>
-									<div class="tui-set-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">Twitter/X    </span>: <span class="tui-sval val-green" id="twitter-val">Connected ✓</span>
-									</div>
-									<div class="tui-set-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">LinkedIn     </span>: <span class="tui-sval val-green">Connected ✓</span>
-									</div>
-									<div class="tui-set-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">Threads      </span>: <span class="tui-sval val-green">Connected ✓</span>
-									</div>
-									<div class="tui-set-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">Mastodon     </span>: <span class="tui-sval val-green">Connected ✓</span>
-									</div>
-									<div class="tui-set-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">Bluesky      </span>: <span class="tui-sval val-green">Connected ✓</span>
-									</div>
-									<div class="tui-set-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">Facebook     </span>: <span class="tui-sval val-green">Connected ✓</span>
-									</div>
-									
-									<div class="tui-gap"></div>
-									<div class="tui-label">BACKUP &amp; SYNC</div>
-									<div class="tui-set-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">Backup Exp.  </span>: <span class="tui-sval val-red">Execute (Press Enter)</span>
-									</div>
-									<div class="tui-set-row">
-										<span class="tui-arr tui-arr-h">&gt;</span>
-										<span class="tui-skey">Backup Imp.  </span>: <span class="tui-sval val-red">Execute (Press Enter)</span>
-									</div>
-									
-									<div class="tui-gap"></div>
-									<div class="tui-muted" style="font-size:0.7rem;font-style:italic">←/→ / enter: Change / Connect · d: Reset/Disconnect · Saved instantly.</div>
-									<div class="tui-muted" style="font-size:0.7rem;font-style:italic">Activate Pro license via CLI: postctl config set license_key &lt;key&gt;</div>
-
-									<!-- Twitter prompt overlay inside panel -->
-									<div class="tui-prompt-overlay" id="twitter-prompt" style="display: none; margin-top: 1rem; border: 1px solid #2d3748; border-radius: 8px; padding: 0.75rem 1rem; background: rgba(26, 32, 44, 0.95); box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
-										<div class="tui-label" style="color: #8b7cf8; margin-bottom: 0.25rem;">TWITTER/X CONNECTION METHOD</div>
-										<div style="margin-bottom: 0.5rem; color: #ecc94b;">Choose the connection method for Twitter/X:</div>
-										<div style="margin-left: 0.5rem; margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 0.25rem;">
-											<div class="tui-prompt-opt tui-row-sel" data-idx="0" style="color: #00f5d4; font-weight: bold; cursor: pointer;">
-												<span class="tui-arr">&gt;</span> 1) Official API (with credits)
-											</div>
-											<div class="tui-prompt-opt" data-idx="1" style="color: #ecc94b; cursor: pointer;">
-												<span class="tui-arr tui-arr-h">&gt;</span> 2) Cookie-based (auth_token & ct0)
-											</div>
-										</div>
-										<div class="tui-muted" style="font-size: 0.72rem; font-style: italic;">↑↓: Select · enter: Confirm · esc: Cancel</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						
-						<!-- Keybindings/Help footer -->
-						<div class="tui-statusbar">tab: next tab · ↑↓: navigate · enter: select · n: new · e: edit · i: import · p: post now · d: delete · r: repurpose · q: quit</div>
-						<div class="tui-statusbar">f1/R: readme · ?: quick help</div>
-					</div>
+				<div class="matrix-wrap">
+					<table class="matrix">
+						<thead><tr><th></th><th><span class="lang-en">Text</span><span class="lang-de">Text</span></th><th><span class="lang-en">Images</span><span class="lang-de">Bilder</span></th><th><span class="lang-en">Carousel</span><span class="lang-de">Carousel</span></th><th><span class="lang-en">Story</span><span class="lang-de">Story</span></th><th><span class="lang-en">Alt text</span><span class="lang-de">Alt-Text</span></th><th><span class="lang-en">Delete via API</span><span class="lang-de">Löschen per API</span></th></tr></thead>
+						<tbody><tr><th>Instagram</th><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="no">–</span></td></tr><tr><th>Facebook Page</th><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="no">–</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td></tr><tr><th>Threads</th><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="no">–</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td></tr><tr><th>X / Twitter</th><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="no">–</span></td><td><span class="no">–</span></td><td><span class="no">–</span></td><td><span class="ok">✓</span></td></tr><tr><th>LinkedIn (profile + page)</th><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="no">–</span></td><td><span class="no">–</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td></tr><tr><th>Bluesky</th><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="no">–</span></td><td><span class="no">–</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td></tr><tr><th>Mastodon</th><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="no">–</span></td><td><span class="no">–</span></td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td></tr><tr><th>Telegram · Discord</th><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="no">–</span></td><td><span class="no">–</span></td><td><span class="no">–</span></td><td><span class="ok">✓</span></td></tr></tbody>
+					</table>
 				</div>
+				<p class="matrix-note"><span class="lang-en">Instagram does not allow deleting posts through its API — remove them in the app. Capabilities follow what each platform's API offers.</span><span class="lang-de">Instagram erlaubt kein Löschen per API — Posts dort in der App entfernen. Die Fähigkeiten folgen dem, was die API der jeweiligen Plattform anbietet.</span></p>
+			</div>
+		</section>
 
-				<div class="tui-demo-hint">
-					Click the window to focus · <kbd class="kbd">Tab</kbd> switches tabs · <kbd class="kbd">↑↓</kbd> navigates · <kbd class="kbd">Enter</kbd> to interact
+		<!-- TUI tour -->
+		<section id="tour" class="tour-section">
+			<div class="container">
+				<div class="section-header">
+					<div class="section-tag"><span class="lang-en">The terminal UI</span><span class="lang-de">Die Terminal-UI</span></div>
+					<h2 class="section-title"><span class="lang-en">Take the tour</span><span class="lang-de">Die Tour</span></h2>
+					<p class="section-subtitle"><span class="lang-en">These are real screens of postctl (with made-up demo data), rendered straight from the app. Mouse and keyboard both work.</span><span class="lang-de">Das sind echte Ansichten von postctl (mit erfundenen Demo-Daten), direkt aus der App gerendert. Maus und Tastatur funktionieren beide.</span></p>
 				</div>
+				<div class="tour-tabs" role="tablist"><button class="tour-tab active" data-tour="dashboard"><span class="lang-en">Dashboard</span><span class="lang-de">Dashboard</span></button><button class="tour-tab" data-tour="posts"><span class="lang-en">Posts</span><span class="lang-de">Posts</span></button><button class="tour-tab" data-tour="editor"><span class="lang-en">Editor</span><span class="lang-de">Editor</span></button><button class="tour-tab" data-tour="calendar"><span class="lang-en">Calendar</span><span class="lang-de">Kalender</span></button><button class="tour-tab" data-tour="schedule"><span class="lang-en">Queue</span><span class="lang-de">Queue</span></button><button class="tour-tab" data-tour="history"><span class="lang-en">History</span><span class="lang-de">Verlauf</span></button><button class="tour-tab" data-tour="settings"><span class="lang-en">Settings</span><span class="lang-de">Einstellungen</span></button></div>
+				<div class="tour-panels"><div class="tour-panel active" id="tour-dashboard">
+						<div class="mock-window"><div class="mock-chrome"><span class="tui-dot tui-dot-red"></span><span class="tui-dot tui-dot-yellow"></span><span class="tui-dot tui-dot-green"></span><span class="mock-title">postctl — dashboard</span></div>
+						<pre class="mock-pre" set:html={mockDashboard}></pre></div>
+						<p class="tour-caption"><span class="lang-en">Campaign progress, the next posts, platform health and token expiry at a glance.</span><span class="lang-de">Kampagnenfortschritt, nächste Posts, Plattform-Status und Token-Ablauf auf einen Blick.</span></p>
+					</div><div class="tour-panel" id="tour-posts">
+						<div class="mock-window"><div class="mock-chrome"><span class="tui-dot tui-dot-red"></span><span class="tui-dot tui-dot-yellow"></span><span class="tui-dot tui-dot-green"></span><span class="mock-title">postctl — posts</span></div>
+						<pre class="mock-pre" set:html={mockPosts}></pre></div>
+						<p class="tour-caption"><span class="lang-en">Filter, search with /, select several posts, publish now or schedule — all from the keyboard.</span><span class="lang-de">Filtern, mit / suchen, mehrere Posts markieren, sofort posten oder planen — komplett per Tastatur.</span></p>
+					</div><div class="tour-panel" id="tour-editor">
+						<div class="mock-window"><div class="mock-chrome"><span class="tui-dot tui-dot-red"></span><span class="tui-dot tui-dot-yellow"></span><span class="tui-dot tui-dot-green"></span><span class="mock-title">postctl — editor</span></div>
+						<pre class="mock-pre" set:html={mockEditor}></pre></div>
+						<p class="tour-caption"><span class="lang-en">Live preview, character counter, alt text per image and one post for several platforms at once.</span><span class="lang-de">Live-Vorschau, Zeichenzähler, Alt-Text pro Bild und ein Post für mehrere Plattformen gleichzeitig.</span></p>
+					</div><div class="tour-panel" id="tour-calendar">
+						<div class="mock-window"><div class="mock-chrome"><span class="tui-dot tui-dot-red"></span><span class="tui-dot tui-dot-yellow"></span><span class="tui-dot tui-dot-green"></span><span class="mock-title">postctl — calendar</span></div>
+						<pre class="mock-pre" set:html={mockCalendar}></pre></div>
+						<p class="tour-caption"><span class="lang-en">Month grid with brand-coloured dots per platform. Click a day to see what goes out.</span><span class="lang-de">Monatsraster mit markenfarbigen Punkten pro Plattform. Ein Klick auf den Tag zeigt, was rausgeht.</span></p>
+					</div><div class="tour-panel" id="tour-schedule">
+						<div class="mock-window"><div class="mock-chrome"><span class="tui-dot tui-dot-red"></span><span class="tui-dot tui-dot-yellow"></span><span class="tui-dot tui-dot-green"></span><span class="mock-title">postctl — queue</span></div>
+						<pre class="mock-pre" set:html={mockSchedule}></pre></div>
+						<p class="tour-caption"><span class="lang-en">The publishing queue with the scheduler status and the next check.</span><span class="lang-de">Die Veröffentlichungs-Queue mit Scheduler-Status und nächstem Check.</span></p>
+					</div><div class="tour-panel" id="tour-history">
+						<div class="mock-window"><div class="mock-chrome"><span class="tui-dot tui-dot-red"></span><span class="tui-dot tui-dot-yellow"></span><span class="tui-dot tui-dot-green"></span><span class="mock-title">postctl — history</span></div>
+						<pre class="mock-pre" set:html={mockHistory}></pre></div>
+						<p class="tour-caption"><span class="lang-en">Every publish with platform ID and error text — plus re-publish and details.</span><span class="lang-de">Jede Veröffentlichung mit Plattform-ID und Fehlertext — samt Details.</span></p>
+					</div><div class="tour-panel" id="tour-settings">
+						<div class="mock-window"><div class="mock-chrome"><span class="tui-dot tui-dot-red"></span><span class="tui-dot tui-dot-yellow"></span><span class="tui-dot tui-dot-green"></span><span class="mock-title">postctl — settings</span></div>
+						<pre class="mock-pre" set:html={mockSettings}></pre></div>
+						<p class="tour-caption"><span class="lang-en">Connect platforms, install the scheduler service, switch the colour theme live.</span><span class="lang-de">Plattformen verbinden, Scheduler-Dienst installieren, Farbschema live umschalten.</span></p>
+					</div></div>
 			</div>
 		</section>
 
@@ -553,22 +311,76 @@ Campaign successfully posted!
 		</section>
 
 
-		<section id="screenshots" class="screenshot-section">
+		<section id="profiles" class="profiles-section">
 			<div class="container">
 				<div class="section-header">
-					<div class="section-tag"><span class="lang-en">Visual Tour</span><span class="lang-de">Visuelle Tour</span></div>
-					<h2 class="section-title"><span class="lang-en">Terminal UI Preview</span><span class="lang-de">Terminal-UI-Vorschau</span></h2>
-					<p class="section-subtitle"><span class="lang-en">Real screenshots of the Bubbletea TUI — Dashboard, Posts, Schedule & Settings tabs running in your terminal.</span><span class="lang-de">Echte Screenshots der Bubbletea-TUI — Dashboard-, Posts-, Zeitplan- & Einstellungen-Tabs live in deinem Terminal.</span></p>
+					<div class="section-tag"><span class="lang-en">Accounts & automation</span><span class="lang-de">Konten & Automatik</span></div>
+					<h2 class="section-title"><span class="lang-en">Separate accounts, one scheduler per profile</span><span class="lang-de">Getrennte Konten, ein Scheduler pro Profil</span></h2>
+					<p class="section-subtitle"><span class="lang-en">Work, private, a client — each profile has its own credentials, database and background service.</span><span class="lang-de">Arbeit, privat, ein Kunde — jedes Profil hat eigene Zugangsdaten, Datenbank und einen eigenen Hintergrunddienst.</span></p>
 				</div>
-				<ScreenshotCarousel />
-				<div class="screenshot-hint">
-					<span class="lang-en">← → arrow keys to navigate</span><span class="lang-de">← → Pfeiltasten zum Navigieren</span>
-					<span class="hint-dot"></span>
-					<span>click thumbnails to jump</span>
+				<div class="info-grid">
+					<div class="info-card"><div class="info-icon">👤</div><h3><span class="lang-en">Profiles</span><span class="lang-de">Profile</span></h3><p><span class="lang-en"><code>postctl profile create work</code>, then <code>--profile work</code> on any command or press <kbd class='kbd'>P</kbd> in the TUI. Credentials never mix.</span><span class="lang-de"><code>postctl profile create work</code>, dann <code>--profile work</code> bei jedem Befehl oder <kbd class='kbd'>P</kbd> in der TUI. Zugangsdaten vermischen sich nie.</span></p></div>
+					<div class="info-card"><div class="info-icon">⏱</div><h3><span class="lang-en">Scheduler service</span><span class="lang-de">Scheduler-Dienst</span></h3><p><span class="lang-en"><code>postctl --profile work daemon install</code> sets up a launchd agent. Posts go out on time even when the TUI is closed — or open.</span><span class="lang-de"><code>postctl --profile work daemon install</code> richtet einen launchd-Dienst ein. Posts gehen pünktlich raus, auch wenn die TUI zu — oder offen — ist.</span></p></div>
+					<div class="info-card"><div class="info-icon">🛡</div><h3><span class="lang-en">Profile guard</span><span class="lang-de">Profil-Schutz</span></h3><p><span class="lang-en">A coloured profile chip, and a confirmation before you publish by hand, so a post never lands on the wrong account.</span><span class="lang-de">Ein farbiger Profil-Chip und eine Rückfrage vor dem manuellen Posten, damit nie ein Post auf dem falschen Konto landet.</span></p></div>
+					<div class="info-card"><div class="info-icon">📈</div><h3><span class="lang-en">Health at a glance</span><span class="lang-de">Gesundheit im Blick</span></h3><p><span class="lang-en">Token expiry, scheduler state, overdue and failed posts show up on the dashboard before they become a problem.</span><span class="lang-de">Token-Ablauf, Scheduler-Status, überfällige und fehlgeschlagene Posts erscheinen im Dashboard, bevor sie zum Problem werden.</span></p></div>
 				</div>
 			</div>
 		</section>
-<!-- AI Operator workflow section (NEW) -->
+
+		<section id="markdown" class="markdown-section">
+			<div class="container">
+				<div class="section-header">
+					<div class="section-tag"><span class="lang-en">Markdown-first</span><span class="lang-de">Markdown-first</span></div>
+					<h2 class="section-title"><span class="lang-en">Posts are just files</span><span class="lang-de">Posts sind einfach Dateien</span></h2>
+					<p class="section-subtitle"><span class="lang-en">Write in your editor, keep it in git, import in one command. Carousels, stories and alt text are a few lines of frontmatter.</span><span class="lang-de">Im Editor schreiben, in git ablegen, mit einem Befehl importieren. Carousels, Stories und Alt-Text sind ein paar Zeilen Frontmatter.</span></p>
+				</div>
+				<div class="md-grid">
+<pre class="md-code"><code>{`---
+platform: instagram
+type: single            # single | story
+campaign: summer-launch
+schedule: 2026-10-23 17:30
+images:
+  - https://example.com/dish-1.png
+  - https://example.com/dish-2.png   # 2+ images = carousel
+alt:
+  - "Seared fish on a green plate"
+  - "Lemon tart with thyme"
+---
+The new menu, dish by dish. Swipe →
+
+#summermenu #local`}</code></pre>
+<pre class="md-code"><code>{`$ postctl --profile work import ./posts
+✔ 4 posts imported (2 Instagram, 1 Threads, 1 X)
+
+$ postctl --profile work daemon status
+● running (com.abteilung83.postctl.work)
+
+$ postctl --profile work list --status scheduled
+ scheduled for 23.10. 17:30  INSTAGRAM  "Summer Menu"
+ scheduled for 23.10. 18:00  THREADS    "Summer Menu"`}</code></pre>
+				</div>
+			</div>
+		</section>
+
+		<section id="safety" class="safety-section">
+			<div class="container">
+				<div class="section-header">
+					<div class="section-tag"><span class="lang-en">Built to protect your accounts</span><span class="lang-de">Gebaut, um deine Konten zu schützen</span></div>
+					<h2 class="section-title"><span class="lang-en">Safe by default</span><span class="lang-de">Sicher als Standard</span></h2>
+					<p class="section-subtitle"><span class="lang-en">Social networks punish bot-like behaviour. postctl paces itself.</span><span class="lang-de">Soziale Netzwerke bestrafen bot-artiges Verhalten. postctl bremst sich selbst.</span></p>
+				</div>
+				<div class="info-grid">
+					<div class="info-card"><div class="info-icon">🕒</div><h3><span class="lang-en">Spread, don't burst</span><span class="lang-de">Verteilen statt Burst</span></h3><p><span class="lang-en">If several posts are overdue (laptop was asleep), only the oldest goes out at once — the rest follow in 20-minute steps.</span><span class="lang-de">Sind mehrere Posts überfällig (der Laptop schlief), geht nur der älteste sofort raus — die übrigen folgen im 20-Minuten-Takt.</span></p></div>
+					<div class="info-card"><div class="info-icon">✋</div><h3><span class="lang-en">60 minutes on X</span><span class="lang-de">60 Minuten bei X</span></h3><p><span class="lang-en">At least an hour between two X posts. A post that comes due earlier simply waits for a later check.</span><span class="lang-de">Zwischen zwei X-Posts liegt mindestens eine Stunde. Ein früher fälliger Post wartet einfach auf einen späteren Check.</span></p></div>
+					<div class="info-card"><div class="info-icon">1️⃣</div><h3><span class="lang-en">Never twice</span><span class="lang-de">Nie doppelt</span></h3><p><span class="lang-en">Every post is claimed atomically before publishing, so two processes or machines can't send it twice.</span><span class="lang-de">Jeder Post wird vor dem Veröffentlichen atomar reserviert — zwei Prozesse oder Rechner können ihn nicht doppelt senden.</span></p></div>
+					<div class="info-card"><div class="info-icon">🗑</div><h3><span class="lang-en">Real deletion</span><span class="lang-de">Echtes Löschen</span></h3><p><span class="lang-en">Deleting a post locally removes it on Facebook, Threads, LinkedIn, X, Bluesky, Mastodon, Telegram and Discord too.</span><span class="lang-de">Lokales Löschen entfernt den Post auch auf Facebook, Threads, LinkedIn, X, Bluesky, Mastodon, Telegram und Discord.</span></p></div>
+				</div>
+				<p class="suite-note"><span class="lang-en">postctl is part of the <a href="https://missionctl.sh" target="_blank" rel="noopener">missionctl</a> suite — the missionctl dashboard shows your next posts and queue health on its own card, and the MCP server lets AI assistants draft and schedule.</span><span class="lang-de">postctl gehört zur <a href="https://missionctl.sh" target="_blank" rel="noopener">missionctl</a>-Suite — das missionctl-Dashboard zeigt nächste Posts und Queue-Zustand auf einer eigenen Karte, und der MCP-Server lässt KI-Assistenten Posts entwerfen und planen.</span></p>
+			</div>
+		</section>
+
+		<!-- AI Operator workflow section (NEW) -->
 		<section id="ai-operator" class="ai-operator-section">
 			<div class="container">
 				<div class="section-header">
@@ -675,22 +487,9 @@ Campaign successfully posted!
 				</div>
 
 				<div class="roadmap-grid">
-					<!-- Phase 1 -->
-					<div class="roadmap-card">
-						<div class="roadmap-badge next">Q3 2026</div>
-						<h3 class="roadmap-title">
-							<span class="lang-en">AI Repurposer (`postctl repurpose`)</span>
-							<span class="lang-de">KI-Beitragsumwandlung (`postctl repurpose`)</span>
-						</h3>
-						<p class="roadmap-desc">
-							<span class="lang-en">Convert long technical blog posts or Git release notes automatically into formatted platform-specific updates and threads using integrated LLMs.</span>
-							<span class="lang-de">Verwandle lange Blogposts oder Release Notes automatisch in plattformgerechte Beiträge und Threads mit integrierten LLMs.</span>
-						</p>
-					</div>
-
 					<!-- Phase 2 -->
 					<div class="roadmap-card">
-						<div class="roadmap-badge next">Q3 2026</div>
+						<div class="roadmap-badge future">Planned</div>
 						<h3 class="roadmap-title">
 							<span class="lang-en">Git Hook Integration & Autopost</span>
 							<span class="lang-de">Git-Hook-Integration & Autopost</span>
@@ -701,22 +500,9 @@ Campaign successfully posted!
 						</p>
 					</div>
 
-					<!-- Phase 3 -->
-					<div class="roadmap-card">
-						<div class="roadmap-badge future">Q4 2026</div>
-						<h3 class="roadmap-title">
-							<span class="lang-en">Terminal Analytics Dashboard</span>
-							<span class="lang-de">Terminal-Statistik-Dashboard</span>
-						</h3>
-						<p class="roadmap-desc">
-							<span class="lang-en">Inspect engagement, impressions, and click rates directly in the Bubbletea TUI, or pull metrics as structured JSON for your AI agents.</span>
-							<span class="lang-de">Überwache Interaktionen, Impressionen und Klickraten direkt in der Bubbletea TUI oder exportiere Metriken als JSON für deine KI-Agenten.</span>
-						</p>
-					</div>
-
 					<!-- Phase 4 -->
 					<div class="roadmap-card">
-						<div class="roadmap-badge future">Q4 2026</div>
+						<div class="roadmap-badge future">Planned</div>
 						<h3 class="roadmap-title">
 							<span class="lang-en">Code-Snippet Social Cards</span>
 							<span class="lang-de">Code-Snippet Social Cards</span>
@@ -2922,224 +2708,51 @@ Campaign successfully posted!
 	.back-to-top:active {
 		transform: translateY(-1px) scale(1.02);
 	}
+
+
+	/* ── Mockups, channels, tour, info cards ─────────────────── */
+	.mock-window { container-type: inline-size; background: #11111b; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+	.mock-chrome { display: flex; align-items: center; gap: 6px; padding: .55rem .8rem; background: #181825; border-bottom: 1px solid var(--border); }
+	.mock-title { margin-left: .6rem; font-family: var(--font-mono); font-size: .72rem; color: rgba(255,255,255,.4); }
+	.mock-pre { margin: 0; padding: .9rem 1rem 1.1rem; overflow-x: auto; background: #11111b; color: #cdd6f4; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: clamp(5px, 1.3cqw, 12px); line-height: 1.32; white-space: pre; }
+	.mock-pre-hero { overflow: hidden; }
+	.mock-window.hero-terminal { max-width: 100%; }
+	.channels-section, .tour-section, .profiles-section, .markdown-section, .safety-section { padding: 6rem 0; }
+	.matrix-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-secondary); }
+	.matrix { width: 100%; border-collapse: collapse; font-size: .92rem; }
+	.matrix th, .matrix td { padding: .85rem 1rem; text-align: center; border-bottom: 1px solid var(--border); }
+	.matrix tbody th { text-align: left; font-weight: 600; color: var(--text-primary, #e2e8f0); white-space: nowrap; }
+	.matrix thead th { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+	.matrix tr:last-child th, .matrix tr:last-child td { border-bottom: none; }
+	.matrix .ok { color: #a6e3a1; font-weight: 700; } .matrix .no { color: rgba(255,255,255,.2); }
+	.matrix-note, .suite-note { text-align: center; margin-top: 1rem; font-size: .82rem; color: rgba(255,255,255,.45); }
+	.suite-note { margin-top: 2.5rem; font-size: .95rem; } .suite-note :global(a) { color: var(--accent); }
+	.tour-tabs { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; margin-bottom: 1.5rem; }
+	.tour-tab { background: var(--bg-secondary); border: 1px solid var(--border); color: rgba(255,255,255,.65); padding: .5rem 1rem; border-radius: 999px; font-family: var(--font-mono); font-size: .78rem; cursor: pointer; transition: var(--transition); }
+	.tour-tab:hover { border-color: var(--accent); color: #fff; }
+	.tour-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+	.tour-panel { display: none; max-width: 980px; margin: 0 auto; }
+	.tour-panel.active { display: block; }
+	.tour-caption { text-align: center; margin-top: 1rem; color: rgba(255,255,255,.6); font-size: .95rem; }
+	.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
+	.info-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; transition: var(--transition); }
+	.info-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+	.info-icon { font-size: 1.6rem; margin-bottom: .75rem; }
+	.info-card h3 { font-size: 1.05rem; margin: 0 0 .5rem; }
+	.info-card p { margin: 0; color: rgba(255,255,255,.65); font-size: .92rem; line-height: 1.55; }
+	.md-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; }
+	.md-code { margin: 0; padding: 1.25rem 1.4rem; background: #11111b; border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .8rem; line-height: 1.5; color: #cdd6f4; }
 </style>
 
 <script>
-	// Terminal typing simulation
-	const commands = [
-		{ text: "postctl import ./posts", output: "Importing posts from ./posts...\n✔ post-1.md -> Loaded successfully (5 tweets, 2 images)\n✔ post-2.md -> Loaded successfully (Single post)\n✔ post-3.md -> Loaded successfully (Single post)\n\nImport complete. 3 draft posts saved to SQLite store." },
-		{ text: "postctl campaign post launch-v1 --dry-run", output: "[DRY RUN] Validating campaign 'launch-v1'...\n✔ Character validation passed (all segments < 280 chars)\n✔ Local image paths exist\n\n[DRY RUN] Posting 'launch-v1-twitter' to Twitter... Success (ID: MockTweetId)\n[DRY RUN] Posting 'launch-v1-linkedin' to LinkedIn... Success (ID: MockLinkedInId)\n\nSimulated run complete. No write actions performed." }
-	];
-
-	let commandIndex = 0;
-	let charIndex = 0;
-	const typingSpeed = 60;
-	const delayBetweenCommands = 5000;
-
-	const typedTextEl = document.querySelector("#typing-terminal .typed-text");
-	const outputEl = document.querySelector("#typing-terminal .terminal-output");
-
-	function typeCommand() {
-		if (!typedTextEl || !outputEl) return;
-		const currentCommand = commands[commandIndex];
-
-		if (charIndex < currentCommand.text.length) {
-			typedTextEl.textContent += currentCommand.text.charAt(charIndex);
-			charIndex++;
-			setTimeout(typeCommand, typingSpeed);
-		} else {
-			// Done typing, show output
-			outputEl.textContent = currentCommand.output;
-			outputEl.classList.remove("hide");
-
-			// Prepare next command
-			setTimeout(() => {
-				charIndex = 0;
-				commandIndex = (commandIndex + 1) % commands.length;
-				typedTextEl.textContent = "";
-				outputEl.classList.add("hide");
-				outputEl.textContent = "";
-				setTimeout(typeCommand, 1000);
-			}, delayBetweenCommands);
-		}
-	}
-
-	// ── Interactive TUI Demo ──────────────────────────────────
-	const tuiWindow = document.getElementById('tui-window');
-	const tuiTabBtns = document.querySelectorAll('.tui-tab-btn');
-	const tuiPanels = document.querySelectorAll('.tui-panel');
-
-	const tabOrder = ['dashboard', 'posts', 'schedule', 'history', 'settings'];
-	let currentTab = 0;
-	let isPromptActive = false;
-	let promptCursor = 0;
-
-	function switchTab(idx: number) {
-		currentTab = (idx + tabOrder.length) % tabOrder.length;
-		const tabName = tabOrder[currentTab];
-		tuiTabBtns.forEach((b, i) => b.classList.toggle('active', i === currentTab));
-		tuiPanels.forEach(p => p.classList.toggle('active', p.id === `panel-${tabName}`));
-	}
-
-	tuiTabBtns.forEach((btn, i) => {
-		btn.addEventListener('click', () => switchTab(i));
-	});
-
-	// Keyboard navigation when window is focused
-	tuiWindow?.addEventListener('keydown', (e) => {
-		const key = (e as KeyboardEvent).key;
-		
-		if (isPromptActive) {
-			e.preventDefault();
-			if (key === 'Escape') {
-				closeTwitterPrompt();
-			} else if (key === 'ArrowUp' || key === 'ArrowDown') {
-				movePromptCursor(key === 'ArrowDown' ? 1 : -1);
-			} else if (key === 'Enter') {
-				confirmTwitterPrompt();
-			}
-			return;
-		}
-
-		if (key === 'Tab') {
-			e.preventDefault();
-			switchTab(currentTab + ((e as KeyboardEvent).shiftKey ? -1 : 1));
-		} else if (key === 'ArrowLeft') {
-			e.preventDefault(); switchTab(currentTab - 1);
-		} else if (key === 'ArrowRight') {
-			e.preventDefault(); switchTab(currentTab + 1);
-		} else if (key === 'ArrowUp' || key === 'ArrowDown') {
-			e.preventDefault();
-			moveRowCursor(key === 'ArrowDown' ? 1 : -1);
-		} else if (key === 'Enter') {
-			e.preventDefault();
-			handleEnter();
-		}
-	});
-
-	// Click the window to focus it
-	tuiWindow?.addEventListener('click', () => tuiWindow.focus());
-
-	// Row cursor movement per panel
-	const panelCursors: Record<string, number> = {
-		dashboard: 0, posts: 0, schedule: 0, history: 2, settings: 0
-	};
-
-	function getSelectableRows(panelId: string): NodeListOf<Element> {
-		const panel = document.getElementById(`panel-${panelId}`);
-		return panel?.querySelectorAll('.tui-campaign-item[class*="tui-row-sel"], .tui-post-item, .tui-hist-row, .tui-set-row') 
-			?? document.querySelectorAll('.__none__');
-	}
-
-	function moveRowCursor(delta: number) {
-		const tab = tabOrder[currentTab];
-		const panel = document.getElementById(`panel-${tab}`);
-		if (!panel) return;
-
-		// Get navigable items
-		let items: NodeListOf<Element> | null = null;
-		if (tab === 'dashboard') items = panel.querySelectorAll('.tui-campaign-item');
-		else if (tab === 'posts') items = panel.querySelectorAll('.tui-post-item');
-		else if (tab === 'schedule') items = panel.querySelectorAll('.tui-sch-item');
-		else if (tab === 'history') items = panel.querySelectorAll('.tui-hist-row');
-		else if (tab === 'settings') items = panel.querySelectorAll('.tui-set-row');
-		else return;
-
-		if (!items || items.length === 0) return;
-
-		// Remove current selection
-		items.forEach(item => {
-			item.classList.remove('tui-row-sel');
-			const arr = item.querySelector('.tui-arr');
-			if (arr) arr.classList.add('tui-arr-h');
-		});
-
-		panelCursors[tab] = Math.max(0, Math.min(items.length - 1, panelCursors[tab] + delta));
-		const selected = items[panelCursors[tab]];
-		selected.classList.add('tui-row-sel');
-		const arr = selected.querySelector('.tui-arr');
-		if (arr) arr.classList.remove('tui-arr-h');
-	}
-
-	function openTwitterPrompt() {
-		const prompt = document.getElementById('twitter-prompt');
-		if (prompt) {
-			prompt.style.display = 'block';
-			isPromptActive = true;
-			promptCursor = 0;
-			updatePromptUI();
-		}
-	}
-
-	function closeTwitterPrompt() {
-		const prompt = document.getElementById('twitter-prompt');
-		if (prompt) {
-			prompt.style.display = 'none';
-			isPromptActive = false;
-		}
-	}
-
-	function movePromptCursor(delta: number) {
-		promptCursor = (promptCursor + delta + 2) % 2;
-		updatePromptUI();
-	}
-
-	function updatePromptUI() {
-		const opts = document.querySelectorAll('#twitter-prompt .tui-prompt-opt');
-		opts.forEach((opt, idx) => {
-			const arr = opt.querySelector('.tui-arr');
-			if (idx === promptCursor) {
-				opt.classList.add('tui-row-sel');
-				opt.setAttribute('style', 'color: #00f5d4; font-weight: bold; cursor: pointer; padding: 0.1rem 0.4rem; border-radius: 2px;');
-				arr?.classList.remove('tui-arr-h');
-			} else {
-				opt.classList.remove('tui-row-sel');
-				opt.setAttribute('style', 'color: #ecc94b; cursor: pointer; padding: 0.1rem 0.4rem; border-radius: 2px;');
-				arr?.classList.add('tui-arr-h');
-			}
-		});
-	}
-
-	function confirmTwitterPrompt() {
-		const twitterVal = document.getElementById('twitter-val');
-		if (twitterVal) {
-			if (promptCursor === 0) {
-				twitterVal.textContent = 'Connected (API) ✓';
-				twitterVal.className = 'tui-sval val-green';
-			} else {
-				twitterVal.textContent = 'Connected (Cookie) ✓';
-				twitterVal.className = 'tui-sval val-cyan';
-			}
-		}
-		closeTwitterPrompt();
-	}
-
-	function handleEnter() {
-		const tab = tabOrder[currentTab];
-		if (tab === 'settings') {
-			if (panelCursors.settings === 2) {
-				// Toggle dry run
-				const dryrunVal = document.getElementById('dryrun-val');
-				if (dryrunVal) {
-					const isDry = dryrunVal.textContent === 'true';
-					dryrunVal.textContent = isDry ? 'false' : 'true';
-					dryrunVal.className = isDry ? 'tui-sval tui-warn' : 'tui-sval tui-ok';
-				}
-			} else if (panelCursors.settings === 5) {
-				openTwitterPrompt();
-			}
-		}
-	}
-
-	// Daemon counter countdown on schedule tab
-	let daemonCount = 28;
-	setInterval(() => {
-		const el = document.getElementById('daemon-counter');
-		if (el) {
-			daemonCount = daemonCount <= 1 ? 30 : daemonCount - 1;
-			el.textContent = String(daemonCount);
-		}
-	}, 1000);
+	// TUI tour tabs
+	const tourTabs = document.querySelectorAll<HTMLElement>('.tour-tab');
+	const tourPanels = document.querySelectorAll<HTMLElement>('.tour-panel');
+	tourTabs.forEach((btn) => btn.addEventListener('click', () => {
+		const id = btn.dataset.tour;
+		tourTabs.forEach((b) => b.classList.toggle('active', b === btn));
+		tourPanels.forEach((p) => p.classList.toggle('active', p.id === `tour-${id}`));
+	}));
 
 	// ── Back to top ──────────────────────────────────────────
 	const backToTopBtn = document.getElementById('back-to-top');
