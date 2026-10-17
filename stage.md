@@ -105,3 +105,14 @@ Built and pushed both branches (`deploy/landing-src` then `deploy/landing` via
 this setup** — confirmed by checking `Last-Modified` on the live response after pushing; it
 stayed on the pre-fix timestamp until a manual pull was triggered on the server. Don't assume a
 push alone means it's live — say so explicitly and remind whoever's driving to trigger the pull.
+
+
+---
+
+## 2026-10-17 — One language per page (hreflang), self-hosted fonts, 404
+
+- **Authoring is unchanged:** keep writing `<span class="lang-en">…</span><span class="lang-de">…</span>` (or any element with those classes). `src/layouts/Layout.astro` renders the page, then `src/lib/i18n.ts` cuts it to one language, so `/` is English and `/de/…` German — separate documents with their own `<html lang>`, canonical, hreflang and sitemap alternates.
+- **New page?** Add `src/pages/foo.astro`, plus a wrapper `src/pages/de/foo.astro` (`import Page from '../foo.astro'; <Page />`). Pass `titleDe`/`descriptionDe` to `<Layout>`.
+- **Language switch** is a plain link: `<a id="lang-toggle" href="__ALT_LANG_URL__">` (the placeholder is replaced per page). Internal links in German pages (`/`, `/docs`, `/impressum`, `/datenschutz`) are prefixed with `/de/` automatically.
+- Fonts (Inter, Space Grotesk, Fira Code, latin subset) are self-hosted via `@fontsource/*`; no Google Fonts request.
+- `src/pages/404.astro` is bilingual and `noindex`; point the web server's error page at `/404.html`.

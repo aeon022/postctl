@@ -1,23 +1,57 @@
 ---
+import { langOf, localize, altPath } from '../lib/i18n';
+import interRegular from '@fontsource/inter/files/inter-latin-400-normal.woff2?url';
+import grotesk700 from '@fontsource/space-grotesk/files/space-grotesk-latin-700-normal.woff2?url';
+import '@fontsource/inter/latin-300.css';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-500.css';
+import '@fontsource/inter/latin-600.css';
+import '@fontsource/inter/latin-700.css';
+import '@fontsource/space-grotesk/latin-400.css';
+import '@fontsource/space-grotesk/latin-500.css';
+import '@fontsource/space-grotesk/latin-600.css';
+import '@fontsource/space-grotesk/latin-700.css';
+import '@fontsource/fira-code/latin-400.css';
+import '@fontsource/fira-code/latin-500.css';
+
 interface Props {
 	title?: string;
 	description?: string;
+	titleDe?: string;
+	descriptionDe?: string;
+	noindex?: boolean;
 }
 
-const { 
-	title = "postctl — Social Media Management from your Terminal", 
-	description = "Terminal-native, Markdown-first social media scheduler. Publish to Instagram, Facebook, Threads, X, LinkedIn, Bluesky and Mastodon from CLI or TUI. Local, no cloud." 
+const lang = langOf(Astro.url.pathname);
+const {
+	title: titleEn = "postctl — Social Media Management from your Terminal",
+	description: descEn = "Terminal-native, Markdown-first social media scheduler. Publish to Instagram, Facebook, Threads, X, LinkedIn, Bluesky and Mastodon from CLI or TUI. Local, no cloud.",
+	titleDe = "postctl — Social-Media-Management im Terminal",
+	descriptionDe = "Terminal-nativer, Markdown-basierter Social-Media-Scheduler. Veröffentliche auf Instagram, Facebook, Threads, X, LinkedIn, Bluesky und Mastodon per CLI oder TUI. Lokal, ohne Cloud.",
+	noindex = false,
 } = Astro.props;
+const title = lang === 'de' ? titleDe : titleEn;
+const description = lang === 'de' ? descriptionDe : descEn;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url.origin).href;
-const ogImageURL = new URL('/og-image.png', Astro.site || Astro.url.origin).href;
+const site = Astro.site || Astro.url.origin;
+const path = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : Astro.url.pathname + '/';
+const canonicalURL = new URL(path, site).href;
+const alt = altPath(path);
+const enURL = new URL(lang === 'en' ? path : alt, site).href;
+const deURL = new URL(lang === 'de' ? path : alt, site).href;
+const ogImageURL = new URL('/og-image.png', site).href;
+
+// One language per document: the page body is rendered, then cut to the active language.
+const body = localize(await Astro.slots.render('default'), lang, path);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="preload" as="font" type="font/woff2" href={interRegular} crossorigin />
+		<link rel="preload" as="font" type="font/woff2" href={grotesk700} crossorigin />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
 		<link rel="apple-touch-icon" href="/appicon_512.jpg" />
 		<meta name="theme-color" content="#08090b" />
@@ -27,7 +61,10 @@ const ogImageURL = new URL('/og-image.png', Astro.site || Astro.url.origin).href
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonicalURL} />
-		<meta name="robots" content="index, follow" />
+		<meta name="robots" content={noindex ? "noindex, follow" : "index, follow"} />
+		<link rel="alternate" hreflang="en" href={enURL} />
+		<link rel="alternate" hreflang="de" href={deURL} />
+		<link rel="alternate" hreflang="x-default" href={enURL} />
 		
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="website" />
@@ -36,8 +73,8 @@ const ogImageURL = new URL('/og-image.png', Astro.site || Astro.url.origin).href
 		<meta property="og:description" content={description} />
 		<meta property="og:image" content={ogImageURL} />
 		<meta property="og:site_name" content="postctl" />
-		<meta property="og:locale" content="en_US" />
-		<meta property="og:locale:alternate" content="de_DE" />
+		<meta property="og:locale" content={lang === "de" ? "de_DE" : "en_US"} />
+		<meta property="og:locale:alternate" content={lang === "de" ? "en_US" : "de_DE"} />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
 		<meta property="og:image:alt" content="postctl terminal UI: dashboard with campaigns, next posts and platform status" />
@@ -61,7 +98,8 @@ const ogImageURL = new URL('/og-image.png', Astro.site || Astro.url.origin).href
 				"price": "0",
 				"priceCurrency": "USD"
 			},
-			"description": "A terminal-native, Markdown-first social media scheduler and publisher for Instagram, Facebook, Threads, X, LinkedIn, Bluesky and Mastodon — CLI and TUI, local data, scheduler service, multiple profiles.",
+			"inLanguage": lang,
+			"description": lang === "de" ? "Terminal-nativer, Markdown-basierter Social-Media-Scheduler für Instagram, Facebook, Threads, X, LinkedIn, Bluesky und Mastodon — CLI und TUI, lokale Daten, Scheduler-Dienst, mehrere Profile." : "A terminal-native, Markdown-first social media scheduler and publisher for Instagram, Facebook, Threads, X, LinkedIn, Bluesky and Mastodon — CLI and TUI, local data, scheduler service, multiple profiles.",
 			"url": "https://postctl.sh",
 			"image": "https://postctl.sh/og-image.png",
 			"featureList": ["Instagram feed, carousel and story posts", "Facebook page and Threads posts with alt text", "Multiple profiles with one scheduler service each", "Markdown frontmatter import", "Built-in safeguards against account bans", "Remote deletion", "MCP server for AI assistants"],
@@ -71,13 +109,9 @@ const ogImageURL = new URL('/og-image.png', Astro.site || Astro.url.origin).href
 			}
 		})} />
 
-		<!-- Google Fonts -->
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 	</head>
 	<body>
-		<slot />
+		<Fragment set:html={body} />
 	</body>
 </html>
 

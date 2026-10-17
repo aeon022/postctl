@@ -1,10 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import FooterSignature from '../components/FooterSignature.astro';
-import LangToggle from '../components/LangToggle.astro';
 ---
 
-<Layout title="Impressum — postctl">
+<Layout title="Impressum — postctl" titleDe="Impressum — postctl">
   <!-- Background Glows -->
   <div class="bg-glow bg-glow-1"></div>
   <div class="bg-glow bg-glow-2"></div>
@@ -18,10 +17,10 @@ import LangToggle from '../components/LangToggle.astro';
     </a>
     <div class="tui-page-header-right">
       <a href="/" class="back-link"><span class="lang-en">← Back to Home</span><span class="lang-de">← Zurück zur Startseite</span></a>
-      <button id="lang-toggle" class="lang-toggle-btn" aria-label="Toggle Language">
+      <a id="lang-toggle" href="__ALT_LANG_URL__" class="lang-toggle-btn" aria-label="Switch language" style="text-decoration:none;display:inline-flex;align-items:center;">
         <span class="lang-en">DE</span>
         <span class="lang-de">EN</span>
-      </button>
+      </a>
     </div>
   </header>
 
@@ -159,8 +158,6 @@ import LangToggle from '../components/LangToggle.astro';
   </main>
 
   <FooterSignature />
-
-  <LangToggle />
 </Layout>
 
 <style>
