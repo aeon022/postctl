@@ -116,6 +116,11 @@ const body = localize(await Astro.slots.render('default'), lang, path);
 </html>
 
 <style is:global>
+
+/* Full JetBrains Mono (OFL) for the TUI mockups: the npm subsets lack box-drawing/block glyphs, so the borders
+   fell back to a system font and broke (gaps between rows). */
+@font-face { font-family: 'JB Mock'; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/JetBrainsMono-Regular.woff2) format('woff2'); }
+@font-face { font-family: 'JB Mock'; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/JetBrainsMono-Bold.woff2) format('woff2'); }
 	/* Cross-page transitions (Chrome/Edge/Safari 18+): fade + slight rise between home and docs */
 	@view-transition { navigation: auto; }
 	::view-transition-old(root) { animation: vt-out .22s ease both; }
