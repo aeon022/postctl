@@ -129,6 +129,10 @@ func (s *SQLiteStore) DeleteToken(ctx context.Context, platform string) error {
 	return nil
 }
 
+// ErrCannotDecrypt means a token exists but none of the known keys opens it (e.g. an older postctl
+// binary or another device without the key file). It is not the same as "not connected".
+var ErrCannotDecrypt = errors.New("cannot decrypt stored token")
+
 // AES-256-GCM token encryption.
 //
 // Key order: POSTCTL_ENCRYPTION_KEY, then the per-installation key file (~/.config/postctl/encryption.key,
@@ -260,7 +264,7 @@ func decrypt(cryptoText string) (string, error) {
 			last = err
 		}
 	}
-	return "", fmt.Errorf("cannot decrypt (wrong or missing encryption key — copy ~/.config/postctl/encryption.key from your other device): %w", last)
+	return "", fmt.Errorf("%w (wrong or missing encryption key — copy ~/.config/postctl/encryption.key from your other device; or an older postctl is still running): %v", ErrCannotDecrypt, last)
 }
 
 // MigrateTokenKey creates the key file (if needed) and re-encrypts every stored token with it.

@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -48,6 +49,14 @@ func PublishPost(ctx context.Context, s *store.SQLiteStore, post *models.Post, d
 
 	// Authentifizierung prüfen (nicht im dry-run)
 	if !dryRun && !plat.IsAuthenticated(ctx) {
+		// A token we cannot decrypt (old binary still running, key file missing here) is not a failed
+		// post: leave it scheduled so a process that has the key publishes it.
+		if _, _, _, gerr := s.GetToken(ctx, post.Platform); errors.Is(gerr, store.ErrCannotDecrypt) {
+			post.Status = models.StatusScheduled
+			_ = s.SavePost(ctx, post)
+			platforms.Log("[SAFETY] Token for %s cannot be decrypted by this process — post %s stays scheduled.", post.Platform, post.ID)
+			return "", gerr
+		}
 		err := fmt.Errorf("not authenticated with %s", post.Platform)
 		post.Status = models.StatusFailed
 		post.Error = err.Error()
