@@ -16,7 +16,14 @@ import {
   Settings, 
   Edit,
   Heart,
-  Cloud
+  Cloud,
+  Users,
+  Timer,
+  Activity,
+  Clock,
+  Hourglass,
+  Fingerprint,
+  Trash2
 } from '@lucide/astro';
 import mockDashboard from '../mockups/dashboard.html?raw';
 import mockPosts from '../mockups/posts.html?raw';
@@ -107,7 +114,7 @@ import LangToggle from '../components/LangToggle.astro';
 				<!-- Real TUI screenshot (generated from the app, fictional demo data) -->
 				<div class="hero-terminal mock-window">
 					<div class="mock-chrome"><span class="tui-dot tui-dot-red"></span><span class="tui-dot tui-dot-yellow"></span><span class="tui-dot tui-dot-green"></span><span class="mock-title">postctl</span></div>
-					<pre class="mock-pre mock-pre-hero" set:html={mockDashboard}></pre>
+					<div class="mock-body"><pre class="mock-pre mock-pre-hero" set:html={mockDashboard}></pre><div class="mock-scan" aria-hidden="true"></div><div class="mock-toast" id="mock-toast" aria-hidden="true"></div></div>
 				</div>
 			</div>
 		</section>
@@ -319,10 +326,10 @@ Campaign successfully posted!
 					<p class="section-subtitle"><span class="lang-en">Work, private, a client — each profile has its own credentials, database and background service.</span><span class="lang-de">Arbeit, privat, ein Kunde — jedes Profil hat eigene Zugangsdaten, Datenbank und einen eigenen Hintergrunddienst.</span></p>
 				</div>
 				<div class="info-grid">
-					<div class="info-card"><div class="info-icon">👤</div><h3><span class="lang-en">Profiles</span><span class="lang-de">Profile</span></h3><p><span class="lang-en"><code>postctl profile create work</code>, then <code>--profile work</code> on any command or press <kbd class='kbd'>P</kbd> in the TUI. Credentials never mix.</span><span class="lang-de"><code>postctl profile create work</code>, dann <code>--profile work</code> bei jedem Befehl oder <kbd class='kbd'>P</kbd> in der TUI. Zugangsdaten vermischen sich nie.</span></p></div>
-					<div class="info-card"><div class="info-icon">⏱</div><h3><span class="lang-en">Scheduler service</span><span class="lang-de">Scheduler-Dienst</span></h3><p><span class="lang-en"><code>postctl --profile work daemon install</code> sets up a launchd agent. Posts go out on time even when the TUI is closed — or open.</span><span class="lang-de"><code>postctl --profile work daemon install</code> richtet einen launchd-Dienst ein. Posts gehen pünktlich raus, auch wenn die TUI zu — oder offen — ist.</span></p></div>
-					<div class="info-card"><div class="info-icon">🛡</div><h3><span class="lang-en">Profile guard</span><span class="lang-de">Profil-Schutz</span></h3><p><span class="lang-en">A coloured profile chip, and a confirmation before you publish by hand, so a post never lands on the wrong account.</span><span class="lang-de">Ein farbiger Profil-Chip und eine Rückfrage vor dem manuellen Posten, damit nie ein Post auf dem falschen Konto landet.</span></p></div>
-					<div class="info-card"><div class="info-icon">📈</div><h3><span class="lang-en">Health at a glance</span><span class="lang-de">Gesundheit im Blick</span></h3><p><span class="lang-en">Token expiry, scheduler state, overdue and failed posts show up on the dashboard before they become a problem.</span><span class="lang-de">Token-Ablauf, Scheduler-Status, überfällige und fehlgeschlagene Posts erscheinen im Dashboard, bevor sie zum Problem werden.</span></p></div>
+					<div class="info-card"><div class="info-icon"><Users size={22} strokeWidth={1.75} /></div><h3><span class="lang-en">Profiles</span><span class="lang-de">Profile</span></h3><p><span class="lang-en"><code>postctl profile create work</code>, then <code>--profile work</code> on any command or press <kbd class='kbd'>P</kbd> in the TUI. Credentials never mix.</span><span class="lang-de"><code>postctl profile create work</code>, dann <code>--profile work</code> bei jedem Befehl oder <kbd class='kbd'>P</kbd> in der TUI. Zugangsdaten vermischen sich nie.</span></p></div>
+					<div class="info-card"><div class="info-icon"><Timer size={22} strokeWidth={1.75} /></div><h3><span class="lang-en">Scheduler service</span><span class="lang-de">Scheduler-Dienst</span></h3><p><span class="lang-en"><code>postctl --profile work daemon install</code> sets up a launchd agent. Posts go out on time even when the TUI is closed — or open.</span><span class="lang-de"><code>postctl --profile work daemon install</code> richtet einen launchd-Dienst ein. Posts gehen pünktlich raus, auch wenn die TUI zu — oder offen — ist.</span></p></div>
+					<div class="info-card"><div class="info-icon"><ShieldCheck size={22} strokeWidth={1.75} /></div><h3><span class="lang-en">Profile guard</span><span class="lang-de">Profil-Schutz</span></h3><p><span class="lang-en">A coloured profile chip, and a confirmation before you publish by hand, so a post never lands on the wrong account.</span><span class="lang-de">Ein farbiger Profil-Chip und eine Rückfrage vor dem manuellen Posten, damit nie ein Post auf dem falschen Konto landet.</span></p></div>
+					<div class="info-card"><div class="info-icon"><Activity size={22} strokeWidth={1.75} /></div><h3><span class="lang-en">Health at a glance</span><span class="lang-de">Gesundheit im Blick</span></h3><p><span class="lang-en">Token expiry, scheduler state, overdue and failed posts show up on the dashboard before they become a problem.</span><span class="lang-de">Token-Ablauf, Scheduler-Status, überfällige und fehlgeschlagene Posts erscheinen im Dashboard, bevor sie zum Problem werden.</span></p></div>
 				</div>
 			</div>
 		</section>
@@ -371,10 +378,10 @@ $ postctl --profile work list --status scheduled
 					<p class="section-subtitle"><span class="lang-en">Social networks punish bot-like behaviour. postctl paces itself.</span><span class="lang-de">Soziale Netzwerke bestrafen bot-artiges Verhalten. postctl bremst sich selbst.</span></p>
 				</div>
 				<div class="info-grid">
-					<div class="info-card"><div class="info-icon">🕒</div><h3><span class="lang-en">Spread, don't burst</span><span class="lang-de">Verteilen statt Burst</span></h3><p><span class="lang-en">If several posts are overdue (laptop was asleep), only the oldest goes out at once — the rest follow in 20-minute steps.</span><span class="lang-de">Sind mehrere Posts überfällig (der Laptop schlief), geht nur der älteste sofort raus — die übrigen folgen im 20-Minuten-Takt.</span></p></div>
-					<div class="info-card"><div class="info-icon">✋</div><h3><span class="lang-en">60 minutes on X</span><span class="lang-de">60 Minuten bei X</span></h3><p><span class="lang-en">At least an hour between two X posts. A post that comes due earlier simply waits for a later check.</span><span class="lang-de">Zwischen zwei X-Posts liegt mindestens eine Stunde. Ein früher fälliger Post wartet einfach auf einen späteren Check.</span></p></div>
-					<div class="info-card"><div class="info-icon">1️⃣</div><h3><span class="lang-en">Never twice</span><span class="lang-de">Nie doppelt</span></h3><p><span class="lang-en">Every post is claimed atomically before publishing, so two processes or machines can't send it twice.</span><span class="lang-de">Jeder Post wird vor dem Veröffentlichen atomar reserviert — zwei Prozesse oder Rechner können ihn nicht doppelt senden.</span></p></div>
-					<div class="info-card"><div class="info-icon">🗑</div><h3><span class="lang-en">Real deletion</span><span class="lang-de">Echtes Löschen</span></h3><p><span class="lang-en">Deleting a post locally removes it on Facebook, Threads, LinkedIn, X, Bluesky, Mastodon, Telegram and Discord too.</span><span class="lang-de">Lokales Löschen entfernt den Post auch auf Facebook, Threads, LinkedIn, X, Bluesky, Mastodon, Telegram und Discord.</span></p></div>
+					<div class="info-card"><div class="info-icon"><Clock size={22} strokeWidth={1.75} /></div><h3><span class="lang-en">Spread, don't burst</span><span class="lang-de">Verteilen statt Burst</span></h3><p><span class="lang-en">If several posts are overdue (laptop was asleep), only the oldest goes out at once — the rest follow in 20-minute steps.</span><span class="lang-de">Sind mehrere Posts überfällig (der Laptop schlief), geht nur der älteste sofort raus — die übrigen folgen im 20-Minuten-Takt.</span></p></div>
+					<div class="info-card"><div class="info-icon"><Hourglass size={22} strokeWidth={1.75} /></div><h3><span class="lang-en">60 minutes on X</span><span class="lang-de">60 Minuten bei X</span></h3><p><span class="lang-en">At least an hour between two X posts. A post that comes due earlier simply waits for a later check.</span><span class="lang-de">Zwischen zwei X-Posts liegt mindestens eine Stunde. Ein früher fälliger Post wartet einfach auf einen späteren Check.</span></p></div>
+					<div class="info-card"><div class="info-icon"><Fingerprint size={22} strokeWidth={1.75} /></div><h3><span class="lang-en">Never twice</span><span class="lang-de">Nie doppelt</span></h3><p><span class="lang-en">Every post is claimed atomically before publishing, so two processes or machines can't send it twice.</span><span class="lang-de">Jeder Post wird vor dem Veröffentlichen atomar reserviert — zwei Prozesse oder Rechner können ihn nicht doppelt senden.</span></p></div>
+					<div class="info-card"><div class="info-icon"><Trash2 size={22} strokeWidth={1.75} /></div><h3><span class="lang-en">Real deletion</span><span class="lang-de">Echtes Löschen</span></h3><p><span class="lang-en">Deleting a post locally removes it on Facebook, Threads, LinkedIn, X, Bluesky, Mastodon, Telegram and Discord too.</span><span class="lang-de">Lokales Löschen entfernt den Post auch auf Facebook, Threads, LinkedIn, X, Bluesky, Mastodon, Telegram und Discord.</span></p></div>
 				</div>
 				<p class="suite-note"><span class="lang-en">postctl is part of the <a href="https://missionctl.sh" target="_blank" rel="noopener">missionctl</a> suite — the missionctl dashboard shows your next posts and queue health on its own card, and the MCP server lets AI assistants draft and schedule.</span><span class="lang-de">postctl gehört zur <a href="https://missionctl.sh" target="_blank" rel="noopener">missionctl</a>-Suite — das missionctl-Dashboard zeigt nächste Posts und Queue-Zustand auf einer eigenen Karte, und der MCP-Server lässt KI-Assistenten Posts entwerfen und planen.</span></p>
 			</div>
@@ -2742,6 +2749,20 @@ $ postctl --profile work list --status scheduled
 	.info-card p { margin: 0; color: rgba(255,255,255,.65); font-size: .92rem; line-height: 1.55; }
 	.md-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; }
 	.md-code { margin: 0; padding: 1.25rem 1.4rem; background: #11111b; border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .8rem; line-height: 1.5; color: #cdd6f4; }
+
+	.info-icon { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 10px; background: rgba(139,124,248,.12); color: var(--accent); margin-bottom: 1rem; font-size: 0; }
+	.mock-body { position: relative; }
+	.mock-scan { position: absolute; left: calc(1rem + 3ch); width: 59ch; height: 1.32em; top: calc(.9rem + 19 * 1.32em); font-size: clamp(5px, 1.3cqw, 12px); background: rgba(139,124,248,.22); border-left: 2px solid var(--accent); border-radius: 2px; pointer-events: none; animation: mock-scan 16s steps(8, jump-none) infinite; }
+	@keyframes mock-scan { from { transform: translateY(0); } to { transform: translateY(calc(7 * 1.32em)); } }
+	.mock-toast { position: absolute; right: 4%; bottom: 7%; max-width: 70%; padding: .45em .8em; background: rgba(24,24,37,.96); border: 1px solid rgba(166,227,161,.45); border-radius: 8px; font-family: var(--font-mono); font-size: clamp(7px, 1.25cqw, 12px); color: #cdd6f4; opacity: 0; transform: translateY(8px); transition: opacity .35s ease, transform .35s ease; box-shadow: 0 8px 28px rgba(0,0,0,.45); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.mock-toast.on { opacity: 1; transform: translateY(0); }
+	.mock-toast :global(.t-ok) { color: #a6e3a1; font-weight: 700; }
+	.bg-glow { will-change: translate; }
+	.bg-glow-1 { animation: glow-drift 22s ease-in-out infinite alternate; }
+	.bg-glow-2 { animation: glow-drift 28s ease-in-out infinite alternate-reverse; }
+	@keyframes glow-drift { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,-30px) scale(1.12); } }
+	.reveal { transition-property: opacity, transform; }
+	@media (prefers-reduced-motion: reduce) { .mock-scan, .bg-glow-1, .bg-glow-2 { animation: none; } .reveal { opacity: 1 !important; transform: none !important; } }
 </style>
 
 <script>
@@ -2753,6 +2774,42 @@ $ postctl --profile work list --status scheduled
 		tourTabs.forEach((b) => b.classList.toggle('active', b === btn));
 		tourPanels.forEach((p) => p.classList.toggle('active', p.id === `tour-${id}`));
 	}));
+
+	// ── Hero motion: toast cycle + soft parallax (skipped for reduced motion) ──
+	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const toast = document.getElementById('mock-toast');
+	if (toast && !reduceMotion) {
+		const msgs = [
+			['Instagram', 'Summer Menu — teaser'],
+			['Threads', 'Summer Menu — teaser'],
+			['X', 'Summer Menu — teaser'],
+			['Facebook', 'Summer Menu — teaser'],
+			['LinkedIn', 'We are hiring a line cook'],
+		];
+		let mi = 0;
+		const showToast = () => {
+			const [pl, ti] = msgs[mi++ % msgs.length];
+			toast.innerHTML = `<span class="t-ok">✓ published</span> <b>${pl}</b> · ${ti}`;
+			toast.classList.add('on');
+			setTimeout(() => toast.classList.remove('on'), 2600);
+		};
+		setTimeout(() => { showToast(); setInterval(showToast, 4200); }, 1800);
+	}
+	if (!reduceMotion) {
+		const heroMock = document.querySelector<HTMLElement>('.hero-terminal');
+		const glows = document.querySelectorAll<HTMLElement>('.bg-glow');
+		let ticking = false;
+		window.addEventListener('scroll', () => {
+			if (ticking) return;
+			ticking = true;
+			requestAnimationFrame(() => {
+				const y = Math.min(window.scrollY, 900);
+				if (heroMock) heroMock.style.transform = `translateY(${y * -0.05}px)`;
+				glows.forEach((g, i) => g.style.translate = `0 ${y * (i ? 0.12 : 0.2)}px`);
+				ticking = false;
+			});
+		}, { passive: true });
+	}
 
 	// ── Back to top ──────────────────────────────────────────
 	const backToTopBtn = document.getElementById('back-to-top');
@@ -2826,7 +2883,7 @@ $ postctl --profile work list --status scheduled
 
 	// ── Scroll reveal ─────────────────────────────────────────
 	const revealTargets = document.querySelectorAll(
-		'.feature-card, .how-step-card, .ai-workflow-card, .pricing-card, .section-header, .tui-window, .donate-banner, .carousel-root, .screenshot-hint, .tui-demo-hint'
+		'.feature-card, .how-step-card, .ai-workflow-card, .pricing-card, .section-header, .donate-banner, .info-card, .mock-window:not(.hero-terminal), .matrix-wrap, .md-code, .tour-tabs, .suite-note, .roadmap-card, .matrix-note'
 	);
 
 	const revealObserver = new IntersectionObserver((entries, observer) => {
@@ -2845,8 +2902,4 @@ $ postctl --profile work list --status scheduled
 		revealObserver.observe(el);
 	});
 
-	// ── Start typing simulator ────────────────────────────────
-	window.addEventListener('DOMContentLoaded', () => {
-		setTimeout(typeCommand, 1000);
-	});
 </script>
