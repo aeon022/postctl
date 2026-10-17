@@ -34,106 +34,85 @@ import FooterSignature from '../components/FooterSignature.astro';
         <span class="lang-de">Informationen über die Verarbeitung personenbezogener Daten gemäß EU-DSGVO.</span>
       </p>
       <p class="lang-note">
-        <span class="lang-en">This English version is a courtesy translation. The German version is legally binding.</span>
-        <span class="lang-de">Diese englische Version ist eine Übersetzung zur Information. Maßgeblich ist die deutsche Fassung.</span>
+        <span class="lang-en">Last updated: 17 October 2026. This English version is a courtesy translation. The German version is legally binding.</span>
+        <span class="lang-de">Stand: 17. Oktober 2026. Dies ist die maßgebliche deutsche Fassung.</span>
       </p>
     </div>
 
     <!-- Privacy Stack Layout -->
     <div class="privacy-stack">
-      <!-- Section 1 -->
       <div class="privacy-card">
-        <div class="card-label">// 01_PRIVACY_OVERVIEW</div>
+        <div class="card-label">// 01_CONTROLLER</div>
+        <h3 class="card-title"><span class="lang-en">Controller</span><span class="lang-de">Verantwortlicher</span></h3>
+        <p class="card-text">
+          <span class="lang-en">The controller within the meaning of the GDPR is Gerwin Weiher, sole proprietor trading as <strong>Abteilung83</strong>, Steyrergasse 88/4, 8010 Graz, Austria, e-mail: <a href="mailto:post@abteilung83.com" class="accent-link underline">post@abteilung83.com</a> (see also the legal notice).</span>
+          <span class="lang-de">Verantwortlicher im Sinne der DSGVO ist Gerwin Weiher, Einzelunternehmer, <strong>Abteilung83</strong>, Steyrergasse 88/4, 8010 Graz, Österreich, E-Mail: <a href="mailto:post@abteilung83.com" class="accent-link underline">post@abteilung83.com</a> (siehe auch Impressum).</span>
+        </p>
+      </div>
+
+      <div class="privacy-card">
+        <div class="card-label">// 02_PRIVACY_OVERVIEW</div>
         <h3 class="card-title"><span class="lang-en">Privacy at a Glance</span><span class="lang-de">Datenschutz auf einen Blick</span></h3>
         <p class="card-text">
-          <span class="lang-en">
-            We place the greatest importance on protecting your privacy. postctl is designed as a <strong>local-first</strong> application.
-            This means your data (such as passwords, API keys, session cookies, and post data) is stored locally on your machine in an
-            encrypted SQLite database and is never transmitted to us.
-          </span>
-          <span class="lang-de">
-            Wir legen größten Wert auf den Schutz deiner Privatsphäre. postctl ist als <strong>local-first</strong> Anwendung konzipiert.
-            Das bedeutet, dass deine Daten (wie Passwörter, API-Keys, Session-Cookies und Beitragsdaten) lokal auf deinem Rechner in einer
-            SQLite-Datenbank verschlüsselt gespeichert werden und zu keinem Zeitpunkt an uns übertragen werden.
-          </span>
+          <span class="lang-en">postctl is a <strong>local-first</strong> application. Your posts, drafts, history and the credentials of your social media accounts stay on your own computer. We do not operate a cloud service for postctl and do not receive your content or your access tokens.</span>
+          <span class="lang-de">postctl ist eine <strong>local-first</strong>-Anwendung. Deine Beiträge, Entwürfe, dein Verlauf und die Zugangsdaten deiner Social-Media-Konten bleiben auf deinem eigenen Rechner. Wir betreiben keinen Cloud-Dienst für postctl und erhalten weder deine Inhalte noch deine Zugriffstoken.</span>
         </p>
       </div>
 
-      <!-- Section 2 -->
       <div class="privacy-card">
-        <div class="card-label">// 02_DESKTOP_CLIENT_DATA</div>
-        <h3 class="card-title"><span class="lang-en">Data Collection in the App (Desktop Client)</span><span class="lang-de">Datenerfassung in der App (Desktop-Client)</span></h3>
+        <div class="card-label">// 03_APP_DATA</div>
+        <h3 class="card-title"><span class="lang-en">Data in the App</span><span class="lang-de">Daten in der App</span></h3>
         <p class="card-text">
-          <span class="lang-en">The app stores login credentials and tokens for connected social media accounts (e.g. LinkedIn, Threads, Twitter/X) exclusively locally on the user's device using AES-256-GCM encryption.</span>
-          <span class="lang-de">Die App speichert Anmeldedaten und Tokens für verbundene Social-Media-Accounts (z. B. LinkedIn, Threads, Twitter/X) ausschließlich lokal auf dem Gerät des Benutzers unter Verwendung von AES-256-GCM Verschlüsselung.</span>
+          <span class="lang-en">Account tokens in the local database are encrypted with AES-256-GCM; backups you create are encrypted as well. There is no telemetry, no usage tracking and no crash reporting.</span>
+          <span class="lang-de">Konto-Tokens in der lokalen Datenbank werden mit AES-256-GCM verschlüsselt, von dir erstellte Backups ebenfalls. Es gibt keine Telemetrie, kein Nutzungs-Tracking und keine Absturzberichte.</span>
         </p>
         <p class="card-text">
-          <span class="lang-en">There is no central cloud database, no trackers, no telemetry, and no server logs on our part. Your data belongs exclusively to you.</span>
-          <span class="lang-de">Es gibt keine zentrale Cloud-Datenbank, keine Tracker, keine Telemetrie und keine Serverprotokolle unsererseits. Deine Daten gehören ausschließlich dir.</span>
+          <span class="lang-en">The app only opens network connections that you cause: (a) to the platforms you connect and publish to (e.g. Instagram, Facebook, Threads, X, LinkedIn, Bluesky, Mastodon) — your content and tokens go directly from your computer to that platform, which processes them under its own privacy policy; (b) to Polar.sh when you activate or check a Pro license (see below); (c) to an AI provider of your choice if you use AI features with your own API key.</span>
+          <span class="lang-de">Die App baut nur Verbindungen auf, die du veranlasst: (a) zu den Plattformen, die du verbindest und auf denen du veröffentlichst (z. B. Instagram, Facebook, Threads, X, LinkedIn, Bluesky, Mastodon) — deine Inhalte und Tokens gehen direkt von deinem Rechner an die jeweilige Plattform, die sie nach ihrer eigenen Datenschutzerklärung verarbeitet; (b) zu Polar.sh, wenn du eine Pro-Lizenz aktivierst oder prüfst (siehe unten); (c) zu einem KI-Anbieter deiner Wahl, falls du KI-Funktionen mit deinem eigenen API-Schlüssel nutzt.</span>
         </p>
       </div>
 
-      <!-- Section 3 -->
       <div class="privacy-card">
-        <div class="card-label">// 03_MERCHANT_OF_RECORD</div>
-        <h3 class="card-title"><span class="lang-en">Payment Processing & Licensing (Polar.sh)</span><span class="lang-de">Zahlungsabwicklung & Lizenzierung (Polar.sh)</span></h3>
+        <div class="card-label">// 04_LICENSE_PAYMENT</div>
+        <h3 class="card-title"><span class="lang-en">Payment & Licensing (Polar.sh)</span><span class="lang-de">Zahlung & Lizenzierung (Polar.sh)</span></h3>
         <p class="card-text">
-          <span class="lang-en">
-            If you purchase a postctl Pro license, payment processing and license key generation are handled via the external service
-            <strong>Polar.sh</strong> (Polar Technologies Inc.). Polar acts as the "Merchant of Record".
-          </span>
-          <span class="lang-de">
-            Wenn du eine Pro-Lizenz von postctl erwirbst, wird die Zahlungsabwicklung und Lizenzschlüssel-Generierung über den externen Dienst
-            <strong>Polar.sh</strong> (Polar Technologies Inc.) abgewickelt. Polar agiert als „Merchant of Record“.
-          </span>
+          <span class="lang-en">If you buy a postctl Pro license, payment and license-key issuing are handled by <strong>Polar.sh</strong> (Polar Software Inc.) as "Merchant of Record". Polar processes e-mail address, billing and payment data to conclude the contract and fulfil tax obligations (Art. 6(1)(b) and (c) GDPR). Data may be transferred to the USA; details and safeguards are in Polar's privacy policy: <a href="https://polar.sh/legal/privacy" target="_blank" rel="noopener noreferrer" class="accent-link underline">polar.sh/legal/privacy</a>.</span>
+          <span class="lang-de">Wenn du eine postctl-Pro-Lizenz kaufst, wickeln <strong>Polar.sh</strong> (Polar Software Inc.) als „Merchant of Record“ Zahlung und Lizenzschlüssel-Ausstellung ab. Polar verarbeitet E-Mail-Adresse sowie Rechnungs- und Zahlungsdaten, um den Vertrag zu schließen und steuerliche Pflichten zu erfüllen (Art. 6 Abs. 1 lit. b und c DSGVO). Eine Übermittlung in die USA ist möglich; Einzelheiten und Garantien stehen in Polars Datenschutzerklärung: <a href="https://polar.sh/legal/privacy" target="_blank" rel="noopener noreferrer" class="accent-link underline">polar.sh/legal/privacy</a>.</span>
         </p>
         <p class="card-text">
-          <span class="lang-en">
-            In doing so, personal data such as your e-mail address and billing information is collected in order to issue the license and
-            fulfil tax obligations. Further information can be found in Polar.sh's privacy policy at
-            <a href="https://polar.sh/privacy" target="_blank" rel="noopener noreferrer" class="accent-link underline">https://polar.sh/privacy</a>.
-          </span>
-          <span class="lang-de">
-            Dabei werden personenbezogene Daten wie E-Mail-Adresse und Rechnungsdaten erfasst, um die Lizenz auszustellen und steuerliche
-            Pflichten zu erfüllen. Weitere Informationen findest du in der Datenschutzerklärung von Polar.sh unter
-            <a href="https://polar.sh/privacy" target="_blank" rel="noopener noreferrer" class="accent-link underline">https://polar.sh/privacy</a>.
-          </span>
+          <span class="lang-en">When you activate or re-check a license, the app sends your license key to Polar's API; Polar sees the key and, as with any request, your IP address. Nothing else is sent, and the result is cached locally so the app also works offline.</span>
+          <span class="lang-de">Bei Aktivierung oder erneuter Prüfung einer Lizenz sendet die App deinen Lizenzschlüssel an die Polar-API; Polar sieht den Schlüssel und, wie bei jeder Anfrage, deine IP-Adresse. Sonst wird nichts übermittelt, das Ergebnis wird lokal zwischengespeichert, sodass die App auch offline funktioniert.</span>
         </p>
       </div>
 
-      <!-- Section 4 -->
       <div class="privacy-card">
-        <div class="card-label">// 04_WEB_HOSTING_LOGS</div>
-        <h3 class="card-title"><span class="lang-en">Website Hosting</span><span class="lang-de">Hosting der Website</span></h3>
+        <div class="card-label">// 05_WEBSITE</div>
+        <h3 class="card-title"><span class="lang-en">This Website</span><span class="lang-de">Diese Website</span></h3>
         <p class="card-text">
-          <span class="lang-en">
-            This website is hosted on GitHub Pages / Cloudflare. When you visit this website, IP addresses and connection logs are
-            collected by default to ensure the stability and security of the website. This constitutes a legitimate interest under
-            Art. 6(1)(f) GDPR.
-          </span>
-          <span class="lang-de">
-            Diese Website wird gehostet auf GitHub Pages / Cloudflare. Beim Aufrufen dieser Website werden standardmäßig IP-Adressen und
-            Verbindungsprotokolle erhoben, um die Stabilität und Sicherheit der Website zu gewährleisten. Dies ist ein berechtigtes Interesse
-            gemäß Art. 6 Abs. 1 lit. f DSGVO.
-          </span>
+          <span class="lang-en">We do not use cookies, local storage, analytics, tracking pixels, embedded third-party content or external CDNs. Fonts are served from this site itself. Links to external sites (e.g. GitHub, Polar) are plain links; data is only exchanged with those sites once you open them.</span>
+          <span class="lang-de">Wir verwenden keine Cookies, keinen Local Storage, keine Analyse- oder Tracking-Dienste, keine eingebetteten Inhalte Dritter und keine externen CDNs. Schriftarten werden von dieser Website selbst ausgeliefert. Links auf externe Seiten (z. B. GitHub, Polar) sind einfache Links; Daten werden mit diesen Seiten erst ausgetauscht, wenn du sie öffnest.</span>
+        </p>
+        <p class="card-text">
+          <span class="lang-en"><strong>Server logs:</strong> the web server of our hosting provider processes your IP address, the time of the request, the requested page and browser information to deliver the site and keep it secure. Legal basis is our legitimate interest in a stable and secure website (Art. 6(1)(f) GDPR). Logs are kept only as long as necessary for operation and security.</span>
+          <span class="lang-de"><strong>Server-Logfiles:</strong> Der Webserver unseres Hosting-Anbieters verarbeitet deine IP-Adresse, den Zeitpunkt der Anfrage, die abgerufene Seite und Browser-Informationen, um die Website auszuliefern und abzusichern. Rechtsgrundlage ist unser berechtigtes Interesse an einer stabilen und sicheren Website (Art. 6 Abs. 1 lit. f DSGVO). Logfiles werden nur so lange gespeichert, wie es für Betrieb und Sicherheit erforderlich ist.</span>
         </p>
       </div>
 
-      <!-- Section 5 -->
       <div class="privacy-card">
-        <div class="card-label">// 05_USER_RIGHTS</div>
+        <div class="card-label">// 06_CONTACT</div>
+        <h3 class="card-title"><span class="lang-en">Contact</span><span class="lang-de">Kontaktaufnahme</span></h3>
+        <p class="card-text">
+          <span class="lang-en">If you e-mail us, we process your address and message to answer your request (Art. 6(1)(b) or (f) GDPR) and delete it once it is no longer needed, subject to statutory retention periods.</span>
+          <span class="lang-de">Wenn du uns per E-Mail kontaktierst, verarbeiten wir deine Adresse und Nachricht zur Beantwortung deiner Anfrage (Art. 6 Abs. 1 lit. b oder f DSGVO) und löschen sie, sobald sie nicht mehr benötigt werden, vorbehaltlich gesetzlicher Aufbewahrungsfristen.</span>
+        </p>
+      </div>
+
+      <div class="privacy-card">
+        <div class="card-label">// 07_USER_RIGHTS</div>
         <h3 class="card-title"><span class="lang-en">Your Rights (GDPR)</span><span class="lang-de">Deine Rechte (DSGVO)</span></h3>
         <p class="card-text">
-          <span class="lang-en">
-            Regarding your data collected via Polar.sh or through our servers, you generally have the rights to access, rectification,
-            erasure, restriction, data portability, and to withdraw consent or object. Please contact the e-mail address given in the
-            legal notice for this purpose.
-          </span>
-          <span class="lang-de">
-            Dir stehen bezüglich deiner bei Polar.sh oder über unsere Server erfassten Daten grundsätzlich die Rechte auf Auskunft,
-            Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit, Widerruf und Widerspruch zu. Wende dich hierzu an die im Impressum
-            angegebene E-Mail-Adresse.
-          </span>
+          <span class="lang-en">You have the right to access, rectification, erasure, restriction of processing, data portability and to object. Please contact post@abteilung83.com. You also have the right to lodge a complaint with a supervisory authority; in Austria this is the <a href="https://www.dsb.gv.at" target="_blank" rel="noopener noreferrer" class="accent-link underline">Datenschutzbehörde</a>, Barichgasse 40–42, 1030 Vienna.</span>
+          <span class="lang-de">Dir stehen die Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch zu. Wende dich dazu an post@abteilung83.com. Außerdem kannst du dich bei einer Aufsichtsbehörde beschweren; in Österreich ist das die <a href="https://www.dsb.gv.at" target="_blank" rel="noopener noreferrer" class="accent-link underline">Datenschutzbehörde</a>, Barichgasse 40–42, 1030 Wien.</span>
         </p>
       </div>
     </div>
