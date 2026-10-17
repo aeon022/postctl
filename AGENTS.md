@@ -74,3 +74,17 @@ git worktree remove <path>
 git branch -D <branch>
 git push origin --delete <branch>   # only if it was pushed
 ```
+
+## Regenerating the landing-page mockups
+
+The TUI screens on postctl.sh are rendered from the real app (fictional demo data), not drawn by hand:
+
+```bash
+M=$(mktemp -d)
+POSTCTL_MOCKUP_DIR=$M go test ./internal/tui -run TestRenderLandingMockups
+for f in dashboard posts calendar editor settings history schedule; do
+  python3 .worktree-landing/scripts/ansi2html.py $M/$f.ansi > .worktree-landing/src/mockups/$f.html
+done
+```
+
+Rerun after visible TUI changes, then build/publish as described above. Never use real account data in the demo.
