@@ -88,3 +88,10 @@ done
 ```
 
 Rerun after visible TUI changes, then build/publish as described above. Never use real account data in the demo.
+
+## Multi-device notes (security update 2026-10)
+
+- The default profile's database may live in a synced `data_dir` (Dropbox) and be used from several machines; named profiles such as `bruecke` are local and must run a scheduler on **one** machine only.
+- Token encryption key: `~/.config/postctl/encryption.key` (0600). Never put it in a synced folder or repo. To migrate a shared DB: install the new binary on every machine, copy the key file to each (AirDrop/USB/scp), only then run `postctl security migrate` on one machine. New tokens saved before the other machines have the key cannot be read there.
+- Linux has no launchd integration: run `postctl daemon` yourself and only where no other machine publishes the same profile.
+- Full checklist: the Social-Media `stage.md` (OneDrive), section "Weitere Rechner".
