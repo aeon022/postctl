@@ -1,0 +1,17 @@
+# postctl
+
+> Terminal-native, Markdown-first social media scheduler (CLI + TUI) for macOS and Linux. Local SQLite data, no cloud. Free and open source for up to 2 networks; Pro unlocks unlimited.
+
+Platforms: Instagram (feed, carousel, story), Facebook pages, Threads, X, LinkedIn (profile and company page), Bluesky, Mastodon, Telegram, Discord and more.
+
+## Key facts
+- Posts are Markdown files with YAML frontmatter; `postctl import` creates drafts or schedules them.
+- Profiles keep accounts separate; `postctl --profile NAME daemon install` installs one scheduler service per profile.
+- Safeguards: overdue posts are spread in 20-minute steps, X keeps a 60-minute minimum gap, posts are claimed atomically (never published twice).
+- Remote deletion where the platform API allows it (not Instagram).
+- MCP server (`postctl mcp`) lets AI assistants list, draft and schedule posts. Part of the missionctl suite.
+
+## Links
+- Home: https://postctl.sh/
+- Docs: https://postctl.sh/docs/
+- Source: https://github.com/aeon022/postctl

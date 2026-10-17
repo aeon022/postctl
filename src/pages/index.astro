@@ -2723,8 +2723,8 @@ $ postctl --profile work list --status scheduled
 	.mock-window { container-type: inline-size; background: #11111b; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
 	.mock-chrome { display: flex; align-items: center; gap: 6px; padding: .55rem .8rem; background: #181825; border-bottom: 1px solid var(--border); }
 	.mock-title { margin-left: .6rem; font-family: var(--font-mono); font-size: .72rem; color: rgba(255,255,255,.4); }
-	.mock-pre { margin: 0; padding: .9rem 1rem 1.1rem; overflow-x: auto; background: #11111b; color: #cdd6f4; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: clamp(5px, 1.3cqw, 12px); line-height: 1.32; white-space: pre; }
-	.mock-pre-hero { overflow: hidden; }
+	.mock-pre { margin: 0; padding: .9rem 1rem 1.1rem; overflow-x: auto; background: #11111b; color: #cdd6f4; font-family: var(--font-mono); font-size: clamp(5px, 1.3cqw, 12px); line-height: 1.32; white-space: pre; }
+	.mock-pre-hero { overflow: hidden; font-size: clamp(3.4px, 1.3cqw, 12px); }
 	.mock-window.hero-terminal { max-width: 100%; }
 	.channels-section, .tour-section, .profiles-section, .markdown-section, .safety-section { padding: 6rem 0; }
 	.matrix-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-secondary); }
@@ -2737,7 +2737,7 @@ $ postctl --profile work list --status scheduled
 	.matrix-note, .suite-note { text-align: center; margin-top: 1rem; font-size: .82rem; color: rgba(255,255,255,.45); }
 	.suite-note { margin-top: 2.5rem; font-size: .95rem; } .suite-note :global(a) { color: var(--accent); }
 	.tour-tabs { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; margin-bottom: 1.5rem; }
-	.tour-tab { background: var(--bg-secondary); border: 1px solid var(--border); color: rgba(255,255,255,.65); padding: .5rem 1rem; border-radius: 999px; font-family: var(--font-mono); font-size: .78rem; cursor: pointer; transition: var(--transition); }
+	.tour-tab { min-height: 40px; background: var(--bg-secondary); border: 1px solid var(--border); color: rgba(255,255,255,.65); padding: .5rem 1rem; border-radius: 999px; font-family: var(--font-mono); font-size: .78rem; cursor: pointer; transition: var(--transition); }
 	.tour-tab:hover { border-color: var(--accent); color: #fff; }
 	.tour-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 	.tour-panel { display: none; max-width: 980px; margin: 0 auto; }
@@ -2750,7 +2750,7 @@ $ postctl --profile work list --status scheduled
 	.info-card h3 { font-size: 1.05rem; margin: 0 0 .5rem; }
 	.info-card p { margin: 0; color: rgba(255,255,255,.65); font-size: .92rem; line-height: 1.55; }
 	.md-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; }
-	.md-code { margin: 0; padding: 1.25rem 1.4rem; background: #11111b; border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: .8rem; line-height: 1.5; color: #cdd6f4; }
+	.md-code { margin: 0; padding: 1.25rem 1.4rem; background: #11111b; border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; font-family: var(--font-mono); font-size: .8rem; line-height: 1.5; color: #cdd6f4; }
 
 	.info-icon { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 10px; background: rgba(139,124,248,.12); color: var(--accent); margin-bottom: 1rem; font-size: 0; }
 	.mock-body { position: relative; }
@@ -2769,6 +2769,17 @@ $ postctl --profile work list --status scheduled
 	.hero-net { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: .75; mask-image: radial-gradient(ellipse at 60% 45%, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at 60% 45%, #000 20%, transparent 75%); }
 	.hero-section { position: relative; }
 	.hero-section .hero-container { position: relative; z-index: 1; }
+
+	@media (max-width: 760px) {
+		.channels-section, .tour-section, .profiles-section, .markdown-section, .safety-section { padding: 4rem 0; }
+		.tour-panel .mock-pre { font-size: 8.5px; } /* readable, scrolls sideways instead of shrinking to dust */
+		.tour-tabs { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: .4rem; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+		.tour-tab { flex: 0 0 auto; }
+		.matrix th, .matrix td { padding: .7rem .6rem; font-size: .82rem; }
+		.md-grid { grid-template-columns: 1fr; }
+		.mock-toast { display: none; }
+	}
+	.mock-pre, .md-code, .matrix-wrap { max-width: 100%; }
 </style>
 
 <script>
