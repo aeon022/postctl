@@ -19,6 +19,9 @@ type Config struct {
 		ClientID     string `mapstructure:"client_id" yaml:"client_id"`
 		ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
 		AuthMode     string `mapstructure:"auth_mode" yaml:"auth_mode"` // "api" oder "cookie"
+		// UnofficialCookieMode must be set explicitly to use auth_mode "cookie": that path drives X's
+		// private web endpoints, is against X's terms and can get the account suspended.
+		UnofficialCookieMode bool `mapstructure:"unofficial_cookie_mode" yaml:"unofficial_cookie_mode"`
 	} `mapstructure:"twitter" yaml:"twitter"`
 	LinkedIn struct {
 		ClientID     string `mapstructure:"client_id" yaml:"client_id"`

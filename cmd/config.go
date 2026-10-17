@@ -98,6 +98,8 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Twitter.ClientSecret = value
 	case "linkedin.client_id":
 		config.ActiveConfig.LinkedIn.ClientID = value
+	case "twitter.unofficial_cookie_mode":
+		config.ActiveConfig.Twitter.UnofficialCookieMode = value == "true" || value == "1" || value == "yes"
 	case "linkedin.client_secret":
 		config.ActiveConfig.LinkedIn.ClientSecret = value
 	case "linkedin.organization_id":
@@ -452,6 +454,10 @@ var configSetupCmd = &cobra.Command{
 		platform := strings.ToLower(strings.TrimSpace(args[0]))
 
 		if platform == "twitter" && setupCookie != "" && setupCt0 != "" {
+			if !config.ActiveConfig.Twitter.UnofficialCookieMode {
+				fmt.Println(wl("Der Cookie-Modus für X ist inoffiziell, verstößt gegen die X-Nutzungsbedingungen und ist standardmäßig aus.\nNur auf eigenes Risiko aktivieren: postctl config set twitter.unofficial_cookie_mode true", "X cookie mode is unofficial, breaks X's terms and is off by default.\nOnly at your own risk, enable with: postctl config set twitter.unofficial_cookie_mode true"))
+				return
+			}
 			config.ActiveConfig.Twitter.AuthMode = "cookie"
 			s, err := store.NewSQLiteStore(config.GetDBPath(), config.Shared())
 			if err != nil {
@@ -490,12 +496,18 @@ var configSetupCmd = &cobra.Command{
 		switch platform {
 		case "twitter":
 			fmt.Println("Wähle die Verbindungsmethode für Twitter/X:")
-			fmt.Println("  1) Offizielle API (Erfordert kostenpflichtigen API-Zugang/Credits) [Empfohlen/Sicher]")
-			fmt.Println("  2) Cookie-basiert (Kostenloser inoffizieller Weg, aber fehleranfällig; Risiko von Kontosperrung!)")
+			fmt.Println("  1) Offizielle API (erfordert X-API-Zugang, kostenpflichtig) [Empfohlen]")
+			if config.ActiveConfig.Twitter.UnofficialCookieMode {
+				fmt.Println("  2) Cookie-basiert (inoffiziell, nicht unterstützt; Risiko von Kontosperrung!)")
+			}
 			fmt.Println()
-			fmt.Print("➔ Deine Wahl (1 oder 2, Standard: 1): ")
+			fmt.Print("➔ Deine Wahl (Standard: 1): ")
 			choice, _ := reader.ReadString('\n')
 			choice = strings.TrimSpace(choice)
+			if choice == "2" && !config.ActiveConfig.Twitter.UnofficialCookieMode {
+				fmt.Println(wl("Der Cookie-Modus ist standardmäßig aus (inoffiziell, gegen die X-Nutzungsbedingungen). Nur auf eigenes Risiko: postctl config set twitter.unofficial_cookie_mode true", "Cookie mode is off by default (unofficial, against X's terms). At your own risk only: postctl config set twitter.unofficial_cookie_mode true"))
+				return
+			}
 
 			if choice == "2" {
 				config.ActiveConfig.Twitter.AuthMode = "cookie"

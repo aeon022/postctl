@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/aeon022/postctl/internal/config"
@@ -52,8 +53,29 @@ func (t *TwitterPlatform) IsAuthenticated(ctx context.Context) bool {
 	return err == nil
 }
 
+var cookieWarnOnce sync.Once
+
+// cookieModeGate refuses the unofficial cookie mode unless it was enabled on purpose
+// (twitter.unofficial_cookie_mode: true) and logs a one-time warning when it runs.
+func cookieModeGate() error {
+	cfg := config.ActiveConfig.Twitter
+	if cfg.AuthMode != "cookie" {
+		return nil
+	}
+	if !cfg.UnofficialCookieMode {
+		return fmt.Errorf("X cookie mode is unofficial and disabled by default (it breaks X's terms and can get the account suspended); use the official API, or opt in with: postctl config set twitter.unofficial_cookie_mode true")
+	}
+	cookieWarnOnce.Do(func() {
+		Log("[WARN] X cookie mode is unofficial and not supported: it can break at any time and the account may be suspended. Use the official API for anything important.")
+	})
+	return nil
+}
+
 // Auth startet den OAuth 2.0 PKCE Flow für Twitter/X
 func (t *TwitterPlatform) Auth(ctx context.Context) error {
+	if err := cookieModeGate(); err != nil {
+		return err
+	}
 	// ponytail: Cookie mode authentication bypasses standard OAuth flow.
 	if config.ActiveConfig.Twitter.AuthMode == "cookie" {
 		if t.IsAuthenticated(ctx) {
@@ -307,6 +329,9 @@ func (t *TwitterPlatform) UploadImage(ctx context.Context, path string) (string,
 
 // Post veröffentlicht einen Thread oder einen einzelnen Tweet auf Twitter/X
 func (t *TwitterPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
+	if err := cookieModeGate(); err != nil {
+		return "", err
+	}
 	if config.ActiveConfig.Twitter.AuthMode == "cookie" {
 		authToken, csrfToken, _, err := t.store.GetToken(ctx, models.PlatformTwitter)
 		if err != nil {
