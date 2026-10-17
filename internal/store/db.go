@@ -3,13 +3,10 @@ package store
 import (
 	"crypto/rand"
 	"database/sql"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
-	"time"
 
 	"github.com/aeon022/missionctl-core/syncdir"
 	_ "modernc.org/sqlite"
@@ -22,52 +19,9 @@ type SQLiteStore struct {
 	shared bool
 }
 
-// postctl opens a fresh *SQLiteStore per operation rather than holding one
-// open for the process's lifetime, and flock(2) isn't reentrant within a
-// process — locks reference-counts the real OS-level lock per path so the
-// same process's own concurrent/sequential opens don't conflict with
-// themselves; only the first open of a path acquires it for real, and only
-// the last matching Close() releases it. A conflict is reported only when
-// a genuinely different process holds it.
-var (
-	lockMu sync.Mutex
-	locks  = map[string]*lockEntry{}
-)
-
-type lockEntry struct {
-	lock  *syncdir.Lock
-	count int
-}
-
-func acquireLock(path string) error {
-	lockMu.Lock()
-	defer lockMu.Unlock()
-	e, ok := locks[path]
-	if !ok {
-		l, err := syncdir.Acquire(path)
-		if err != nil {
-			return err
-		}
-		e = &lockEntry{lock: l}
-		locks[path] = e
-	}
-	e.count++
-	return nil
-}
-
-func releaseLock(path string) {
-	lockMu.Lock()
-	defer lockMu.Unlock()
-	e, ok := locks[path]
-	if !ok {
-		return
-	}
-	e.count--
-	if e.count == 0 {
-		e.lock.Release()
-		delete(locks, path)
-	}
-}
+// No cross-process file lock: SQLite's own locking (busy timeout below) is enough for several
+// local processes, and a TUI left open must never stop the scheduler daemon from publishing.
+// Double publishing is prevented per post by TryLockPost.
 
 // NewSQLiteStore erstellt oder öffnet die SQLite-Datenbank und führt Migrationen aus.
 // shared must reflect whether dbPath is a user-configured (possibly
@@ -104,36 +58,21 @@ func NewSQLiteStore(dbPath string, shared bool) (*SQLiteStore, error) {
 		return nil, fmt.Errorf("%s hasn't finished downloading from iCloud yet (found %s) — open Finder and download it, or disable \"Optimize Mac Storage\" for this folder", expandedPath, placeholder)
 	}
 
-	err = acquireLock(expandedPath)
-	for i := 0; i < 8 && errors.Is(err, syncdir.ErrLocked); i++ { // ride out a short-lived holder (daemon check)
-		time.Sleep(250 * time.Millisecond)
-		err = acquireLock(expandedPath)
-	}
-	if err != nil {
-		if errors.Is(err, syncdir.ErrLocked) {
-			return nil, fmt.Errorf("postctl is already running elsewhere, or a previous session crashed — remove %s.lock if you're sure nothing else is using it", expandedPath)
-		}
-		return nil, err
-	}
-
 	// Verzeichnis erstellen, falls es nicht existiert
 	dbDir := filepath.Dir(expandedPath)
 	if err := os.MkdirAll(dbDir, 0755); err != nil {
-		releaseLock(expandedPath)
 		return nil, fmt.Errorf("create db directory: %w", err)
 	}
 
 	// Verbindung öffnen
 	db, err := sql.Open("sqlite", expandedPath+"?_journal="+syncdir.JournalMode(shared)+"&_timeout=5000")
 	if err != nil {
-		releaseLock(expandedPath)
 		return nil, fmt.Errorf("open sqlite db: %w", err)
 	}
 
 	// Verbindung testen
 	if err := db.Ping(); err != nil {
 		db.Close()
-		releaseLock(expandedPath)
 		return nil, fmt.Errorf("ping db: %w", err)
 	}
 
@@ -142,7 +81,6 @@ func NewSQLiteStore(dbPath string, shared bool) (*SQLiteStore, error) {
 	// Migrationen ausführen
 	if err := store.migrate(); err != nil {
 		db.Close()
-		releaseLock(expandedPath)
 		return nil, fmt.Errorf("run migrations: %w", err)
 	}
 
@@ -156,30 +94,19 @@ func (s *SQLiteStore) Suspend() error {
 	if s.path == "" {
 		return nil
 	}
-	err := s.db.Close()
-	releaseLock(s.path)
-	return err
+	return s.db.Close()
 }
 
-// Resume re-acquires the lock and reopens the connection after Suspend.
+// Resume reopens the connection after Suspend.
 func (s *SQLiteStore) Resume() error {
 	if s.path == "" {
 		return nil
-	}
-	err := acquireLock(s.path)
-	for i := 0; i < 20 && errors.Is(err, syncdir.ErrLocked); i++ { // the child may still be flushing
-		time.Sleep(250 * time.Millisecond)
-		err = acquireLock(s.path)
-	}
-	if err != nil {
-		return fmt.Errorf("re-acquire database lock: %w", err)
 	}
 	db, err := sql.Open("sqlite", s.path+"?_journal="+syncdir.JournalMode(s.shared)+"&_timeout=5000")
 	if err == nil {
 		err = db.Ping()
 	}
 	if err != nil {
-		releaseLock(s.path)
 		return fmt.Errorf("reopen database: %w", err)
 	}
 	s.db = db
@@ -188,9 +115,7 @@ func (s *SQLiteStore) Resume() error {
 
 // Close schließt die Datenbankverbindung
 func (s *SQLiteStore) Close() error {
-	err := s.db.Close()
-	releaseLock(s.path)
-	return err
+	return s.db.Close()
 }
 
 // expandPath expandiert den Home-Directory-Tilde-Pfad
