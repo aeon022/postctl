@@ -15,7 +15,7 @@ import * as TutorialDocDe from '../../documents/TUTORIAL.md';
 import * as TutorialDocEn from '../../documents/TUTORIAL-en.md';
 ---
 
-<Layout titleDe="postctl Doku — Social-Media-Management im Terminal" descriptionDe="Dokumentation zu postctl: Installation, CLI-Befehle, TUI-Tastenkürzel, Plattform-Setup für Instagram, Facebook, Threads, X, LinkedIn, Bluesky und Mastodon, Profile und Scheduler-Dienst." title="postctl Docs — Terminal-Native Social Media Management" description="Documentation for postctl: install, CLI commands, TUI keybindings, platform setup for Instagram, Facebook, Threads, X, LinkedIn, Bluesky and Mastodon, profiles and the scheduler service.">
+<Layout titleDe="postctl Doku — Social-Media-Management im Terminal" descriptionDe="Dokumentation zu postctl: Installation, CLI-Befehle, TUI-Tastenkürzel, Plattform-Setup, Profile und Scheduler-Dienst." title="postctl Docs — Terminal-Native Social Media Management" description="Documentation for postctl: install, CLI commands, TUI keybindings, platform setup, profiles and the scheduler service.">
 	<!-- Decorative Grid & Glow Background -->
 	<div class="bg-glow bg-glow-1"></div>
 	<div class="bg-glow bg-glow-2"></div>
@@ -144,7 +144,7 @@ import * as TutorialDocEn from '../../documents/TUTORIAL-en.md';
 				<section class="doc-section" id="doc-installation">
 					<div class="doc-body markdown-content">
 						<div class="lang-en">
-							<h1>Installation & Setup Guide</h1>
+							<h2 class="doc-title">Installation & Setup Guide</h2>
 							<p>Get started with <code>postctl</code> by building the binary and initializing your local developer workspace.</p>
 							
 							<h2>System Requirements</h2>
@@ -186,7 +186,7 @@ go build -o postctl main.go
 							</ul>
 						</div>
 						<div class="lang-de">
-							<h1>Installations- & Einrichtungsanleitung</h1>
+							<h2 class="doc-title">Installations- & Einrichtungsanleitung</h2>
 							<p>Beginne mit <code>postctl</code>, indem du das Binary kompilierst und deinen lokalen Entwickler-Arbeitsbereich initialisierst.</p>
 							
 							<h2>Systemanforderungen</h2>
@@ -234,7 +234,7 @@ go build -o postctl main.go
 				<section class="doc-section" id="doc-vim-flow">
 					<div class="doc-body markdown-content">
 					<div class="lang-en">
-						<h1>📝 Vim / Neovim External Editor Flow</h1>
+						<h2 class="doc-title">📝 Vim / Neovim External Editor Flow</h2>
 						<p>Inside the interactive Terminal UI, you can spawn your terminal-native text editor (like Neovim or Vim) to edit post text, adjust templates, or modify metadata on the fly.</p>
 
 						<div class="callout tip">
@@ -283,7 +283,7 @@ images: ["logo.png"]
 						<p>For multi-post threads, separate each section using a line containing only <code>---</code>.</p>
 					</div>
 					<div class="lang-de">
-						<h1>📝 Vim / Neovim externer Editor-Flow</h1>
+						<h2 class="doc-title">📝 Vim / Neovim externer Editor-Flow</h2>
 						<p>In der interaktiven Terminal-UI kannst du deinen terminal-nativen Texteditor (wie Neovim oder Vim) starten, um Beitragstext zu bearbeiten, Vorlagen anzupassen oder Metadaten spontan zu ändern.</p>
 
 						<div class="callout tip">
@@ -338,7 +338,7 @@ images: ["logo.png"]
 				<section class="doc-section" id="doc-image-resolution">
 					<div class="doc-body markdown-content">
 					<div class="lang-en">
-						<h1>🖼️ Image Path Resolution & Platform Uploads</h1>
+						<h2 class="doc-title">🖼️ Image Path Resolution & Platform Uploads</h2>
 						<p>Manage and attach media assets seamlessly using local file references.</p>
 
 						<h2>How Image Paths Are Resolved</h2>
@@ -360,7 +360,7 @@ images: ["logo.png"]
 						</ul>
 					</div>
 					<div class="lang-de">
-						<h1>🖼️ Bildpfad-Auflösung & Plattform-Uploads</h1>
+						<h2 class="doc-title">🖼️ Bildpfad-Auflösung & Plattform-Uploads</h2>
 						<p>Verwalte und binde Medien-Assets nahtlos über lokale Dateireferenzen ein.</p>
 
 						<h2>Wie Bildpfade aufgelöst werden</h2>
@@ -424,7 +424,7 @@ images: ["logo.png"]
 				<section class="doc-section" id="doc-api-bluesky-mastodon">
 					<div class="doc-body markdown-content">
 					<div class="lang-en">
-						<h1>🦋 Bluesky & Mastodon Setup Guide</h1>
+						<h2 class="doc-title">🦋 Bluesky & Mastodon Setup Guide</h2>
 						<p>Learn how to connect <code>postctl</code> to Bluesky (via the AT Protocol) and Mastodon instances.</p>
 
 						<h2>1. Bluesky Integration</h2>
@@ -469,7 +469,7 @@ images: ["logo.png"]
 						</ol>
 					</div>
 					<div class="lang-de">
-						<h1>🦋 Bluesky- & Mastodon-Einrichtungsanleitung</h1>
+						<h2 class="doc-title">🦋 Bluesky- & Mastodon-Einrichtungsanleitung</h2>
 						<p>Erfahre, wie du <code>postctl</code> mit Bluesky (über das AT Protocol) und Mastodon-Instanzen verbindest.</p>
 
 						<h2>1. Bluesky-Integration</h2>
@@ -520,7 +520,7 @@ images: ["logo.png"]
 				<section class="doc-section" id="doc-api-facebook">
 					<div class="doc-body markdown-content">
 					<div class="lang-en">
-						<h1>🤖 Facebook Setup Guide</h1>
+						<h2 class="doc-title">🤖 Facebook Setup Guide</h2>
 						<p>Configure automated publication to Facebook business/creator Pages using Meta Graph API tokens.</p>
 
 						<h2>Facebook Integration</h2>
@@ -545,7 +545,7 @@ images: ["logo.png"]
 						<p>Accept the prompt to authorize managing and publishing pages. The access token is exchanged for a permanent page access token and saved securely.</p>
 					</div>
 					<div class="lang-de">
-						<h1>🤖 Facebook-Einrichtungsanleitung</h1>
+						<h2 class="doc-title">🤖 Facebook-Einrichtungsanleitung</h2>
 						<p>Konfiguriere die automatisierte Veröffentlichung auf Facebook-Business-/Creator-Seiten über Meta-Graph-API-Tokens.</p>
 
 						<h2>Facebook-Integration</h2>
@@ -1162,7 +1162,10 @@ images: ["logo.png"]
 	}
 
 	/* Markdown Content Styling */
-	.markdown-content h1 {
+	.markdown-content pre { max-width: 100%; overflow-x: auto; }
+	.markdown-content code { overflow-wrap: anywhere; }
+	.markdown-content table { display: block; max-width: 100%; overflow-x: auto; }
+	.markdown-content h1, .markdown-content h2.doc-title {
 		font-size: 2.25rem;
 		line-height: 1.25;
 		margin-bottom: 1.5rem;

@@ -405,10 +405,10 @@ $ postctl --profile work list --status scheduled
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
 							<span class="w-icon"><Bot size={40} /></span>
-							<h4>
+							<h3>
 								<span class="lang-en">1. AI Generates Drafts</span>
 								<span class="lang-de">1. KI erstellt Entwürfe</span>
-							</h4>
+							</h3>
 							<p>
 								<span class="lang-en">Your coding agent reads web contents or release files and generates formatted Markdown draft files into a directory.</span>
 								<span class="lang-de">Dein Coding-Agent liest Webinhalte oder Release-Dateien und erstellt formatierte Markdown-Entwürfe in einem Ordner.</span>
@@ -418,10 +418,10 @@ $ postctl --profile work list --status scheduled
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
 							<span class="w-icon"><Database size={40} /></span>
-							<h4>
+							<h3>
 								<span class="lang-en">2. AI Imports & Checks</span>
 								<span class="lang-de">2. KI importiert & prüft</span>
-							</h4>
+							</h3>
 							<p>
 								<span class="lang-en">AI runs `postctl import` and checks results using `postctl list --format json`. Validation catches lengths and files.</span>
 								<span class="lang-de">Die KI führt `postctl import` aus und prüft Ergebnisse mit `postctl list --format json`. Die Validierung prüft Längen & Bilder.</span>
@@ -431,10 +431,10 @@ $ postctl --profile work list --status scheduled
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
 							<span class="w-icon"><ShieldCheck size={40} /></span>
-							<h4>
+							<h3>
 								<span class="lang-en">3. Dry-Run Validation</span>
 								<span class="lang-de">3. Dry-Run Validierung</span>
-							</h4>
+							</h3>
 							<p>
 								<span class="lang-en">AI executes `postctl campaign post launch-v1 --dry-run` to query APIs and verify integrity without causing live posts.</span>
 								<span class="lang-de">Die KI führt `postctl campaign post launch-v1 --dry-run` aus, um APIs zu testen und die Integrität ohne Live-Posts zu prüfen.</span>
@@ -444,10 +444,10 @@ $ postctl --profile work list --status scheduled
 					<div class="ai-workflow-card">
 						<div class="workflow-step">
 							<span class="w-icon"><UserCheck size={40} /></span>
-							<h4>
+							<h3>
 								<span class="lang-en">4. Human Approves & Posts</span>
 								<span class="lang-de">4. Mensch prüft & postet</span>
-							</h4>
+							</h3>
 							<p>
 								<span class="lang-en">You review the simulated outcome in chat. Give the agent approval, and it triggers the final publish command.</span>
 								<span class="lang-de">Du prüfst das simulierte Ergebnis im Chat. Gib dem Agenten die Freigabe und er stößt den finalen Veröffentlichungs-Befehl an.</span>
@@ -1750,7 +1750,7 @@ $ postctl --profile work list --status scheduled
 		color: var(--accent);
 		margin-bottom: 1rem;
 	}
-	.workflow-step h4 {
+	.workflow-step h3 {
 		font-size: 1.15rem;
 		margin-bottom: 0.75rem;
 	}

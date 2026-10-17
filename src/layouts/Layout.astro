@@ -27,7 +27,7 @@ const {
 	title: titleEn = "postctl — Social Media Management from your Terminal",
 	description: descEn = "Terminal-native, Markdown-first social media scheduler. Publish to Instagram, Facebook, Threads, X, LinkedIn, Bluesky and Mastodon from CLI or TUI. Local, no cloud.",
 	titleDe = "postctl — Social-Media-Management im Terminal",
-	descriptionDe = "Terminal-nativer, Markdown-basierter Social-Media-Scheduler. Veröffentliche auf Instagram, Facebook, Threads, X, LinkedIn, Bluesky und Mastodon per CLI oder TUI. Lokal, ohne Cloud.",
+	descriptionDe = "Terminal-nativer Social-Media-Scheduler: Instagram, Facebook, Threads, X, LinkedIn, Bluesky und Mastodon per CLI oder TUI. Markdown-basiert, lokal, ohne Cloud.",
 	noindex = false,
 } = Astro.props;
 const title = lang === 'de' ? titleDe : titleEn;
@@ -170,7 +170,13 @@ const body = localize(await Astro.slots.render('default'), lang, path);
 	html[lang="de"] .lang-en { display: none !important; }
 	html[lang="en"] .lang-de { display: none !important; }
 
+	@media (pointer: coarse) { /* finger-sized hit areas for footer/legal links (were 15-22px tall) */
+		footer a, .footer-link, .back-link { display: inline-block; padding-block: .5rem; }
+		.copy-btn { min-height: 32px; }
+	}
+
 	html {
+		overflow-x: clip; /* decorative glows/canvas must never create sideways scrolling (clip keeps position:sticky working) */
 		scroll-behavior: smooth;
 		background-color: var(--bg-primary);
 		color: var(--text-primary);

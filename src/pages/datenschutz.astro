@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import FooterSignature from '../components/FooterSignature.astro';
 ---
 
-<Layout title="Privacy Policy — postctl" titleDe="Datenschutzerklärung — postctl">
+<Layout title="Privacy Policy — how postctl handles data" titleDe="Datenschutzerklärung — postctl" description="Privacy policy for postctl and postctl.sh: local-first data, license check via Polar, no cookies or tracking, hosting in Vienna, your GDPR rights." descriptionDe="Datenschutzerklärung für postctl und postctl.sh: lokale Daten, Lizenzprüfung über Polar, keine Cookies oder Tracker, Hosting in Wien, deine DSGVO-Rechte.">
   <!-- Background Glows -->
   <div class="bg-glow bg-glow-1"></div>
   <div class="bg-glow bg-glow-2"></div>
@@ -43,7 +43,7 @@ import FooterSignature from '../components/FooterSignature.astro';
     <div class="privacy-stack">
       <div class="privacy-card">
         <div class="card-label">// 01_CONTROLLER</div>
-        <h3 class="card-title"><span class="lang-en">Controller</span><span class="lang-de">Verantwortlicher</span></h3>
+        <h2 class="card-title"><span class="lang-en">Controller</span><span class="lang-de">Verantwortlicher</span></h2>
         <p class="card-text">
           <span class="lang-en">The controller within the meaning of the GDPR is Gerwin Weiher, sole proprietor trading as <strong>Abteilung83</strong>, Steyrergasse 88/4, 8010 Graz, Austria, e-mail: <a href="mailto:post@abteilung83.com" class="accent-link underline">post@abteilung83.com</a> (see also the legal notice).</span>
           <span class="lang-de">Verantwortlicher im Sinne der DSGVO ist Gerwin Weiher, Einzelunternehmer, <strong>Abteilung83</strong>, Steyrergasse 88/4, 8010 Graz, Österreich, E-Mail: <a href="mailto:post@abteilung83.com" class="accent-link underline">post@abteilung83.com</a> (siehe auch Impressum).</span>
@@ -52,7 +52,7 @@ import FooterSignature from '../components/FooterSignature.astro';
 
       <div class="privacy-card">
         <div class="card-label">// 02_PRIVACY_OVERVIEW</div>
-        <h3 class="card-title"><span class="lang-en">Privacy at a Glance</span><span class="lang-de">Datenschutz auf einen Blick</span></h3>
+        <h2 class="card-title"><span class="lang-en">Privacy at a Glance</span><span class="lang-de">Datenschutz auf einen Blick</span></h2>
         <p class="card-text">
           <span class="lang-en">postctl is a <strong>local-first</strong> application. Your posts, drafts, history and the credentials of your social media accounts stay on your own computer. We do not operate a cloud service for postctl and do not receive your content or your access tokens.</span>
           <span class="lang-de">postctl ist eine <strong>local-first</strong>-Anwendung. Deine Beiträge, Entwürfe, dein Verlauf und die Zugangsdaten deiner Social-Media-Konten bleiben auf deinem eigenen Rechner. Wir betreiben keinen Cloud-Dienst für postctl und erhalten weder deine Inhalte noch deine Zugriffstoken.</span>
@@ -61,7 +61,7 @@ import FooterSignature from '../components/FooterSignature.astro';
 
       <div class="privacy-card">
         <div class="card-label">// 03_APP_DATA</div>
-        <h3 class="card-title"><span class="lang-en">Data in the App</span><span class="lang-de">Daten in der App</span></h3>
+        <h2 class="card-title"><span class="lang-en">Data in the App</span><span class="lang-de">Daten in der App</span></h2>
         <p class="card-text">
           <span class="lang-en">Account tokens in the local database are encrypted with AES-256-GCM using a random key stored in a private file on your device; configuration and database files are readable by you only. Backups you create are encrypted as well (key derived from your password with PBKDF2). There is no telemetry, no usage tracking and no crash reporting.</span>
           <span class="lang-de">Konto-Tokens in der lokalen Datenbank werden mit AES-256-GCM und einem zufälligen Schlüssel in einer privaten Datei auf deinem Gerät verschlüsselt; Konfigurations- und Datenbankdateien sind nur für dich lesbar. Von dir erstellte Backups werden ebenfalls verschlüsselt (Schlüssel per PBKDF2 aus deinem Passwort abgeleitet). Es gibt keine Telemetrie, kein Nutzungs-Tracking und keine Absturzberichte.</span>
@@ -74,7 +74,7 @@ import FooterSignature from '../components/FooterSignature.astro';
 
       <div class="privacy-card">
         <div class="card-label">// 04_LICENSE_PAYMENT</div>
-        <h3 class="card-title"><span class="lang-en">Payment & Licensing (Polar.sh)</span><span class="lang-de">Zahlung & Lizenzierung (Polar.sh)</span></h3>
+        <h2 class="card-title"><span class="lang-en">Payment & Licensing (Polar.sh)</span><span class="lang-de">Zahlung & Lizenzierung (Polar.sh)</span></h2>
         <p class="card-text">
           <span class="lang-en">If you buy a postctl Pro license, payment and license-key issuing are handled by <strong>Polar.sh</strong> (Polar Software Inc.) as "Merchant of Record". Polar processes e-mail address, billing and payment data to conclude the contract and fulfil tax obligations (Art. 6(1)(b) and (c) GDPR). Data may be transferred to the USA; details and safeguards are in Polar's privacy policy: <a href="https://polar.sh/legal/privacy-policy" target="_blank" rel="noopener noreferrer" class="accent-link underline">polar.sh/legal/privacy-policy</a>.</span>
           <span class="lang-de">Wenn du eine postctl-Pro-Lizenz kaufst, wickeln <strong>Polar.sh</strong> (Polar Software Inc.) als „Merchant of Record“ Zahlung und Lizenzschlüssel-Ausstellung ab. Polar verarbeitet E-Mail-Adresse sowie Rechnungs- und Zahlungsdaten, um den Vertrag zu schließen und steuerliche Pflichten zu erfüllen (Art. 6 Abs. 1 lit. b und c DSGVO). Eine Übermittlung in die USA ist möglich; Einzelheiten und Garantien stehen in Polars Datenschutzerklärung: <a href="https://polar.sh/legal/privacy-policy" target="_blank" rel="noopener noreferrer" class="accent-link underline">polar.sh/legal/privacy-policy</a>.</span>
@@ -87,7 +87,7 @@ import FooterSignature from '../components/FooterSignature.astro';
 
       <div class="privacy-card">
         <div class="card-label">// 05_WEBSITE</div>
-        <h3 class="card-title"><span class="lang-en">This Website</span><span class="lang-de">Diese Website</span></h3>
+        <h2 class="card-title"><span class="lang-en">This Website</span><span class="lang-de">Diese Website</span></h2>
         <p class="card-text">
           <span class="lang-en">We do not use cookies, local storage, analytics, tracking pixels, embedded third-party content or external CDNs. Fonts are served from this site itself. Links to external sites (e.g. GitHub, Polar) are plain links; data is only exchanged with those sites once you open them.</span>
           <span class="lang-de">Wir verwenden keine Cookies, keinen Local Storage, keine Analyse- oder Tracking-Dienste, keine eingebetteten Inhalte Dritter und keine externen CDNs. Schriftarten werden von dieser Website selbst ausgeliefert. Links auf externe Seiten (z. B. GitHub, Polar) sind einfache Links; Daten werden mit diesen Seiten erst ausgetauscht, wenn du sie öffnest.</span>
@@ -100,7 +100,7 @@ import FooterSignature from '../components/FooterSignature.astro';
 
       <div class="privacy-card">
         <div class="card-label">// 06_CONTACT</div>
-        <h3 class="card-title"><span class="lang-en">Contact</span><span class="lang-de">Kontaktaufnahme</span></h3>
+        <h2 class="card-title"><span class="lang-en">Contact</span><span class="lang-de">Kontaktaufnahme</span></h2>
         <p class="card-text">
           <span class="lang-en">If you e-mail us, we process your address and message to answer your request (Art. 6(1)(b) or (f) GDPR) and delete it once it is no longer needed, subject to statutory retention periods.</span>
           <span class="lang-de">Wenn du uns per E-Mail kontaktierst, verarbeiten wir deine Adresse und Nachricht zur Beantwortung deiner Anfrage (Art. 6 Abs. 1 lit. b oder f DSGVO) und löschen sie, sobald sie nicht mehr benötigt werden, vorbehaltlich gesetzlicher Aufbewahrungsfristen.</span>
@@ -109,7 +109,7 @@ import FooterSignature from '../components/FooterSignature.astro';
 
       <div class="privacy-card">
         <div class="card-label">// 07_USER_RIGHTS</div>
-        <h3 class="card-title"><span class="lang-en">Your Rights (GDPR)</span><span class="lang-de">Deine Rechte (DSGVO)</span></h3>
+        <h2 class="card-title"><span class="lang-en">Your Rights (GDPR)</span><span class="lang-de">Deine Rechte (DSGVO)</span></h2>
         <p class="card-text">
           <span class="lang-en">You have the right to access, rectification, erasure, restriction of processing, data portability and to object. Please contact post@abteilung83.com. You also have the right to lodge a complaint with a supervisory authority; in Austria this is the <a href="https://www.dsb.gv.at" target="_blank" rel="noopener noreferrer" class="accent-link underline">Datenschutzbehörde</a>, Barichgasse 40–42, 1030 Vienna.</span>
           <span class="lang-de">Dir stehen die Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch zu. Wende dich dazu an post@abteilung83.com. Außerdem kannst du dich bei einer Aufsichtsbehörde beschweren; in Österreich ist das die <a href="https://www.dsb.gv.at" target="_blank" rel="noopener noreferrer" class="accent-link underline">Datenschutzbehörde</a>, Barichgasse 40–42, 1030 Wien.</span>
