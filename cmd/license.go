@@ -72,7 +72,7 @@ var licenseActivateCmd = &cobra.Command{
 		fmt.Printf("Activating license with Polar.sh organization %s...\n", orgID)
 
 		url := "https://api.polar.sh/v1/customer-portal/license-keys/activate"
-		resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonBytes))
+		resp, err := polarHTTP.Post(url, "application/json", bytes.NewBuffer(jsonBytes))
 		if err != nil {
 			fmt.Printf("✗ Network error: Could not reach Polar.sh API (%v)\n", err)
 			fmt.Println("  Basic fallback: key registered. Activates when connection returns.")
@@ -116,7 +116,7 @@ var licenseActivateCmd = &cobra.Command{
 		// the product wasn't configured to track individual devices.
 		if polarErr.Error == "NotPermitted" {
 			valBody, _ := json.Marshal(LicenseValidateRequest{Key: key, OrganizationID: orgID})
-			valResp, valErr := http.Post("https://api.polar.sh/v1/customer-portal/license-keys/validate", "application/json", bytes.NewBuffer(valBody))
+			valResp, valErr := polarHTTP.Post("https://api.polar.sh/v1/customer-portal/license-keys/validate", "application/json", bytes.NewBuffer(valBody))
 			if valErr == nil {
 				defer valResp.Body.Close()
 				valBytes, _ := io.ReadAll(valResp.Body)
@@ -218,7 +218,7 @@ var licenseStatusCmd = &cobra.Command{
 		jsonBytes, _ := json.Marshal(reqBody)
 
 		url := "https://api.polar.sh/v1/customer-portal/license-keys/validate"
-		resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonBytes))
+		resp, err := polarHTTP.Post(url, "application/json", bytes.NewBuffer(jsonBytes))
 		if err != nil {
 			fmt.Println("License Type: PRO (Offline)")
 			fmt.Printf("License Key:  %s\n", maskSecret(key))
@@ -277,3 +277,6 @@ func init() {
 	licenseCmd.AddCommand(licenseStatusCmd)
 	rootCmd.AddCommand(licenseCmd)
 }
+
+// polarHTTP bounds every license call; http.DefaultClient has no timeout and could hang the CLI.
+var polarHTTP = &http.Client{Timeout: 15 * time.Second}

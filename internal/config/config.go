@@ -267,13 +267,17 @@ func loadConfig(profile string) error {
 	// Falls die Konfigurationsdatei nicht existiert, erstellen wir sie mit Standardwerten
 	configPath := filepath.Join(dir, "config.yaml")
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		if err := os.MkdirAll(dir, 0755); err != nil {
+		if err := os.MkdirAll(dir, 0o700); err != nil {
 			return fmt.Errorf("create config dir: %w", err)
 		}
-		if err := os.WriteFile(configPath, []byte(defaultConfigYAML(profile)), 0644); err != nil {
+		if err := os.WriteFile(configPath, []byte(defaultConfigYAML(profile)), 0o600); err != nil {
 			return fmt.Errorf("create default config file: %w", err)
 		}
 	}
+
+	// The file holds API secrets and tokens: older versions wrote it world-readable.
+	_ = os.Chmod(configPath, 0o600)
+	_ = os.Chmod(dir, 0o700)
 
 	yamlBytes, err := os.ReadFile(configPath)
 	if err != nil {
@@ -463,7 +467,7 @@ func defaultDataDir() string {
 	base := coreconfig.DataDir("postctl")
 	if ActiveProfile != "" {
 		dir := filepath.Join(base, "profiles", ActiveProfile)
-		_ = os.MkdirAll(dir, 0o755)
+		_ = os.MkdirAll(dir, 0o700)
 		return dir
 	}
 
@@ -484,7 +488,7 @@ func defaultDataDir() string {
 // SaveConfig schreibt die aktuelle ActiveConfig zurück in config.yaml des aktiven Profils
 func SaveConfig() error {
 	dir := configDir(ActiveProfile)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return fmt.Errorf("create config dir: %w", err)
 	}
 	configPath := filepath.Join(dir, "config.yaml")
@@ -494,9 +498,10 @@ func SaveConfig() error {
 		return fmt.Errorf("marshal config to yaml: %w", err)
 	}
 
-	if err := os.WriteFile(configPath, yamlBytes, 0644); err != nil {
+	if err := os.WriteFile(configPath, yamlBytes, 0o600); err != nil {
 		return fmt.Errorf("write config file: %w", err)
 	}
+	_ = os.Chmod(configPath, 0o600) // WriteFile keeps the mode of an existing file
 
 	return nil
 }

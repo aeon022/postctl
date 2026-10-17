@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/aeon022/postctl/internal/redact"
 	"time"
 
 	"github.com/aeon022/postctl/internal/models"
@@ -20,7 +21,7 @@ func (s *SQLiteStore) AddHistoryEntry(ctx context.Context, entry *models.History
 
 	var errorStr sql.NullString
 	if entry.Error != "" {
-		errorStr = sql.NullString{String: entry.Error, Valid: true}
+		errorStr = sql.NullString{String: redact.Secrets(entry.Error), Valid: true}
 	}
 
 	var platformID sql.NullString

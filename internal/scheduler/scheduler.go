@@ -31,6 +31,15 @@ func PublishPost(ctx context.Context, s *store.SQLiteStore, post *models.Post, d
 	// Falls es ein Thread-Post ist, verteile die globalen Bilder auf die einzelnen Tweets
 	post.PrepareTweets()
 
+	// Nur echte Bilddateien hochladen (verhindert das Abfließen beliebiger lokaler Dateien)
+	if err := platforms.CheckPostImages(post); err != nil && !dryRun {
+		post.Status = models.StatusFailed
+		post.Error = err.Error()
+		_ = s.SavePost(ctx, post)
+		_ = s.AddHistoryEntry(ctx, &models.HistoryEntry{PostID: post.ID, Action: "failed", Error: err.Error()})
+		return "", err
+	}
+
 	// Plattform holen
 	plat, err := platforms.GetPlatform(post.Platform, s, dryRun)
 	if err != nil {

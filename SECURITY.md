@@ -29,6 +29,8 @@ Good-faith research that follows this policy — no access to other people's dat
 ## How postctl protects your data (summary)
 
 - Local-first: posts, history and credentials stay on your machine; there is no postctl cloud.
-- Account tokens in the local database and exported backups are encrypted with AES-256-GCM.
+- Config, database and logs are owner-only (`0600`). Account tokens are encrypted with AES-256-GCM using a random per-installation key file; backups use AES-256-GCM with a PBKDF2-derived key.
+- Uploads from local paths are limited to real image files; token-like values are redacted from logs and stored errors.
+- MCP: publishing and scheduling are off unless explicitly enabled (`POSTCTL_MCP_ALLOW_PUBLISH=1`).
 - No telemetry. Network traffic goes only to the platforms you connect, to Polar.sh for license checks, and to an AI provider if you enable AI features with your own key.
-- Keep your config and database in a directory only you can read, and rotate tokens if a device is lost.
+- Rotate tokens if a device is lost; copy the key file only between your own devices, never into a synced folder.

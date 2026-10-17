@@ -2068,7 +2068,7 @@ func (m Model) exportHistoryCmd(history []models.HistoryEntry) tea.Cmd {
 		}
 
 		filename := "history_export.json"
-		err = os.WriteFile(filename, b, 0644)
+		err = os.WriteFile(filename, b, 0o600)
 		if err != nil {
 			return exportFinishedMsg{err: fmt.Errorf("write file: %w", err)}
 		}
@@ -2089,7 +2089,7 @@ func (m Model) exportHistoryEntryCmd(entry *models.HistoryEntry) tea.Cmd {
 		}
 
 		filename := fmt.Sprintf("history_entry_%s.json", entry.ID)
-		err = os.WriteFile(filename, b, 0644)
+		err = os.WriteFile(filename, b, 0o600)
 		if err != nil {
 			return exportFinishedMsg{err: fmt.Errorf("write file: %w", err)}
 		}

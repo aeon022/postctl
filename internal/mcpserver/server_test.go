@@ -79,6 +79,7 @@ func TestTwitterThreadSplit(t *testing.T) {
 }
 
 func TestCreateWithScheduleAndReschedule(t *testing.T) {
+	t.Setenv(allowPublishEnv, "1")
 	isolate(t)
 	id := create(t, map[string]any{"platform": "mastodon", "body": "später", "schedule": "2026-12-01T09:00:00+01:00"})
 	text, _ := call(t, handleGetPost, map[string]any{"id": id})
@@ -97,6 +98,7 @@ func TestCreateWithScheduleAndReschedule(t *testing.T) {
 }
 
 func TestValidationErrors(t *testing.T) {
+	t.Setenv(allowPublishEnv, "1") // exercise the validation behind the opt-in gate
 	isolate(t)
 	cases := []struct {
 		name string
@@ -140,6 +142,7 @@ func TestListCampaignsEmpty(t *testing.T) {
 }
 
 func TestSchedulePostLogsOneScheduledEvent(t *testing.T) {
+	t.Setenv(allowPublishEnv, "1")
 	isolate(t)
 	t.Setenv("MISSIONCTL_DATA_DIR", t.TempDir())
 	id := create(t, map[string]any{"platform": "mastodon", "body": "entwurf", "title": "Mein Beitrag"})
@@ -154,6 +157,7 @@ func TestSchedulePostLogsOneScheduledEvent(t *testing.T) {
 }
 
 func TestCreateWithScheduleLogsAndPlainDraftDoesNot(t *testing.T) {
+	t.Setenv(allowPublishEnv, "1")
 	isolate(t)
 	t.Setenv("MISSIONCTL_DATA_DIR", t.TempDir())
 	create(t, map[string]any{"platform": "bluesky", "body": "nur ein Entwurf"})

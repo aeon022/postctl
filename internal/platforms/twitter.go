@@ -105,7 +105,7 @@ func (t *TwitterPlatform) Auth(ctx context.Context) error {
 			"  5. Run the authentication command again.")
 	}
 
-	state := fmt.Sprintf("state-%d", time.Now().UnixNano())
+	state := GenerateState()
 	verifier, err := GenerateVerifier()
 	if err != nil {
 		return fmt.Errorf("generate verifier: %w", err)
@@ -773,8 +773,6 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.Flag("headless", true),
 		chromedp.Flag("disable-gpu", true),
-		chromedp.Flag("no-sandbox", true),
-		chromedp.Flag("disable-blink-features", "AutomationControlled"),
 		chromedp.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"),
 	)
 
@@ -949,12 +947,6 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 
 	err := chromedp.Run(chromeCtx, actions...)
 	if err != nil {
-		// ponytail: capture screenshot on error to debug what X is displaying
-		var buf []byte
-		if shotErr := chromedp.Run(chromeCtx, chromedp.CaptureScreenshot(&buf)); shotErr == nil {
-			_ = os.WriteFile("/Users/gweiher/Desktop/postctl_headless_error.png", buf, 0644)
-			Log("📸 Headless failure screenshot saved to Desktop as 'postctl_headless_error.png'")
-		}
 		return "", fmt.Errorf("headless post failed: %w", err)
 	}
 

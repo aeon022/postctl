@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/aeon022/postctl/internal/redact"
 	"strings"
 	"time"
 
@@ -74,7 +75,7 @@ func (s *SQLiteStore) SavePost(ctx context.Context, post *models.Post) error {
 		scheduledStr,
 		postedStr,
 		post.PlatformID,
-		post.Error,
+		redact.Secrets(post.Error),
 		post.SourceFile,
 		post.CreatedAt.Format(time.RFC3339),
 		post.UpdatedAt.Format(time.RFC3339),

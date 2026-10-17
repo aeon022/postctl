@@ -64,7 +64,7 @@ func (m *MastodonPlatform) Auth(ctx context.Context) error {
 		}
 	}
 
-	state := fmt.Sprintf("state-%d", time.Now().UnixNano())
+	state := GenerateState()
 	redirectURI := "http://127.0.0.1:8753/callback"
 	scopes := "read write"
 

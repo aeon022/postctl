@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -50,7 +51,7 @@ func toolGetPost() mcp.Tool {
 
 func toolCreatePost() mcp.Tool {
 	return mcp.NewTool("create_post",
-		mcp.WithDescription("Create a new social media post draft in the postctl database. Use publish_post to send it immediately or set schedule to publish later."),
+		mcp.WithDescription("Create a new social media post draft in the postctl database. Scheduling and publishing through MCP are disabled unless the server runs with POSTCTL_MCP_ALLOW_PUBLISH=1; otherwise the post is saved as a draft."),
 		mcp.WithString("platform", mcp.Required(), mcp.Description("Target platform: twitter, linkedin, threads, mastodon, bluesky")),
 		mcp.WithString("body", mcp.Required(), mcp.Description("Post content. For Twitter threads, separate tweets with '---' on its own line.")),
 		mcp.WithString("title", mcp.Description("Optional title for reference")),
@@ -162,6 +163,16 @@ func handleGetPost(_ context.Context, req mcp.CallToolRequest) (*mcp.CallToolRes
 	return jsonResult(post)
 }
 
+// An AI agent that reads untrusted text (mail, web pages) can be talked into publishing. Anything
+// that leads to a public post therefore needs an explicit opt-in on the MCP server's environment.
+const allowPublishEnv = "POSTCTL_MCP_ALLOW_PUBLISH"
+
+func publishAllowed() bool { return os.Getenv(allowPublishEnv) == "1" }
+
+func publishDisabled() *mcp.CallToolResult {
+	return mcp.NewToolResultError("publishing and scheduling through MCP is disabled by default (an AI agent could be tricked into posting). Drafts are fine; publish in the postctl TUI, or set " + allowPublishEnv + "=1 in this MCP server's environment to allow it.")
+}
+
 func handleCreatePost(_ context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	platform := req.GetString("platform", "")
 	body := req.GetString("body", "")
@@ -195,6 +206,9 @@ func handleCreatePost(_ context.Context, req mcp.CallToolRequest) (*mcp.CallTool
 		post.Body = body
 	}
 
+	if scheduleStr != "" && !publishAllowed() {
+		scheduleStr = "" // saved as a draft; scheduling is opt-in (see allowPublishEnv)
+	}
 	if scheduleStr != "" {
 		t, err := time.Parse(time.RFC3339, scheduleStr)
 		if err != nil {
@@ -226,6 +240,9 @@ func handlePublishPost(_ context.Context, req mcp.CallToolRequest) (*mcp.CallToo
 	if id == "" {
 		return mcp.NewToolResultError("id is required"), nil
 	}
+	if !dryRun && !publishAllowed() {
+		return publishDisabled(), nil
+	}
 	s, err := openStore()
 	if err != nil {
 		return mcp.NewToolResultError(err.Error()), nil
@@ -250,6 +267,9 @@ func handleSchedulePost(_ context.Context, req mcp.CallToolRequest) (*mcp.CallTo
 
 	if id == "" || scheduleStr == "" {
 		return mcp.NewToolResultError("id and schedule are required"), nil
+	}
+	if !publishAllowed() {
+		return publishDisabled(), nil
 	}
 	t, err := time.Parse(time.RFC3339, scheduleStr)
 	if err != nil {

@@ -260,6 +260,9 @@ Switch between views using tabs or the keybindings below.
 
 postctl ships a built-in MCP server that exposes all core operations to AI agents. This lets tools like Claude Desktop create, schedule, and publish posts on your behalf.
 
+> [!IMPORTANT]
+> **Publishing and scheduling through MCP are off by default** — an AI agent that reads untrusted text (mail, web pages) could be tricked into posting. Without opt-in, `create_post` saves drafts and `publish_post` / `schedule_post` refuse. To allow them, start the MCP server with `POSTCTL_MCP_ALLOW_PUBLISH=1` in its environment (`dry_run` always works).
+
 ### Claude Desktop Configuration
 
 Add the following to `~/Library/Application Support/Claude/claude_desktop_config.json`:
@@ -314,6 +317,18 @@ Claude calls `list_posts` with `status: scheduled`, presents the results for you
 Claude calls `get_post` to retrieve the original, then calls `create_post` twice — once for `linkedin` and once for `threads` — adapting tone and length for each platform automatically.
 
 ---
+
+## Security
+
+- **Local files are owner-only:** `config.yaml` (API secrets), the database and the scheduler log are written with `0600` permissions; older, world-readable files are tightened automatically on the next start.
+- **Token encryption:** stored tokens use AES-256-GCM with a random per-installation key in `~/.config/postctl/encryption.key` (`0600`, never inside a synced data directory). Installations that predate the key file switch with `postctl security migrate`; `postctl security status` shows what you use. Copy the key file to your other devices — a synced database is unreadable without it.
+- **Backups** (`postctl config export` / `config import`) are encrypted with AES-256-GCM, key derived with PBKDF2-HMAC-SHA256 (600k iterations, random salt). Older backups still restore.
+- **Uploads are checked:** only real PNG/JPEG/GIF/WebP files (any extension, symlinks resolved, ≤ 25 MB) are uploaded from local paths — a post can never publish e.g. an SSH key.
+- **No secrets in logs:** token-like values are stripped from logs, history and error messages. `postctl config set KEY -` reads a secret from stdin instead of the command line.
+- **OAuth:** random `state`, PKCE, callback only on `127.0.0.1`; forged callbacks cannot abort a login.
+- **X cookie mode** is unofficial, off by default and needs `twitter.unofficial_cookie_mode: true`.
+
+Report vulnerabilities privately: see [SECURITY.md](SECURITY.md).
 
 ## Platform Notes
 

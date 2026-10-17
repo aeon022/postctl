@@ -40,13 +40,9 @@ if [ ! -d "$TARGET_DIR" ]; then
 fi
 
 # Führe den Import im Hintergrund aus
+# Nur das installierte postctl verwenden (kein ./postctl aus dem Repository: wäre fremder Code)
 if command -v postctl >/dev/null 2>&1; then
     postctl import "$TARGET_DIR" > /dev/null 2>&1 &
-else
-    # Fallback: Versuche lokales Binary
-    if [ -f ./postctl ]; then
-        ./postctl import "$TARGET_DIR" > /dev/null 2>&1 &
-    fi
 fi
 `, hookDirFlag)
 

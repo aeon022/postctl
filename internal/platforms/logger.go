@@ -2,6 +2,8 @@ package platforms
 
 import (
 	"fmt"
+
+	"github.com/aeon022/postctl/internal/redact"
 	"sync"
 	"time"
 )
@@ -15,7 +17,7 @@ var (
 func Log(format string, a ...interface{}) {
 	LogMu.Lock()
 	defer LogMu.Unlock()
-	msg := fmt.Sprintf(format, a...)
+	msg := redact.Secrets(fmt.Sprintf(format, a...))
 	timestamp := time.Now().Format("15:04:05")
 	LogBuffer = append(LogBuffer, fmt.Sprintf("[%s] %s", timestamp, msg))
 	if len(LogBuffer) > 200 {

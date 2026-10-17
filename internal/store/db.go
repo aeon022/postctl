@@ -60,7 +60,7 @@ func NewSQLiteStore(dbPath string, shared bool) (*SQLiteStore, error) {
 
 	// Verzeichnis erstellen, falls es nicht existiert
 	dbDir := filepath.Dir(expandedPath)
-	if err := os.MkdirAll(dbDir, 0755); err != nil {
+	if err := os.MkdirAll(dbDir, 0o700); err != nil {
 		return nil, fmt.Errorf("create db directory: %w", err)
 	}
 
@@ -77,6 +77,9 @@ func NewSQLiteStore(dbPath string, shared bool) (*SQLiteStore, error) {
 	}
 
 	store := &SQLiteStore{db: db, path: expandedPath, shared: shared}
+	for _, f := range []string{expandedPath, expandedPath + "-wal", expandedPath + "-shm"} {
+		_ = os.Chmod(f, 0o600) // posts and encrypted tokens: owner only (no-op if the file does not exist)
+	}
 
 	// Migrationen ausführen
 	if err := store.migrate(); err != nil {

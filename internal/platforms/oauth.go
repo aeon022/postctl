@@ -10,6 +10,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 	"html"
@@ -75,18 +76,18 @@ func StartCallbackServer(expectedState string, timeout time.Duration) (string, e
 		code := r.URL.Query().Get("code")
 		authErr := r.URL.Query().Get("error")
 
+		// A request without the right state (another local page, a scan) must not end the login.
+		if state != expectedState {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("<h1>Ungültiger State</h1>"))
+			return
+		}
+
 		if authErr != "" {
 			errChan <- fmt.Errorf("oauth error from provider: %s", authErr)
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("<h1>Authentifizierung fehlgeschlagen</h1><p>Fehler: " + html.EscapeString(authErr) + "</p>"))
-			return
-		}
-
-		if state != expectedState {
-			errChan <- fmt.Errorf("state mismatch: got %q, want %q", state, expectedState)
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("<h1>Ungültiger State</h1>"))
 			return
 		}
 
@@ -175,18 +176,18 @@ func StartCallbackServerTLS(expectedState string, timeout time.Duration) (string
 		code := r.URL.Query().Get("code")
 		authErr := r.URL.Query().Get("error")
 
+		// A request without the right state (another local page, a scan) must not end the login.
+		if state != expectedState {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("<h1>Ungültiger State</h1>"))
+			return
+		}
+
 		if authErr != "" {
 			errChan <- fmt.Errorf("oauth error from provider: %s", authErr)
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("<h1>Authentifizierung fehlgeschlagen</h1><p>Fehler: " + authErr + "</p>"))
-			return
-		}
-
-		if state != expectedState {
-			errChan <- fmt.Errorf("state mismatch: got %q, want %q", state, expectedState)
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("<h1>Ungültiger State</h1>"))
 			return
 		}
 
@@ -293,4 +294,13 @@ func generateSelfSignedCert() (tls.Certificate, error) {
 	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: privBytes})
 
 	return tls.X509KeyPair(certPEM, keyPEM)
+}
+
+// GenerateState returns an unguessable OAuth state value (CSRF protection for the callback).
+func GenerateState() string {
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		panic("crypto/rand unavailable: " + err.Error())
+	}
+	return hex.EncodeToString(b)
 }

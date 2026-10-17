@@ -80,7 +80,7 @@ func (l *LinkedInPlatform) Auth(ctx context.Context) error {
 			"  5. Run the authentication command again.")
 	}
 
-	state := fmt.Sprintf("state-%d", time.Now().UnixNano())
+	state := GenerateState()
 	redirectURI := "http://localhost:8753/callback"
 
 	scopes := linkedinScopes()

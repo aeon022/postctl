@@ -110,16 +110,23 @@ func TestCallbackServer(t *testing.T) {
 		t.Errorf("success: %+v", r)
 	}
 
+	// a forged state is answered with 400 but must NOT end the login: the real callback still works
 	ch = run("S2", 5*time.Second)
 	if status, _ := callbackGet(t, "state=WRONG&code=X"); status != 400 {
 		t.Errorf("mismatch status = %d", status)
 	}
-	if r := <-ch; r.err == nil || !strings.Contains(r.err.Error(), "state mismatch") || r.code != "" {
-		t.Errorf("a forged state must be rejected, got %+v", r)
+	if status, _ := callbackGet(t, "error=denied"); status != 400 {
+		t.Errorf("a provider error without the right state is ignored, status = %d", status)
+	}
+	if status, _ := callbackGet(t, "state=S2&code=REAL"); status != 200 {
+		t.Errorf("the genuine callback still succeeds, status = %d", status)
+	}
+	if r := <-ch; r.err != nil || r.code != "REAL" {
+		t.Errorf("forged requests must not poison the flow, got %+v", r)
 	}
 
 	ch = run("S3", 5*time.Second)
-	_, body := callbackGet(t, "error=%3Cscript%3Ealert(1)%3C%2Fscript%3E")
+	_, body := callbackGet(t, "state=S3&error=%3Cscript%3Ealert(1)%3C%2Fscript%3E")
 	if strings.Contains(body, "<script>") {
 		t.Errorf("provider error must be HTML-escaped in the response, got %q", body)
 	}
@@ -137,5 +144,12 @@ func TestCallbackServer(t *testing.T) {
 
 	if r := <-run("S5", 100*time.Millisecond); r.err == nil || !strings.Contains(r.err.Error(), "timed out") {
 		t.Errorf("timeout: %+v", r)
+	}
+}
+
+func TestGenerateStateIsUnguessable(t *testing.T) {
+	a, b := GenerateState(), GenerateState()
+	if a == b || len(a) != 32 {
+		t.Fatalf("state must be 16 random bytes, got %q / %q", a, b)
 	}
 }

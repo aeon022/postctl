@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -73,6 +74,14 @@ func maskSecret(s string) string {
 }
 
 func setConfigValue(key, value string) error {
+	if value == "-" { // read the secret from stdin instead of the command line
+		b, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return fmt.Errorf("read value from stdin: %w", err)
+		}
+		value = strings.TrimSpace(string(b))
+	}
+
 	switch strings.ToLower(key) {
 	case "db_path":
 		config.ActiveConfig.DBPath = value
@@ -283,6 +292,9 @@ func reportConfigShow(cmd *cobra.Command) {
 
 func reportConfigSuccess(cmd *cobra.Command, key, value string) {
 	out := cmd.OutOrStdout()
+	if k := strings.ToLower(key); strings.Contains(k, "token") || strings.Contains(k, "secret") || strings.Contains(k, "password") || strings.Contains(k, "key") || strings.Contains(k, "webhook") {
+		value = maskSecret(value) // never echo credentials back into the terminal scrollback
+	}
 	if FormatFlag == "json" {
 		outJSON := configSuccessJSON{
 			OK:    true,

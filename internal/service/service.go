@@ -105,6 +105,10 @@ func Install(profile string) error {
 	if err := os.WriteFile(p, []byte(plist(exe, profile)), 0o644); err != nil {
 		return err
 	}
+	if f, err := os.OpenFile(logPath(profile), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o600); err == nil { // post text ends up in the log
+		f.Close()
+		_ = os.Chmod(logPath(profile), 0o600)
+	}
 	_ = launchctl("bootout", domain()+"/"+Label(profile)) // reload with the new plist; ok if not loaded
 	for i := 0; i < 50 && Running(profile); i++ {         // bootout is asynchronous; bootstrapping too early fails with EIO
 		time.Sleep(100 * time.Millisecond)

@@ -85,7 +85,7 @@ func (t *ThreadsPlatform) Auth(ctx context.Context) error {
 			"  7. Run the authentication command again.")
 	}
 
-	state := fmt.Sprintf("state-%d", time.Now().UnixNano())
+	state := GenerateState()
 	redirectURI := "https://localhost:8753/callback"
 
 	// Scopes für Threads
