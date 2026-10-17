@@ -63,8 +63,8 @@ import FooterSignature from '../components/FooterSignature.astro';
         <div class="card-label">// 03_APP_DATA</div>
         <h3 class="card-title"><span class="lang-en">Data in the App</span><span class="lang-de">Daten in der App</span></h3>
         <p class="card-text">
-          <span class="lang-en">Account tokens in the local database are encrypted with AES-256-GCM; backups you create are encrypted as well. There is no telemetry, no usage tracking and no crash reporting.</span>
-          <span class="lang-de">Konto-Tokens in der lokalen Datenbank werden mit AES-256-GCM verschlüsselt, von dir erstellte Backups ebenfalls. Es gibt keine Telemetrie, kein Nutzungs-Tracking und keine Absturzberichte.</span>
+          <span class="lang-en">Account tokens in the local database are encrypted with AES-256-GCM using a random key stored in a private file on your device; configuration and database files are readable by you only. Backups you create are encrypted as well (key derived from your password with PBKDF2). There is no telemetry, no usage tracking and no crash reporting.</span>
+          <span class="lang-de">Konto-Tokens in der lokalen Datenbank werden mit AES-256-GCM und einem zufälligen Schlüssel in einer privaten Datei auf deinem Gerät verschlüsselt; Konfigurations- und Datenbankdateien sind nur für dich lesbar. Von dir erstellte Backups werden ebenfalls verschlüsselt (Schlüssel per PBKDF2 aus deinem Passwort abgeleitet). Es gibt keine Telemetrie, kein Nutzungs-Tracking und keine Absturzberichte.</span>
         </p>
         <p class="card-text">
           <span class="lang-en">The app only opens network connections that you cause: (a) to the platforms you connect and publish to (e.g. Instagram, Facebook, Threads, X, LinkedIn, Bluesky, Mastodon) — your content and tokens go directly from your computer to that platform, which processes them under its own privacy policy; (b) to Polar.sh when you activate or check a Pro license (see below); (c) to an AI provider of your choice if you use AI features with your own API key.</span>

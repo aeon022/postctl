@@ -633,8 +633,8 @@ $ postctl --profile work list --status scheduled
 							<span class="faq-icon">+</span>
 						</summary>
 						<div class="faq-answer">
-							<p class="lang-en">Your API keys, tokens, and cookies are stored <strong>locally</strong> on your machine inside a SQLite database. No credentials ever leave your computer or get sent to third-party servers. Your backups are encrypted locally using <strong>AES-256-GCM</strong> with key-stretching (PBKDF2).</p>
-							<p class="lang-de">Deine API-Keys, Tokens und Cookies werden <strong>lokal</strong> in einer SQLite-Datenbank auf deinem Rechner gespeichert. Keine Zugangsdaten verlassen jemals dein Gerät. Backups werden lokal mit <strong>AES-256-GCM</strong> und Key-Stretching (PBKDF2) verschlüsselt.</p>
+							<p class="lang-en">Your API keys, tokens, and cookies are stored <strong>locally</strong> on your machine, in owner-only files. Tokens are encrypted with <strong>AES-256-GCM</strong> using a private per-installation key; nothing is ever sent to us. Backups use AES-256-GCM with a PBKDF2-derived key (600,000 iterations, random salt).</p>
+							<p class="lang-de">Deine API-Keys, Tokens und Cookies werden <strong>lokal</strong> auf deinem Rechner in Dateien gespeichert, die nur du lesen kannst. Tokens werden mit <strong>AES-256-GCM</strong> und einem privaten Schlüssel pro Installation verschlüsselt; an uns wird nichts gesendet. Backups nutzen AES-256-GCM mit PBKDF2-Schlüsselableitung (600.000 Iterationen, zufälliger Salt).</p>
 						</div>
 					</details>
 
@@ -724,6 +724,10 @@ $ postctl --profile work list --status scheduled
 								<li>
 									<span class="lang-en"><strong>Profiles &amp; scheduler service:</strong> separate accounts per profile, each with its own launchd scheduler (<code>postctl daemon install</code>), plus a calendar tab in the TUI.</span>
 									<span class="lang-de"><strong>Profile &amp; Scheduler-Dienst:</strong> getrennte Konten pro Profil, jeweils mit eigenem launchd-Scheduler (<code>postctl daemon install</code>), dazu ein Kalender-Tab in der TUI.</span>
+								</li>
+								<li>
+									<span class="lang-en"><strong>Security hardening:</strong> owner-only config/DB/log files, per-installation token key (<code>postctl security status</code>), PBKDF2 backups, image-only uploads, secrets redacted from logs, MCP publishing off by default, X cookie mode opt-in.</span>
+									<span class="lang-de"><strong>Sicherheits-Härtung:</strong> Config/DB/Log nur für dich lesbar, Token-Schlüssel pro Installation (<code>postctl security status</code>), PBKDF2-Backups, nur Bild-Uploads, Geheimnisse aus Logs entfernt, MCP-Veröffentlichung standardmäßig aus, X-Cookie-Modus nur per Opt-in.</span>
 								</li>
 								<li>
 									<span class="lang-en"><strong>Ban protection:</strong> overdue posts are spread in 20-minute steps, and X posts keep a 60-minute minimum gap.</span>

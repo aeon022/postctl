@@ -116,3 +116,15 @@ push alone means it's live — say so explicitly and remind whoever's driving to
 - **Language switch** is a plain link: `<a id="lang-toggle" href="__ALT_LANG_URL__">` (the placeholder is replaced per page). Internal links in German pages (`/`, `/docs`, `/impressum`, `/datenschutz`) are prefixed with `/de/` automatically.
 - Fonts (Inter, Space Grotesk, Fira Code, latin subset) are self-hosted via `@fontsource/*`; no Google Fonts request.
 - `src/pages/404.astro` is bilingual and `noindex`; point the web server's error page at `/404.html`.
+
+## Web server security headers (Plesk → Apache & nginx → additional nginx directives)
+
+```nginx
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-Frame-Options "DENY" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+```
+`unsafe-inline` is needed for the inline scripts/styles (JSON-LD, hero effects); tighten with hashes later. Also set the 404 page to `/404.html`.
