@@ -570,16 +570,17 @@ $ postctl --profile work list --status scheduled
 								<span class="promo-label"><span class="lang-en">Code:</span><span class="lang-de">Code:</span></span>
 								<code class="promo-value">postctl2026</code>
 							</div>
-							<p class="plan-desc"><span class="lang-en">Unlock all 6 platforms, stats dashboard, and support open-source development.</span><span class="lang-de">Schalte alle 6 Plattformen und das Statistik-Dashboard frei und unterstütze die Open-Source-Entwicklung.</span></p>
+							<p class="plan-desc"><span class="lang-en">Unlock unlimited networks, the stats dashboard, and support open-source development.</span><span class="lang-de">Schalte unbegrenzt viele Netzwerke und das Statistik-Dashboard frei und unterstütze die Open-Source-Entwicklung.</span></p>
 						</div>
 						<ul class="plan-features">
-							<li><span class="check-icon">✓</span> <span><strong><span class="lang-en">Connect all 6 supported platforms</span><span class="lang-de">Alle 6 unterstützten Plattformen verbinden</span></strong></span></li>
+							<li><span class="check-icon">✓</span> <span><strong><span class="lang-en">Connect unlimited social networks</span><span class="lang-de">Beliebig viele soziale Netzwerke verbinden</span></strong></span></li>
 							<li><span class="check-icon">✓</span> <span><strong><span class="lang-en">Use on up to 5 personal devices</span><span class="lang-de">Auf bis zu 5 Geräten nutzen</span></strong> <span class="lang-en">(activations limit)</span><span class="lang-de">(Aktivierungslimit)</span></span></li>
 							<li><span class="check-icon">✓</span> <span><span class="lang-en">Automated license key issuance via Polar.sh</span><span class="lang-de">Automatische Lizenzschlüssel-Ausstellung über Polar.sh</span></span></li>
 							<li><span class="check-icon">✓</span> <span><span class="lang-en">Support open-source development & funding</span><span class="lang-de">Unterstützt Open-Source-Entwicklung & Finanzierung</span></span></li>
 						</ul>
 						<div class="plan-cta">
 							<a href="https://buy.polar.sh/polar_cl_ookKcZLP6IjbeYc9inqKu3734J9WA8ssy5cL90jmJSs" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full"><span class="lang-en">Get Pro License</span><span class="lang-de">Pro-Lizenz holen</span></a>
+							<p class="plan-note"><span class="lang-en">30-day money-back guarantee · updates as long as postctl is developed · <a href="/terms">terms</a></span><span class="lang-de">30 Tage Geld-zurück-Garantie · Updates, solange postctl entwickelt wird · <a href="/terms">Bedingungen</a></span></p>
 						</div>
 					</div>
 				</div>
@@ -656,8 +657,8 @@ $ postctl --profile work list --status scheduled
 							<span class="faq-icon">+</span>
 						</summary>
 						<div class="faq-answer">
-							<p class="lang-en"><code>postctl</code> supports <strong>both</strong> the official OAuth 2.0 API credentials and cookie-based web session login. Since Twitter/X API pricing is high (~$100/mo), the cookie-based bypass simulates standard browser interactions (including randomized delays and automated headless Google Chrome via <code>chromedp</code>) to post for free. If you have a developer account, we highly recommend using the official API for maximum stability.</p>
-							<p class="lang-de"><code>postctl</code> unterstützt <strong>sowohl</strong> die offizielle OAuth 2.0 API als auch die Cookie-basierte Web-Session-Anmeldung. Da Twitter/X hohe API-Preise (ca. 100$/Monat) verlangt, bietet der Cookie-Bypass eine kostenlose Alternative, die typische Browser-Aktionen (inklusive zufälliger Verzögerungen und headless Google Chrome via <code>chromedp</code>) simuliert. Wenn du einen Entwickler-Account hast, empfehlen wir die Nutzung der offiziellen API für maximale Stabilität.</p>
+							<p class="lang-en"><code>postctl</code> uses the <strong>official X API</strong> (OAuth 2.0) — the supported, stable way. API access is paid by whoever uses it. An unofficial cookie mode exists for experiments, but it is switched off by default, against X's terms, unsupported and can get an account suspended; it must be enabled deliberately in the configuration.</p>
+							<p class="lang-de"><code>postctl</code> nutzt die <strong>offizielle X-API</strong> (OAuth 2.0) — der unterstützte, stabile Weg. Den API-Zugang bezahlt, wer ihn nutzt. Für Experimente gibt es einen inoffiziellen Cookie-Modus, der aber standardmäßig aus ist, gegen die X-Nutzungsbedingungen verstößt, nicht unterstützt wird und zur Kontosperrung führen kann; er muss bewusst in der Konfiguration aktiviert werden.</p>
 						</div>
 					</details>
 
@@ -805,7 +806,8 @@ $ postctl --profile work list --status scheduled
 				<span class="logo-text">Licensed under MIT &copy; 2026 aeon022.</span>
 				<a href="/docs" class="footer-link">Docs</a>
 				<a href="/impressum" class="footer-link">Impressum</a>
-				<a href="/datenschutz" class="footer-link">Datenschutz</a>
+				<a href="/datenschutz" class="footer-link"><span class="lang-en">Privacy</span><span class="lang-de">Datenschutz</span></a>
+				<a href="/terms" class="footer-link"><span class="lang-en">Terms</span><span class="lang-de">Nutzungsbedingungen</span></a>
 				<a href="https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW" target="_blank" rel="noopener noreferrer" class="footer-link">Support</a>
 				<a href="https://github.com/aeon022/postctl" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a>
 			</div>
@@ -2777,6 +2779,8 @@ $ postctl --profile work list --status scheduled
 		.mock-toast { display: none; }
 	}
 	.mock-pre, .md-code, .matrix-wrap { max-width: 100%; }
+	.plan-note { margin-top: .9rem; text-align: center; font-size: .78rem; color: rgba(255,255,255,.5); line-height: 1.5; }
+	.plan-note a { color: var(--accent); }
 </style>
 
 <script>

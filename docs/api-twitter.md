@@ -2,15 +2,57 @@
 
 Dieses Dokument beschreibt Schritt für Schritt, wie du die Authentifizierung für Twitter/X in `postctl` einrichtest.
 
-Es stehen dir zwei Optionen zur Verfügung:
-* **Option A: Cookie-basierte Authentifizierung (Kostenlos, aber inoffiziell)** – Nutzt deine bestehende Browsersitzung. Kostenlos, aber fehleranfällig und mit Risiko einer Kontosperrung.
-* **Option B: Offizielle API (Kostenpflichtig & Empfohlen)** – Nutzt die offizielle Twitter API (erfordert ein bezahltes Abonnement ab ca. $100/Monat oder prepaid API-Credits). Der sichere, stabile Weg.
+Für Twitter/X gibt es einen unterstützten und einen inoffiziellen Weg:
+* **Option A: Offizielle API (kostenpflichtig, empfohlen)** – Nutzt die offizielle X-API (bezahlter Zugang oder prepaid API-Credits). Der unterstützte, stabile Weg; die Kosten trägt, wer die API nutzt.
+* **Option B: Cookie-basiert (inoffiziell, nicht unterstützt, nur auf eigenes Risiko)** – Standardmäßig **ausgeschaltet**. Verstößt gegen die X-Nutzungsbedingungen und kann zur Sperrung deines Kontos führen.
 
 ---
 
-## Option A: Cookie-basierte Authentifizierung (Kostenlos, aber inoffiziell)
+## Option A: Offizielle API (Kostenpflichtig & Empfohlen)
 
-Diese Methode simuliert eine echte Browser-Sitzung, indem sie deine Anmelde-Cookies verwendet. Sie ist vollkommen kostenlos und erfordert keine Einrichtung im Twitter Developer Portal.
+Wenn du ein offizielles Entwickler-Konto besitzt und die monatlichen API-Kosten tragen möchtest, kannst du die Standard-OAuth-Authentifizierung nutzen.
+
+> [!IMPORTANT]
+> **Kostenhinweis (Stand 2026):**
+> Twitter/X bietet für neu erstellte Developer-Accounts keinen kostenlosen Schreibzugriff (Free Tier) mehr an. Um über die offizielle Schnittstelle zu posten, ist ein kostenpflichtiger API-Zugang (z. B. Basic Tier für ca. $100/Monat oder prepaid Credits) im Developer Portal erforderlich.
+
+### Schritt 1: App im Developer Portal konfigurieren
+1. Gehe auf das [Twitter Developer Portal](https://developer.twitter.com) und melde dich an.
+2. Erstelle ein neues **Projekt** und eine neue **App** in deinem Portal-Dashboard.
+3. Navigiere in den **App Settings** zu **User authentication settings** und klicke auf **Set up**:
+   * **App Type**: Wähle **Web App, Automated App or Bot**.
+   * **App Permissions**: Wähle **Read and Write** (wichtig für Schreibrechte).
+   * **Type of App**: Wähle **Native App** oder **Single Page App** (für OAuth 2.0 PKCE).
+   * **Callback URI / Redirect URL**: Trage exakt `http://localhost:8753/callback` ein.
+   * **Website URL**: Trage deine eigene Website oder `https://github.com/aeon022/postctl` ein.
+4. Speichere die Einstellungen und kopiere die angezeigte **Client ID** und das **Client Secret** an einen sicheren Ort.
+
+### Schritt 2: Schlüssel hinterlegen
+```bash
+# Client ID eintragen
+./postctl config set twitter.client_id "DEINE_CLIENT_ID"
+
+# Client Secret eintragen
+./postctl config set twitter.client_secret "DEIN_CLIENT_SECRET"
+```
+
+### Schritt 3: Authentifizierung durchführen
+```bash
+./postctl auth twitter
+```
+Es öffnet sich ein Browserfenster, in dem du der App den Zugriff erlaubst. Nach erfolgreichem Login speichert `postctl` dein verschlüsseltes Access- und Refresh-Token.
+
+---
+
+## Option B: Cookie-basiert (inoffiziell, nicht unterstützt)
+
+Diese Methode simuliert eine echte Browser-Sitzung, indem sie deine Anmelde-Cookies verwendet. Sie erfordert keine Einrichtung im Twitter Developer Portal, ist aber **nicht unterstützt** und standardmäßig deaktiviert. Aktivierung nur bewusst und auf eigenes Risiko:
+
+```bash
+postctl config set twitter.unofficial_cookie_mode true
+```
+
+Ohne diese Einstellung verweigert postctl den Cookie-Modus. Bei der ersten Nutzung erscheint eine Warnung im Log. Es gibt keine Garantie und keinen Support für diesen Weg; eine Sperrung deines Kontos geht zu deinen Lasten.
 
 > [!WARNING]
 > **Inoffizielle Umgehungsmethode (Risiko von Kontosperrung):**
@@ -52,39 +94,3 @@ Sollte beim Veröffentlichen eines Tweets ein GraphQL-Fehler wie `empty tweet ID
 1. **Automatischer Browser-Start**: `postctl` startet im Hintergrund unsichtbar Google Chrome (mittels `chromedp`), lädt deine Cookies (`auth_token` & `ct0`), navigiert zur Web-Oberfläche von X, befüllt den Composer (inklusive Threads und Medien-Uploads) und klickt auf "Posten".
 2. **Voraussetzung**: Google Chrome muss auf deinem System installiert sein (wird auf macOS standardmäßig in `/Applications` gesucht).
 3. **Abgelaufene Session-Cookies**: Wenn auch der Headless-Browser scheitert, sind in der Regel deine Cookies abgelaufen. Wiederhole einfach **Schritt 1** und trage die neuen Cookies ein.
-
----
-
-## Option B: Offizielle API (Kostenpflichtig & Empfohlen)
-
-Wenn du ein offizielles Entwickler-Konto besitzt und die monatlichen API-Kosten tragen möchtest, kannst du die Standard-OAuth-Authentifizierung nutzen.
-
-> [!IMPORTANT]
-> **Kostenhinweis (Stand 2026):**
-> Twitter/X bietet für neu erstellte Developer-Accounts keinen kostenlosen Schreibzugriff (Free Tier) mehr an. Um über die offizielle Schnittstelle zu posten, ist ein kostenpflichtiger API-Zugang (z. B. Basic Tier für ca. $100/Monat oder prepaid Credits) im Developer Portal erforderlich.
-
-### Schritt 1: App im Developer Portal konfigurieren
-1. Gehe auf das [Twitter Developer Portal](https://developer.twitter.com) und melde dich an.
-2. Erstelle ein neues **Projekt** und eine neue **App** in deinem Portal-Dashboard.
-3. Navigiere in den **App Settings** zu **User authentication settings** und klicke auf **Set up**:
-   * **App Type**: Wähle **Web App, Automated App or Bot**.
-   * **App Permissions**: Wähle **Read and Write** (wichtig für Schreibrechte).
-   * **Type of App**: Wähle **Native App** oder **Single Page App** (für OAuth 2.0 PKCE).
-   * **Callback URI / Redirect URL**: Trage exakt `http://localhost:8753/callback` ein.
-   * **Website URL**: Trage deine eigene Website oder `https://github.com/aeon022/postctl` ein.
-4. Speichere die Einstellungen und kopiere die angezeigte **Client ID** und das **Client Secret** an einen sicheren Ort.
-
-### Schritt 2: Schlüssel hinterlegen
-```bash
-# Client ID eintragen
-./postctl config set twitter.client_id "DEINE_CLIENT_ID"
-
-# Client Secret eintragen
-./postctl config set twitter.client_secret "DEIN_CLIENT_SECRET"
-```
-
-### Schritt 3: Authentifizierung durchführen
-```bash
-./postctl auth twitter
-```
-Es öffnet sich ein Browserfenster, in dem du der App den Zugriff erlaubst. Nach erfolgreichem Login speichert `postctl` dein verschlüsseltes Access- und Refresh-Token.
