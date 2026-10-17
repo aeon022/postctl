@@ -80,6 +80,7 @@ import LangToggle from '../components/LangToggle.astro';
 	<main>
 		<!-- Hero Section -->
 		<section class="hero-section">
+			<canvas id="hero-net" class="hero-net" aria-hidden="true"></canvas>
 			<div class="container hero-container">
 				<div class="hero-content">
 					<div class="badge">
@@ -2763,6 +2764,10 @@ $ postctl --profile work list --status scheduled
 	@keyframes glow-drift { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,-30px) scale(1.12); } }
 	.reveal { transition-property: opacity, transform; }
 	@media (prefers-reduced-motion: reduce) { .mock-scan, .bg-glow-1, .bg-glow-2 { animation: none; } .reveal { opacity: 1 !important; transform: none !important; } }
+
+	.hero-net { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: .75; mask-image: radial-gradient(ellipse at 60% 45%, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at 60% 45%, #000 20%, transparent 75%); }
+	.hero-section { position: relative; }
+	.hero-section .hero-container { position: relative; z-index: 1; }
 </style>
 
 <script>
@@ -2809,6 +2814,68 @@ $ postctl --profile work list --status scheduled
 				ticking = false;
 			});
 		}, { passive: true });
+	}
+
+	// ── Hero background: drifting network, packets travel between nodes (= posts going out) ──
+	const netCanvas = document.getElementById('hero-net') as HTMLCanvasElement | null;
+	if (netCanvas && !reduceMotion) {
+		const ctx = netCanvas.getContext('2d')!;
+		type Node = { x: number; y: number; vx: number; vy: number; r: number };
+		type Packet = { a: number; b: number; t: number };
+		let W = 0, H = 0, nodes: Node[] = [], packets: Packet[] = [], visible = true, raf = 0;
+		const dpr = Math.min(window.devicePixelRatio || 1, 2);
+		const resize = () => {
+			const r = netCanvas.getBoundingClientRect();
+			W = r.width; H = r.height;
+			netCanvas.width = W * dpr; netCanvas.height = H * dpr;
+			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+			const n = Math.round(Math.min(70, Math.max(24, (W * H) / 20000)));
+			nodes = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .25, vy: (Math.random() - .5) * .25, r: 1 + Math.random() * 1.6 }));
+		};
+		const LINK = 150;
+		const frame = () => {
+			raf = 0;
+			if (!visible || document.hidden) return;
+			ctx.clearRect(0, 0, W, H);
+			for (const n of nodes) {
+				n.x += n.vx; n.y += n.vy;
+				if (n.x < -10) n.x = W + 10; else if (n.x > W + 10) n.x = -10;
+				if (n.y < -10) n.y = H + 10; else if (n.y > H + 10) n.y = -10;
+			}
+			for (let i = 0; i < nodes.length; i++) {
+				for (let j = i + 1; j < nodes.length; j++) {
+					const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y, d = Math.hypot(dx, dy);
+					if (d < LINK) {
+						ctx.strokeStyle = `rgba(139,124,248,${(1 - d / LINK) * 0.22})`;
+						ctx.lineWidth = 1;
+						ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
+					}
+				}
+			}
+			ctx.fillStyle = 'rgba(190,180,255,.55)';
+			for (const n of nodes) { ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, 6.283); ctx.fill(); }
+			if (packets.length < 6 && Math.random() < 0.03) {
+				const a = Math.floor(Math.random() * nodes.length);
+				let best = -1, bd = LINK;
+				for (let k = 0; k < nodes.length; k++) if (k !== a) { const d = Math.hypot(nodes[a].x - nodes[k].x, nodes[a].y - nodes[k].y); if (d < bd) { bd = d; best = k; } }
+				if (best >= 0) packets.push({ a, b: best, t: 0 });
+			}
+			packets = packets.filter((p) => (p.t += 0.018) < 1);
+			for (const p of packets) {
+				const A = nodes[p.a], B = nodes[p.b];
+				const x = A.x + (B.x - A.x) * p.t, y = A.y + (B.y - A.y) * p.t;
+				ctx.fillStyle = 'rgba(166,227,161,.95)';
+				ctx.shadowColor = 'rgba(166,227,161,.9)'; ctx.shadowBlur = 10;
+				ctx.beginPath(); ctx.arc(x, y, 2.2, 0, 6.283); ctx.fill();
+				ctx.shadowBlur = 0;
+			}
+			raf = requestAnimationFrame(frame);
+		};
+		const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+		resize(); kick();
+		window.addEventListener('resize', () => { resize(); kick(); });
+		document.addEventListener('visibilitychange', kick);
+		new IntersectionObserver((e) => { visible = e[0].isIntersecting; kick(); }).observe(netCanvas);
 	}
 
 	// ── Back to top ──────────────────────────────────────────
