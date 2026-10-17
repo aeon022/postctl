@@ -6,7 +6,8 @@ postctl manages credentials for social media accounts, so security reports are t
 
 Please report suspected vulnerabilities **privately** — not as a public issue or pull request:
 
-- E-mail: **post@abteilung83.com** (subject: `postctl security`)
+- GitHub: **Security → Report a vulnerability** (private)
+- or e-mail: **post@abteilung83.com** (subject: `postctl security`)
 - Languages: German or English
 - Helpful details: affected version (`postctl --version`), platform, steps to reproduce, impact, and a proof of concept if you have one. Please do not include real tokens or account data.
 
