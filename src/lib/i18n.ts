@@ -30,7 +30,7 @@ export function filterLang(html: string, lang: Lang): string {
 /** German pages live under /de/: prefix internal page links (not assets, not external). */
 export function localizeLinks(html: string, lang: Lang): string {
 	if (lang === 'en') return html;
-	return html.replace(/href="\/(docs|impressum|datenschutz)?\/?(#[^"]*)?"/g, (_m, p, h) => `href="/de/${p ? p + '/' : ''}${h ?? ''}"`);
+	return html.replace(/href="\/(docs|impressum|datenschutz|terms)?\/?(#[^"]*)?"/g, (_m, p, h) => `href="/de/${p ? p + '/' : ''}${h ?? ''}"`);
 }
 
 const norm = (p: string) => (p.endsWith('/') ? p : p + '/');
