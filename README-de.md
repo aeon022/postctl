@@ -400,13 +400,15 @@ Sobald gesetzt, wechselt postctl seinen SQLite-Journal-Modus automatisch von WAL
 
 ## Preise
 
-Der Kern von postctl ist kostenlos und Open Source (MIT) — unbegrenzte Beiträge und Entwürfe für bis zu 2 verbundene Konten. Eine Pro-Lifetime-Lizenz hebt das Konto-Limit auf und unterstützt die Weiterentwicklung; kaufen auf [Polar.sh](https://polar.sh) und aktivieren mit:
+Der Kern von postctl ist kostenlos und Open Source (MIT) — unbegrenzte Beiträge und Entwürfe für bis zu 2 verbundene Konten. **postctl Pro** (Abo: €4,90/Monat oder €39/Jahr, jederzeit kündbar) hebt das Konto-Limit auf und finanziert die Entwicklung; abonniere auf [Polar.sh](https://buy.polar.sh/polar_cl_IWIUVznawezToJcwJTWKk3WJ4hsNuRvTFN3ro3vK3ru) und aktiviere mit:
 
 ```bash
 postctl license activate <key>
 ```
 
-**🎉 Launch-Special:** mit Code `POSTCTL2026` gibt's 37 % Rabatt — gültig bis 31. Oktober 2026.
+**🎉 Launch-Special:** mit Code `postctl2026` gibt's 37 % Rabatt auf das erste Jahr beim Jahresabo — gültig bis 31. Dezember 2026.
+
+**So funktioniert das Abo:** postctl prüft die Lizenz etwa einmal täglich bei Polar (eine zuvor gültige Lizenz funktioniert offline bis zu 21 Tage weiter). Endet ein Abo, wird nichts gelöscht: Der kostenlose Kern arbeitet mit deinen ersten zwei verbundenen Netzwerken weiter, und Posts für weitere Netzwerke bleiben geplant, bis Pro wieder aktiv ist. Als „Lifetime“ vor dem 18.10.2026 gekaufte Lizenzen bleiben gültig.
 
 ## Lizenz
 
