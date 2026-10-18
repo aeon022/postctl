@@ -96,8 +96,8 @@ func (m Model) askBody(w, h int) string {
 	pw := min(w, 64)
 	var lines []string
 	who := config.ActiveProfile
-	if who == "" {
-		who = "default"
+	if who == "" || who == "default" {
+		who = Tr("picker_default") // the default profile is shown as "Privat" / "Private"
 	}
 	chip := profileChip(config.ActiveProfile)
 	if chip == "" {

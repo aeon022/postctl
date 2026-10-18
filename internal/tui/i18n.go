@@ -214,7 +214,7 @@ var translationsMap = map[string]map[string]string{
 	"editor_preview_label":   {"de": "Vorschau:", "en": "Preview:"},
 	"cal_weekdays":           {"de": "Mo Di Mi Do Fr Sa So", "en": "Mo Tu We Th Fr Sa Su"},
 	"picker_title":           {"de": "Profil wählen", "en": "Choose a profile"},
-	"picker_default":         {"de": "default", "en": "default"},
+	"picker_default":         {"de": "Privat", "en": "Private"},
 
 	"hint_close": {
 		"de": "schließen",

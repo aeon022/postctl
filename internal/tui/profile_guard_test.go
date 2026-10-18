@@ -52,3 +52,9 @@ func TestManualPublishAsksFirstAndOnlyYesSends(t *testing.T) {
 		t.Error("y must start publishing")
 	}
 }
+
+func TestDefaultProfileIsLabelledPrivate(t *testing.T) {
+	if got := profileLabel(""); got != "Privat" && got != "Private" {
+		t.Errorf("the default profile should read Privat/Private in the picker, got %q", got)
+	}
+}
