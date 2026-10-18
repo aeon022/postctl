@@ -80,6 +80,11 @@ var scheduleCmd = &cobra.Command{
 			parsedTime = t
 		}
 
+		if DryRunFlag { // --dry-run must never change anything
+			fmt.Printf("[DRY RUN] Would schedule post %q for %s\n", postID, parsedTime.Format(time.RFC3339))
+			return
+		}
+
 		// 3. Post als geplant markieren
 		post.Status = models.StatusScheduled
 		post.ScheduledAt = &parsedTime

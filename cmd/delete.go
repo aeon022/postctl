@@ -35,6 +35,11 @@ var deleteCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		if DryRunFlag { // --dry-run must never change anything
+			fmt.Printf("[DRY RUN] Would delete post %q (status %s)\n", postID, post.Status)
+			return
+		}
+
 		// Real platform delete must succeed before the local record goes
 		// away — used to only print a warning on failure and delete the
 		// local row regardless, which left the post live and untracked on

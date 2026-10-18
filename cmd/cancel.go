@@ -39,6 +39,11 @@ var cancelCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		if DryRunFlag { // --dry-run must never change anything
+			fmt.Printf("[DRY RUN] Would cancel scheduled post %q (status %s → draft)\n", postID, post.Status)
+			return
+		}
+
 		post.Status = models.StatusDraft
 		post.ScheduledAt = nil
 		post.Error = ""
