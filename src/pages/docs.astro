@@ -970,13 +970,9 @@ images: ["logo.png"]
 	}
 
 	/* Left Sidebar styling */
+	/* The sidebar scrolls with the page — no scrollbar of its own. */
 	.docs-sidebar {
-		position: sticky;
-		top: 110px;
-		max-height: calc(100vh - 140px);
-		overflow-y: auto;
 		padding-right: 1.5rem;
-		scrollbar-width: thin;
 		z-index: 10;
 		border-right: 1px solid var(--border);
 	}
@@ -1453,6 +1449,9 @@ images: ["logo.png"]
 			left: -280px;
 			width: 280px;
 			height: calc(100vh - 130px);
+			height: calc(100dvh - 130px);
+			overflow-y: auto; /* the drawer scrolls on phones (on desktop the sidebar just scrolls with the page) */
+			overscroll-behavior: contain;
 			background: var(--bg-primary);
 			border-right: 1px solid var(--border);
 			padding: 1.5rem;
