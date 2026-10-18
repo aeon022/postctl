@@ -45,6 +45,8 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&DryRunFlag, "dry-run", false, "Simulate execution without side effects")
 	rootCmd.PersistentFlags().StringVar(&ProfileFlag, "profile", "", "Use a named profile — separate config, credentials, and data, e.g. work, private (env: POSTCTL_PROFILE)")
 
+	rootCmd.Version = Version // enables `postctl --version` ("postctl version X"), like the other suite tools
+
 	// Version subcommand
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "version",
