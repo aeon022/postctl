@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/aeon022/postctl/internal/config"
+	"github.com/aeon022/postctl/internal/license"
 	"github.com/spf13/cobra"
 )
 
@@ -87,13 +88,22 @@ var licenseActivateCmd = &cobra.Command{
 
 		if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated {
 			type activateResp struct {
-				Status string `json:"status"`
+				Status     string `json:"status"`
+				LicenseKey struct {
+					BenefitID string    `json:"benefit_id"`
+					CreatedAt time.Time `json:"created_at"`
+				} `json:"license_key"`
 			}
 			var ar activateResp
 			_ = json.Unmarshal(bodyBytes, &ar)
 			status := ar.Status
 			if status == "" {
 				status = "granted"
+			}
+			status = license.Effective(status, ar.LicenseKey.BenefitID, ar.LicenseKey.CreatedAt)
+			if status == "not_for_postctl" {
+				fmt.Println("✗ This key belongs to another product (e.g. a missionctl Bundle bought after 18 Oct 2026). postctl Pro is a separate subscription: https://postctl.sh/#pricing")
+				os.Exit(1)
 			}
 			fmt.Println("✓ License key activated successfully! postctl Pro features unlocked.")
 			config.ActiveConfig.LicenseKey = key
@@ -122,13 +132,20 @@ var licenseActivateCmd = &cobra.Command{
 				valBytes, _ := io.ReadAll(valResp.Body)
 				if valResp.StatusCode == http.StatusOK {
 					type validateResp struct {
-						Status string `json:"status"`
+						Status    string    `json:"status"`
+						BenefitID string    `json:"benefit_id"`
+						CreatedAt time.Time `json:"created_at"`
 					}
 					var vr validateResp
 					_ = json.Unmarshal(valBytes, &vr)
 					status := vr.Status
 					if status == "" {
 						status = "granted"
+					}
+					status = license.Effective(status, vr.BenefitID, vr.CreatedAt)
+					if status == "not_for_postctl" {
+						fmt.Println("✗ This key belongs to another product (e.g. a missionctl Bundle bought after 18 Oct 2026). postctl Pro is a separate subscription: https://postctl.sh/#pricing")
+						os.Exit(1)
 					}
 					fmt.Println("✓ License key verified (this product doesn't track per-device activations). postctl Pro features unlocked.")
 					config.ActiveConfig.LicenseKey = key
@@ -231,7 +248,9 @@ var licenseStatusCmd = &cobra.Command{
 
 		if resp.StatusCode == http.StatusOK {
 			type LicenseValidateResp struct {
-				Status string `json:"status"`
+				Status    string    `json:"status"`
+				BenefitID string    `json:"benefit_id"`
+				CreatedAt time.Time `json:"created_at"`
 			}
 			var valResp LicenseValidateResp
 			_ = json.Unmarshal(bodyBytes, &valResp)
@@ -240,10 +259,17 @@ var licenseStatusCmd = &cobra.Command{
 			if valResp.Status != "" {
 				status = valResp.Status
 			}
+			status = license.Effective(status, valResp.BenefitID, valResp.CreatedAt)
 
-			fmt.Println("License Type: PRO")
-			fmt.Printf("License Key:  %s\n", maskSecret(key))
-			fmt.Printf("Status:       %s (Verified with Polar.sh)\n", strings.ToUpper(status))
+			if status == "not_for_postctl" {
+				fmt.Println("License Type: OTHER PRODUCT")
+				fmt.Printf("License Key:  %s\n", maskSecret(key))
+				fmt.Println("Status:       this key does not include postctl Pro (Pro is a separate subscription: https://postctl.sh/#pricing)")
+			} else {
+				fmt.Println("License Type: PRO")
+				fmt.Printf("License Key:  %s\n", maskSecret(key))
+				fmt.Printf("Status:       %s (Verified with Polar.sh)\n", strings.ToUpper(status))
+			}
 
 			config.ActiveConfig.LicenseStatus = status
 			_ = config.SaveConfig()

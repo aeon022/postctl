@@ -119,12 +119,14 @@ type Config struct {
 		// safe to just browse/edit.
 		AutoPublish bool `mapstructure:"auto_publish" yaml:"auto_publish"`
 	} `mapstructure:"scheduler" yaml:"scheduler"`
-	DBPath        string   `mapstructure:"db_path" yaml:"db_path"`
-	DataDir       string   `mapstructure:"data_dir" yaml:"data_dir"`
-	LicenseKey    string   `mapstructure:"license_key" yaml:"license_key"`
-	LicenseStatus string   `mapstructure:"license_status" yaml:"license_status"`
-	PolarOrgID    string   `mapstructure:"polar_org_id" yaml:"polar_org_id"`
-	RSSFeeds      []string `mapstructure:"rss_feeds" yaml:"rss_feeds"`
+	DBPath        string `mapstructure:"db_path" yaml:"db_path"`
+	DataDir       string `mapstructure:"data_dir" yaml:"data_dir"`
+	LicenseKey    string `mapstructure:"license_key" yaml:"license_key"`
+	LicenseStatus string `mapstructure:"license_status" yaml:"license_status"`
+	// LicenseCheckedAt (RFC3339) is the last successful validation against Polar; Pro is a subscription, so the cache is re-checked daily.
+	LicenseCheckedAt string   `mapstructure:"license_checked_at" yaml:"license_checked_at"`
+	PolarOrgID       string   `mapstructure:"polar_org_id" yaml:"polar_org_id"`
+	RSSFeeds         []string `mapstructure:"rss_feeds" yaml:"rss_feeds"`
 }
 
 // ActiveConfig stellt die geladene Konfiguration global zur Verfügung

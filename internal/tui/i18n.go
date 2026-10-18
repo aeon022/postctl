@@ -533,8 +533,8 @@ var translationsMap = map[string]map[string]string{
 		"en": "Execute (Press Enter)",
 	},
 	"settings_help_footer": {
-		"de": "←/→ / enter: Ändern / Verbinden  ·  d: Reset/Disconnect  ·  Sofort gespeichert.\nSupport postctl (Spenden): https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW\nPro-Lizenz kaufen (37% Launch-Special, Code postctl2026): https://buy.polar.sh/polar_cl_ookKcZLP6IjbeYc9inqKu3734J9WA8ssy5cL90jmJSs\nAktivieren: postctl config set license_key <key>",
-		"en": "←/→ / enter: Change / Connect  ·  d: Reset/Disconnect  ·  Saved instantly.\nSupport postctl (Donate): https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW\nBuy Pro (37% launch special, code postctl2026): https://buy.polar.sh/polar_cl_ookKcZLP6IjbeYc9inqKu3734J9WA8ssy5cL90jmJSs\nActivate: postctl config set license_key <key>",
+		"de": "←/→ / enter: Ändern / Verbinden  ·  d: Reset/Disconnect  ·  Sofort gespeichert.\nSupport postctl (Spenden): https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW\nPro-Abo (€4,90/Monat oder €39/Jahr; Jahr: Code postctl2026 = 37% im 1. Jahr): https://buy.polar.sh/polar_cl_IWIUVznawezToJcwJTWKk3WJ4hsNuRvTFN3ro3vK3ru\nAktivieren: postctl license activate <key>",
+		"en": "←/→ / enter: Change / Connect  ·  d: Reset/Disconnect  ·  Saved instantly.\nSupport postctl (Donate): https://buy.polar.sh/polar_cl_wQUHDTz9e8ZLhWS59jxxRaBGiNjdaWIHpwt4T4fyzhW\nPro subscription (€4.90/month or €39/year; yearly: code postctl2026 = 37% off year one): https://buy.polar.sh/polar_cl_IWIUVznawezToJcwJTWKk3WJ4hsNuRvTFN3ro3vK3ru\nActivate: postctl license activate <key>",
 	},
 
 	// Posts View

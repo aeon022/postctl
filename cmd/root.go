@@ -1,7 +1,12 @@
 package cmd
 
 import (
+	"context"
+	"net/http"
+	"time"
+
 	"fmt"
+	"github.com/aeon022/postctl/internal/license"
 	"os"
 
 	"github.com/aeon022/postctl/internal/config"
@@ -24,7 +29,18 @@ var rootCmd = &cobra.Command{
 		if profile == "" {
 			profile = os.Getenv("POSTCTL_PROFILE")
 		}
-		return config.LoadConfigProfile(profile)
+		if err := config.LoadConfigProfile(profile); err != nil {
+			return err
+		}
+		// Pro is a subscription: when the daily re-check is due, look it up now (4 s at most, never blocks on errors).
+		switch cmd.Name() {
+		case "version", "help", "license", "daemon", "completion":
+		default:
+			ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+			defer cancel()
+			_, _ = license.RevalidateIfDue(ctx, &http.Client{Timeout: 4 * time.Second}, time.Now())
+		}
+		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return runTUI()

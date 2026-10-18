@@ -431,13 +431,15 @@ Once set, postctl automatically switches its SQLite journal mode from WAL to rol
 
 ## Pricing
 
-The core of postctl is free and open-source (MIT) — unlimited posts and drafts on up to 2 connected accounts. A Pro lifetime license removes the account limit and supports development; buy it on [Polar.sh](https://polar.sh) and activate with:
+The core of postctl is free and open-source (MIT) — unlimited posts and drafts on up to 2 connected accounts. **postctl Pro** (subscription: €4.90/month or €39/year, cancel any time) removes the account limit and funds development; subscribe on [Polar.sh](https://buy.polar.sh/polar_cl_IWIUVznawezToJcwJTWKk3WJ4hsNuRvTFN3ro3vK3ru) and activate with:
 
 ```bash
 postctl license activate <key>
 ```
 
-**🎉 Launch special:** use code `POSTCTL2026` for 37% off — through October 31, 2026.
+**🎉 Launch special:** use code `postctl2026` on the yearly plan for 37% off the first year — through December 31, 2026.
+
+**How the subscription works:** postctl re-checks the license with Polar about once a day (a previously valid license keeps working offline for up to 21 days). If a subscription ends, nothing is deleted: the free core keeps working with your first two connected networks, and posts for further networks stay scheduled until Pro is active again. Licenses bought as "Lifetime" before 2026-10-18 stay valid.
 
 ## License
 

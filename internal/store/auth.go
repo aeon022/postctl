@@ -323,3 +323,31 @@ func (s *SQLiteStore) MigrateTokenKey(ctx context.Context) (int, error) {
 	}
 	return len(all), tx.Commit()
 }
+
+// FreePlatforms is how many connected platforms the free core publishes to.
+const FreePlatforms = 2
+
+// PlatformAllowed reports whether posts may be published to platform. With a Pro subscription every
+// platform is allowed; without it the first FreePlatforms connected platforms are (the rest stay connected
+// and their posts stay scheduled — nothing is deleted or marked failed, they publish again once Pro is back).
+func (s *SQLiteStore) PlatformAllowed(ctx context.Context, platform string) bool {
+	if config.IsPro() {
+		return true
+	}
+	rows, err := s.db.QueryContext(ctx, "SELECT platform FROM auth_tokens ORDER BY rowid ASC LIMIT ?", FreePlatforms)
+	if err != nil {
+		return true // never block publishing on a store error
+	}
+	defer rows.Close()
+	n := 0
+	for rows.Next() {
+		var p string
+		if rows.Scan(&p) == nil {
+			n++
+			if p == platform {
+				return true
+			}
+		}
+	}
+	return n < FreePlatforms // a not-yet-connected platform is handled by SaveToken's own limit
+}

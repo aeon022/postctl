@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"sort"
 	"time"
 
 	"github.com/aeon022/postctl/internal/config"
+	"github.com/aeon022/postctl/internal/license"
 	"github.com/aeon022/postctl/internal/models"
 	"github.com/aeon022/postctl/internal/platforms"
 	"github.com/aeon022/postctl/internal/store"
@@ -39,6 +41,10 @@ func PublishPost(ctx context.Context, s *store.SQLiteStore, post *models.Post, d
 		_ = s.SavePost(ctx, post)
 		_ = s.AddHistoryEntry(ctx, &models.HistoryEntry{PostID: post.ID, Action: "failed", Error: err.Error()})
 		return "", err
+	}
+
+	if !dryRun && !s.PlatformAllowed(ctx, post.Platform) {
+		return "", fmt.Errorf("💡 Pro: without an active postctl Pro subscription only the first %d connected platforms publish (%s is not one of them) — the post stays as it is", store.FreePlatforms, post.Platform)
 	}
 
 	// Plattform holen
@@ -125,7 +131,7 @@ func RunDaemon(ctx context.Context, open func() (*store.SQLiteStore, error), che
 	ticker := time.NewTicker(checkInterval)
 	defer ticker.Stop()
 
-	var lastRefresh time.Time
+	var lastRefresh, lastLicense time.Time
 	check := func() {
 		// Keep the Instagram token alive (refreshed when 30+ days old); looked at twice a day.
 		if !dryRun && time.Since(lastRefresh) > 12*time.Hour {
@@ -134,6 +140,15 @@ func RunDaemon(ctx context.Context, open func() (*store.SQLiteStore, error), che
 				platforms.Log("[SCHEDULER] Instagram-Token-Erneuerung fehlgeschlagen: %v", err)
 			} else if ok {
 				platforms.Log("[SCHEDULER] Instagram-Token erneuert (60 Tage ab heute).")
+			}
+		}
+		// Pro is a subscription: re-check the cached license against Polar (at most daily; offline keeps it for 21 days).
+		if !dryRun && time.Since(lastLicense) > time.Hour {
+			lastLicense = time.Now()
+			if changed, err := license.RevalidateIfDue(ctx, &http.Client{Timeout: 15 * time.Second}, time.Now()); err != nil {
+				platforms.Log("[LICENSE] Prüfung bei Polar nicht möglich (%v) — gespeicherter Status bleibt.", err)
+			} else if changed {
+				platforms.Log("[LICENSE] Pro-Status geändert: %s", config.ActiveConfig.LicenseStatus)
 			}
 		}
 		s, err := open()
@@ -293,6 +308,10 @@ func checkAndPublishDue(ctx context.Context, s *store.SQLiteStore, dryRun bool) 
 		if p.ScheduledAt != nil && p.ScheduledAt.Before(now) {
 			if gap, ok := minGap[p.Platform]; ok && !dryRun && time.Since(lastPosted[p.Platform]) < gap {
 				platforms.Log("[SAFETY] Post %s (%s) zurückgestellt: Mindestabstand %s seit letztem Post noch nicht erreicht.", p.ID, p.Platform, gap)
+				continue
+			}
+			if !dryRun && !s.PlatformAllowed(ctx, p.Platform) {
+				platforms.Log("[PRO] Post %s (%s) bleibt geplant: ohne aktives Pro-Abo veröffentlicht postctl nur auf den ersten %d verbundenen Plattformen.", p.ID, p.Platform, store.FreePlatforms)
 				continue
 			}
 			if !dryRun {
