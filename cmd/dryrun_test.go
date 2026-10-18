@@ -49,3 +49,23 @@ func TestDryRunDoesNotDeleteCancelOrSchedule(t *testing.T) {
 		t.Errorf("dry-run cancel changed the scheduled post: %v %+v", err, p)
 	}
 }
+
+func TestInstagramTokenCheck(t *testing.T) {
+	now := time.Date(2026, 12, 1, 12, 0, 0, 0, time.Local)
+	for _, tc := range []struct {
+		issued string
+		ok     bool
+	}{
+		{"2026-11-20", true},  // 11 days old
+		{"2026-10-16", false}, // 46 days old: the daemon should have refreshed it
+		{"2026-09-01", false}, // expired
+	} {
+		c, found := instagramTokenCheck("instagram", true, tc.issued, now)
+		if !found || c.OK != tc.ok {
+			t.Errorf("issued %s: found=%v ok=%v (%s), want ok=%v", tc.issued, found, c.OK, c.Detail, tc.ok)
+		}
+	}
+	if _, found := instagramTokenCheck("facebook", true, "2026-11-20", now); found {
+		t.Error("only the Instagram-Login token is checked")
+	}
+}
