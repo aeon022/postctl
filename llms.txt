@@ -1,6 +1,6 @@
 # postctl
 
-> Terminal-native, Markdown-first social media scheduler (CLI + TUI) for macOS and Linux. Local SQLite data, no cloud. Free and open source for up to 2 networks; Pro unlocks unlimited.
+> Terminal-native, Markdown-first social media scheduler (CLI + TUI) for macOS and Linux. Local SQLite data, no cloud. Free and open source for up to 2 networks; Pro (subscription, €4.90/month or €39/year) unlocks unlimited networks.
 
 Platforms: Instagram (feed, carousel, story), Facebook pages, Threads, X, LinkedIn (profile and company page), Bluesky, Mastodon, Telegram, Discord and more.
 
