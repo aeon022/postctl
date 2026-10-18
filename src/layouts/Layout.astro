@@ -175,14 +175,15 @@ const body = localize(await Astro.slots.render('default'), lang, path);
 		.copy-btn { min-height: 32px; }
 	}
 
-	/* The decorative glows were wider than a phone and hung out of the right edge. Mobile browsers then widen
-	   the layout viewport to fit them (zoomed-out page you can pan sideways) — overflow:hidden/clip does not
-	   prevent that. On small screens they simply stay inside the viewport. */
-	@media (max-width: 800px) {
-		.bg-glow { width: 100vw !important; height: 100vw !important; animation: none !important; transform: none !important; } /* drift animation scaled them past the edge */
-		.bg-glow-1 { left: 0 !important; right: auto !important; }
-		.bg-glow-2 { right: auto !important; left: 0 !important; }
-	}
+	/* Decorative glows live in a fixed, clipping layer. They used to hang out of the page's right edge; mobile and
+	   tablet browsers then widen the layout viewport to fit them (zoomed-out page you can pan sideways) —
+	   overflow:hidden/clip on html or body does not prevent that. A fixed layer never adds scrollable overflow. */
+	.bg-layer { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: -2; contain: strict; }
+	.bg-layer .bg-glow { position: absolute !important; z-index: auto !important; }
+	.bg-layer .bg-glow-1 { top: -150px !important; left: calc(50% - 300px) !important; right: auto !important; }
+	.bg-layer .bg-glow-2 { top: auto !important; bottom: -220px !important; right: -220px !important; left: auto !important; }
+
+	h1, h2, h3, h4 { overflow-wrap: anywhere; hyphens: auto; } /* long German compounds on 320px phones */
 
 	html {
 		overflow-x: clip; /* decorative glows/canvas must never create sideways scrolling (clip keeps position:sticky working) */

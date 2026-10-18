@@ -38,8 +38,7 @@ import FooterSignature from '../components/FooterSignature.astro';
 
 <Layout>
 	<!-- Decorative Grid & Glow Background -->
-	<div class="bg-glow bg-glow-1"></div>
-	<div class="bg-glow bg-glow-2"></div>
+	<div class="bg-layer" aria-hidden="true"><div class="bg-glow bg-glow-1"></div><div class="bg-glow bg-glow-2"></div></div>
 	<div class="grid-overlay"></div>
 
 	<!-- Navigation Header -->
@@ -1064,7 +1063,9 @@ $ postctl --profile work list --status scheduled
 			display: none;
 		}
 	}
-	@media (max-width: 768px) {
+	/* The nav has ten items: it only fits in one row on wide desktops, so everything up to 1180px (phones, iPads in
+	   both orientations, small laptops) gets the menu button. */
+	@media (max-width: 1180px) {
 		.mobile-nav-toggle {
 			display: inline-flex;
 		}
@@ -1086,6 +1087,10 @@ $ postctl --profile work list --status scheduled
 			visibility: hidden;
 			transform: translateY(-8px);
 			transition: var(--transition);
+			max-height: calc(100vh - 96px);   /* landscape phones: the menu scrolls instead of running off the screen */
+			max-height: calc(100dvh - 96px);
+			overflow-y: auto;
+			overscroll-behavior: contain;
 		}
 		.nav.nav-open {
 			opacity: 1;
@@ -1338,7 +1343,7 @@ $ postctl --profile work list --status scheduled
 	}
 	.features-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
 		gap: 2rem;
 	}
 	.feature-card {
@@ -1730,7 +1735,7 @@ $ postctl --profile work list --status scheduled
 	}
 	.ai-workflow-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
 		gap: 2rem;
 		margin-top: 2rem;
 	}
@@ -1767,7 +1772,7 @@ $ postctl --profile work list --status scheduled
 	}
 	.roadmap-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
 		gap: 2rem;
 		margin-top: 3.5rem;
 	}
@@ -2021,7 +2026,7 @@ $ postctl --profile work list --status scheduled
 	}
 	.pricing-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
 		gap: 2.5rem;
 		max-width: 900px;
 		margin: 0 auto;
@@ -2746,13 +2751,13 @@ $ postctl --profile work list --status scheduled
 	.tour-panel { display: none; max-width: 980px; margin: 0 auto; }
 	.tour-panel.active { display: block; }
 	.tour-caption { text-align: center; margin-top: 1rem; color: rgba(255,255,255,.6); font-size: .95rem; }
-	.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
+	.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 1.25rem; }
 	.info-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; transition: var(--transition); }
 	.info-card:hover { border-color: var(--accent); transform: translateY(-3px); }
 	.info-icon { font-size: 1.6rem; margin-bottom: .75rem; }
 	.info-card h3 { font-size: 1.05rem; margin: 0 0 .5rem; }
 	.info-card p { margin: 0; color: rgba(255,255,255,.65); font-size: .92rem; line-height: 1.55; }
-	.md-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; }
+	.md-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 1.25rem; }
 	.md-code { margin: 0; padding: 1.25rem 1.4rem; background: #11111b; border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; font-family: var(--font-mono); font-size: .8rem; line-height: 1.5; color: #cdd6f4; }
 
 	.info-icon { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 10px; background: rgba(139,124,248,.12); color: var(--accent); margin-bottom: 1rem; font-size: 0; }

@@ -5,8 +5,7 @@ import FooterSignature from '../components/FooterSignature.astro';
 
 <Layout title="Legal Notice — postctl by Abteilung83" titleDe="Impressum — postctl von Abteilung83" description="Legal notice for postctl.sh: provider Abteilung83 (Gerwin Weiher), Graz, Austria — contact, trade information and liability." descriptionDe="Impressum von postctl.sh: Diensteanbieter Abteilung83 (Gerwin Weiher), Graz, Österreich — Kontakt, Gewerbeangaben und Haftung.">
   <!-- Background Glows -->
-  <div class="bg-glow bg-glow-1"></div>
-  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-layer" aria-hidden="true"><div class="bg-glow bg-glow-1"></div><div class="bg-glow bg-glow-2"></div></div>
   <div class="grid-overlay"></div>
 
   <!-- Minimal Header -->
@@ -167,7 +166,7 @@ import FooterSignature from '../components/FooterSignature.astro';
 <style>
   .legal-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
     gap: 2rem;
     max-width: 1000px;
     margin: 0 auto 3rem;
@@ -247,7 +246,7 @@ import FooterSignature from '../components/FooterSignature.astro';
 
   .disclaimer-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
     gap: 2.5rem;
   }
 

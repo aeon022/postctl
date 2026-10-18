@@ -17,8 +17,7 @@ import * as TutorialDocEn from '../../documents/TUTORIAL-en.md';
 
 <Layout titleDe="postctl Doku — Social-Media-Management im Terminal" descriptionDe="Dokumentation zu postctl: Installation, CLI-Befehle, TUI-Tastenkürzel, Plattform-Setup, Profile und Scheduler-Dienst." title="postctl Docs — Terminal-Native Social Media Management" description="Documentation for postctl: install, CLI commands, TUI keybindings, platform setup, profiles and the scheduler service.">
 	<!-- Decorative Grid & Glow Background -->
-	<div class="bg-glow bg-glow-1"></div>
-	<div class="bg-glow bg-glow-2"></div>
+	<div class="bg-layer" aria-hidden="true"><div class="bg-glow bg-glow-1"></div><div class="bg-glow bg-glow-2"></div></div>
 	<div class="grid-overlay"></div>
 
 	<!-- Navigation Header -->
@@ -885,6 +884,10 @@ images: ["logo.png"]
 			visibility: hidden;
 			transform: translateY(-8px);
 			transition: var(--transition);
+			max-height: calc(100vh - 96px);   /* landscape phones: scroll instead of running off the screen */
+			max-height: calc(100dvh - 96px);
+			overflow-y: auto;
+			overscroll-behavior: contain;
 		}
 		.nav.nav-open {
 			opacity: 1;
