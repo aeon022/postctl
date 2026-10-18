@@ -420,9 +420,11 @@ func (t *ThreadsPlatform) publishContainer(ctx context.Context, userID, token, c
 			return "", err
 		}
 
-		resp, err := t.client.Do(req)
+		// threads_publish can take well over the usual 15 s; a timeout here does NOT mean the post failed
+		// (2026-10-18: published, but the answer came too late). Give this one call more time.
+		resp, err := (&http.Client{Timeout: 90 * time.Second}).Do(req)
 		if err != nil {
-			lastErr = fmt.Errorf("publish threads container request: %w", err)
+			lastErr = fmt.Errorf("publish threads container request (the post may still have been published — check Threads, then `postctl mark-posted <id>`): %w", err)
 			continue
 		}
 
