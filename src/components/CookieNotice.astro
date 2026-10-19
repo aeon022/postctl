@@ -1,0 +1,52 @@
+---
+---
+
+<div id="cookie-banner" role="region" aria-label="Cookie notice" style="
+  display: none;
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-hover);
+  border-radius: 10px;
+  padding: 0.75rem 1.1rem;
+  align-items: center;
+  gap: 1rem;
+  max-width: 560px;
+  width: calc(100% - 2rem);
+  box-shadow: var(--shadow-md);
+">
+  <p style="color: var(--text-secondary); font-size: 0.82rem; margin: 0; flex: 1; line-height: 1.5;">
+    <span class="lang-en">This site sets no cookies and has no tracking or analytics. One local entry remembers that you dismissed this notice.</span>
+    <span class="lang-de">Diese Website setzt keine Cookies und hat kein Tracking und keine Analyse. Ein lokaler Eintrag merkt sich, dass du diesen Hinweis geschlossen hast.</span>
+    <a href="/cookies" style="color: var(--accent); text-decoration: none; margin-left: 0.35em;"><span class="lang-en">Learn more</span><span class="lang-de">Mehr erfahren</span></a>
+  </p>
+  <button id="cookie-accept" type="button" style="
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+  ">OK</button>
+</div>
+
+<script is:inline>
+  (function () {
+    var banner = document.getElementById('cookie-banner');
+    if (!banner) return;
+    var accepted = false;
+    try { accepted = !!localStorage.getItem('cookie-accepted'); } catch (_) {}
+    if (!accepted) banner.style.display = 'flex';
+    document.getElementById('cookie-accept').addEventListener('click', function () {
+      try { localStorage.setItem('cookie-accepted', '1'); } catch (_) {}
+      banner.style.display = 'none';
+    });
+  })();
+</script>
