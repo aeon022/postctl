@@ -91,16 +91,17 @@ func TestOfflineKeepsProUntilGraceEnds(t *testing.T) {
 	}
 }
 
-func TestServerErrorsAndOverridesDoNotDowngrade(t *testing.T) {
+func TestServerErrorsDoNotDowngrade(t *testing.T) {
 	_, now := setup(t, "granted", time.Now().Add(-48*time.Hour), func(w http.ResponseWriter, r *http.Request) { http.Error(w, "boom", 503) })
 	RevalidateIfDue(context.Background(), http.DefaultClient, now)
 	if !config.IsPro() {
 		t.Error("a 503 from Polar must not remove Pro")
 	}
+	// no hard-coded developer or family keys: every key, ours included, is checked against Polar
 	calls, now := setup(t, "active", time.Time{}, reply("revoked"))
 	config.ActiveConfig.LicenseKey = "postctl-pro-family"
-	if changed, _ := RevalidateIfDue(context.Background(), http.DefaultClient, now); changed || *calls != 0 || !config.IsPro() {
-		t.Error("the local developer/family override is never sent to Polar")
+	if RevalidateIfDue(context.Background(), http.DefaultClient, now); *calls == 0 || config.IsPro() {
+		t.Error("a made-up key must be validated against Polar and lose Pro when Polar says revoked")
 	}
 }
 

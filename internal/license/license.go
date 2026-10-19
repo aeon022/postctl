@@ -24,11 +24,6 @@ const (
 
 var apiBase = "https://api.polar.sh" // overridden by tests
 
-// IsLocalOverride reports keys that are developer/family overrides, never sent to Polar.
-func IsLocalOverride(key string) bool {
-	return key == "postctl-pro-dev" || key == "postctl-pro-family" || strings.HasPrefix(key, "PCTL-DEV-")
-}
-
 // postctl Pro is sold as its own subscription. These Polar license benefits unlock it: the subscription
 // benefit and the former Lifetime benefit. Keys of the missionctl Bundle also unlocked postctl Pro until the
 // subscription launched, so Bundle keys created before BundleCutoff stay valid (grandfathered); a Bundle
@@ -72,7 +67,7 @@ func RevalidateIfDue(ctx context.Context, c *http.Client, now time.Time) (change
 	cfg := &config.ActiveConfig
 	key := strings.TrimSpace(cfg.LicenseKey)
 	org := strings.TrimSpace(cfg.PolarOrgID)
-	if key == "" || org == "" || IsLocalOverride(key) {
+	if key == "" || org == "" {
 		return false, nil
 	}
 	checked, _ := time.Parse(time.RFC3339, cfg.LicenseCheckedAt)

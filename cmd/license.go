@@ -213,13 +213,6 @@ var licenseStatusCmd = &cobra.Command{
 			return
 		}
 
-		if key == "postctl-pro-dev" || key == "postctl-pro-family" || strings.HasPrefix(key, "PCTL-DEV-") {
-			fmt.Println("License Type: PRO DEVELOPMENT/FAMILY BYPASS")
-			fmt.Printf("License Key:  %s\n", maskSecret(key))
-			fmt.Println("Status:       Active (Local developer override)")
-			return
-		}
-
 		if orgID == "" {
 			fmt.Println("License Type: PRO (Local/Pending)")
 			fmt.Printf("License Key:  %s\n", maskSecret(key))
