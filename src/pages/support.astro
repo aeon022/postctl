@@ -1,0 +1,300 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FooterSignature from '../components/FooterSignature.astro';
+---
+
+<Layout title="Help & Contact — postctl" titleDe="Hilfe & Kontakt — postctl" description="How to get help with postctl: GitHub issues for bugs, email for licences and billing, response time 3 to 5 working days." descriptionDe="So bekommst du Hilfe zu postctl: GitHub-Issues für Fehler, E-Mail für Lizenzen und Abrechnung, Antwortzeit 3 bis 5 Arbeitstage.">
+  <!-- Background Glows -->
+  <div class="bg-layer" aria-hidden="true"><div class="bg-glow bg-glow-1"></div><div class="bg-glow bg-glow-2"></div></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Minimal Header -->
+  <header class="tui-page-header">
+    <a href="/" class="tui-logo">
+      <span class="logo-icon">&gt;_</span>
+      <span class="logo-text">postctl<span class="logo-blink">_</span></span>
+    </a>
+    <div class="tui-page-header-right">
+      <a href="/" class="back-link"><span class="lang-en">← Back to Home</span><span class="lang-de">← Zurück zur Startseite</span></a>
+      <a id="lang-toggle" href="__ALT_LANG_URL__" class="lang-toggle-btn" aria-label="Switch language" style="text-decoration:none;display:inline-flex;align-items:center;">
+        <span class="lang-en">DE</span>
+        <span class="lang-de">EN</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="tui-page-main">
+    <!-- Section Header -->
+    <div class="tui-page-section-header">
+      <div class="section-tag">Support</div>
+      <h1 class="section-title"><span class="lang-en">Help & Contact</span><span class="lang-de">Hilfe & Kontakt</span></h1>
+      <p class="section-subtitle">
+        <span class="lang-en">postctl is built and supported by one person. I answer within 3 to 5 working days; there is no 24/7 support.</span>
+        <span class="lang-de">postctl wird von einer Person entwickelt und betreut. Ich antworte innerhalb von 3 bis 5 Arbeitstagen; einen 24/7-Support gibt es nicht.</span>
+      </p>
+    </div>
+
+    <!-- Privacy Stack Layout -->
+    <div class="privacy-stack">
+      <div class="privacy-card">
+        <div class="card-label">// 01_BUGS</div>
+        <h2 class="card-title"><span class="lang-en">Bugs and feature requests</span><span class="lang-de">Fehler und Wünsche</span></h2>
+        <p class="card-text">
+          <span class="lang-en">Open an issue on <a href="https://github.com/aeon022/postctl/issues">GitHub</a>. Please include your version (<code>postctl --version</code>), operating system and the exact steps. Do not paste tokens, passwords or post contents you consider private.</span>
+          <span class="lang-de">Eröffne ein Issue auf <a href="https://github.com/aeon022/postctl/issues">GitHub</a>. Bitte nenne Version (<code>postctl --version</code>), Betriebssystem und die genauen Schritte. Füge keine Tokens, Passwörter oder private Beitragsinhalte ein.</span>
+        </p>
+      </div>
+
+      <div class="privacy-card">
+        <div class="card-label">// 02_LICENCE</div>
+        <h2 class="card-title"><span class="lang-en">Licences and billing</span><span class="lang-de">Lizenzen und Abrechnung</span></h2>
+        <p class="card-text">
+          <span class="lang-en">Purchases and licence keys are handled by Polar. For a lost key or a billing question, email <a href="mailto:hello@abteilung83.com">hello@abteilung83.com</a> from the address you bought with. Run <code>postctl license status</code> to see what your installation reports.</span>
+          <span class="lang-de">Käufe und Lizenzschlüssel werden über Polar abgewickelt. Bei einem verlorenen Schlüssel oder Fragen zur Abrechnung schreib an <a href="mailto:hello@abteilung83.com">hello@abteilung83.com</a>, von der Adresse, mit der du gekauft hast. <code>postctl license status</code> zeigt, was deine Installation meldet.</span>
+        </p>
+      </div>
+
+      <div class="privacy-card">
+        <div class="card-label">// 03_SECURITY</div>
+        <h2 class="card-title"><span class="lang-en">Security</span><span class="lang-de">Sicherheit</span></h2>
+        <p class="card-text">
+          <span class="lang-en">Report vulnerabilities privately to <a href="mailto:hello@abteilung83.com">hello@abteilung83.com</a>, not in a public issue. See also <code>/.well-known/security.txt</code>.</span>
+          <span class="lang-de">Melde Sicherheitslücken privat an <a href="mailto:hello@abteilung83.com">hello@abteilung83.com</a>, nicht in einem öffentlichen Issue. Siehe auch <code>/.well-known/security.txt</code>.</span>
+        </p>
+      </div>
+
+      <div class="privacy-card">
+        <div class="card-label">// 04_DOCS</div>
+        <h2 class="card-title"><span class="lang-en">Docs first</span><span class="lang-de">Erst die Doku</span></h2>
+        <p class="card-text">
+          <span class="lang-en">Setup, platforms and commands are in the <a href="/docs">documentation</a>.</span>
+          <span class="lang-de">Einrichtung, Plattformen und Befehle stehen in der <a href="/docs">Dokumentation</a>.</span>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <FooterSignature />
+</Layout>
+
+<style>
+  .privacy-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto 5rem;
+  }
+
+  .privacy-card {
+    background: #0d0e12b3;
+    border: 1px solid #ffffff14;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 12px 40px #00000080;
+    transition: all 0.25s;
+  }
+
+  .privacy-card:hover {
+    border-color: #8b7cf833;
+    box-shadow: 0 12px 40px rgba(139, 124, 248, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .card-label {
+    font-family: monospace;
+    color: #8b7cf8;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px dashed #ffffff14;
+    padding-bottom: 0.5rem;
+  }
+
+  .card-title {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .card-text {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 1rem;
+  }
+
+  .card-text:last-child {
+    margin-bottom: 0;
+  }
+
+  .accent-link {
+    color: #8b7cf8;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .accent-link:hover {
+    color: #a99ef8;
+  }
+
+  /* Core Layout Styles override/additions */
+  .bg-glow {
+    background: radial-gradient(circle, rgba(139, 124, 248, 0.08) 0%, rgba(8, 9, 11, 0) 70%);
+    z-index: -2;
+    pointer-events: none;
+    border-radius: 50%;
+    width: 600px;
+    height: 600px;
+    position: absolute;
+  }
+  .bg-glow-1 {
+    top: -150px;
+    left: calc(50% - 300px);
+  }
+  .bg-glow-2 {
+    top: 600px;
+    right: -200px;
+  }
+  .grid-overlay {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    z-index: -1;
+    pointer-events: none;
+    background-size: 80px 80px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .tui-page-header {
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+  }
+  .tui-logo {
+    font-family: monospace;
+    align-items: center;
+    gap: .5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+  }
+  .logo-icon {
+    color: #8b7cf8;
+  }
+  .logo-text {
+    letter-spacing: -.03em;
+    background: linear-gradient(135deg, #fff 40%, #8b7cf8 100%);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+  }
+  .logo-blink {
+    color: #8b7cf8;
+    animation: 1s infinite cursor-blink;
+  }
+  @keyframes cursor-blink {
+    0%, to { opacity: 0; }
+    50% { opacity: 1; }
+  }
+
+  .tui-page-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .back-link {
+    color: rgba(255, 255, 255, 0.5);
+    font-family: monospace;
+    border: 1px solid #ffffff14;
+    transition: all 0.2s;
+    border-radius: 6px;
+    padding: .4rem .8rem;
+    font-size: .85rem;
+    text-decoration: none;
+  }
+  .back-link:hover {
+    color: #8b7cf8;
+    border-color: #8b7cf8;
+    background: rgba(139, 124, 248, 0.05);
+  }
+  .lang-toggle-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lang-toggle-btn:hover {
+    background: rgba(139, 124, 248, 0.15);
+    border-color: rgba(139, 124, 248, 0.4);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(139, 124, 248, 0.2);
+  }
+
+  .tui-page-main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 4rem;
+  }
+
+  .tui-page-section-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+  }
+  .section-tag {
+    font-family: monospace;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #8b7cf8;
+    background: rgba(139, 124, 248, 0.08);
+    border: 1px solid rgba(139, 124, 248, 0.2);
+    border-radius: 100px;
+    margin-bottom: 1rem;
+    padding: .3rem .8rem;
+    font-size: .7rem;
+    display: inline-block;
+  }
+  .section-title {
+    font-family: var(--font-heading, inherit);
+    color: #ffffff;
+    letter-spacing: -.01em;
+    margin-bottom: 1rem;
+    font-size: 2.6rem;
+    font-weight: 700;
+    overflow-wrap: break-word;
+  }
+  .section-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  .lang-note {
+    color: rgba(255, 255, 255, 0.35);
+    font-family: monospace;
+    font-size: 0.78rem;
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 480px) {
+    .section-title {
+      font-size: 2rem;
+    }
+  }
+</style>
