@@ -4,6 +4,16 @@ Terminal social media and blogging manager. Write posts in Markdown, schedule th
 
 **Supported platforms:** Twitter/X · LinkedIn · Threads · Mastodon · Bluesky · Facebook · Telegram · Discord · Reddit · Dev.to · Hashnode · Medium
 
+![postctl demo](docs/demo.gif)
+
+**Install**
+
+```bash
+brew install aeon022/tap/postctl
+```
+
+Prebuilt binaries for macOS and Linux (arm64, amd64) are on the [Releases](https://github.com/aeon022/postctl/releases) page. Questions: see [SUPPORT.md](SUPPORT.md).
+
 ---
 
 ## Quick Start
