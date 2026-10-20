@@ -178,3 +178,35 @@ func TestInstagramSendsAltTextAndLocationAndFallsBack(t *testing.T) {
 		t.Errorf("expected rejected attempt, plain retry, publish; got %+v", r)
 	}
 }
+
+func TestInstagramVideoStoryAndReel(t *testing.T) {
+	srv, reqs := mastoServer(t, func(r mReq, n int, w http.ResponseWriter) {
+		if r.Method == "GET" {
+			_, _ = w.Write([]byte(`{"status_code":"FINISHED"}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{"id":"X` + string(rune('0'+n)) + `"}`))
+	})
+	p := newIG(srv.URL)
+	ctx := context.Background()
+
+	if _, err := p.Post(ctx, &models.Post{Type: "story", Images: []string{"https://x/v.mp4"}}); err != nil {
+		t.Fatal(err)
+	}
+	r := igPosts(*reqs)
+	if r[0].Form.Get("media_type") != "STORIES" || r[0].Form.Get("video_url") != "https://x/v.mp4" || r[0].Form.Get("image_url") != "" {
+		t.Errorf("video story container: %+v", r[0])
+	}
+
+	*reqs = nil
+	if _, err := p.Post(ctx, &models.Post{Body: "c", Images: []string{"https://x/v.mp4?raw=1"}}); err != nil {
+		t.Fatal(err)
+	}
+	r = igPosts(*reqs)
+	if r[0].Form.Get("media_type") != "REELS" || r[0].Form.Get("caption") != "c" || r[0].Form.Get("video_url") == "" {
+		t.Errorf("reel container: %+v", r[0])
+	}
+	if _, err := p.Post(ctx, &models.Post{Body: "c", Images: []string{"https://x/1.png", "https://x/v.mp4"}}); err == nil {
+		t.Error("a video inside a carousel must be rejected")
+	}
+}

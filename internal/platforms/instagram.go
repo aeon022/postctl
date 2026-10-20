@@ -27,7 +27,7 @@ type InstagramPlatform struct {
 }
 
 func NewInstagramPlatform(token, accountID string) *InstagramPlatform {
-	return &InstagramPlatform{token: token, accountID: accountID, client: &http.Client{Timeout: 30 * time.Second}, baseURL: "https://graph.facebook.com/v19.0", pollEvery: 2 * time.Second, pollFor: 90 * time.Second}
+	return &InstagramPlatform{token: token, accountID: accountID, client: &http.Client{Timeout: 30 * time.Second}, baseURL: "https://graph.facebook.com/v19.0", pollEvery: 2 * time.Second, pollFor: 5 * time.Minute}
 }
 
 func (i *InstagramPlatform) Name() string { return models.PlatformInstagram }
@@ -152,9 +152,15 @@ func (i *InstagramPlatform) optionalFor(post *models.Post, n int, withLocation b
 	return o
 }
 
+// isVideo reports whether a media URL points to a video (by file extension).
+func isVideo(u string) bool {
+	u = strings.ToLower(strings.SplitN(u, "?", 2)[0])
+	return strings.HasSuffix(u, ".mp4") || strings.HasSuffix(u, ".mov")
+}
+
 // Post publishes post.Images as a feed post: one image, a carousel (2-10 images),
-// or a Story when post.Type is "story" (one image, no caption). All image URLs
-// must be public https:// URLs.
+// or a Story when post.Type is "story" (one image, no caption). A single .mp4/.mov
+// URL becomes a Reel (feed post) or a video Story. All URLs must be public https://.
 func (i *InstagramPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
 	if !i.IsAuthenticated(ctx) {
 		return "", i.Auth(ctx)
@@ -175,6 +181,13 @@ func (i *InstagramPlatform) Post(ctx context.Context, post *models.Post) (string
 	if story && len(post.Images) != 1 {
 		return "", fmt.Errorf("instagram: a story takes exactly one image, got %d", len(post.Images))
 	}
+	if len(post.Images) > 1 {
+		for _, img := range post.Images {
+			if isVideo(img) {
+				return "", fmt.Errorf("instagram: videos in carousels are not supported (%q)", img)
+			}
+		}
+	}
 	if len(post.Images) > 10 {
 		return "", fmt.Errorf("instagram: a carousel holds at most 10 images, got %d", len(post.Images))
 	}
@@ -182,6 +195,10 @@ func (i *InstagramPlatform) Post(ctx context.Context, post *models.Post) (string
 	var creation string
 	var err error
 	switch {
+	case story && isVideo(post.Images[0]):
+		creation, err = i.container(ctx, url.Values{"video_url": {post.Images[0]}, "media_type": {"STORIES"}}, nil)
+	case isVideo(post.Images[0]):
+		creation, err = i.container(ctx, url.Values{"video_url": {post.Images[0]}, "media_type": {"REELS"}, "caption": {caption}}, i.optionalFor(post, -1, true))
 	case story:
 		creation, err = i.container(ctx, url.Values{"image_url": {post.Images[0]}, "media_type": {"STORIES"}}, nil)
 	case len(post.Images) == 1:
