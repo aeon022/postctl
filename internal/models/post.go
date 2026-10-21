@@ -30,6 +30,7 @@ const (
 	PlatformReddit    = "reddit"
 	PlatformHashnode  = "hashnode"
 	PlatformMedium    = "medium"
+	PlatformTikTok    = "tiktok"
 )
 
 // Post repräsentiert einen Social-Media-Post

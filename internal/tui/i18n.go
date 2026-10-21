@@ -484,6 +484,10 @@ var translationsMap = map[string]map[string]string{
 		"de": "Instagram    ",
 		"en": "Instagram    ",
 	},
+	"settings_auth_tiktok": {
+		"de": "TikTok       ",
+		"en": "TikTok       ",
+	},
 	"settings_auth_telegram": {
 		"de": "Telegram     ",
 		"en": "Telegram     ",

@@ -85,6 +85,7 @@ func (m Model) settingsOptions() []settingOption {
 		{label: Tr("settings_auth_bluesky"), value: platformStatus(models.PlatformBluesky), kind: settingPlatformAuth, platform: models.PlatformBluesky},
 		{label: Tr("settings_auth_facebook"), value: platformStatus(models.PlatformFacebook), kind: settingPlatformAuth, platform: models.PlatformFacebook},
 		{label: Tr("settings_auth_instagram"), value: platformStatus(models.PlatformInstagram), kind: settingPlatformAuth, platform: models.PlatformInstagram},
+		{label: Tr("settings_auth_tiktok"), value: platformStatus(models.PlatformTikTok), kind: settingPlatformAuth, platform: models.PlatformTikTok},
 		{label: Tr("settings_auth_telegram"), value: platformStatus(models.PlatformTelegram), kind: settingPlatformAuth, platform: models.PlatformTelegram},
 		{label: Tr("settings_auth_discord"), value: platformStatus(models.PlatformDiscord), kind: settingPlatformAuth, platform: models.PlatformDiscord},
 		{label: Tr("settings_auth_devto"), value: platformStatus(models.PlatformDevTo), kind: settingPlatformAuth, platform: models.PlatformDevTo},

@@ -48,6 +48,8 @@ func GetPlatform(name string, s *store.SQLiteStore, dryRun bool) (Platform, erro
 			ig.baseURL = "https://graph.instagram.com/v21.0"
 		}
 		return ig, nil
+	case models.PlatformTikTok:
+		return NewTikTokPlatform(s, config.ActiveConfig.TikTok.ClientKey, config.ActiveConfig.TikTok.ClientSecret), nil
 	case models.PlatformTelegram:
 		return NewTelegramPlatform(s, config.ActiveConfig.Telegram.BotToken, config.ActiveConfig.Telegram.ChatID), nil
 	case models.PlatformDiscord:

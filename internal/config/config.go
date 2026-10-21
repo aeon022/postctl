@@ -51,6 +51,10 @@ type Config struct {
 		// OAuth redirect URL is needed: Auth just verifies and stores it.
 		PageToken string `mapstructure:"page_token" yaml:"page_token"`
 	} `mapstructure:"facebook" yaml:"facebook"`
+	TikTok struct {
+		ClientKey    string `mapstructure:"client_key" yaml:"client_key"`
+		ClientSecret string `mapstructure:"client_secret" yaml:"client_secret"`
+	} `mapstructure:"tiktok" yaml:"tiktok"`
 	Telegram struct {
 		BotToken string `mapstructure:"bot_token" yaml:"bot_token"`
 		ChatID   string `mapstructure:"chat_id" yaml:"chat_id"`
@@ -375,6 +379,10 @@ facebook:
   app_id: ""
   app_secret: ""
   page_id: ""
+
+tiktok:
+  client_key: ""
+  client_secret: ""
 
 telegram:
   bot_token: ""

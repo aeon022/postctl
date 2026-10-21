@@ -326,7 +326,7 @@ func padRight(s string, w int) string {
 
 var platformNames = map[string]string{
 	models.PlatformTwitter: "Twitter/X", models.PlatformLinkedIn: "LinkedIn", models.PlatformThreads: "Threads",
-	models.PlatformMastodon: "Mastodon", models.PlatformBluesky: "Bluesky", models.PlatformFacebook: "Facebook", models.PlatformInstagram: "Instagram",
+	models.PlatformMastodon: "Mastodon", models.PlatformBluesky: "Bluesky", models.PlatformFacebook: "Facebook", models.PlatformInstagram: "Instagram", models.PlatformTikTok: "TikTok",
 }
 
 func platformName(p string) string {
@@ -344,7 +344,7 @@ func platformName(p string) string {
 var platformBrand = map[string]string{
 	models.PlatformTwitter: "#71767B", models.PlatformLinkedIn: "#0A66C2", models.PlatformThreads: "#8A8A8A",
 	models.PlatformMastodon: "#6364FF", models.PlatformBluesky: "#0085FF", models.PlatformFacebook: "#1877F2",
-	models.PlatformInstagram: "#E4405F",
+	models.PlatformInstagram: "#E4405F", models.PlatformTikTok: "#25F4EE",
 }
 
 func platformPill(p string) string {
@@ -379,7 +379,7 @@ func platformLimit(platform string) int {
 		return 300
 	case "mastodon", "threads":
 		return 500
-	case "instagram":
+	case "instagram", "tiktok":
 		return 2200
 	case "linkedin":
 		return 3000

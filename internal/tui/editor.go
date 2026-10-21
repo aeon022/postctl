@@ -22,7 +22,7 @@ import (
 
 // initEditor initialisiert die Eingabefelder des Editors mit Werten eines bestehenden Beitrags oder leer
 // editorPlatforms is the platform selector's order.
-var editorPlatforms = []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "instagram", "telegram", "discord", "devto", "reddit", "hashnode", "medium"}
+var editorPlatforms = []string{"twitter", "linkedin", "threads", "mastodon", "bluesky", "facebook", "instagram", "tiktok", "telegram", "discord", "devto", "reddit", "hashnode", "medium"}
 
 // editor focus targets, in tab order
 const (

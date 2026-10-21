@@ -372,6 +372,7 @@ func (m Model) loadDataCmd() tea.Msg {
 		models.PlatformBluesky:   false,
 		models.PlatformFacebook:  false,
 		models.PlatformInstagram: config.ActiveConfig.Instagram.AccessToken != "" && config.ActiveConfig.Instagram.AccountID != "",
+		models.PlatformTikTok:    config.ActiveConfig.TikTok.ClientKey != "" && config.ActiveConfig.TikTok.ClientSecret != "",
 		models.PlatformTelegram:  config.ActiveConfig.Telegram.BotToken != "" && config.ActiveConfig.Telegram.ChatID != "",
 		models.PlatformDiscord:   config.ActiveConfig.Discord.WebhookURL != "",
 		models.PlatformDevTo:     config.ActiveConfig.DevTo.APIToken != "",
@@ -569,6 +570,8 @@ func platformNeedsSetup(platformName string) bool {
 		return (config.ActiveConfig.Facebook.AppID == "" || config.ActiveConfig.Facebook.AppSecret == "") && config.ActiveConfig.Facebook.PageToken == ""
 	case models.PlatformInstagram:
 		return config.ActiveConfig.Instagram.AccessToken == "" || config.ActiveConfig.Instagram.AccountID == ""
+	case models.PlatformTikTok:
+		return config.ActiveConfig.TikTok.ClientKey == "" || config.ActiveConfig.TikTok.ClientSecret == ""
 	case models.PlatformTelegram:
 		return config.ActiveConfig.Telegram.BotToken == "" || config.ActiveConfig.Telegram.ChatID == ""
 	case models.PlatformDiscord:
@@ -626,6 +629,9 @@ func (m Model) clearPlatformCmd(platformName string) tea.Cmd {
 		case models.PlatformInstagram:
 			config.ActiveConfig.Instagram.AccessToken = ""
 			config.ActiveConfig.Instagram.AccountID = ""
+		case models.PlatformTikTok:
+			config.ActiveConfig.TikTok.ClientKey = ""
+			config.ActiveConfig.TikTok.ClientSecret = ""
 		case models.PlatformTelegram:
 			config.ActiveConfig.Telegram.BotToken = ""
 			config.ActiveConfig.Telegram.ChatID = ""

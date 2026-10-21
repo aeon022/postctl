@@ -179,8 +179,8 @@ func TestSettingsOptions_Shape(t *testing.T) {
 	m := NewModel(s)
 
 	opts := m.settingsOptions()
-	if len(opts) != 24 {
-		t.Fatalf("len(settingsOptions()) = %d, want 24", len(opts))
+	if len(opts) != 25 {
+		t.Fatalf("len(settingsOptions()) = %d, want 25", len(opts))
 	}
 
 	wantCyclable := []string{"settings_ai_provider", "settings_ai_model", "settings_dry_run", "settings_auto_publish", "settings_language", "settings_theme"}
@@ -196,7 +196,7 @@ func TestSettingsOptions_Shape(t *testing.T) {
 
 	wantPlatforms := []string{
 		models.PlatformTwitter, models.PlatformLinkedIn, models.PlatformThreads, models.PlatformMastodon,
-		models.PlatformBluesky, models.PlatformFacebook, models.PlatformInstagram, models.PlatformTelegram, models.PlatformDiscord,
+		models.PlatformBluesky, models.PlatformFacebook, models.PlatformInstagram, models.PlatformTikTok, models.PlatformTelegram, models.PlatformDiscord,
 		models.PlatformDevTo, models.PlatformReddit, models.PlatformHashnode, models.PlatformMedium,
 	}
 	for i, p := range wantPlatforms {
@@ -211,13 +211,13 @@ func TestSettingsOptions_Shape(t *testing.T) {
 
 	wantActions := []settingActionID{actionExport, actionImport, actionEditSlots, actionScheduler}
 	for i, a := range wantActions {
-		idx := 20 + i
+		idx := 21 + i
 		if opts[idx].kind != settingAction || opts[idx].action != a {
 			t.Errorf("opts[%d] = {kind:%v action:%v}, want {settingAction %v}", idx, opts[idx].kind, opts[idx].action, a)
 		}
 	}
-	if opts[20].separatorBefore == "" {
-		t.Error(`opts[20] (Export) missing separatorBefore ("BACKUP & SYNC")`)
+	if opts[21].separatorBefore == "" {
+		t.Error(`opts[21] (Export) missing separatorBefore ("BACKUP & SYNC")`)
 	}
 }
 

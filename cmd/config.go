@@ -135,6 +135,10 @@ func setConfigValue(key, value string) error {
 		config.ActiveConfig.Facebook.PageToken = value
 	case "facebook.page_id":
 		config.ActiveConfig.Facebook.PageID = value
+	case "tiktok.client_key":
+		config.ActiveConfig.TikTok.ClientKey = value
+	case "tiktok.client_secret":
+		config.ActiveConfig.TikTok.ClientSecret = value
 	case "telegram.bot_token":
 		config.ActiveConfig.Telegram.BotToken = value
 	case "telegram.chat_id":
@@ -218,6 +222,7 @@ func reportConfigShow(cmd *cobra.Command) {
 	masked.Bluesky.AppPassword = maskSecret(masked.Bluesky.AppPassword)
 	masked.Facebook.AppSecret = maskSecret(masked.Facebook.AppSecret)
 	masked.Facebook.PageToken = maskSecret(masked.Facebook.PageToken)
+	masked.TikTok.ClientSecret = maskSecret(masked.TikTok.ClientSecret)
 	masked.Telegram.BotToken = maskSecret(masked.Telegram.BotToken)
 	masked.Discord.WebhookURL = maskSecret(masked.Discord.WebhookURL)
 	masked.Reddit.ClientSecret = maskSecret(masked.Reddit.ClientSecret)
@@ -738,6 +743,28 @@ var configSetupCmd = &cobra.Command{
 			}
 			if igID != "" {
 				config.ActiveConfig.Instagram.AccountID = igID
+			}
+
+		case "tiktok":
+			fmt.Println("Schritt 1: Lege auf developers.tiktok.com eine App an und aktiviere Login Kit + Content Posting API (Scope video.upload).")
+			fmt.Println("Schritt 2: Trage als Redirect URI http://127.0.0.1:8753/callback ein (genau so, wenn TikTok das zulässt).")
+			fmt.Println("Schritt 3: Füge dein TikTok-Konto als Target User (Sandbox) hinzu, solange die App nicht geprüft ist.")
+			fmt.Println("Schritt 4: Trage unten Client Key und Client Secret ein. Danach: postctl auth tiktok")
+			fmt.Println()
+
+			fmt.Print("➔ Client Key: ")
+			clientKey, _ := reader.ReadString('\n')
+			clientKey = strings.TrimSpace(clientKey)
+
+			fmt.Print("➔ Client Secret: ")
+			clientSecret, _ := reader.ReadString('\n')
+			clientSecret = strings.TrimSpace(clientSecret)
+
+			if clientKey != "" {
+				config.ActiveConfig.TikTok.ClientKey = clientKey
+			}
+			if clientSecret != "" {
+				config.ActiveConfig.TikTok.ClientSecret = clientSecret
 			}
 
 		case "telegram":
