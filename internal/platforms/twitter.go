@@ -328,6 +328,9 @@ func (t *TwitterPlatform) UploadImage(ctx context.Context, path string) (string,
 }
 
 // Post veröffentlicht einen Thread oder einen einzelnen Tweet auf Twitter/X
+// cookieRetryDelay is the pause before the second GraphQL attempt in cookie mode.
+var cookieRetryDelay = 30 * time.Second
+
 func (t *TwitterPlatform) Post(ctx context.Context, post *models.Post) (string, error) {
 	if err := cookieModeGate(); err != nil {
 		return "", err
@@ -339,6 +342,18 @@ func (t *TwitterPlatform) Post(ctx context.Context, post *models.Post) (string, 
 		}
 		// ponytail: try fast direct HTTP/GraphQL approach first, fallback to headless browser if rate limited (344) or outdated queryId
 		tweetID, err := t.postCookieBased(ctx, post, authToken, csrfToken)
+		if err != nil && post.Type != "thread" {
+			// GraphQL failures were transient so far (a retry later went through), while the
+			// headless fallback timed out in the daemon every time. Threads are not retried:
+			// a partial thread would be posted twice.
+			Log("⚠️ GraphQL direct post failed: %v. Retrying in %s...", err, cookieRetryDelay)
+			select {
+			case <-ctx.Done():
+				return "", ctx.Err()
+			case <-time.After(cookieRetryDelay):
+			}
+			tweetID, err = t.postCookieBased(ctx, post, authToken, csrfToken)
+		}
 		if err != nil {
 			Log("⚠️ GraphQL direct post failed: %v. Falling back to headless browser...", err)
 			id, hErr := t.postHeadless(ctx, post, authToken, csrfToken)
@@ -831,9 +846,15 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 		}
 	})
 
+	// stage names the step that was running when Run failed (a bare "context deadline exceeded" says nothing)
+	stage := "start"
+	mark := func(s string) chromedp.Action {
+		return chromedp.ActionFunc(func(context.Context) error { stage = s; return nil })
+	}
+
 	var actions []chromedp.Action
 	actions = append(actions, network.Enable())
-	actions = append(actions, chromedp.Navigate("https://x.com"))
+	actions = append(actions, mark("load x.com"), chromedp.Navigate("https://x.com"))
 
 	// Set session cookies to log in automatically
 	actions = append(actions, chromedp.ActionFunc(func(ctx context.Context) error {
@@ -867,7 +888,7 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 		return network.SetCookie("ct0", actualCsrfToken).WithDomain(".x.com").WithPath("/").WithSecure(true).Do(ctx)
 	}))
 
-	actions = append(actions, chromedp.Navigate("https://x.com/compose/post"))
+	actions = append(actions, mark("load compose page"), chromedp.Navigate("https://x.com/compose/post"))
 	actions = append(actions, chromedp.Sleep(2*time.Second))
 
 	// Cookie-Banner akzeptieren/schließen, falls vorhanden
@@ -902,7 +923,7 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 
 	for i, tweet := range tweetsToPost {
 		textareaSelector := fmt.Sprintf(`[data-testid="tweetTextarea_%d"]`, i)
-		actions = append(actions, chromedp.WaitVisible(textareaSelector))
+		actions = append(actions, mark(fmt.Sprintf("wait for text field %d", i)), chromedp.WaitVisible(textareaSelector))
 		actions = append(actions, chromedp.Click(textareaSelector))
 		actions = append(actions, chromedp.SendKeys(textareaSelector, tweet.Content))
 
@@ -931,7 +952,7 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 	}
 
 	postButtonSelector := `[data-testid="tweetButtonConfirm"], [data-testid="tweetButton"]`
-	actions = append(actions, chromedp.WaitVisible(postButtonSelector))
+	actions = append(actions, mark("wait for post button"), chromedp.WaitVisible(postButtonSelector))
 	actions = append(actions, chromedp.ActionFunc(func(ctx context.Context) error {
 		Log("🚀 Clicking post button via JS (dispatching events)...")
 		return chromedp.Evaluate(fmt.Sprintf(`{
@@ -945,14 +966,14 @@ func (t *TwitterPlatform) postHeadless(ctx context.Context, post *models.Post, a
 	}))
 
 	// Wait briefly for GQL intercept to catch the tweet ID
-	actions = append(actions, chromedp.Sleep(5*time.Second))
+	actions = append(actions, mark("after post click"), chromedp.Sleep(5*time.Second))
 
 	// Close the browser explicitly
 	actions = append(actions, browser.Close())
 
 	err := chromedp.Run(chromeCtx, actions...)
 	if err != nil {
-		return "", fmt.Errorf("headless post failed: %w", err)
+		return "", fmt.Errorf("headless post failed (%s): %w", stage, err)
 	}
 
 	select {
