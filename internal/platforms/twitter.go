@@ -341,7 +341,12 @@ func (t *TwitterPlatform) Post(ctx context.Context, post *models.Post) (string, 
 		tweetID, err := t.postCookieBased(ctx, post, authToken, csrfToken)
 		if err != nil {
 			Log("⚠️ GraphQL direct post failed: %v. Falling back to headless browser...", err)
-			return t.postHeadless(ctx, post, authToken, csrfToken)
+			id, hErr := t.postHeadless(ctx, post, authToken, csrfToken)
+			if hErr != nil {
+				// keep the GraphQL cause: the daemon log only sees the returned error
+				return "", fmt.Errorf("%w (GraphQL attempt before: %v)", hErr, err)
+			}
+			return id, nil
 		}
 		return tweetID, nil
 	}
