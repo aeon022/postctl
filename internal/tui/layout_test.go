@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/aeon022/missionctl-core/tuitest"
 	"github.com/aeon022/postctl/internal/models"
@@ -281,5 +282,29 @@ func TestHelpIsAPanelWithCloseHint(t *testing.T) {
 	}
 	if foot := ansi.Strip(mm.(Model).footerLine()); !strings.Contains(foot, "? close") {
 		t.Errorf("footer while help is open: %q", foot)
+	}
+}
+
+func TestMouseWheelMovesTheListCursorAndScrollsTheDetail(t *testing.T) {
+	m := atTab(t, layoutModel(t, 100, 30), tabPosts)
+	m.cursor = 0
+	down, _ := m.Update(tea.MouseWheelMsg{Button: tea.MouseWheelDown})
+	if got := down.(Model).cursor; got != 1 {
+		t.Fatalf("wheel down moves the cursor to 1, got %d", got)
+	}
+	up, _ := down.(Model).Update(tea.MouseWheelMsg{Button: tea.MouseWheelUp})
+	if got := up.(Model).cursor; got != 0 {
+		t.Fatalf("wheel up moves it back, got %d", got)
+	}
+	// ignored while typing a search
+	s := m.openSearch()
+	if still, _ := s.Update(tea.MouseWheelMsg{Button: tea.MouseWheelDown}); still.(Model).cursor != s.cursor {
+		t.Error("wheel must not move the list while searching")
+	}
+	// in the post detail the wheel scrolls
+	m.selectedPost = &m.posts[0]
+	sc, _ := m.Update(tea.MouseWheelMsg{Button: tea.MouseWheelDown})
+	if sc.(Model).detailScrollOffset != 1 {
+		t.Errorf("wheel scrolls the detail, offset %d", sc.(Model).detailScrollOffset)
 	}
 }

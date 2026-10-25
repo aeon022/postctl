@@ -1334,6 +1334,18 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		}
+		// Everywhere else the wheel acts like ↑/↓ (list cursor, detail scroll), so the middle area
+		// follows the mouse while header and footer stay put. Not while typing or answering a prompt.
+		if !m.showReadme && !m.showHelp && !m.isEditing && !m.searching && !m.editingQueueSlots && !m.inPalette &&
+			m.ask == nil && !m.loading && m.err == nil {
+			code := tea.KeyUp
+			if msg.Button == tea.MouseWheelDown {
+				code = tea.KeyDown
+			} else if msg.Button != tea.MouseWheelUp {
+				return m, nil
+			}
+			return m.Update(tea.KeyPressMsg{Code: code})
+		}
 		return m, nil
 
 	case tea.KeyPressMsg:
