@@ -115,3 +115,6 @@ echo ""
 echo -e "${GREEN}${BOLD}Setup erfolgreich abgeschlossen! 🎉${NC}"
 echo -e "Tipp: Richte deine API-Schlüssel ein mit:"
 echo -e "  ${YELLOW}postctl config set <key> <value>${NC}"
+
+# man pages (best effort): man postctl
+mkdir -p "$HOME/.local/share/man/man1" && "${INSTALL_DIR:-$HOME/.local/bin}/postctl" man "$HOME/.local/share/man/man1" >/dev/null 2>&1 || true
