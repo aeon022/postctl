@@ -29,6 +29,14 @@ func isOnline() bool {
 	return err == nil
 }
 
+// requestNeverSent reports a DNS or connect failure: the request did not leave the machine, so
+// retrying later cannot double-post (unlike a timeout after sending).
+func requestNeverSent(err error) bool {
+	var dns *net.DNSError
+	var op *net.OpError
+	return errors.As(err, &dns) || (errors.As(err, &op) && op.Op == "dial")
+}
+
 // PublishPost veröffentlicht einen Post und aktualisiert den DB-Status sowie die Historie
 func PublishPost(ctx context.Context, s *store.SQLiteStore, post *models.Post, dryRun bool) (string, error) {
 	// Falls es ein Thread-Post ist, verteile die globalen Bilder auf die einzelnen Tweets
@@ -81,6 +89,13 @@ func PublishPost(ctx context.Context, s *store.SQLiteStore, post *models.Post, d
 		return plat.Post(ctx, post)
 	})
 	if err != nil {
+		// Still no network after the retries (typically right after wake-up): stay scheduled, the next tick retries.
+		if requestNeverSent(err) {
+			post.Status = models.StatusScheduled
+			_ = s.SavePost(ctx, post)
+			platforms.Log("[SAFETY] No network for %s — post %s stays scheduled: %v", post.Platform, post.ID, err)
+			return "", err
+		}
 		t := time.Now()
 		post.Status = models.StatusFailed
 		post.Error = err.Error()
