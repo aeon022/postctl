@@ -238,22 +238,28 @@ func TestThreadsInsightsAreMappedToMetrics(t *testing.T) {
 
 func TestThreadsPostCarousel(t *testing.T) {
 	srv, reqs := qServer(t, func(r qReq, n int, w http.ResponseWriter) {
-		if strings.HasSuffix(r.Path, "/threads") {
+		switch {
+		case strings.HasSuffix(r.Path, "/threads"):
 			_, _ = w.Write([]byte(fmt.Sprintf(`{"id":"c%d"}`, n)))
-			return
+		case r.Path == "/v1.0/c1" && n == 3:
+			_, _ = w.Write([]byte(`{"status":"IN_PROGRESS"}`))
+		case strings.HasPrefix(r.Path, "/v1.0/c"):
+			_, _ = w.Write([]byte(`{"status":"FINISHED"}`))
+		default:
+			_, _ = w.Write([]byte(fmt.Sprintf(`{"id":"post-of-%s"}`, r.Q.Get("creation_id"))))
 		}
-		_, _ = w.Write([]byte(fmt.Sprintf(`{"id":"post-of-%s"}`, r.Q.Get("creation_id"))))
 	})
 	p := newThreads(t, srv.URL, "77:TOK")
 	id, err := p.Post(context.Background(), &models.Post{Type: "single", Body: "week", Images: []string{"https://x/1.png", "https://x/2.png"}})
-	if err != nil || id != "post-of-c3" {
+	if err != nil || id != "post-of-c6" {
 		t.Fatalf("id=%q err=%v", id, err)
 	}
 	r := *reqs
-	// two items, the carousel container, then publish
-	if len(r) != 4 || r[0].Q.Get("is_carousel_item") != "true" || r[1].Q.Get("image_url") != "https://x/2.png" ||
-		r[2].Q.Get("media_type") != "CAROUSEL" || r[2].Q.Get("children") != "c1,c2" || r[2].Q.Get("text") != "week" ||
-		r[3].Path != "/v1.0/77/threads_publish" || r[3].Q.Get("creation_id") != "c3" {
+	// two items, wait for both (c1 is polled twice), the carousel container, then publish
+	if len(r) != 7 || r[0].Q.Get("is_carousel_item") != "true" || r[1].Q.Get("image_url") != "https://x/2.png" ||
+		r[2].Path != "/v1.0/c1" || r[3].Path != "/v1.0/c1" || r[4].Path != "/v1.0/c2" ||
+		r[5].Q.Get("media_type") != "CAROUSEL" || r[5].Q.Get("children") != "c1,c2" || r[5].Q.Get("text") != "week" ||
+		r[6].Path != "/v1.0/77/threads_publish" || r[6].Q.Get("creation_id") != "c6" {
 		t.Errorf("unexpected requests: %+v", r)
 	}
 }

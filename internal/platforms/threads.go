@@ -495,11 +495,52 @@ func (t *ThreadsPlatform) postCarousel(ctx context.Context, userID, token, text 
 		}
 		kids = append(kids, id)
 	}
+	// Threads rejects the carousel ("Ungültige untergeordnete Carousel-Elemente", 4279004,
+	// 2026-10-26) while the item containers are still processing.
+	for _, id := range kids {
+		if err := t.waitReady(ctx, token, id); err != nil {
+			return "", err
+		}
+	}
 	parent, err := create(url.Values{"media_type": {"CAROUSEL"}, "children": {strings.Join(kids, ",")}, "text": {text}})
 	if err != nil {
 		return "", err
 	}
 	return t.publishContainer(ctx, userID, token, parent)
+}
+
+// waitReady polls a container until Threads has finished processing it (max ~60 s).
+func (t *ThreadsPlatform) waitReady(ctx context.Context, token, id string) error {
+	for i := 0; i < 30; i++ {
+		req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf(t.baseURL+"/v1.0/%s?fields=status,error_message&access_token=%s", url.PathEscape(id), url.QueryEscape(token)), nil)
+		if err != nil {
+			return err
+		}
+		resp, err := t.client.Do(req)
+		if err != nil {
+			return err
+		}
+		b, _ := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		var st struct {
+			Status string `json:"status"`
+			Err    string `json:"error_message"`
+		}
+		_ = json.Unmarshal(b, &st)
+		switch st.Status {
+		case "ERROR", "EXPIRED":
+			return fmt.Errorf("threads container %s failed processing (%s): %s", id, st.Status, st.Err)
+		case "IN_PROGRESS":
+		default: // FINISHED (or no status reported)
+			return nil
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(2 * time.Second):
+		}
+	}
+	return fmt.Errorf("threads container %s still IN_PROGRESS after 60s", id)
 }
 
 // Post veröffentlicht einen einzelnen Beitrag oder einen Thread auf Threads
