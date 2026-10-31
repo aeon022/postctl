@@ -19,3 +19,17 @@ func TestCreateProfile(t *testing.T) {
 		t.Errorf("ListProfiles = %v", names)
 	}
 }
+
+// 2026-10-29: "--profile default" created a third, empty profile next to the real default.
+func TestProfileDefaultIsTheUnprofiledDefault(t *testing.T) {
+	t.Setenv("HOME", t.TempDir())
+	if err := LoadConfigProfile("default"); err != nil {
+		t.Fatal(err)
+	}
+	if ActiveProfile != "" {
+		t.Errorf("ActiveProfile = %q, want the unprofiled default", ActiveProfile)
+	}
+	if names, _ := ListProfiles(); len(names) != 0 {
+		t.Errorf("ListProfiles = %v", names)
+	}
+}

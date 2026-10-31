@@ -205,7 +205,8 @@ func ListProfiles() ([]string, error) {
 	}
 	var names []string
 	for _, e := range entries {
-		if e.IsDir() {
+		if e.IsDir() && e.Name() != "default" { // stray dir from an old "--profile default"
+
 			names = append(names, e.Name())
 		}
 	}
@@ -241,7 +242,11 @@ func LoadConfig() error {
 // original default). Called once at startup from the --profile flag /
 // POSTCTL_PROFILE env var.
 func LoadConfigProfile(profile string) error {
-	return loadConfig(strings.TrimSpace(profile))
+	profile = strings.TrimSpace(profile)
+	if profile == "default" { // the unprofiled default, not a new profile named "default"
+		profile = ""
+	}
+	return loadConfig(profile)
 }
 
 func loadConfig(profile string) error {
