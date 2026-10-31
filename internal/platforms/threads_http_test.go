@@ -2,6 +2,7 @@ package platforms
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -37,7 +38,9 @@ func qServer(t *testing.T, h func(r qReq, n int, w http.ResponseWriter)) (*httpt
 func newThreads(t *testing.T, srvURL string, token string) *ThreadsPlatform {
 	t.Helper()
 	threadsRetryDelay, threadsPostGap = 0, 0
-	t.Cleanup(func() { threadsRetryDelay, threadsPostGap = 3*time.Second, time.Second })
+	item := threadsItemRetry
+	threadsItemRetry.BaseDelay = 0
+	t.Cleanup(func() { threadsRetryDelay, threadsPostGap, threadsItemRetry = 3*time.Second, time.Second, item })
 	p := NewThreadsPlatform(newTestStore(t), "app", "secret")
 	p.baseURL = srvURL
 	if token != "" {
@@ -293,5 +296,43 @@ func TestThreadsSendsAltTextAndFallsBack(t *testing.T) {
 	}
 	if (*reqs)[1].Q.Has("alt_text") || (*reqs)[1].Q.Get("image_url") == "" {
 		t.Errorf("retry must drop alt_text and keep the image: %v", (*reqs)[1].Q)
+	}
+}
+
+// 2026-10-31: Meta reset the connection while creating carousel item 4 of 5 and the post failed.
+func TestThreadsCarouselSurvivesConnectionReset(t *testing.T) {
+	resets := 0
+	srv, _ := qServer(t, func(r qReq, n int, w http.ResponseWriter) {
+		switch {
+		case strings.HasSuffix(r.Path, "/threads") && r.Q.Get("image_url") == "https://x/2.png" && resets < 2:
+			resets++
+			conn, _, _ := w.(http.Hijacker).Hijack()
+			_ = conn.Close()
+		case strings.HasSuffix(r.Path, "/threads"):
+			_, _ = w.Write([]byte(fmt.Sprintf(`{"id":"c%d"}`, n)))
+		case strings.HasPrefix(r.Path, "/v1.0/c"):
+			_, _ = w.Write([]byte(`{"status":"FINISHED"}`))
+		default:
+			_, _ = w.Write([]byte(`{"id":"live"}`))
+		}
+	})
+	p := newThreads(t, srv.URL, "77:TOK")
+	id, err := p.Post(context.Background(), &models.Post{Type: "single", Body: "m", Images: []string{"https://x/1.png", "https://x/2.png"}})
+	if err != nil || id != "live" || resets != 2 {
+		t.Fatalf("id=%q err=%v resets=%d", id, err, resets)
+	}
+}
+
+// A carousel that keeps failing before publish is reported as transient and not published,
+// so the scheduler keeps it scheduled instead of marking it failed.
+func TestThreadsCarouselOutageIsNotPublishedAndTransient(t *testing.T) {
+	srv, _ := qServer(t, func(r qReq, n int, w http.ResponseWriter) {
+		w.WriteHeader(503)
+		_, _ = w.Write([]byte(`{}`))
+	})
+	p := newThreads(t, srv.URL, "77:TOK")
+	_, err := p.Post(context.Background(), &models.Post{Type: "single", Body: "m", Images: []string{"https://x/1.png", "https://x/2.png"}})
+	if !errors.Is(err, ErrNotPublished) || !IsTransient(err) {
+		t.Fatalf("err=%v", err)
 	}
 }

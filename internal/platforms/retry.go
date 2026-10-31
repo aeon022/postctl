@@ -79,6 +79,12 @@ func backoffDelay(cfg RetryConfig, attempt int) time.Duration {
 	return d + jitter
 }
 
+// ErrNotPublished marks a failure that happened before anything went live, so retrying it later cannot double-post.
+var ErrNotPublished = errors.New("nothing published yet")
+
+// IsTransient reports whether err is a network, 429 or 5xx failure.
+func IsTransient(err error) bool { return isRetryable(err) }
+
 // isRetryable decides whether an error from a platform call is worth retrying.
 // Network-level failures (timeouts, connection resets, DNS lookup errors) and
 // HTTP 429/5xx responses are treated as transient; everything else — 4xx auth or

@@ -31,6 +31,9 @@ func isOnline() bool {
 
 // requestNeverSent reports a DNS or connect failure: the request did not leave the machine, so
 // retrying later cannot double-post (unlike a timeout after sending).
+// notPublishedRetryWindow bounds how long a post that failed before going live keeps being retried.
+const notPublishedRetryWindow = 2 * time.Hour
+
 func requestNeverSent(err error) bool {
 	var dns *net.DNSError
 	var op *net.OpError
@@ -94,6 +97,14 @@ func PublishPost(ctx context.Context, s *store.SQLiteStore, post *models.Post, d
 			post.Status = models.StatusScheduled
 			_ = s.SavePost(ctx, post)
 			platforms.Log("[SAFETY] No network for %s — post %s stays scheduled: %v", post.Platform, post.ID, err)
+			return "", err
+		}
+		// Transient failure before anything went live (e.g. a Threads carousel item): retry on later ticks for a while.
+		if errors.Is(err, platforms.ErrNotPublished) && platforms.IsTransient(err) && post.ScheduledAt != nil && time.Since(*post.ScheduledAt) < notPublishedRetryWindow {
+			post.Status = models.StatusScheduled
+			post.Error = err.Error()
+			_ = s.SavePost(ctx, post)
+			platforms.Log("[SAFETY] %s: nothing published yet — post %s stays scheduled and is retried: %v", post.Platform, post.ID, err)
 			return "", err
 		}
 		t := time.Now()

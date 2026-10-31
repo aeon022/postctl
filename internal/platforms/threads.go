@@ -30,7 +30,9 @@ type ThreadsPlatform struct {
 // Pauses between Threads API calls (publish retry, thread items); tests zero them.
 var (
 	threadsRetryDelay = 3 * time.Second
-	threadsPostGap    = 1 * time.Second
+	// Carousel item containers: Meta resets single connections now and then (2026-10-31, item 4 of 5).
+	threadsItemRetry = RetryConfig{MaxAttempts: 5, BaseDelay: 2 * time.Second, MaxDelay: 20 * time.Second}
+	threadsPostGap   = 1 * time.Second
 )
 
 func NewThreadsPlatform(s *store.SQLiteStore, appID, appSecret string) *ThreadsPlatform {
@@ -475,23 +477,28 @@ func (t *ThreadsPlatform) postCarousel(ctx context.Context, userID, token, text 
 		return r.ID, nil
 	}
 
+	retried := func(params url.Values) (string, error) {
+		return WithRetry(ctx, threadsItemRetry, "threads", func() (string, error) { return create(params) })
+	}
+	notYet := func(err error) error { return fmt.Errorf("%w: %w", ErrNotPublished, err) }
+
 	var kids []string
 	for n, img := range images {
 		u, err := t.UploadImage(ctx, img)
 		if err != nil {
-			return "", err
+			return "", notYet(err)
 		}
 		form := url.Values{"media_type": {"IMAGE"}, "image_url": {u}, "is_carousel_item": {"true"}}
 		if n < len(alts) && alts[n] != "" {
 			form.Set("alt_text", alts[n])
 		}
-		id, err := create(form)
-		if err != nil && form.Has("alt_text") {
+		id, err := retried(form)
+		if err != nil && form.Has("alt_text") && !IsTransient(err) {
 			form.Del("alt_text")
-			id, err = create(form)
+			id, err = retried(form)
 		}
 		if err != nil {
-			return "", err
+			return "", notYet(err)
 		}
 		kids = append(kids, id)
 	}
@@ -499,12 +506,12 @@ func (t *ThreadsPlatform) postCarousel(ctx context.Context, userID, token, text 
 	// 2026-10-26) while the item containers are still processing.
 	for _, id := range kids {
 		if err := t.waitReady(ctx, token, id); err != nil {
-			return "", err
+			return "", notYet(err)
 		}
 	}
-	parent, err := create(url.Values{"media_type": {"CAROUSEL"}, "children": {strings.Join(kids, ",")}, "text": {text}})
+	parent, err := retried(url.Values{"media_type": {"CAROUSEL"}, "children": {strings.Join(kids, ",")}, "text": {text}})
 	if err != nil {
-		return "", err
+		return "", notYet(err)
 	}
 	return t.publishContainer(ctx, userID, token, parent)
 }
