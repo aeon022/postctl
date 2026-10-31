@@ -222,9 +222,20 @@ func TestLinkedInCompanyPagePostsViaPostsAPI(t *testing.T) {
 		t.Errorf("media = %v", media)
 	}
 
-	// several images are rejected, not silently dropped
-	if _, err := l.Post(ctx, &models.Post{Body: "x", Images: []string{"a.png", "b.png"}}); err == nil {
-		t.Error("multiple images must be rejected")
+	// several images: one upload each, then content.multiImage (2026-10-31: monthly carousel failed)
+	*reqs = nil
+	if _, err := l.Post(ctx, &models.Post{Body: "x", Images: []string{img, img}, Alts: []string{"S1", "S2"}}); err != nil {
+		t.Fatal(err)
+	}
+	got = *reqs
+	if len(got) != 5 {
+		t.Fatalf("expected 2x(init, PUT) + post; got %+v", got)
+	}
+	sent = nil
+	_ = json.Unmarshal(got[4].Raw, &sent)
+	imgs := sent["content"].(map[string]any)["multiImage"].(map[string]any)["images"].([]any)
+	if len(imgs) != 2 || imgs[1].(map[string]any)["altText"] != "S2" || imgs[0].(map[string]any)["id"] != "urn:li:image:IMG1" {
+		t.Errorf("multiImage = %v", imgs)
 	}
 
 	// delete goes through /rest/posts

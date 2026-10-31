@@ -110,11 +110,11 @@ func (l *LinkedInPlatform) uploadImageREST(ctx context.Context, token, owner, sr
 }
 
 // postOrg publishes as the company page via the Posts API (POST /rest/posts).
-// Text or a single image; the post id comes back in the x-restli-id header.
+// Text, one image or 2-20 images (multiImage); the post id comes back in the x-restli-id header.
 func (l *LinkedInPlatform) postOrg(ctx context.Context, token string, post *models.Post) (string, error) {
 	author := "urn:li:organization:" + config.ActiveConfig.LinkedIn.OrganizationID
-	if len(post.Images) > 1 {
-		return "", fmt.Errorf("linkedin: company-page posts with several images are not supported yet (got %d)", len(post.Images))
+	if len(post.Images) > 20 {
+		return "", fmt.Errorf("linkedin: a company-page post holds at most 20 images, got %d", len(post.Images))
 	}
 	body := map[string]any{
 		"author":                    author,
@@ -124,18 +124,26 @@ func (l *LinkedInPlatform) postOrg(ctx context.Context, token string, post *mode
 		"lifecycleState":            "PUBLISHED",
 		"isReshareDisabledByAuthor": false,
 	}
-	if len(post.Images) == 1 {
-		img, err := l.uploadImageREST(ctx, token, author, post.Images[0])
+	var media []map[string]string
+	for i, src := range post.Images {
+		img, err := l.uploadImageREST(ctx, token, author, src)
 		if err != nil {
 			return "", err
 		}
-		media := map[string]string{"id": img}
-		if a := post.AltAt(0); a != "" {
-			media["altText"] = a
+		m := map[string]string{"id": img}
+		if a := post.AltAt(i); a != "" {
+			m["altText"] = a
 		} else if post.Title != "" {
-			media["altText"] = post.Title
+			m["altText"] = post.Title
 		}
-		body["content"] = map[string]any{"media": media}
+		media = append(media, m)
+	}
+	switch len(media) {
+	case 0:
+	case 1:
+		body["content"] = map[string]any{"media": media[0]}
+	default:
+		body["content"] = map[string]any{"multiImage": map[string]any{"images": media}}
 	}
 	b, err := json.Marshal(body)
 	if err != nil {
