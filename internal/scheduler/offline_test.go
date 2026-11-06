@@ -13,4 +13,8 @@ func TestRequestNeverSent(t *testing.T) {
 	if !requestNeverSent(dns) || requestNeverSent(timeout) || requestNeverSent(errors.New("status 400")) {
 		t.Fatal("only dial/DNS failures may be retried without risking a double post")
 	}
+	chrome := errors.New("headless post failed (load x.com): page load error net::ERR_INTERNET_DISCONNECTED (GraphQL attempt before: lookup x.com: no such host)")
+	if !requestNeverSent(chrome) {
+		t.Fatal("headless Chrome offline error must be retried")
+	}
 }

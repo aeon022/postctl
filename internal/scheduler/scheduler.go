@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/aeon022/postctl/internal/config"
@@ -37,7 +38,17 @@ const notPublishedRetryWindow = 2 * time.Hour
 func requestNeverSent(err error) bool {
 	var dns *net.DNSError
 	var op *net.OpError
-	return errors.As(err, &dns) || (errors.As(err, &op) && op.Op == "dial")
+	if errors.As(err, &dns) || (errors.As(err, &op) && op.Op == "dial") {
+		return true
+	}
+	// Headless Chrome reports its network errors as plain text (no net.Error to unwrap).
+	msg := err.Error()
+	for _, m := range []string{"net::ERR_INTERNET_DISCONNECTED", "net::ERR_NAME_NOT_RESOLVED", "net::ERR_NETWORK_CHANGED", "no such host"} {
+		if strings.Contains(msg, m) {
+			return true
+		}
+	}
+	return false
 }
 
 // PublishPost veröffentlicht einen Post und aktualisiert den DB-Status sowie die Historie
