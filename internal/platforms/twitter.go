@@ -10,7 +10,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -278,7 +277,7 @@ func (t *TwitterPlatform) UploadImage(ctx context.Context, path string) (string,
 		return "", err
 	}
 
-	file, err := os.Open(path)
+	file, name, err := openImage(ctx, path)
 	if err != nil {
 		return "", fmt.Errorf("open image file: %w", err)
 	}
@@ -288,7 +287,7 @@ func (t *TwitterPlatform) UploadImage(ctx context.Context, path string) (string,
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("media", filepath.Base(path))
+	part, err := writer.CreateFormFile("media", name)
 	if err != nil {
 		return "", err
 	}
@@ -494,7 +493,7 @@ func (t *TwitterPlatform) FetchAnalytics(ctx context.Context, platformID string)
 }
 
 func (t *TwitterPlatform) uploadImageCookieBased(ctx context.Context, path string, authToken, csrfToken string) (string, error) {
-	file, err := os.Open(path)
+	file, name, err := openImage(ctx, path)
 	if err != nil {
 		return "", fmt.Errorf("open image file: %w", err)
 	}
@@ -504,7 +503,7 @@ func (t *TwitterPlatform) uploadImageCookieBased(ctx context.Context, path strin
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("media", filepath.Base(path))
+	part, err := writer.CreateFormFile("media", name)
 	if err != nil {
 		return "", err
 	}

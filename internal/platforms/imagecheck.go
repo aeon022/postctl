@@ -1,10 +1,14 @@
 package platforms
 
 import (
+	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/aeon022/postctl/internal/models"
@@ -58,4 +62,42 @@ func CheckPostImages(p *models.Post) error {
 		}
 	}
 	return nil
+}
+
+// openImage opens a local image, or downloads an http(s) image (platforms like X need the bytes,
+// not a URL). Returns the content and a filename for the multipart upload.
+func openImage(ctx context.Context, path string) (io.ReadCloser, string, error) {
+	if !strings.HasPrefix(path, "http://") && !strings.HasPrefix(path, "https://") {
+		f, err := os.Open(path)
+		return f, filepath.Base(path), err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, "", err
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, "", fmt.Errorf("download image %s: %w", path, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, "", fmt.Errorf("download image %s: status %d", path, resp.StatusCode)
+	}
+	data, err := io.ReadAll(io.LimitReader(resp.Body, maxImageBytes+1))
+	if err != nil {
+		return nil, "", fmt.Errorf("download image %s: %w", path, err)
+	}
+	if len(data) > maxImageBytes {
+		return nil, "", fmt.Errorf("image %s is larger than %d MB", path, maxImageBytes>>20)
+	}
+	switch http.DetectContentType(data) {
+	case "image/png", "image/jpeg", "image/gif", "image/webp":
+	default:
+		return nil, "", fmt.Errorf("%s is not a PNG/JPEG/GIF/WebP image", path)
+	}
+	name := "image"
+	if u, err := url.Parse(path); err == nil {
+		name = filepath.Base(u.Path)
+	}
+	return io.NopCloser(bytes.NewReader(data)), name, nil
 }

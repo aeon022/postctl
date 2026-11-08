@@ -1,6 +1,10 @@
 package platforms
 
 import (
+	"context"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
@@ -27,5 +31,37 @@ func TestCheckLocalImage(t *testing.T) {
 		if err := CheckLocalImage(bad); err == nil {
 			t.Errorf("%s must be refused", bad)
 		}
+	}
+}
+
+func TestOpenImageURL(t *testing.T) {
+	png := "\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/feed/a.png" {
+			_, _ = w.Write([]byte(png))
+			return
+		}
+		if r.URL.Path == "/key.png" {
+			_, _ = w.Write([]byte("-----BEGIN OPENSSH PRIVATE KEY-----"))
+			return
+		}
+		http.NotFound(w, r)
+	}))
+	defer srv.Close()
+	ctx := context.Background()
+
+	rc, name, err := openImage(ctx, srv.URL+"/feed/a.png?v=c697e69")
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, _ := io.ReadAll(rc)
+	if name != "a.png" || string(b) != png {
+		t.Errorf("got name %q, %d bytes", name, len(b))
+	}
+	if _, _, err := openImage(ctx, srv.URL+"/missing.png"); err == nil {
+		t.Error("404 must fail")
+	}
+	if _, _, err := openImage(ctx, srv.URL+"/key.png"); err == nil {
+		t.Error("non-image must be refused")
 	}
 }
